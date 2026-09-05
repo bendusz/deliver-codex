@@ -1,0 +1,15 @@
+Spec: Deliver project
+Purpose:
+  Coordinate a project-manager workflow whose changes stay inside explicit specifications.
+Platform: Node.js 22 or newer
+Structure:
+  /plugins: Deliver plugin code and assets.
+  /tests: Tests for Deliver support code.
+Owns:
+  The project-level workflow contract and its boundaries.
+Must:
+  Read the relevant spec chain before changing implementation files.
+  Keep implementation writes inside the editable scope declared by the relevant specs.
+Must not:
+  Treat prose or unprefixed names in Owns as filesystem paths.
+  Widen an authorization snapshot by editing a .sdd file during inspection.

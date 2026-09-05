@@ -1,0 +1,9 @@
+{
+  "criteria": [
+    {
+      "id": "AC-1",
+      "status": "PASS",
+      "evidence": "node --test tests/greet.test.mjs passed; the greeting test asserts greet('Ada') === 'Hello, Ada!'"
+    }
+  ]
+}

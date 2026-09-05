@@ -1,0 +1,17 @@
+{
+  "name": "deliver-codex",
+  "version": "0.1.0",
+  "description": "Codex-first software delivery with durable checkpoints and optional Claude review",
+  "type": "module",
+  "license": "GPL-3.0-or-later",
+  "repository": { "type": "git", "url": "https://github.com/bendusz/deliver-codex.git" },
+  "homepage": "https://github.com/bendusz/deliver-codex#readme",
+  "bugs": { "url": "https://github.com/bendusz/deliver-codex/issues" },
+  "engines": { "node": ">=22" },
+  "bin": { "deliver": "bin/deliver.mjs" },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "validate": "node scripts/validate.mjs"
+  },
+  "files": ["bin", "scripts/validate.mjs", "plugins/deliver", "docs/evaluation.md", "README.md", "LICENSE", "NOTICE.md"]
+}
