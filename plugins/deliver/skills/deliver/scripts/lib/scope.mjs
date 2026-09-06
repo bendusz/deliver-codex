@@ -3,6 +3,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { sha256, canonical, DeliverError } from './state.mjs';
 import { changedContracts } from './contracts.mjs';
+import { assertPmBinding } from './pm.mjs';
 
 const toPosix = (value) => value.split(path.sep).join('/');
 const hasControl = (value) => /[\x00-\x1f\x7f]/.test(value);
@@ -248,6 +249,7 @@ export function compareSnapshots(root, baseline, current, touches, dirtyAtStart 
 }
 
 export function inspectScope(state) {
+  assertPmBinding(state);
   if (!state.baseline || !state.task) throw new DeliverError('task has no baseline; run start first', 66);
   validateTaskPaths(state.project_root, state.task.packet);
   const current = snapshot(state.project_root, [...state.task.packet.touches, ...state.task.packet.read_paths, ...state.task.packet.specs]);

@@ -26,6 +26,11 @@ Not completed in this build: live paid Claude review, a full model-to-model comp
 cross-machine state relocation, distributed claims, automatic legacy migration and live Windows
 CLI integration. These are explicit limitations, not simulated successes.
 
+The shared-PM bridge adds deterministic original -> Codex -> original round-trip tests using
+unchanged Deliver 0.22.0 templates and its actor/session readers. Tests run real Git integration
+and Node gates with explicitly synthetic review fixtures. They prove state interoperability at
+completed story boundaries, not live Claude agent behavior or mid-story takeover.
+
 ## Documentation checked
 
 - [Codex native agents](https://learn.chatgpt.com/docs/agent-configuration/subagents)

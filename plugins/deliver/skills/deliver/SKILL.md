@@ -15,6 +15,9 @@ Do not silently substitute models or require Claude.
 
 ## Working contract
 
+- Project progress lives in the original `pm/pm-state.json`, actor files and log. Read
+  `references/compatibility.md` before starting or resuming a project. `.deliver/` holds
+  Codex execution evidence, not a second project backlog. Switch hosts at completed story boundaries.
 - Quick may implement directly. Managed and Governed delegate bounded implementation to
   `deliver-builder`. Never edit a scope while another worker owns it.
 - Use native subagents when delegating. Start with a fresh, minimal task packet when the host
@@ -43,7 +46,7 @@ Do not silently substitute models or require Claude.
 | Parallel story implementation | `references/parallel.md` |
 | Independent Claude review explicitly requested/enabled | `references/claude-review.md` |
 | Analyze artifacts or govern a high-assurance delivery | `references/governance.md` |
-| Old `pm/` project or Claude/ChatGPT host | `references/compatibility.md` |
+| Shared project state, host switching or an existing `pm/` project | `references/compatibility.md` |
 
 Resolve resource paths relative to this skill directory, never a cache path remembered from
 another session. Invoke `node <skill-directory>/scripts/deliver.mjs help` for the runtime's

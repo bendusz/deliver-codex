@@ -102,6 +102,18 @@ function validateState(state) {
     const expectedHash = sha256(canonical({ entries: state.baseline.snapshot.entries, git_meta: state.baseline.snapshot.git_meta }));
     if (state.baseline.snapshot.hash !== expectedHash) fail('baseline snapshot hash does not match its content');
   }
+  if (state.pm_binding !== undefined && state.pm_binding !== null) {
+    const binding = state.pm_binding;
+    if (!isObject(binding) || !['actor', 'story', 'story_path', 'story_hash', 'integration_branch', 'actor_path'].every((key) => typeof binding[key] === 'string')) fail('bad PM binding');
+    if (!/^[a-z0-9-]+-[a-f0-9]{12}$/.test(binding.actor) || binding.actor_path !== `pm/actors/${binding.actor}.json`
+      || !binding.story_path.startsWith('docs/stories/') || binding.story_path.split(/[\\/]/).includes('..')) fail('unsafe PM binding');
+  }
+  if (state.completion_snapshot !== undefined) {
+    const snap = state.completion_snapshot;
+    if (!isObject(snap) || !isObject(snap.entries) || typeof snap.git_meta !== 'string'
+      || snap.hash !== sha256(canonical({ entries: snap.entries, git_meta: snap.git_meta }))
+      || state.phase !== 'finished' || snap.hash !== state.review?.snapshot_hash || snap.hash !== state.verification?.snapshot_hash) fail('bad completion snapshot');
+  }
   for (const gate of state.gates) {
     if (!isObject(gate) || gate.provenance !== 'deliver-runtime-executed-v1' || typeof gate.name !== 'string'
       || typeof gate.command !== 'string' || !['PASS', 'FAIL'].includes(gate.status)

@@ -76,8 +76,9 @@ See [the runtime command guide](plugins/deliver/skills/deliver/references/runtim
 Do not copy example PASS receipts into real work. The coordinator must obtain actual review
 and evidence. Reviewer identities are attestations, not authentication.
 
-State lives under `.deliver/runs/`; local gate logs live under `.deliver/logs/`. Keep durable
-checkpoints with work under your repository's policy. Review logs for sensitive output before
+Shared project progress lives in the original `pm/pm-state.json`, `pm/actors/` and `pm/log.md`.
+Codex execution receipts live under `.deliver/runs/`; local gate logs live under `.deliver/logs/`.
+Keep durable checkpoints with work under your repository's policy. Review logs for sensitive output before
 sharing. State currently binds to its checkout's absolute path. Moving or cloning a checkout
 requires deliberate adoption/reconciliation; it is not automatic cross-machine resume.
 
@@ -103,9 +104,12 @@ bounded pointers to existing run IDs when installed as a plugin and trusted by C
 enforces approval or restarts work. Project skill setup does not install that optional hook.
 No marketplace or global plugin configuration is modified by this build.
 
-The procedural core is host-neutral. The original Claude-hosted Deliver remains unchanged.
-Legacy `pm/` artifacts can inform an explicitly reviewed adoption; no automatic migration or
-full replacement Claude plugin is supplied. ChatGPT can use the planning/artifact instructions,
+The original Claude-hosted Deliver remains unchanged. The shared-state adapter supports its
+0.22.0 project/actor formats and completed-story handoffs in both directions. It preserves IDs,
+unknown fields, acceptance text and ownership; runtime finish alone never claims a merge.
+Use [the shared-state command guide](plugins/deliver/skills/deliver/references/compatibility.md).
+Mid-story takeover, older-schema migration and simultaneous PM writers across hosts are not supported.
+ChatGPT can use the planning/artifact instructions,
 but local execution requires repository tools and does not work merely by attaching this README.
 
 Scope checks are post-run audits, not an OS sandbox. Gate commands run under the host's current
@@ -129,7 +133,8 @@ npm run validate
 Run these development commands from a source checkout. Tests use temporary repositories,
 real Git/Node checks, and fake model executables. They cover
 setup and launcher behavior, resume, stale evidence, governance, failure rounds, contract scope,
-symlinks, optional hooks and external-review failure handling. They do not establish model
+symlinks, shared PM round trips against unchanged original readers, optional hooks and external-review
+failure handling. They do not establish model
 quality or token savings. See [the evaluation plan](docs/evaluation.md) before changing routing defaults.
 
 Licensed GPL-3.0-or-later. See [NOTICE.md](NOTICE.md) for provenance.
