@@ -10,10 +10,18 @@ try {
   const root = execFileSync('git', ['-C', input.cwd, 'rev-parse', '--show-toplevel'], {
     encoding: 'utf8', timeout: 2000, stdio: ['ignore', 'pipe', 'ignore']
   }).trimEnd();
+  const hints = [];
+  try {
+    if (fs.lstatSync(path.join(root, 'pm')).isDirectory()
+      && fs.lstatSync(path.join(root, 'pm/pm-state.json')).isFile()) {
+      hints.push('Shared Deliver project state is in pm/pm-state.json and pm/actors/. Read the Deliver compatibility reference and shared state before selecting or resuming a story.');
+    }
+  } catch {}
   const store = path.join(root, '.deliver');
   const runs = path.join(store, 'runs');
-  if (fs.lstatSync(store).isSymbolicLink() || fs.lstatSync(runs).isSymbolicLink()) process.exit(0);
-  const states = fs.readdirSync(runs).filter((name) => /^[0-9a-f-]{36}\.json$/.test(name)).slice(-20).flatMap((name) => {
+  const states = (() => { try {
+    if (fs.lstatSync(store).isSymbolicLink() || fs.lstatSync(runs).isSymbolicLink()) return [];
+    return fs.readdirSync(runs).filter((name) => /^[0-9a-f-]{36}\.json$/.test(name)).slice(-20).flatMap((name) => {
     try {
       const file = path.join(runs, name);
       const stat = fs.lstatSync(file);
@@ -22,9 +30,11 @@ try {
       if (!['initialized', 'starting', 'active'].includes(state.phase) || !Number.isSafeInteger(state.revision)) return [];
       return [`${name.slice(0, -5)}: ${state.phase}, revision ${state.revision}`];
     } catch { return []; }
-  }).slice(0, 3);
-  if (states.length) process.stdout.write(JSON.stringify({ hookSpecificOutput: {
+    }).slice(0, 3);
+  } catch { return []; } })();
+  if (states.length) hints.push(`Deliver execution receipts are available under .deliver/runs/: ${states.join('; ')}. Inspect the actual worktree before writing. Multiple runs require explicit selection.`);
+  if (hints.length) process.stdout.write(JSON.stringify({ hookSpecificOutput: {
     hookEventName: 'SessionStart',
-    additionalContext: `Deliver runs are available under .deliver/runs/: ${states.join('; ')}. If continuing Deliver, inspect status and the actual worktree before writing. Multiple runs require explicit selection.`
+    additionalContext: hints.join(' ')
   } }));
 } catch { /* Optional pointer hook is inert without readable valid state. */ }

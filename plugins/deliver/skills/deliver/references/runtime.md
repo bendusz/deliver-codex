@@ -19,6 +19,10 @@ Managed/Governed must use an actual approval received from the user, never an in
 Use `assets/task.example.json` for the task schema. Acceptance is an array of `{id,text}`;
 commands maps gate names to exact command strings. An empty commands object explicitly records
 that no automated gates are available, not that acceptance is waived.
+For a project with `pm/pm-state.json`, first follow `compatibility.md` and claim its story.
+Add `--story docs/stories/<story>.md` to `start`; the packet must retain that story's identity,
+acceptance text and scope. `finish` retains the exact verified file snapshot for the separate
+post-integration `pm.mjs complete` command. Shared project progress remains in `pm/`.
 
 Write packets, receipts and notes under `.deliver/` before recording them. Keep substantive
 plans/contracts in their normal project locations. The runtime excludes its own `.deliver/`

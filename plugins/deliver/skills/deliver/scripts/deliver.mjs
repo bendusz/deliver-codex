@@ -16,6 +16,7 @@ import {
 import { baselineDirtyPaths, gitRoot, inspectScope, snapshot, validateTaskPaths } from './lib/scope.mjs';
 import { executeGate, gateIsCurrent, parseEnvironment } from './lib/gates.mjs';
 import { captureContracts } from './lib/contracts.mjs';
+import { preparePmBinding } from './lib/pm.mjs';
 
 const HELP = `Deliver deterministic runtime
 
@@ -25,7 +26,7 @@ Usage:
   deliver.mjs init --mode managed|governed --plan <file>
   deliver.mjs status --run <uuid|state.json>
   deliver.mjs approve --run <run> --approver <id>
-  deliver.mjs start --run <run> --task <packet.json> --builder <id>
+  deliver.mjs start --run <run> --task <packet.json> --builder <id> [--story docs/stories/<story>.md]
   deliver.mjs check --run <run>
   deliver.mjs gate --run <run> --name <command-name> --command <exact-shell-command> [--cwd <relative-dir>] [--env <json>]
   deliver.mjs review --run <run> --snapshot <sha256> --reviewer <id> --receipt <json>
@@ -42,7 +43,7 @@ Gate commands are intentionally authorized runtime steps. The runtime invokes th
 const VALUE_FLAGS = new Set([
   '--mode', '--plan', '--run', '--approver', '--task', '--builder', '--expected-revision',
   '--name', '--command', '--cwd', '--env', '--reviewer', '--receipt', '--verifier', '--results',
-  '--label', '--kind', '--reason', '--snapshot',
+  '--label', '--kind', '--reason', '--snapshot', '--story',
 ]);
 
 function args(argv) {
@@ -213,6 +214,7 @@ function main() {
       syncPlan(state);
       requireCurrentApproval(state);
       const packet = validateTaskPaths(state.project_root, packetInput);
+      state.pm_binding = preparePmBinding(state, packet, o['--story']);
       state.contracts = captureContracts(state.project_root, packet);
       state.task = { packet, builder, started_at: new Date().toISOString() };
       const dirtyPaths = baselineDirtyPaths(state.project_root);
@@ -348,6 +350,7 @@ function main() {
       if (state.verification.verifier === state.task.builder) throw new DeliverError('verifier must differ from builder', 66);
       if (state.mode === 'governed' && state.verification.verifier === state.review.reviewer) throw new DeliverError('governed verifier must differ from reviewer', 66);
       state.phase = 'finished';
+      state.completion_snapshot = checked.current;
       state.finished_at = new Date().toISOString();
       event(state, 'finished', { snapshot_hash: checked.current.hash });
     });

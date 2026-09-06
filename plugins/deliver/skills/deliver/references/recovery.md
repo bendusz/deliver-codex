@@ -1,6 +1,7 @@
 # Resume, handoff and doctor
 
-Read runtime state first, then inspect repository status, branch/HEAD and the current task.
+Read shared `pm/` project/actor state first when present, using `compatibility.md`. Then read the
+selected Codex runtime state and inspect repository status, branch/HEAD and the current task.
 Only then read the current checkpoint and relevant contract or knowledge index pointers.
 Do not pull/rebase as a side effect of resume. Inspect remote state with a fetch only when
 network access and the user's workflow permit it; integration is a separate mutation.
@@ -25,5 +26,5 @@ approval; show the new plan and obtain approval again. Do not expand touches in 
 keeping a previous PASS. Preserve abandoned work and old runs as history. A new scope needs a
 new task baseline with the old changes explicitly reconciled.
 
-`pm/` compatibility is covered in `compatibility.md`. Do not treat a legacy `signed_off: true`
+`pm/` compatibility is covered in `compatibility.md`. Do not treat shared `signed_off: true`
 as approval of a new or edited plan.

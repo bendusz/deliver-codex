@@ -4,6 +4,7 @@
 
 Quick uses a compact task packet and direct implementation. It still needs scope checks,
 project gates, and independent review, but not a product spec, sprint, wiki, or a claim commit.
+For a shared project, use the existing `pm/` story/claim convention described in `compatibility.md`.
 For a truly trivial non-code edit, use the host's ordinary editing workflow instead of
 forcing Deliver onto the task.
 
@@ -18,6 +19,8 @@ Inspect repository status, applicable AGENTS.md instructions and real commands. 
 work and conventions. Delegate a bounded read-only map to `deliver-explorer` when exploration
 would otherwise crowd the main context. Research current APIs through available documentation
 tools; give the researcher a question and output limit.
+Read shared project and actor state before selecting work. For a new shared project, initialize
+the upstream-compatible `pm/` records through `scripts/pm.mjs`; do not invent another state schema.
 
 Clarify only missing decisions that change scope, acceptance or architecture. In Managed and
 Governed, write a concise plan with objective, non-goals, task ordering, risks and executable
@@ -36,6 +39,7 @@ Read `runtime.md`. Start a run and task before writes so a before-state exists. 
 main thread is the builder. In Managed/Governed dispatch `deliver-builder` with the task packet,
 absolute root, relevant instructions, contract paths and any unresolved evidence. Request a
 short summary, changed paths, targeted checks and blockers. Do not pass an entire transcript.
+In PM-managed projects, claim the selected story first and pass `--story` at runtime start.
 
 After every writer, run the scope check. Unexpected paths stop the workflow with work preserved.
 Builders run targeted self-checks. The coordinator runs the declared final gates against the
@@ -60,3 +64,5 @@ or the user changes the requirement through correct-course.
 Finish records completion, it does not commit or merge. Summarize changes, commands, acceptance
 evidence and remaining risks. Commit or publish only within the user's separate authorization.
 Do not force branches or no-ff merges onto a repository's existing delivery policy.
+For shared projects, follow `compatibility.md` to record the post-integration completion and
+host-neutral handoff. A runtime finish alone never updates a story to merged.
