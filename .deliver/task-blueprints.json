@@ -1,0 +1,501 @@
+{
+  "T02": {
+    "objective": "Implement strict story readers and read-only upstream-compatible project inspector",
+    "touches": [
+      "plugins/deliver/skills/deliver/scripts/lib/story.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/project-state.mjs",
+      "plugins/deliver/skills/deliver/scripts/pm.mjs",
+      "tests/project-state.test.mjs",
+      "tests/story.test.mjs"
+    ],
+    "acceptance": [
+      {
+        "id": "T02-AC1",
+        "text": "Valid current upstream projects produce matching derived phase, approval, claims, sprint, worktree and handoff state against unchanged pinned inspector."
+      },
+      {
+        "id": "T02-AC2",
+        "text": "Strict story parsing preserves exact ordered criterion text and substantive contract hash while precisely separating Execution metadata; unsafe or duplicate sections fail."
+      },
+      {
+        "id": "T02-AC3",
+        "text": "Inspection handles malformed/missing/FIFO/symlink inputs and missing identity without mutation, hangs or false completion, and pm status exposes it without breaking legacy reads."
+      }
+    ],
+    "id": "T02",
+    "read_paths": [
+      "AGENTS.md",
+      "docs/plans/2026-09-09-upstream-parity.md"
+    ],
+    "commands": {
+      "test": "npm test",
+      "validate": "npm run validate"
+    },
+    "specs": []
+  },
+  "T06": {
+    "objective": "Complete native planning operations, scale policies and project artifact templates",
+    "touches": [
+      "plugins/deliver/skills/deliver/SKILL.md",
+      "plugins/deliver/skills/deliver/references/workflow.md",
+      "plugins/deliver/skills/deliver/references/discovery.md",
+      "plugins/deliver/skills/deliver/references/specification.md",
+      "plugins/deliver/skills/deliver/references/planning.md",
+      "plugins/deliver/skills/deliver/references/decomposition.md",
+      "plugins/deliver/skills/deliver/references/scale-profiles.md",
+      "plugins/deliver/skills/deliver/references/operations.md",
+      "plugins/deliver/skills/deliver/assets/templates",
+      "plugins/deliver/skills/deliver/assets/operations.json",
+      "scripts/validate.mjs",
+      "tests/operations.test.mjs"
+    ],
+    "acceptance": [
+      {
+        "id": "T06-AC1",
+        "text": "Installed skill discovers every approved high-level operation with arguments, output and write authority and only loads relevant references."
+      },
+      {
+        "id": "T06-AC2",
+        "text": "Current templates preserve stable requirement IDs, clarify blocking unknowns, produce ready unclaimed stories, and implement independent project scale and execution mode policies."
+      },
+      {
+        "id": "T06-AC3",
+        "text": "Entry remains below context budget, every operation and asset path resolves, no Claude plugin-root or slash-registration assumptions survive, and plan grants standing PM Git/PR authority."
+      }
+    ],
+    "id": "T06",
+    "read_paths": [
+      "AGENTS.md",
+      "docs/plans/2026-09-09-upstream-parity.md"
+    ],
+    "commands": {
+      "test": "npm test",
+      "validate": "npm run validate"
+    },
+    "specs": []
+  },
+  "T07": {
+    "id": "T07",
+    "objective": "Implement read-only artifact analysis, claim readiness contract and evidence-based quality checklist assets",
+    "read_paths": [
+      "AGENTS.md",
+      "docs/plans/2026-09-09-upstream-parity.md"
+    ],
+    "touches": [
+      "plugins/deliver/skills/deliver/references/governance.md",
+      "plugins/deliver/skills/deliver/assets/templates/checklist-spec-quality.md.template",
+      "plugins/deliver/skills/deliver/assets/templates/checklist-plan-quality.md.template",
+      "plugins/deliver/skills/deliver/assets/templates/checklist-story-readiness.md.template",
+      "plugins/deliver/skills/deliver/assets/templates/checklist-verification-quality.md.template",
+      "plugins/deliver/skills/deliver/scripts/analyze.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/analyze.mjs",
+      "tests/analysis.test.mjs"
+    ],
+    "acceptance": [
+      {
+        "id": "T07-AC1",
+        "text": "Read-only deterministic analysis reports located clarification, requirement coverage, dependency, scope, command and declared lens defects against production artifact templates; input errors never become PASS."
+      },
+      {
+        "id": "T07-AC2",
+        "text": "Analysis separates factual findings from semantic review still needed, exports claim readiness for applicable scales, and preserves files and project state even on malformed, unsafe or nonregular inputs."
+      },
+      {
+        "id": "T07-AC3",
+        "text": "Four packaged quality checklist templates and native governance instructions preserve evidence-only checkoffs, read-only analysis, scale requirements, and explicit remediation without silently changing artifacts."
+      }
+    ],
+    "commands": {
+      "test": "npm test",
+      "validate": "npm run validate"
+    },
+    "specs": []
+  },
+  "T03": {
+    "id": "T03",
+    "objective": "Bind current shared approval and story claims to every runtime evidence operation while preserving legacy reads",
+    "read_paths": [
+      "AGENTS.md",
+      "docs/plans/2026-09-09-upstream-parity.md"
+    ],
+    "touches": [
+      "plugins/deliver/skills/deliver/scripts/lib/pm.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+      "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+      "plugins/deliver/skills/deliver/scripts/pm.mjs",
+      "tests/current-lifecycle.test.mjs",
+      "tests/pm-compatibility.test.mjs"
+    ],
+    "acceptance": [
+      {
+        "id": "T03-AC1",
+        "text": "Current-format pending, approved and revoked markers use tracked regular plans and exact Git digests; authorized current claims preserve the exact story contract, actor, route and branch without mutating foreign work."
+      },
+      {
+        "id": "T03-AC2",
+        "text": "Runtime start/check/gate/review/verify/finish require current shared approval and ownership; standalone Quick cannot bypass recognized shared projects, and changed plans, routes, claims or branches invalidate continuation."
+      },
+      {
+        "id": "T03-AC3",
+        "text": "Duplicate runs and claim/resume cannot reset spent retries or fixes, unavailable explicit builder routes fail without fallback, current state is default for new projects, and legacy reads and original compatibility regressions remain supported."
+      }
+    ],
+    "commands": {
+      "test": "npm test",
+      "validate": "npm run validate"
+    },
+    "specs": []
+  },
+  "T04": {
+    "id": "T04",
+    "objective": "Add durable coordinator Execution transitions and audited two-phase commit adoption without resetting cumulative scope or budgets",
+    "read_paths": [
+      "AGENTS.md",
+      "docs/plans/2026-09-09-upstream-parity.md"
+    ],
+    "touches": [
+      "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/pm.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/scope.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+      "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+      "plugins/deliver/skills/deliver/scripts/pm.mjs",
+      "plugins/deliver/skills/deliver/references/runtime.md",
+      "tests/transitions.test.mjs",
+      "tests/scope-regressions.test.mjs",
+      "tests/current-lifecycle.test.mjs"
+    ],
+    "acceptance": [
+      {
+        "id": "T04-AC1",
+        "text": "Coordinator transitions enforce legal Execution states and persist monotonic retry/fix counters before dispatch; conflict-aware recovery preserves spent attempts and never overwrites changed story contracts."
+      },
+      {
+        "id": "T04-AC2",
+        "text": "Prepared commit adoption checks direct-parent HEAD, exact intended tree/index/branch and protected Git metadata, permits only previously audited scoped edits, and leaves original scope and dirty-work baseline immutable."
+      },
+      {
+        "id": "T04-AC3",
+        "text": "Real temporary Git repo lifecycle tests cover build, authorized commit, fresh gates/review/verification, fix and fresh-process recovery; stale PASS, unauthorized commits and bookkeeping-hidden source/contract/receipt changes cannot pass."
+      }
+    ],
+    "commands": {
+      "test": "npm test",
+      "validate": "npm run validate"
+    },
+    "specs": []
+  },
+  "T05": {
+    "id": "T05",
+    "objective": "Reconcile verified local or remote integration and write upstream-compatible merged Execution and BASE_COMMIT handoffs",
+    "read_paths": [
+      "AGENTS.md",
+      "docs/plans/2026-09-09-upstream-parity.md"
+    ],
+    "touches": [
+      "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/pm.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/remote.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+      "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+      "plugins/deliver/skills/deliver/scripts/pm.mjs",
+      "plugins/deliver/skills/deliver/references/compatibility.md",
+      "plugins/deliver/skills/deliver/references/shipping.md",
+      "tests/integration.test.mjs",
+      "tests/remote.test.mjs",
+      "tests/current-roundtrip.test.mjs"
+    ],
+    "acceptance": [
+      {
+        "id": "T05-AC1",
+        "text": "Finish alone leaves claims active; merged Execution is recorded only after checking the real integration commit/tree against fresh verified evidence, retaining identity, criteria and spent counters."
+      },
+      {
+        "id": "T05-AC2",
+        "text": "Both current upstream/Codex story-boundary directions and fresh-process interruption/resume pass against unchanged pinned reader; handoff BASE_COMMIT matches the recorded integration and tolerates its own handoff-only commit."
+      },
+      {
+        "id": "T05-AC3",
+        "text": "PM remote adapter pushes scoped branches, creates/updates PRs and merges only exact verified heads with passing required checks under standing authorization; fake remote tests cover missing auth, pending/failure, races and merge result mismatch without real remote/model calls."
+      }
+    ],
+    "commands": {
+      "test": "npm test",
+      "validate": "npm run validate"
+    },
+    "specs": []
+  },
+  "T08": {
+    "id": "T08",
+    "objective": "Unify phase-aware resume, read-only doctor/hooks and current-scale first-claim readiness without resetting state",
+    "read_paths": [
+      "AGENTS.md",
+      "docs/plans/2026-09-09-upstream-parity.md"
+    ],
+    "touches": [
+      "plugins/deliver/skills/deliver/references/recovery.md",
+      "plugins/deliver/skills/deliver/scripts/pm.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/diagnostics.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+      "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+      "plugins/deliver/hooks/context.mjs",
+      "tests/diagnostics.test.mjs",
+      "tests/hooks-and-environment.test.mjs",
+      "tests/current-lifecycle.test.mjs"
+    ],
+    "acceptance": [
+      {
+        "id": "T08-AC1",
+        "text": "Fresh-process resume uses shared inspector to select correct phase/story or report ambiguity; approval drift, stale claims, missing evidence/worktrees and older missing retrospectives remain visible without edits."
+      },
+      {
+        "id": "T08-AC2",
+        "text": "Doctor and optional context hook perform bounded read-only checks with located OK/MISSING/DRIFT/UNKNOWN output, including environment/gates/roles/configuration; malformed hook input and absent hooks do not affect workflow."
+      },
+      {
+        "id": "T08-AC3",
+        "text": "Material correction revokes shared approval and retains spent budgets, while applicable-scale first claims require current artifact analysis and explicit semantic review; seeded blocking findings prevent claim without creating state or treating regex scans as semantic PASS."
+      }
+    ],
+    "commands": {
+      "test": "npm test",
+      "validate": "npm run validate"
+    },
+    "specs": []
+  },
+  "T09": {
+    "id": "T09",
+    "objective": "Preview and apply explicit conflict-aware migration from legacy tmp/flat/actor PM formats while preserving historical evidence and spent budgets",
+    "read_paths": [
+      "AGENTS.md",
+      "docs/plans/2026-09-09-upstream-parity.md"
+    ],
+    "touches": [
+      "plugins/deliver/skills/deliver/scripts/lib/migration.mjs",
+      "plugins/deliver/skills/deliver/scripts/migrate.mjs",
+      "plugins/deliver/skills/deliver/references/migration.md",
+      "tests/migration.test.mjs",
+      "tests/fixtures/migration"
+    ],
+    "acceptance": [
+      {
+        "id": "T09-AC1",
+        "text": "Read-only preview inventories integration and open-story branch evidence for legacy tmp, flat and actor formats, proposes exact writes/removals, retains original criteria/teammates/terminal evidence, and uses maximum credible spent counters."
+      },
+      {
+        "id": "T09-AC2",
+        "text": "Ambiguous identities/routes/status or changed before-images block apply without guessing; current+legacy drift remains explicit; approval digest follows authorized plan edits, and PASS alone cannot become merged."
+      },
+      {
+        "id": "T09-AC3",
+        "text": "Apply uses recoverable before-image journal, preserves unknown/untracked/uncommitted legacy history and old runtime receipts as history, supports safe interrupted recovery and idempotent reruns, and requires new evidence after active-run rebind."
+      }
+    ],
+    "commands": {
+      "test": "npm test",
+      "validate": "npm run validate"
+    },
+    "specs": []
+  },
+  "T10": {
+    "id": "T10",
+    "objective": "Require evidence-based completed-sprint retrospectives and explicit carried-over findings",
+    "read_paths": [
+      "AGENTS.md",
+      "docs/plans/2026-09-09-upstream-parity.md"
+    ],
+    "touches": [
+      "plugins/deliver/skills/deliver/references/retrospective.md",
+      "plugins/deliver/skills/deliver/assets/templates/retro.md.template",
+      "plugins/deliver/skills/deliver/scripts/lib/retrospective.mjs",
+      "plugins/deliver/skills/deliver/scripts/retro.mjs",
+      "tests/retrospective.test.mjs"
+    ],
+    "acceptance": [
+      {
+        "id": "T10-AC1",
+        "text": "Retrospective preparation requires a completed sprint and real bounded integration range, asks the upstream three questions from actual evidence, and handles unavailable history as UNKNOWN."
+      },
+      {
+        "id": "T10-AC2",
+        "text": "Retrospective records preserve carried-over work and major findings as explicit follow-up stories; AGENTS.md changes are proposed as a diff and never silently applied."
+      },
+      {
+        "id": "T10-AC3",
+        "text": "Tiny/small skip mandatory retrospectives; nonregular records never count; incomplete sprints fail without mutation and oldest missing retrospective remains first in inspector."
+      }
+    ],
+    "commands": {
+      "test": "npm test",
+      "validate": "npm run validate"
+    },
+    "specs": []
+  },
+  "T11": {
+    "id": "T11",
+    "objective": "Complete native knowledge/research/review/advice operations with honest review finding adaptation",
+    "read_paths": [
+      "AGENTS.md",
+      "docs/plans/2026-09-09-upstream-parity.md"
+    ],
+    "touches": [
+      "plugins/deliver/skills/deliver/references/knowledge.md",
+      "plugins/deliver/skills/deliver/references/research.md",
+      "plugins/deliver/skills/deliver/references/review.md",
+      "plugins/deliver/skills/deliver/references/advice.md",
+      "plugins/deliver/skills/deliver/references/claude-review.md",
+      "plugins/deliver/skills/deliver/assets/templates/wiki-schema.md.template",
+      "plugins/deliver/skills/deliver/assets/templates/wiki-index.md.template",
+      "plugins/deliver/skills/deliver/assets/templates/wiki-page.md.template",
+      "plugins/deliver/skills/deliver/assets/templates/research-report.md.template",
+      "plugins/deliver/skills/deliver/assets/templates/review-report.md.template",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-librarian.toml",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-researcher.toml",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-reviewer.toml",
+      "plugins/deliver/skills/deliver/scripts/lib/review-scope.mjs",
+      "plugins/deliver/skills/deliver/scripts/review-scope.mjs",
+      "tests/review-scope.test.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+      "tests/review-adapter.test.mjs"
+    ],
+    "acceptance": [
+      {
+        "id": "T11-AC1",
+        "text": "Knowledge references and wiki templates preserve upstream schema, authoritative source links and superseded decisions; research uses primary citations and read-only operations never update project state."
+      },
+      {
+        "id": "T11-AC2",
+        "text": "Review scopes recent/worktree/branch/codebase produce the actual bounded intended diff with explicit integration base; risks select integrity plus applicable architecture/security lenses and retain extra lenses discovered in the diff."
+      },
+      {
+        "id": "T11-AC3",
+        "text": "Native advice remains bounded and read-only; upstream CONCERNS maps to retained minor findings, and optional external review remains tool-less/explicit with no gate-execution claims."
+      }
+    ],
+    "commands": {
+      "test": "npm test",
+      "validate": "npm run validate"
+    },
+    "specs": []
+  },
+  "T12": {
+    "id": "T12",
+    "objective": "Support independent shared-story worktrees, collision checks, serial integration and interruption recovery",
+    "read_paths": [
+      "AGENTS.md",
+      "docs/plans/2026-09-09-upstream-parity.md"
+    ],
+    "touches": [
+      "plugins/deliver/skills/deliver/references/parallel.md",
+      "plugins/deliver/skills/deliver/scripts/lib/parallel.mjs",
+      "plugins/deliver/skills/deliver/scripts/parallel.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+      "tests/parallel.test.mjs"
+    ],
+    "acceptance": [
+      {
+        "id": "T12-AC1",
+        "text": "Parallel readiness blocks unresolved dependencies, conflicting bounded touches and crossed ownership; each story keeps separate branch/worktree/evidence and whole-wave checks precede dispatch."
+      },
+      {
+        "id": "T12-AC2",
+        "text": "Two independent stories complete and integrate serially with unchanged sibling receipts while changed integration content requires fresh evidence; fresh-process recovery reports each story state without budget resets."
+      },
+      {
+        "id": "T12-AC3",
+        "text": "Failed/dirty worktrees remain intact, cleanup is clean-only and explicit, remote claim visibility is honest, and upstream external-runner shared-ref timing constraints remain documented separately from native behavior."
+      }
+    ],
+    "commands": {
+      "test": "npm test",
+      "validate": "npm run validate"
+    },
+    "specs": []
+  },
+  "T13B": {
+    "id": "T13B",
+    "objective": "Execute two explicitly selected native builder comparisons from the same approved story/base in isolated preserved worktrees with fake adapter tests",
+    "read_paths": [
+      "AGENTS.md",
+      "docs/plans/2026-09-09-upstream-parity.md"
+    ],
+    "touches": [
+      "plugins/deliver/skills/deliver/references/benchmark.md",
+      "plugins/deliver/skills/deliver/scripts/lib/benchmark-workflow.mjs",
+      "plugins/deliver/skills/deliver/scripts/benchmark-run.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/benchmark.mjs",
+      "tests/benchmark-workflow.test.mjs"
+    ],
+    "acceptance": [
+      {
+        "id": "T13B-AC1",
+        "text": "Comparison validates two distinct explicit available native configurations before mutation and builds both from the same approved story/base in isolated worktrees, never rewriting the persisted route or silently substituting a model."
+      },
+      {
+        "id": "T13B-AC2",
+        "text": "Workflow records actual first-pass gates, review findings, independent benchmark retries, elapsed time and exposed/null measurements in the T13A schema, with deterministic scoring and no automatic merge or route selection."
+      },
+      {
+        "id": "T13B-AC3",
+        "text": "Fake adapters exercise both configurations including failure/retry, dirty-worktree preservation and restart evidence; no test calls real models/remotes, and optional external-builder pairing remains honestly unavailable unless explicitly configured."
+      }
+    ],
+    "commands": {
+      "test": "npm test",
+      "validate": "npm run validate"
+    },
+    "specs": []
+  },
+  "T14": {
+    "id": "T14",
+    "objective": "Package and document verified upstream parity with truthful evidence matrix, preserved setup upgrades and an installed end-to-end example",
+    "read_paths": [
+      "AGENTS.md",
+      "docs/plans/2026-09-09-upstream-parity.md"
+    ],
+    "touches": [
+      "README.md",
+      "AGENTS.md",
+      "package.json",
+      "NOTICE.md",
+      "plugins/deliver/NOTICE.md",
+      "plugins/deliver/.codex-plugin/plugin.json",
+      "docs/evaluation.md",
+      "docs/parity-contract.json",
+      "docs/parity-evidence.md",
+      "docs/examples",
+      "plugins/deliver/skills/deliver/SKILL.md",
+      "plugins/deliver/skills/deliver/assets/operations.json",
+      "plugins/deliver/skills/deliver/references/workflow.md",
+      "plugins/deliver/skills/deliver/references/operations.md",
+      "scripts/validate.mjs",
+      "scripts/setup.mjs",
+      "tests/setup.test.mjs",
+      "tests/operations.test.mjs",
+      "tests/packaging.test.mjs"
+    ],
+    "acceptance": [
+      {
+        "id": "T14-AC1",
+        "text": "Every implemented operation/module/template is present in installed package and all references resolve; default current progress guidance replaces active 0.22 guidance, customized setup files remain preserved and explicit upgrade instructions are accurate."
+      },
+      {
+        "id": "T14-AC2",
+        "text": "Capability evidence matrix reports actual deterministic/model-reviewed/model-exercised evidence and deliberate provider/platform limitations without presenting fixtures as live trials or unmeasured efficiency as fact."
+      },
+      {
+        "id": "T14-AC3",
+        "text": "Worked standard example and complete test/validation evidence support planning, approval, build, review, distinct verification, resume, integration, handoff and retrospective; release diff receives final independent review and distinct verification."
+      }
+    ],
+    "commands": {
+      "test": "npm test",
+      "validate": "npm run validate"
+    },
+    "specs": []
+  }
+}

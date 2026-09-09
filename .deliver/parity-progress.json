@@ -1,0 +1,67 @@
+{
+  "plan": "docs/plans/2026-09-09-upstream-parity.md",
+  "approval": "Ben approved in conversation; standing PM commits/PR/merge authority",
+  "integration_branch": "feat/upstream-parity",
+  "tasks": {
+    "T00": {
+      "status": "reviewed, verified, integrated",
+      "worktree": "/tmp/deliver-parity-t00",
+      "run": "298d8b1b-27f7-4241-a61f-9b2f17f588d9",
+      "builder": "/root/t00_builder",
+      "commit": "7063579"
+    },
+    "T01": {
+      "status": "reviewed, verified, integrated",
+      "worktree": "/tmp/deliver-parity-t01",
+      "run": "f157180e-8595-4c07-aadc-0824a4c4120a",
+      "builder": "/root/t01_builder",
+      "commit": "d8b9a9c"
+    },
+    "T06": {
+      "status": "reviewed, verified, integrated after fix round 1",
+      "worktree": "/tmp/deliver-parity-t06",
+      "run": "97421b5f-81ec-4897-9433-6e7b4da67adf",
+      "builder": "/root/t00_builder",
+      "snapshot": "d9bdbf178fb29ceebb6ccba51ca4276e16b67ac16d24968c5c12bfbce2ec1fc3",
+      "correction_builder": "/root/benchmark_builder",
+      "findings": [
+        "Independent reviewer found unconditional checkpoint merge pauses conflicting with explicit standing merge approval."
+      ],
+      "commit": "ad3e0e46d6f325b51900ff26fe1869a241adc2a7"
+    },
+    "T02": {
+      "status": "fix round 1 full gates passed; independent re-review underway",
+      "worktree": "/tmp/deliver-parity-t02-ready",
+      "run": "f3ab27ff-119d-4ffd-b529-c83e84869d39",
+      "builder": "/root/t01_builder",
+      "snapshot": "db49e17fbc318d3a30f2c411c5b233033791e5031c70ee2de50a009e8087395c",
+      "findings": [
+        "Completion must not report done when shared approval implementation_ready is false, including missing/null plan digest and untracked approval/plan.",
+        "Story Execution and plan branch names must reject Git-invalid references consistently."
+      ],
+      "fixes": 1
+    },
+    "T13A": {
+      "status": "reviewed, verified, integrated; full T13 workflow remains pending",
+      "worktree": "/tmp/deliver-parity-t13a",
+      "run": "3c72298f-1bd3-48b4-8ec7-b7fdf541462c",
+      "builder": "/root/benchmark_builder",
+      "snapshot": "f6d71245520f8f1d546ac56657ca24e25fc09278bcfd21e3773443cec122193b",
+      "commit": "2fdde58b35cdea33c1c95190c18d98d91e827881"
+    },
+    "T07": {
+      "status": "read-only implementation preparation; analyzer library first, claim wiring requires later core integration"
+    }
+  },
+  "next": "Review corrected T02, then dispatch T03 approval/claims and T07 artifact analysis from the integrated reader baseline.",
+  "interfaces": {
+    "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
+    "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
+    "approval": "shared Git digest plus internal runtime hash, no missing-digest fail-open for execution"
+  },
+  "pull_request": "https://github.com/bendusz/deliver-codex/pull/2",
+  "coordinator_notes": [
+    "Do not use git push -u during active runs: shared tracking-config mutation invalidates their protected Git metadata. Use explicit remote/branch pushes.",
+    "Unused pre-dispatch T02 baseline 1cb0b0fd-76f5-462a-8df2-4a5a8d18f39f was archived under .deliver/aborted after initial sequencing error; no worker ran, no budgets spent, no evidence reused."
+  ]
+}
