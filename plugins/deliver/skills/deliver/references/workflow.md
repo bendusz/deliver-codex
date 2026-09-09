@@ -11,7 +11,11 @@ forcing Deliver onto the task.
 Managed keeps an approved plan, bounded tasks, delegated builds and durable state.
 Governed adds requirement traceability, explicit review lenses and a distinct verifier.
 Ask for approval of material decisions, not routine steps within an already authorized task.
-Do not reinterpret plan approval as permission to publish, install, deploy, or spend money.
+Approved delivery gives the PM standing authority to create scoped commits, push story branches,
+create or update pull requests, and merge code after the required checks pass. Follow repository
+policy and verify the actual integration result. Do not ask again for each Git or pull request
+step. Builders and reviewers do not perform integration. Review-only and discovery-only work
+remains read-only. Installation, paid provider calls and deployment require separate authorization.
 
 ## Discover and plan
 
@@ -61,8 +65,9 @@ review and verification receipts only for the exact code state inspected. A late
 requires renewed relevant gates and review. UNKNOWN blocks completion until evidence is obtained
 or the user changes the requirement through correct-course.
 
-Finish records completion, it does not commit or merge. Summarize changes, commands, acceptance
-evidence and remaining risks. Commit or publish only within the user's separate authorization.
+Finish records verified runtime completion; it does not itself commit or merge. The PM continues
+through the authorized Git and pull request steps, then confirms the resulting integration before
+recording it as merged. Summarize changes, commands, acceptance evidence and remaining risks.
 Do not force branches or no-ff merges onto a repository's existing delivery policy.
 For shared projects, follow `compatibility.md` to record the post-integration completion and
 host-neutral handoff. A runtime finish alone never updates a story to merged.

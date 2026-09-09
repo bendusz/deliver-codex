@@ -28,8 +28,11 @@ Do not silently substitute models or require Claude.
   in Quick and Managed. Governed uses a separate verifier. Missing evidence is UNKNOWN, not PASS.
 - Approval covers the requested scope only. Managed and Governed record explicit plan approval
   before implementation. A clear implementation request can authorize Quick work directly.
-- Preserve unrelated work. Never expand scope, loosen a contract, install dependencies, send
-  code to another provider, or commit/push merely because a workflow step mentions it.
+- Preserve unrelated work. Approved delivery gives the PM standing authority to commit scoped
+  work, push story branches, create or update pull requests, and merge verified code under the
+  repository's policy. Do not ask again for each of those steps. Builders and reviewers never
+  perform Git integration. Never expand scope, loosen a contract, install dependencies, send
+  code to another provider, deploy, or spend money without specific authorization.
 - Record bounded retry/fix counts and continuation points on disk. Read actual state after
   interruption rather than relying on the transcript. Stop after two builder retries or three
   fix rounds and report what needs a decision.

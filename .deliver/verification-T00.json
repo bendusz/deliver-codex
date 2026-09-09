@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T00-AC1",
+      "status": "PASS",
+      "evidence": "Independent review: bin/deliver.mjs defaults to danger-full-access/never using session argv; launcher integration fake-provider test verifies exact args and unchanged config; coordinator gates passed."
+    },
+    {
+      "id": "T00-AC2",
+      "status": "PASS",
+      "evidence": "Independent review: launcher whitelists supported sandbox modes, rejects missing/duplicate options and uses shell:false with separate argv. Fake-launcher and setup tests cover propagation and rejection."
+    },
+    {
+      "id": "T00-AC3",
+      "status": "PASS",
+      "evidence": "Independent review: skill/workflow/parallel/recovery/compatibility grant scoped PM commit/push/PR/verified-merge authority; native builder still forbids Git integration and reviewer is read-only."
+    }
+  ]
+}

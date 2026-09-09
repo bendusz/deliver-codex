@@ -13,8 +13,9 @@ evidence that its work survived an interruption.
 
 A handoff is a runtime checkpoint plus a short note containing the next action, unresolved
 decision, evidence paths and blockers. Do not duplicate every state field in a second document.
-Commit durable run state with the work only if repository policy allows it and the user has
-authorized commits. Logs may stay local; missing load-bearing logs make verification UNKNOWN.
+For an approved delivery, the PM may commit durable run state with the scoped work when repository
+policy allows it. Builders and reviewers do not make that commit. Logs may stay local; missing
+load-bearing logs make verification UNKNOWN.
 
 Doctor is read-only: inspect state schema/revision, pending locks, task paths, approval, code
 identity, missing evidence, and role installation. Do not clear locks, migrate state, edit
