@@ -8,9 +8,11 @@ Check dependencies and normalized write scopes before dispatch. Distinct paths d
 semantic independence: shared interfaces, generated outputs, test databases and ports can
 still collide. Default to at most three workers and serialize uncertain tasks.
 
-The coordinator owns worktree creation and integration only when authorized. Pass every worker
-its absolute worktree root. Each task gets its own before-state and final evidence. Preserve
-dirty worktrees on failure or interruption and report them in the checkpoint.
+For an approved delivery, the PM owns worktree creation, scoped commits, story-branch pushes,
+pull request creation or updates, and verified integration without repeated confirmation. Builders
+and reviewers do not perform those steps. Pass every worker its absolute worktree root. Each task
+gets its own before-state and final evidence. Preserve dirty worktrees on failure or interruption
+and report them in the checkpoint.
 
 Integrate serially under the repository's policy. Evidence from a pre-integration tree cannot
 approve a different merged tree. Run gates and review changes introduced by integration before
