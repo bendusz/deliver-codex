@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T02-AC1",
+      "status": "PASS",
+      "evidence": "Independent inspection and the exact-snapshot test evidence confirm the current inspector matches the unchanged pinned 0.25.1 reader for phase, approval fields, claims, branch/story, unmerged IDs, retrospective precedence, worktrees and handoff freshness. The focused fixture covers a handoff-only commit, multiple sprints and foreign claims."
+    },
+    {
+      "id": "T02-AC2",
+      "status": "FAIL",
+      "evidence": "The parser preserves ordered criterion bytes, separates the final Execution section from contractHash, retains safe extension fields and rejects duplicate sections and unsafe touch paths. However, story.mjs lines 103-107 accept multiple Git-invalid pm-exec branches, allowing unsafe execution metadata to parse as merged."
+    },
+    {
+      "id": "T02-AC3",
+      "status": "FAIL",
+      "evidence": "Symlink, FIFO, malformed story, missing identity and missing-Git cases are bounded and the current status route preserves legacy output. A targeted independent temporary-repository reproduction found phase done with implementation_ready false when the approved marker has null digest, the plan is absent/untracked, and all stories plus retrospectives appear complete. This is a false completion for missing approval inputs despite APPROVAL_NOT_EXECUTABLE diagnostics. Full npm test and npm run validate gates passed at snapshot 738524ccf54d7b987af6fff9280b65379b80679e9c76885803a1756ab84f4c39 but do not cover this combination."
+    }
+  ]
+}
