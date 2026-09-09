@@ -22,7 +22,10 @@ Deliver at `../pm-skill` is reference material, not an edit target.
 
 - Node.js 22+, ESM, built-in modules only. No install-time or import-time side effects.
 - Main model `gpt-6-astra`, worker defaults `gpt-5.6-sol`; no silent model fallback.
-- Preserve project and global configuration. Never auto-install, commit, push or send code externally.
+- Preserve project and global configuration. Default execution to no sandbox; sandboxing is opt-in.
+- For approved delivery, the PM may commit scoped work, push story branches, create/update PRs and
+  merge verified code without repeated permission questions. Builders do not perform Git integration.
+- Installation, paid external-provider calls and deployment require scope-specific authorization.
 - State/evidence validation is deterministic. Model review receipts are attestations, not authentication.
 - Keep the skill entry short; load only the reference for the requested operation.
 - Runtime tests must not invoke real model services.
