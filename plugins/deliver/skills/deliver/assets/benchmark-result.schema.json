@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Deliver native builder benchmark result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "benchmark_id", "story", "base_commit", "runs"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "benchmark_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "story": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "base_commit": { "type": "string", "pattern": "^[0-9a-fA-F]{7,64}$" },
+    "runs": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "configuration",
+          "story",
+          "base_commit",
+          "status",
+          "elapsed_seconds",
+          "retries",
+          "gates",
+          "first_pass_gates",
+          "review_findings",
+          "changed_paths",
+          "tokens",
+          "cost"
+        ],
+        "properties": {
+          "configuration": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "label", "provider", "model", "role", "reasoning_effort"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+              "label": { "type": "string", "minLength": 1, "maxLength": 200 },
+              "provider": { "type": "string", "minLength": 1, "maxLength": 128 },
+              "model": { "type": "string", "minLength": 1, "maxLength": 256 },
+              "role": { "type": "string", "minLength": 1, "maxLength": 128 },
+              "reasoning_effort": {
+                "type": ["string", "null"],
+                "minLength": 1,
+                "maxLength": 64
+              }
+            }
+          },
+          "story": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "base_commit": { "type": "string", "pattern": "^[0-9a-fA-F]{7,64}$" },
+          "status": { "enum": ["completed", "blocked", "failed"] },
+          "elapsed_seconds": { "type": "number", "minimum": 0, "maximum": 31536000 },
+          "retries": { "type": "integer", "minimum": 0, "maximum": 100 },
+          "gates": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["passed", "total"],
+            "properties": {
+              "passed": { "type": "integer", "minimum": 0, "maximum": 1000 },
+              "total": { "type": "integer", "minimum": 1, "maximum": 1000 }
+            }
+          },
+          "first_pass_gates": { "type": "boolean" },
+          "review_findings": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["block", "major"],
+            "properties": {
+              "block": { "type": "integer", "minimum": 0, "maximum": 10000 },
+              "major": { "type": "integer", "minimum": 0, "maximum": 10000 }
+            }
+          },
+          "changed_paths": { "type": "integer", "minimum": 0, "maximum": 100000 },
+          "tokens": { "type": ["integer", "null"], "minimum": 0, "maximum": 1000000000000 },
+          "cost": { "type": ["number", "null"], "minimum": 0, "maximum": 1000000000 },
+          "notes": { "type": "string", "maxLength": 4000 }
+        }
+      }
+    }
+  },
+  "$comment": "The bundled validator also enforces safe integers, finite numbers, passed <= total, matching story/base identifiers, consistent first-pass metrics, and distinct configuration IDs and effective provider/model/role/reasoning settings. This file is a result contract, not a claim that Deliver implements a general JSON Schema engine."
+}
