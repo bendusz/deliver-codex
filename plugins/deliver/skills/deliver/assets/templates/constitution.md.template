@@ -1,0 +1,25 @@
+# <Project> project constitution
+
+<!-- Include only project-specific, checkable rules. Do not repeat or weaken Deliver's approval,
+scope, review, verification or repository rules. Delete unused sections. If no extra rules exist,
+write "No additional project-specific rules." -->
+
+## Principles
+
+- <A checkable project-specific trade-off rule.>
+
+## Engineering standards
+
+- <Language, error-handling or dependency rule.>
+
+## Testing standards
+
+- <Project-specific test or coverage requirement.>
+
+## Security and privacy
+
+- <Authentication, authorization, secret or data rule.>
+
+## Product constraints
+
+- <Accessibility, platform, performance or tone constraint.>

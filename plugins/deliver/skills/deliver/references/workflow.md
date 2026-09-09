@@ -4,7 +4,8 @@
 
 Quick uses a compact task packet and direct implementation. It still needs scope checks,
 project gates, and independent review, but not a product spec, sprint, wiki, or a claim commit.
-For a shared project, use the existing `pm/` story/claim convention described in `compatibility.md`.
+For a shared project, use the approved story and its `pm-exec` claim described in
+`compatibility.md`; shared-project verification remains distinct at every scale.
 For a truly trivial non-code edit, use the host's ordinary editing workflow instead of
 forcing Deliver onto the task.
 
@@ -17,20 +18,20 @@ policy and verify the actual integration result. Do not ask again for each Git o
 step. Builders and reviewers do not perform integration. Review-only and discovery-only work
 remains read-only. Installation, paid provider calls and deployment require separate authorization.
 
-## Discover and plan
+## Prepare approved work
 
 Inspect repository status, applicable AGENTS.md instructions and real commands. Preserve existing
 work and conventions. Delegate a bounded read-only map to `deliver-explorer` when exploration
 would otherwise crowd the main context. Research current APIs through available documentation
 tools; give the researcher a question and output limit.
-Read shared project and actor state before selecting work. For a new shared project, initialize
-the upstream-compatible `pm/` records through `scripts/pm.mjs`; do not invent another state schema.
+Read the shared inspector result before selecting work. For a new project, follow `discovery.md`,
+`specification.md`, `planning.md` and `decomposition.md` as their Enter rules become true. Choose
+scale independently from execution mode using `scale-profiles.md`.
 
-Clarify only missing decisions that change scope, acceptance or architecture. In Managed and
-Governed, write a concise plan with objective, non-goals, task ordering, risks and executable
-verification commands. The product spec, if needed, owns intent; the plan owns delivery. Existing
-user documents take precedence over creating another copy. Show the plan and wait for explicit
-approval. Record it with the runtime only after the user actually approves.
+Clarify only decisions that change scope, acceptance or architecture. Existing user documents take
+precedence over creating another copy. Managed and Governed need an approved plan; shared projects
+also need a current tracked `docs/approval.json` whose digest matches that plan. Never manufacture
+approval or bypass a pending, revoked or drifted marker.
 
 Use the task template in `assets/task.example.json` as a shape, not as project content. Each task
 has an outcome, acceptance IDs, bounded write paths, relevant read paths and gate commands.
@@ -44,6 +45,8 @@ main thread is the builder. In Managed/Governed dispatch `deliver-builder` with 
 absolute root, relevant instructions, contract paths and any unresolved evidence. Request a
 short summary, changed paths, targeted checks and blockers. Do not pass an entire transcript.
 In PM-managed projects, claim the selected story first and pass `--story` at runtime start.
+Decomposition never writes the claim. The coordinator adds the story's Execution section and
+`pm-exec` block only during the claim transition.
 
 After every writer, run the scope check. Unexpected paths stop the workflow with work preserved.
 Builders run targeted self-checks. The coordinator runs the declared final gates against the

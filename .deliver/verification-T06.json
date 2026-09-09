@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T06-AC1",
+      "status": "PASS",
+      "evidence": "Independent inspection found 27 named operations with explicit arguments, output shape, mutation paths/external authority and one resolving reference each. The entry routes operation lookup to references/operations.md, which directs the PM to read only the selected operation's reference. The installed-skill operation test and fresh exact-snapshot test gate passed."
+    },
+    {
+      "id": "T06-AC2",
+      "status": "PASS",
+      "evidence": "The templates preserve US-, FR-, AC- and SM- IDs, require blocking clarifications to be resolved, and decomposition leaves stories unclaimed. Scale and execution mode are recorded independently. Corrected scale-profiles.md lines 22-38 make checkpoint pauses explicit choices, give the user's latest preference or authorization precedence over defaults, and limit unplanned pauses to material scope or requirement changes."
+    },
+    {
+      "id": "T06-AC3",
+      "status": "PASS",
+      "evidence": "SKILL.md is 576 words, all routed operation/template paths resolve, and inspected files contain no Claude plugin-root or /deliver: registration assumptions. SKILL.md, planning.md, workflow.md and corrected scale-profiles.md consistently grant standing PM authority for scoped commits, branch pushes, pull requests and verified merges without repeated permission. Fresh npm test and npm run validate gates passed at snapshot d9bdbf178fb29ceebb6ccba51ca4276e16b67ac16d24968c5c12bfbce2ec1fc3."
+    }
+  ]
+}

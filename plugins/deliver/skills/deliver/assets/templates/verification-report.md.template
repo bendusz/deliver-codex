@@ -1,0 +1,36 @@
+<!-- Write to docs/verification/<story-id>.md when the scale requires a durable report. -->
+# Verification: <story-id> "<Title>"
+
+- Date: <YYYY-MM-DD>
+- Story: docs/stories/<story-file>.md
+- Covers: <FR-..., AC-...>
+- Branch: <story branch> into <integration branch>
+- Code identity: <verified commit or snapshot>
+
+## Changed files
+
+- <Path.>
+
+## Gates
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| test | `<command or N/A>` | PASS / FAIL / N/A |
+| lint | `<command or N/A>` | PASS / FAIL / N/A |
+| build | `<command or N/A>` | PASS / FAIL / N/A |
+
+## Independent review
+
+| Lens | Verdict | Open findings |
+| --- | --- | --- |
+| code-integrity-reviewer | PASS / CONCERNS / FAIL | <none or finding IDs> |
+
+## Acceptance verification
+
+- Status: PASS / FAIL / UNKNOWN
+- AC-001: PASS / FAIL / UNKNOWN. Evidence: <command or inspected behavior and result>.
+- Action for FAIL or UNKNOWN: <required fix or missing evidence>.
+
+## Integration status
+
+<SHIPPED on YYYY-MM-DD through commit or pull request, or BLOCKED with reason.>

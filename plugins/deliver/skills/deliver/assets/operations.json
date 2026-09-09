@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "invocation": {
+    "skill": "$deliver <operation> [arguments]",
+    "ordinary_language": true,
+    "registered_slash_commands": false,
+    "runtime_commands_are_operations": false
+  },
+  "operations": [
+    {
+      "name": "discover",
+      "aliases": ["start"],
+      "arguments": [{ "name": "request", "required": false, "description": "The product goal or problem to explore." }],
+      "output": { "kind": "brief", "paths": [], "description": "An agreed problem statement, solution direction and named unknowns." },
+      "mutation": { "mode": "read-only", "paths": [], "external": [] },
+      "reference": "references/discovery.md"
+    },
+    {
+      "name": "specify",
+      "aliases": [],
+      "arguments": [{ "name": "request", "required": false, "description": "Product intent to add or revise." }],
+      "output": { "kind": "artifact", "paths": ["docs/spec.md"], "description": "A product specification with stable IDs and an unresolved-marker count." },
+      "mutation": { "mode": "project-write", "paths": ["docs/spec.md"], "external": [] },
+      "reference": "references/specification.md"
+    },
+    {
+      "name": "clarify",
+      "aliases": [],
+      "arguments": [{ "name": "focus", "required": false, "description": "An optional requirement or topic to prioritize." }],
+      "output": { "kind": "artifact-update", "paths": ["docs/spec.md"], "description": "Recorded answers and the remaining blocking unknowns." },
+      "mutation": { "mode": "project-write", "paths": ["docs/spec.md"], "external": [] },
+      "reference": "references/specification.md"
+    },
+    {
+      "name": "constitution",
+      "aliases": [],
+      "arguments": [{ "name": "rules", "required": false, "description": "Project-specific checkable constraints." }],
+      "output": { "kind": "artifact", "paths": ["docs/constitution.md"], "description": "The project's additional enforceable rules." },
+      "mutation": { "mode": "project-write", "paths": ["docs/constitution.md"], "external": [] },
+      "reference": "references/planning.md"
+    },
+    {
+      "name": "plan",
+      "aliases": [],
+      "arguments": [{ "name": "request", "required": false, "description": "Planning focus or constraints." }],
+      "output": { "kind": "artifact", "paths": ["docs/plan.md", "docs/approval.json"], "description": "A delivery plan and pending approval marker." },
+      "mutation": { "mode": "project-write", "paths": ["docs/plan.md", "docs/approval.json"], "external": [] },
+      "reference": "references/planning.md"
+    },
+    {
+      "name": "approve",
+      "aliases": ["sign-off"],
+      "arguments": [{ "name": "approver", "required": true, "description": "The actual human approver identity." }],
+      "output": { "kind": "approval", "paths": ["docs/plan.md", "docs/approval.json"], "description": "Approval bound to the current Git plan digest." },
+      "mutation": { "mode": "project-write", "paths": ["docs/plan.md", "docs/approval.json"], "external": ["git-commit"] },
+      "reference": "references/planning.md"
+    },
+    {
+      "name": "decompose",
+      "aliases": [],
+      "arguments": [{ "name": "sprint", "required": false, "description": "The sprint to decompose, defaulting to the next planned sprint." }],
+      "output": { "kind": "artifacts", "paths": ["docs/stories/<story-id>-<slug>.md"], "description": "Ready, unclaimed story files and a sprint-to-story map." },
+      "mutation": { "mode": "project-write", "paths": ["docs/stories/"], "external": [] },
+      "reference": "references/decomposition.md"
+    },
+    {
+      "name": "contracts",
+      "aliases": ["skeleton"],
+      "arguments": [{ "name": "sprint", "required": false, "description": "The sprint whose source-adjacent contracts are needed." }],
+      "output": { "kind": "artifacts", "paths": [".specdd/bootstrap.md", "<owned-source-path>.sdd"], "description": "A SpecDD contract tree for the approved scope." },
+      "mutation": { "mode": "project-write", "paths": [".specdd/", "<approved-contract-path>.sdd"], "external": [] },
+      "reference": "references/specdd.md"
+    },
+    {
+      "name": "analyze",
+      "aliases": [],
+      "arguments": [{ "name": "scope", "required": false, "description": "Optional artifact, sprint, story or requirement scope." }],
+      "output": { "kind": "report", "paths": [], "description": "Located consistency findings and a headline status." },
+      "mutation": { "mode": "read-only", "paths": [], "external": [] },
+      "reference": "references/governance.md"
+    },
+    {
+      "name": "checklist",
+      "aliases": [],
+      "arguments": [{ "name": "target", "required": true, "description": "Spec, plan, story ID or verification ID." }],
+      "output": { "kind": "artifact", "paths": ["docs/checklists/<target>.md"], "description": "An evidence-based quality checklist." },
+      "mutation": { "mode": "project-write", "paths": ["docs/checklists/"], "external": [] },
+      "reference": "references/governance.md"
+    },
+    {
+      "name": "deliver",
+      "aliases": ["build", "implement"],
+      "arguments": [{ "name": "story", "required": true, "description": "A ready story ID or path." }],
+      "output": { "kind": "verified-change", "paths": ["<story-pm-meta-touches>", ".deliver/"], "description": "Scoped code, gate evidence and independent review or verification." },
+      "mutation": { "mode": "delivery-write", "paths": ["<story-pm-meta-touches>", ".deliver/"], "external": [] },
+      "reference": "references/workflow.md"
+    },
+    {
+      "name": "claim",
+      "aliases": [],
+      "arguments": [{ "name": "story", "required": true, "description": "One approved, ready and unclaimed story ID or path." }],
+      "output": { "kind": "claim", "paths": ["docs/stories/<story-id>-<slug>.md"], "description": "A story branch and pm-exec claim owned by the current actor." },
+      "mutation": { "mode": "delivery-write", "paths": ["docs/stories/<story-id>-<slug>.md", ".deliver/"], "external": ["git-branch", "git-commit"] },
+      "reference": "references/workflow.md"
+    },
+    {
+      "name": "review",
+      "aliases": [],
+      "arguments": [{ "name": "scope", "required": false, "description": "Recent commit, worktree, branch or codebase scope." }],
+      "output": { "kind": "report", "paths": [], "description": "Independent findings with evidence and severity." },
+      "mutation": { "mode": "read-only", "paths": [], "external": [] },
+      "reference": "references/governance.md"
+    },
+    {
+      "name": "advise",
+      "aliases": ["decision"],
+      "arguments": [{ "name": "question", "required": true, "description": "A consequential decision and its constraints." }],
+      "output": { "kind": "recommendation", "paths": [], "description": "A bounded recommendation with reasoning." },
+      "mutation": { "mode": "external-read", "paths": [], "external": ["optional-approved-provider-read"] },
+      "reference": "references/governance.md"
+    },
+    {
+      "name": "verify",
+      "aliases": [],
+      "arguments": [{ "name": "story", "required": true, "description": "The built story to verify against exact criteria." }],
+      "output": { "kind": "verification", "paths": ["docs/verification/<story-id>.md"], "description": "PASS, FAIL or UNKNOWN per criterion with evidence." },
+      "mutation": { "mode": "project-write", "paths": ["docs/verification/", "docs/stories/<story-id>-<slug>.md", ".deliver/"], "external": [] },
+      "reference": "references/workflow.md"
+    },
+    {
+      "name": "complete",
+      "aliases": ["ship", "integrate"],
+      "arguments": [{ "name": "story-or-project", "required": false, "description": "The verified story or completed project, inferred only when unambiguous." }],
+      "output": { "kind": "completion", "paths": ["docs/verification/<story-id>.md", "docs/completion-report.md"], "description": "Verified integration status and completion evidence." },
+      "mutation": { "mode": "delivery-write", "paths": ["docs/stories/", "docs/verification/", "docs/completion-report.md", "docs/handoff/", ".deliver/"], "external": ["git-commit", "git-push", "pull-request-create-or-update", "verified-merge"] },
+      "reference": "references/workflow.md"
+    },
+    {
+      "name": "status",
+      "aliases": [],
+      "arguments": [{ "name": "project", "required": false, "description": "Project root, defaulting to the current repository." }],
+      "output": { "kind": "state", "paths": [], "description": "Derived approval, phase, story, claim and handoff status." },
+      "mutation": { "mode": "read-only", "paths": [], "external": [] },
+      "reference": "references/recovery.md"
+    },
+    {
+      "name": "resume",
+      "aliases": [],
+      "arguments": [{ "name": "run-or-story", "required": false, "description": "An optional run or story selector when state is ambiguous." }],
+      "output": { "kind": "continuation", "paths": [], "description": "Reconciled current position, blockers and next action." },
+      "mutation": { "mode": "read-only", "paths": [], "external": [] },
+      "reference": "references/recovery.md"
+    },
+    {
+      "name": "doctor",
+      "aliases": [],
+      "arguments": [{ "name": "scope", "required": false, "description": "Optional component or environment scope." }],
+      "output": { "kind": "diagnostic", "paths": [], "description": "Located OK, MISSING, DRIFT or UNKNOWN readiness results." },
+      "mutation": { "mode": "read-only", "paths": [], "external": [] },
+      "reference": "references/recovery.md"
+    },
+    {
+      "name": "correct-course",
+      "aliases": [],
+      "arguments": [{ "name": "change", "required": true, "description": "The requested direction, scope or criterion change." }],
+      "output": { "kind": "replan", "paths": ["docs/spec.md", "docs/plan.md", "docs/approval.json", "docs/stories/"], "description": "A reconciled change with approval status and preserved history." },
+      "mutation": { "mode": "project-write", "paths": ["docs/spec.md", "docs/plan.md", "docs/approval.json", "docs/stories/", ".deliver/"], "external": ["git-commit", "git-push"] },
+      "reference": "references/recovery.md"
+    },
+    {
+      "name": "handoff",
+      "aliases": [],
+      "arguments": [{ "name": "focus", "required": false, "description": "Optional context to emphasize for the next session." }],
+      "output": { "kind": "artifact", "paths": ["docs/handoff/<actor-id>.md"], "description": "A Git-grounded continuation note." },
+      "mutation": { "mode": "project-write", "paths": ["docs/handoff/"], "external": ["git-commit"] },
+      "reference": "references/recovery.md"
+    },
+    {
+      "name": "retrospective",
+      "aliases": ["retro", "retrospect"],
+      "arguments": [{ "name": "sprint", "required": false, "description": "A completed sprint, defaulting to the oldest missing retrospective." }],
+      "output": { "kind": "artifact", "paths": ["docs/retros/sprint-<n>.md"], "description": "A cross-story review and accepted process learnings." },
+      "mutation": { "mode": "project-write", "paths": ["docs/retros/", "AGENTS.md"], "external": ["git-commit"] },
+      "reference": "references/recovery.md"
+    },
+    {
+      "name": "research",
+      "aliases": [],
+      "arguments": [{ "name": "question", "required": true, "description": "A bounded technical or product research question." }],
+      "output": { "kind": "report", "paths": ["docs/research/<topic>.md"], "description": "A source-backed research report." },
+      "mutation": { "mode": "project-write", "paths": ["docs/research/"], "external": ["network-read"] },
+      "reference": "references/knowledge.md"
+    },
+    {
+      "name": "wiki",
+      "aliases": [],
+      "arguments": [{ "name": "action", "required": true, "description": "Query, ingest or lint plus its target." }],
+      "output": { "kind": "knowledge", "paths": ["docs/wiki/"], "description": "A query answer or updated and linted project knowledge." },
+      "mutation": { "mode": "project-write", "paths": ["docs/wiki/"], "external": [] },
+      "reference": "references/knowledge.md"
+    },
+    {
+      "name": "parallel",
+      "aliases": [],
+      "arguments": [{ "name": "stories", "required": true, "description": "Independent ready story IDs." }],
+      "output": { "kind": "delivery", "paths": ["<story-worktrees>", ".deliver/"], "description": "Isolated story results integrated serially after verification." },
+      "mutation": { "mode": "delivery-write", "paths": ["<story-worktrees>", ".deliver/"], "external": ["git-branch", "git-worktree", "git-push", "pull-request-create-or-update", "verified-merge"] },
+      "reference": "references/parallel.md"
+    },
+    {
+      "name": "benchmark-builders",
+      "aliases": [],
+      "arguments": [{ "name": "story", "required": true, "description": "One approved ready story to compare in disposable worktrees." }],
+      "output": { "kind": "benchmark", "paths": ["tmp/builder-benchmark/"], "description": "Deterministic comparison results; benchmark work is never merged." },
+      "mutation": { "mode": "project-write", "paths": ["tmp/builder-benchmark/"], "external": ["optional-approved-provider-call", "git-worktree"] },
+      "reference": "references/governance.md"
+    },
+    {
+      "name": "migrate",
+      "aliases": [],
+      "arguments": [{ "name": "legacy-project", "required": false, "description": "The current project, after a read-only migration preview." }],
+      "output": { "kind": "migration", "paths": ["docs/", ".deliver/"], "description": "Reviewed current-format artifacts with legacy history preserved." },
+      "mutation": { "mode": "project-write", "paths": ["docs/", ".deliver/", "<reviewed-legacy-paths>"], "external": ["git-commit"] },
+      "reference": "references/recovery.md"
+    }
+  ]
+}

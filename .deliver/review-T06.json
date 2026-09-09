@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "findings": [
+    {
+      "severity": "major",
+      "message": "Resolved in fix round 1: the checkpoint policy now says review cadence does not create extra permission requirements, pauses apply only when explicitly selected, the user's latest authorization overrides defaults, and high-risk work inside approved scope receives gates/review/verification without a new user permission step.",
+      "path": "plugins/deliver/skills/deliver/references/scale-profiles.md",
+      "resolved": true
+    }
+  ],
+  "summary": "Independent re-review verified the scale policy correction against the user's standing scoped Git/PR/merge authorization. The prior major finding is resolved and both fresh exact-snapshot gates passed."
+}
