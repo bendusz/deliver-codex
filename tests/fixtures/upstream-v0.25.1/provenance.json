@@ -1,0 +1,37 @@
+{
+  "upstream": "https://github.com/bendusz/deliver",
+  "version": "0.25.1",
+  "commit": "3aa3f3a0a6baed15e9a8a99ef15405b79efd37aa",
+  "license": "GPL-3.0-or-later",
+  "reader_dependencies": [
+    "node:child_process",
+    "node:fs",
+    "node:path",
+    "node:url"
+  ],
+  "files": [
+    { "fixture": "hooks/lib.mjs", "source": "plugins/deliver/hooks/lib.mjs", "sha256": "157bc7afe458d9ce4e05dd9bd3a8bb3326e791d3f5578737bfc17ad7e6dcfaea" },
+    { "fixture": "templates/AGENTS.md.template", "source": "plugins/deliver/templates/AGENTS.md.template", "sha256": "e188fbe70d50050a1ea2b5225eff41155366cfb9bcfbd9ac44336e40fa127823" },
+    { "fixture": "templates/CLAUDE.md.template", "source": "plugins/deliver/templates/CLAUDE.md.template", "sha256": "e8d5dd46d7bdc6f6cc5e4b9b845611660d6db84fc647d8519e2fd59f59575ccc" },
+    { "fixture": "templates/HANDOFF.md.template", "source": "plugins/deliver/templates/HANDOFF.md.template", "sha256": "ec44977ce51a36fa54aa30e9a6f9489a5ed235eeb9b9ca43901db35cd7bebc1f" },
+    { "fixture": "templates/approval.json.template", "source": "plugins/deliver/templates/approval.json.template", "sha256": "91465c46c86cf5ea709a772cc2ae4c8aee72e187dfce994adbab5fc3c030dbca" },
+    { "fixture": "templates/checklist-plan-quality.md.template", "source": "plugins/deliver/templates/checklist-plan-quality.md.template", "sha256": "2cf69e59c44b12f7b22b2b5035b1bcb19a8d25647521ff35206279bf5af9ef25" },
+    { "fixture": "templates/checklist-spec-quality.md.template", "source": "plugins/deliver/templates/checklist-spec-quality.md.template", "sha256": "193518525bdca5760a80b91b7519f7e894cd339a3daed9bb824077a157e1f2fd" },
+    { "fixture": "templates/checklist-story-readiness.md.template", "source": "plugins/deliver/templates/checklist-story-readiness.md.template", "sha256": "f5f365e215233a00629b8c098b0d3f767fd8185c4d5b7089328e93138595d765" },
+    { "fixture": "templates/checklist-verification-quality.md.template", "source": "plugins/deliver/templates/checklist-verification-quality.md.template", "sha256": "f05149e21bfa28f300cab1b1470598c01f0624ce43d0f4a14926a6366dacf68a" },
+    { "fixture": "templates/claude-settings-hardening.json.template", "source": "plugins/deliver/templates/claude-settings-hardening.json.template", "sha256": "730f3279d940a1644f9b0815ade5266757d2e8b93f1e708ee2fb98622f78ebb9" },
+    { "fixture": "templates/completion-report.md.template", "source": "plugins/deliver/templates/completion-report.md.template", "sha256": "8b5bee3b93a16a127c3d2c46ae286eff2c18d267d5ffc25f9bc9a3c314d8ec30" },
+    { "fixture": "templates/constitution.md.template", "source": "plugins/deliver/templates/constitution.md.template", "sha256": "0a7dac3ac9c1fb0a0162ef048cf570a5cf9140ba01080d263910edca844ff513" },
+    { "fixture": "templates/plan.md.template", "source": "plugins/deliver/templates/plan.md.template", "sha256": "95455a8d9e0a86df7484f027ead29d847ecc8964e704c5bbb75d444137a8083f" },
+    { "fixture": "templates/retro.md.template", "source": "plugins/deliver/templates/retro.md.template", "sha256": "79e642d07644f58c73274ed92d689a27dd13bd610fa717117177d313a6f4ac6d" },
+    { "fixture": "templates/sdd-module.template", "source": "plugins/deliver/templates/sdd-module.template", "sha256": "f8324f4ff59c184bc1ee865847a6a72a4e8cc4feac888f3c6f815c64790a4d88" },
+    { "fixture": "templates/sdd-root.template", "source": "plugins/deliver/templates/sdd-root.template", "sha256": "8169f1e6a0fdb17e4f89b73deaeee1e4b3a5930ad2f65ddc3bf387a65dc991ba" },
+    { "fixture": "templates/spec.md.template", "source": "plugins/deliver/templates/spec.md.template", "sha256": "29e4c5630f18b5d7458b54b00138826d72d220a3863429a7fc2b0260f415b4d4" },
+    { "fixture": "templates/specdd-bootstrap.md.template", "source": "plugins/deliver/templates/specdd-bootstrap.md.template", "sha256": "2bc3c3175dc0eb5f9ad669517857a0ee324d18d47725552143e0e63dff59ea0a" },
+    { "fixture": "templates/story.md.template", "source": "plugins/deliver/templates/story.md.template", "sha256": "2bfa9c32cc339f4b7b8764ff73e4e59e6562ab42dc720192ec8235342bf8c383" },
+    { "fixture": "templates/verification-report.md.template", "source": "plugins/deliver/templates/verification-report.md.template", "sha256": "9f82e7857ce5e633918156712b56a2ff6e4c38325c3e8c16006e09c07a6a7006" },
+    { "fixture": "templates/wiki-index.md.template", "source": "plugins/deliver/templates/wiki-index.md.template", "sha256": "a0f8c0fbb36296a24a1be6567e28eaf0cd9808f8e0696084808c72adeefa037d" },
+    { "fixture": "templates/wiki-page.md.template", "source": "plugins/deliver/templates/wiki-page.md.template", "sha256": "fda4f3d0e37bab47d79774b865752360d5b0bb3acf8cf7e8249d93b0900daeed" },
+    { "fixture": "templates/wiki-schema.md.template", "source": "plugins/deliver/templates/wiki-schema.md.template", "sha256": "f2b5981a07b942d2b87d108c9d90b19cb4738cd632f3e908a75cc14a5c89b0e7" }
+  ]
+}

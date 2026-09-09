@@ -1,0 +1,29 @@
+# S<sprint>-<n>: <title>
+<!-- pm-meta: {"builder":"<expert-builder|codex-builder|auto>","touches":["<repo-relative file or directory root; no globs; required and bounded>"]} -->
+Sprint: <n> · Priority: <high|med|low> · Covers: <FR-…, AC-…> · Depends on: <ids|none> · Parallel-safe: <yes|no>
+Risk: <low|med|high> · Review lenses: <code-integrity-reviewer[, architecture-reviewer][, security-auditor]> · Specs: <.sdd paths|none>
+
+## Goal
+<one paragraph>
+
+## Context (self-contained)
+<facts a cold builder needs that are absent from AGENTS.md>
+<name the source files, symbols, interfaces, and conventions. When a complete inventory matters,
+name the exact search that finds it.>
+
+## Acceptance criteria (testable)
+- [ ] <criterion>
+
+## Out of scope
+- <item>
+
+## Verification
+- Prove done with: `<command>`
+
+## Verification evidence
+
+## Execution
+<!-- Never written at decomposition; the claim commit adds this section (references/state.md).
+     One JSON comment on its own line, then optional dated notes for events with no commit.
+     Shape: pm-exec: {"owner":"<actor-id>","builder":"<expert-builder|codex-builder>","branch":"pm/S<sprint>-<n>-<slug>","status":"<claimed|building|built|in-review|merged|blocked>","rounds":0,"retries":0,"updated":"<YYYY-MM-DD HH:MM>"}
+     Then lines such as: - <YYYY-MM-DD HH:MM> external review skipped: codex CLI absent. -->
