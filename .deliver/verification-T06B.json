@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T06B-AC1",
+      "status": "PASS",
+      "evidence": "The regression fills the production story template after setup installs it, parses it with the installed scripts/lib/story.mjs, and asserts ID, title, sprint, priority, Covers, Depends on, Parallel-safe, risk, review lenses, specs, pm-meta, exact unchecked acceptance text, and null execution state."
+    },
+    {
+      "id": "T06B-AC2",
+      "status": "PASS",
+      "evidence": "The production template now uses middle-dot separators and the exact Parallel-safe field spelling accepted by the strict parser and present in the pinned upstream format. The bounded diff does not change scripts/lib/story.mjs or tests/fixtures/upstream-v0.25.1."
+    },
+    {
+      "id": "T06B-AC3",
+      "status": "PASS",
+      "evidence": "tests/template-compatibility.test.mjs runs setupProject against a temporary project, confirms installed template bytes equal bundled production bytes, imports the installed parser, and exercises those filled bytes end to end. Coordinator npm test and npm run validate gates both passed at snapshot ca84692b0e44143e661d1ca03b971a0e1281db9ebe44b72c933d3757c1fd1a69."
+    }
+  ]
+}
