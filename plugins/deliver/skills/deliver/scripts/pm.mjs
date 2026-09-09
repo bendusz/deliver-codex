@@ -2,6 +2,7 @@
 import { DeliverError } from './lib/state.mjs';
 import { gitRoot, snapshot } from './lib/scope.mjs';
 import { initializePm, readPm, approvePm, claimPm, completePm, recoverPm, pmActorId } from './lib/pm.mjs';
+import { detectProjectFormat, inspectProjectState } from './lib/project-state.mjs';
 
 const help = `Shared Deliver project state (upstream 0.22.0)
   pm.mjs init [--name PROJECT]
@@ -30,7 +31,14 @@ try {
     const root = gitRoot(process.cwd());
     let result;
     if (command === 'init') result = initializePm(root, options['--name']);
-    else if (command === 'status') { const shared = readPm(root); result = { managed: Boolean(shared), ...shared }; }
+    else if (command === 'status') {
+      const format = detectProjectFormat(root);
+      if (format === 'current') result = inspectProjectState(root);
+      else {
+        const shared = readPm(root);
+        result = { managed: Boolean(shared), ...shared };
+      }
+    }
     else if (command === 'actor-id') result = { actor: pmActorId(root) };
     else if (command === 'approve') result = approvePm(root, options['--approver']);
     else if (command === 'claim') result = claimPm(root, options['--story'], options['--branch']);

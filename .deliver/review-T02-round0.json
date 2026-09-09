@@ -1,0 +1,18 @@
+{
+  "status": "FAIL",
+  "findings": [
+    {
+      "severity": "major",
+      "message": "Completion gating ignores approval.implementation_ready. A tracked approved marker with a null digest and no tracked plan, one merged story, and its retrospective returns phase done while also reporting APPROVAL_NOT_EXECUTABLE and implementation_ready false. Downgrade invalid or non-executable approval to planning before deriving done, and cover missing/null digest plus untracked marker/plan variants.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/project-state.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "pm-exec branch validation accepts Git-invalid names such as @, foo//bar, a trailing dot or .lock, and @{ sequences. Such malformed execution metadata can still mark a story merged and contribute to completion. Apply the complete supported Git-ref rules consistently with the plan integration-branch reader and add focused rejection cases.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/story.mjs",
+      "resolved": false
+    }
+  ],
+  "summary": "Independent review confirmed valid upstream state parity and most strict-reader behavior, but found two acceptance-blocking paths: non-executable approval can derive done, and malformed Git branch metadata is accepted."
+}
