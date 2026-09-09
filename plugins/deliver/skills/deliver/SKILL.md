@@ -15,9 +15,9 @@ Do not silently substitute models or require Claude.
 
 ## Working contract
 
-- Project progress lives in the original `pm/pm-state.json`, actor files and log. Read
-  `references/compatibility.md` before starting or resuming a project. `.deliver/` holds
-  Codex execution evidence, not a second project backlog. Switch hosts at completed story boundaries.
+- Shared progress lives in `docs/approval.json`, `docs/stories/` Execution blocks and Git history.
+  `.deliver/` holds Codex execution evidence, not another backlog. Read `references/compatibility.md`
+  before starting or switching hosts, and switch at completed story boundaries.
 - Quick may implement directly. Managed and Governed delegate bounded implementation to
   `deliver-builder`. Never edit a scope while another worker owns it.
 - Use native subagents when delegating. Start with a fresh, minimal task packet when the host
@@ -41,7 +41,13 @@ Do not silently substitute models or require Claude.
 
 | Request or phase | Read |
 |---|---|
-| Start, discover, specify, clarify, plan or build | `references/workflow.md` |
+| Operation names, arguments, output or authority | `references/operations.md` |
+| Discover or start a new project | `references/discovery.md` |
+| Specify or clarify product intent | `references/specification.md` |
+| Constitution, plan or approval | `references/planning.md` |
+| Project scale or checkpoint policy | `references/scale-profiles.md` |
+| Decompose an approved plan or check story readiness | `references/decomposition.md` |
+| Build, gate, review, verify, integrate or complete | `references/workflow.md` |
 | Execute state, scope, gate or receipt commands | `references/runtime.md` |
 | Resume, handoff, doctor or correct-course | `references/recovery.md` |
 | SpecDD skeleton, contracts or contract-aware change | `references/specdd.md` |

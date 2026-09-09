@@ -1,0 +1,36 @@
+<!-- Write to docs/completion-report.md after every planned story has verified integration. -->
+# <Project> completion report
+
+- Date: <YYYY-MM-DD>
+- Spec: <docs/spec.md or N/A>
+- Plan: docs/plan.md
+- Constitution: <docs/constitution.md or N/A>
+- Integration history: `git log --first-parent <integration branch>`
+
+## Outcome
+
+<What shipped and the result against the approved goals.>
+
+## Delivered stories
+
+| Story | Covers | Title | Status | Merge or pull request |
+| --- | --- | --- | --- | --- |
+| S1-1 | FR-001, AC-001 | <Title> | merged | <commit or pull request> |
+
+## Traceability
+
+| Requirement | Delivered by | Verification | Notes |
+| --- | --- | --- | --- |
+| FR-001 | S1-1 | docs/verification/S1-1.md | |
+| AC-001 | S1-1 | docs/verification/S1-1.md | |
+
+## Gates, review and verification
+
+- Deterministic gates: <results or N/A>.
+- Independent review: <lenses, verdicts and accepted minor findings>.
+- Acceptance verification: <status and evidence path per story>.
+- Analysis: <last headline status or N/A for a scale that skips analysis>.
+
+## Follow-ups and known issues
+
+- <Deferred item, limitation or debt.>

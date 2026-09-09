@@ -1,0 +1,22 @@
+# <Project>
+
+<What this project is and why.>
+
+## Commands
+
+- Test: `<command or N/A>`
+- Lint: `<command or N/A>`
+- Build: `<command or N/A>`
+- Run: `<command or N/A>`
+
+## Layout
+
+<Top-level directories and their contents.>
+
+## Conventions
+
+<Only rules that differ from language or framework defaults.>
+
+## Gotchas
+
+<Non-obvious facts a contributor must know.>

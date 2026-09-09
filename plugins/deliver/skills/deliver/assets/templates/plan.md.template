@@ -1,0 +1,65 @@
+# <Project> delivery plan
+
+<!-- Source spec: docs/spec.md, or "none, intent captured inline" for an agreed tiny project. -->
+
+## Overview
+
+<What will be delivered and why.>
+
+## Source spec
+
+- docs/spec.md
+
+## Delivery policy
+
+- Scale: <tiny | small | standard | large | regulated>
+- Execution mode: <Quick | Managed | Governed>
+- Checkpoint policy: <story-level | sprint-level | autonomous>
+- Integration branch: <main>
+- Skeleton: <specdd | none>
+
+## Scope
+
+### In
+
+- <Included outcome.>
+
+### Out
+
+- <Excluded outcome.>
+
+## Stories
+
+| ID | Title | Priority | Covers | Depends on | Parallel safe |
+| --- | --- | --- | --- | --- | --- |
+| S1-1 | <Title> | high | FR-001, AC-001 | none | no |
+
+## Architecture and decisions
+
+<Stack, boundaries and material choices with reasons.>
+
+## Traceability
+
+| Requirement | Covered by | Notes |
+| --- | --- | --- |
+| FR-001 | S1-1 | |
+| AC-001 | S1-1 | |
+
+## Commands
+
+- Test: `<command or N/A>`
+- Lint: `<command or N/A>`
+- Build: `<command or N/A>`
+- Run: `<command or N/A>`
+
+## Risks
+
+- <Risk and mitigation.>
+
+## Clarifications
+
+<!-- Must be empty before approval. -->
+
+## Sign-off
+
+Approved by __________ on ____-__-__
