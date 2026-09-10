@@ -25,6 +25,11 @@ story contract/specs, actor/builder/source branch and in-review Execution hash, 
 run/baseline/adoption/review lineage, generation/unique correction branch, inherited findings,
 and MAX counter-source identities. Reject free-form caller failures or substitute state bytes.
 
+The real-M basis requires a current failing gate, a FAIL verification criterion, or an integration
+review with FAIL or an unresolved block/major finding. Missing evidence, UNKNOWN alone, pending
+workflow and superseded failures do not authorize a source correction. Preserve those states
+as incomplete evidence until the applicable operation provides a current result.
+
 Prepare requires canonical current approval, unchanged contract/scope/route, immutable finished C
 still at its recorded source ref/worktree, the L record's actual failure, same common repository,
 and no pending/started correction. For no-M, I must still be the clean checked-out integration tip,
