@@ -1,0 +1,12 @@
+{
+  "status": "FAIL",
+  "findings": [
+    {
+      "severity": "major",
+      "message": "The temporary body helper does not guarantee the accepted absolute mode0600 file contract. os.tmpdir() can return an inherited relative TMPDIR, so the adapter passes a relative --body-file path to a child whose cwd is target.root; the file was created relative to the coordinator cwd and may be unreadable there. openSync(..., 0600) is also filtered by the process umask and the descriptor is never fchmod'd, so a restrictive umask creates mode000 rather than mode0600. Resolve and validate an absolute temporary base, force the open descriptor to 0600, and add a regression that varies target.root/TMPDIR and the umask while proving exact argv, mode and cleanup.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/remote.mjs",
+      "resolved": false
+    }
+  ],
+  "summary": "T05R fails review at frozen snapshot ec1d3e38373cffe052fcdeac99ff3f1d3d94c51fd45fe3745fa6b5f60fcff263 because publish and merge do not satisfy the required absolute mode0600 temporary-body contract under supported inherited environments. The exact remote/PR identity, bounded command protocol, conservative checks classification, protected merge invocation and post-merge remote-base proof otherwise match the packet. Coordinator npm test and npm run validate both passed at this exact snapshot, but the test suite does not vary TMPDIR or umask and therefore misses the defect."
+}
