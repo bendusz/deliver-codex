@@ -126,9 +126,9 @@ test('original -> Codex -> original round trip preserves schemas, claims, counte
   assert.notEqual(f.pm('claim', '--story', storyPath).status, 0);
 });
 
-test('new shared projects use the upstream templates without implying sign-off', (t) => {
+test('explicit legacy initialization uses the upstream templates without implying sign-off', (t) => {
   const f = fixture(t, { upstream: false });
-  assert.equal(f.pm('init', '--name', 'New shared project').status, 0);
+  assert.equal(f.pm('init', '--name', 'New shared project', '--format', 'legacy').status, 0);
   assert.deepEqual(Object.keys(f.read('pm/pm-state.json')).sort(), Object.keys(template('pm-state')).sort());
   assert.deepEqual(Object.keys(f.read(f.actorPath)).sort(), Object.keys(template('actor-state')).sort());
   assert.equal(f.read('pm/pm-state.json').signed_off, false);
@@ -143,7 +143,7 @@ test('new shared projects use the upstream templates without implying sign-off',
 test('shared PM records cannot be initialized under Git ignore rules', (t) => {
   const f = fixture(t, { upstream: false });
   f.write('.gitignore', 'pm/\n');
-  const result = f.pm('init');
+  const result = f.pm('init', '--format', 'legacy');
   assert.notEqual(result.status, 0);
   assert.match(result.json.error, /ignored by Git/);
   assert.equal(fs.existsSync(path.join(f.root, 'pm/pm-state.json')), false);

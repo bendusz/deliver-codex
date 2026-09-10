@@ -104,9 +104,28 @@ function validateState(state) {
   }
   if (state.pm_binding !== undefined && state.pm_binding !== null) {
     const binding = state.pm_binding;
-    if (!isObject(binding) || !['actor', 'story', 'story_path', 'story_hash', 'integration_branch', 'actor_path'].every((key) => typeof binding[key] === 'string')) fail('bad PM binding');
-    if (!/^[a-z0-9-]+-[a-f0-9]{12}$/.test(binding.actor) || binding.actor_path !== `pm/actors/${binding.actor}.json`
-      || !binding.story_path.startsWith('docs/stories/') || binding.story_path.split(/[\\/]/).includes('..')) fail('unsafe PM binding');
+    const safeActor = (value) => typeof value === 'string' && /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?-[a-f0-9]{12}$/.test(value);
+    const safeStoryPath = (value) => typeof value === 'string' && /^docs\/stories\/S\d+-\d+-[^/\\]+\.md$/.test(value);
+    const safeBranch = (value) => typeof value === 'string' && value && value.length <= 512 && value !== '@'
+      && !value.startsWith('-') && !value.startsWith('/') && !value.endsWith('/') && !value.endsWith('.')
+      && !value.includes('..') && !value.includes('//') && !value.includes('@{')
+      && !/[\x00-\x20\x7f~^:?*[\\\]]/.test(value)
+      && value.split('/').every((part) => part && !part.startsWith('.') && !part.endsWith('.lock'));
+    if (!isObject(binding)) fail('bad PM binding');
+    if (binding.format === 'current') {
+      if (!['actor', 'story', 'story_path', 'contract_hash', 'execution_hash', 'plan_digest', 'branch', 'builder', 'integration_branch']
+        .every((key) => typeof binding[key] === 'string')) fail('bad current PM binding');
+      if (!safeActor(binding.actor) || !/^S\d+-\d+$/.test(binding.story) || !safeStoryPath(binding.story_path)
+        || !/^[0-9a-f]{64}$/.test(binding.contract_hash) || !/^[0-9a-f]{64}$/.test(binding.execution_hash)
+        || !/^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(binding.plan_digest)
+        || !safeBranch(binding.branch) || !safeBranch(binding.integration_branch)
+        || !['codex-builder', 'expert-builder'].includes(binding.builder)) fail('unsafe current PM binding');
+    } else {
+      if (binding.format !== undefined && binding.format !== 'legacy') fail('unsupported PM binding format');
+      if (!['actor', 'story', 'story_path', 'story_hash', 'integration_branch', 'actor_path'].every((key) => typeof binding[key] === 'string')) fail('bad legacy PM binding');
+      if (!safeActor(binding.actor) || binding.actor_path !== `pm/actors/${binding.actor}.json`
+        || !binding.story_path.startsWith('docs/stories/') || binding.story_path.split(/[\\/]/).includes('..')) fail('unsafe legacy PM binding');
+    }
   }
   if (state.completion_snapshot !== undefined) {
     const snap = state.completion_snapshot;
