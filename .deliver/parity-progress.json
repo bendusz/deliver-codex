@@ -112,7 +112,12 @@
       "fixes": 3,
       "commit": "8bdd6f1367141add5af69c9b7bce19da3e1a46ab",
       "integration_commit": "4c419a7c948642b9a5e35e3cc59a4b03b2b8d806",
-      "post_acceptance_review_finding": "Requested Claude review independently reproduced stale commit-preparation deadlock after legal correction. Additional bounded follow-up requires retained lineage/counters; original finished run remains historical evidence."
+      "post_acceptance_review_finding": "Requested Claude review independently reproduced stale commit-preparation deadlock after legal correction. Additional bounded follow-up requires retained lineage/counters; original finished run remains historical evidence.",
+      "post_acceptance_review_resolution": {
+        "task": "T04F",
+        "commit": "0a6623936a000afad6bbb0f4d2c51b5b8d6ca419",
+        "status": "confirmed stale-preparation defect repaired and independently verified"
+      }
     },
     "T05L": {
       "status": "implementing approved fix5",
@@ -159,17 +164,22 @@
       "integration_commit": "10e6c2260c59faad6802988932efcfcd189e088b"
     },
     "T04F": {
-      "status": "full153/153 tests and validate PASS; independent review pending",
+      "status": "reviewed, verified, integrated",
       "worktree": "/tmp/deliver-parity-t04f",
       "run": "8ba60517-eee5-486d-96db-cf86b1aebf49",
       "builder": "/root/t04_repair_builder",
       "fixes": 4,
       "retries": 0,
       "source_run": "9e5faaea-1973-4a63-b57c-6c943bf4c5d0",
-      "snapshot": "a0f9aafd948b2b2a1ce6d9432b01d70c3f0941f4aea102da7b8d2799e490c866"
+      "snapshot": "a0f9aafd948b2b2a1ce6d9432b01d70c3f0941f4aea102da7b8d2799e490c866",
+      "commit": "0a6623936a000afad6bbb0f4d2c51b5b8d6ca419",
+      "integration_commit": "2fff9e6a58c65f92bd7315ea91c0fe10c50fd4b6",
+      "findings": [
+        "Inherited nonblocking legacy active-hook documentation limitation remains assigned T14."
+      ]
     }
   },
-  "next": "Finish independent T04F and T05L fixes against unchanged per-task baselines, then integrate and run fresh combined gates/review before continuing parity.",
+  "next": "Finish approved T05L fix5, fresh full gates/review, then integrate and run distinct combined verification before continuing parity.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
@@ -182,11 +192,11 @@
     "Runtime task read_paths cannot include .deliver. Frozen supplemental design copies live under docs/plans/parity-contracts; coordinator progress/evidence stays under .deliver."
   ],
   "latest_integrated_validation": {
-    "commit": "10e6c2260c59faad6802988932efcfcd189e088b",
-    "tests": 144,
-    "passed": 144,
+    "commit": "2fff9e6a58c65f92bd7315ea91c0fe10c50fd4b6",
+    "tests": 153,
+    "passed": 153,
     "validate": "PASS",
-    "scope": "All production/test/package files identical to T05R frozen gate snapshot; intervening root differences are coordinator/planning docs only. Source through T04/T07 plus T13A and T05R."
+    "scope": "Integrated production/test/package source is byte-identical to accepted T04F tree; actual full gates ran in its worktree. T05L remains separate and pending."
   },
   "requested_external_review": {
     "model": "claude-fable-5-1",
