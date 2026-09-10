@@ -96,22 +96,25 @@
       ]
     },
     "T04": {
-      "status": "independent fix2 FAIL recorded; final fix round3 authorized",
+      "status": "reviewed, verified, integrated after final fix round3",
       "worktree": "/tmp/deliver-parity-t04",
       "run": "9e5faaea-1973-4a63-b57c-6c943bf4c5d0",
       "builder": "/root/t01_builder",
-      "snapshot": "875e8f2ce514173cd99aa70cc04d18bd320767a8fb2821d1622487ae6c6398a2",
+      "snapshot": "50471c7d0d9ca1fbe5fb567aefba1966305546e925b6cdeefcaee5b76ec4b1bf",
       "findings": [
         "Independent diagnosis: current snapshot Git metadata schema changed; real old metadata exactly matches baseline. Add exact legacy-v1 comparison for pre-anchor runs without loosening actual Git drift checks.",
         "Review: commit preparation includes unchanged pre-start dirty paths under touches.",
         "Review: recovery validates path-shaped images but not the full legal story/run before-after transition.",
         "Fix2 review: prepared/adopted index flags and complete audited changed-entry tree coverage are missing.",
-        "Fix2 review: current anchor suppresses recursive baseline Git metadata but does not protect initialized submodule metadata."
+        "Fix2 review: current anchor suppresses recursive baseline Git metadata but does not protect initialized submodule metadata.",
+        "Minor carried to T14: explain restricted legacy active-hook anchor upgrades and explicit reconciliation without baseline/budget reset."
       ],
-      "fixes": 3
+      "fixes": 3,
+      "commit": "8bdd6f1367141add5af69c9b7bce19da3e1a46ab",
+      "integration_commit": "4c419a7c948642b9a5e35e3cc59a4b03b2b8d806"
     }
   },
-  "next": "T04 independent fix2 review, then T05L local integration and T05R provider port. T05C corrections/T05B wiring, T08 readiness/resume, T09 migration, T10 retrospectives, T11 knowledge/review, T11P completion report, T12 parallel, T13B comparisons and T14 release remain.",
+  "next": "T05L local integration and T05R provider port can dispatch. Then T05C/T05B, T08, T09, T10, T11/T11P, T12, T13B and T14.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
