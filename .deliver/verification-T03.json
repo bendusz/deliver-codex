@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T03-AC1",
+      "status": "PASS",
+      "evidence": "Current approval requires tracked regular marker and plan files and stores the exact Git plan digest; claim preserves actor, resolved route, branch, contract hash, execution hash and spent counters without changing foreign work. Fix-round tests additionally prove same-owner resume rejects dirty integration and story checkouts, succeeds from clean integration, and exact story specs cannot be omitted."
+    },
+    {
+      "id": "T03-AC2",
+      "status": "PASS",
+      "evidence": "Current-format init forces docs/plan.md and shared approval reuse; start binds the exact claim, and inspectScope revalidates approval, ownership, route, branch, contract and Execution for check/gate/review/verify/finish. The correction test nulls an active current binding and verifies all five continuation commands fail, while plan, route, branch and revocation regressions also block continuation."
+    },
+    {
+      "id": "T03-AC3",
+      "status": "PASS",
+      "evidence": "Duplicate current story runs are rejected; counters resume with their maximum persisted values; unavailable expert-builder fails without fallback; sequential same-actor other-story work returns PARALLEL_BATCH_REQUIRED; pm init defaults new projects to current state while explicit legacy initialization, status and original round-trip regressions remain supported. Coordinator npm test and npm run validate both passed at snapshot 68bf0a95c015bd9b3bce8ddc523b493621c0fe850a52f8632569b355aab82c26."
+    }
+  ]
+}

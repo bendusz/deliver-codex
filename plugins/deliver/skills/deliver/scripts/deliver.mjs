@@ -17,6 +17,7 @@ import { baselineDirtyPaths, gitRoot, inspectScope, snapshot, validateTaskPaths 
 import { executeGate, gateIsCurrent, parseEnvironment } from './lib/gates.mjs';
 import { captureContracts } from './lib/contracts.mjs';
 import { preparePmBinding } from './lib/pm.mjs';
+import { detectProjectFormat, inspectProjectState } from './lib/project-state.mjs';
 
 const HELP = `Deliver deterministic runtime
 
@@ -88,7 +89,27 @@ function active(state) {
 }
 
 function requireCurrentApproval(state) {
+  const format = detectProjectFormat(state.project_root);
+  if (format === 'current') {
+    const shared = inspectProjectState(state.project_root, { actorId: null });
+    if (!shared?.approval?.implementation_ready) throw new DeliverError('current project needs an approved tracked marker and matching shared plan', 66);
+    const planPath = path.join(state.project_root, 'docs', 'plan.md');
+    if (state.plan.path !== planPath || currentPlanHash(state) !== state.plan.hash) throw new DeliverError('runtime must use the unchanged approved shared docs/plan.md', 66);
+    if (!approvalIsCurrent(state) || state.approval.source !== 'current-project'
+      || state.approval.shared_plan_digest !== shared.approval.plan_digest) {
+      state.approval = {
+        approver: shared.approval.approver || 'shared-project',
+        plan_hash: state.plan.hash,
+        approved_at: shared.approval.approved_date || new Date().toISOString(),
+        source: 'current-project',
+        shared_plan_digest: shared.approval.plan_digest,
+      };
+      event(state, 'shared_approval_reused', { plan_hash: state.plan.hash, plan_digest: shared.approval.plan_digest });
+    }
+    return shared;
+  }
   if (state.mode !== 'quick' && !approvalIsCurrent(state)) throw new DeliverError(`${state.mode} mode needs explicit approval for the current plan`, 66);
+  return null;
 }
 
 function parseReceipt(file) {
@@ -185,8 +206,25 @@ function main() {
   const o = args(rest);
   if (command === 'init') {
     const root = gitRoot(process.cwd());
-    const created = createRun(root, required(o, '--mode'), o['--plan']);
-    output(summarize(created.state, created.file));
+    const format = detectProjectFormat(root);
+    let plan = o['--plan'];
+    if (format === 'current') {
+      const sharedPlan = path.join(root, 'docs', 'plan.md');
+      if (plan && path.resolve(root, plan) !== sharedPlan) throw new DeliverError('current projects must use the shared docs/plan.md', 64);
+      plan = 'docs/plan.md';
+    }
+    const created = createRun(root, required(o, '--mode'), plan);
+    if (format !== 'current') {
+      output(summarize(created.state, created.file));
+      return;
+    }
+    const shared = inspectProjectState(root, { actorId: null });
+    if (!shared?.approval?.implementation_ready) {
+      output(summarize(created.state, created.file));
+      return;
+    }
+    const updated = updateRun(created.file, 0, (state) => { requireCurrentApproval(state); });
+    output(summarize(updated.state, updated.file));
     return;
   }
   const run = required(o, '--run');
@@ -198,6 +236,9 @@ function main() {
   if (command === 'approve') {
     const approver = actor(required(o, '--approver'), '--approver');
     const updated = updateRun(run, o.expectedRevision, (state) => {
+      if (detectProjectFormat(state.project_root) === 'current') {
+        throw new DeliverError('current projects use pm.mjs approve; the runtime reuses that shared approval', 66);
+      }
       const planHash = syncPlan(state);
       state.approval = { approver, plan_hash: planHash, approved_at: new Date().toISOString() };
       event(state, 'approved', { approver, plan_hash: planHash });
