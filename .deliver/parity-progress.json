@@ -124,11 +124,15 @@
       ]
     },
     "T05R": {
-      "status": "full gates passed; independent review and acceptance verification pending",
+      "status": "fix1 dispatched after independent AC2 temporary-body failure",
       "worktree": "/tmp/deliver-parity-t05r",
       "run": "722c47ba-d20f-410d-a201-e093f9315254",
       "builder": "/root/benchmark_builder",
-      "snapshot": "ec1d3e38373cffe052fcdeac99ff3f1d3d94c51fd45fe3745fa6b5f60fcff263"
+      "snapshot": "ec1d3e38373cffe052fcdeac99ff3f1d3d94c51fd45fe3745fa6b5f60fcff263",
+      "fixes": 1,
+      "findings": [
+        "Independent review: relative TMPDIR makes body argv relative; restrictive umask prevents exact0600. Actual failed review/verification archived round1 before fix1 dispatch."
+      ]
     }
   },
   "next": "Finish independent review and integration of active T05L/T05R; then T05C/T05B, T08, T09, T10, T11/T11P, T12, T13B and T14.",
