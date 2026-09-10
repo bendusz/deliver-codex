@@ -114,7 +114,7 @@
       "integration_commit": "4c419a7c948642b9a5e35e3cc59a4b03b2b8d806"
     },
     "T05L": {
-      "status": "fix1 full gates PASS; independent re-review and Managed verification active",
+      "status": "fix2 dispatched after independent round2 FAIL; retries1 preserved",
       "worktree": "/tmp/deliver-parity-t05l",
       "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
       "builder": "/root/t01_builder",
@@ -124,11 +124,13 @@
         "Independent review round1: evidence-only M refresh and no-M failure record missing.",
         "Independent review round1: actual live M bytes, gate logs and prior failure receipts are not durably bound.",
         "Independent review round1: integration record ID/path is not canonical or bound to source run.",
-        "Independent review round1: adopted P/E/H/reporting proof and truthful escaped findings are incomplete."
+        "Independent review round1: adopted P/E/H/reporting proof and truthful escaped findings are incomplete.",
+        "Independent review round2: clean initialized scoped submodule manifests mismatch and protected I metadata incorrectly freezes legitimate M gitlink changes.",
+        "Independent review round2 minor: fresh M handoff can omit unresolved source C concerns retained in the report."
       ],
-      "builder_checkpoint": "All four round1 major groups corrected; builder focused31/31. Root npm test147/147 and validate PASS at frozen candidate. Independent review/verification dispatched; acceptance pending.",
+      "builder_checkpoint": "Actual FAIL review and verification archived round2 and recorded; fix2 recorded at revision13 before dispatch. Prior four round1 major groups resolved by independent review. Original baseline retained.",
       "snapshot": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3",
-      "fixes": 1,
+      "fixes": 2,
       "candidate_snapshot": "477c3fb8d6ae901dc3c6160406acab0834ab7123c3c65a9b7c8cffbf499dab92"
     },
     "T05R": {
