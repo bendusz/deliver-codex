@@ -120,7 +120,7 @@
       }
     },
     "T05L": {
-      "status": "implementing approved fix5",
+      "status": "fix5 full158/158 tests and validate PASS; independent review pending",
       "worktree": "/tmp/deliver-parity-t05l",
       "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
       "builder": "/root/benchmark_builder",
@@ -141,7 +141,7 @@
       "builder_checkpoint": "Approval recorded; prior FAIL evidence archived; original baseline retained. Repair finalization/legacy evidence recovery and panel aggregate consistency.",
       "snapshot": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3",
       "fixes": 5,
-      "candidate_snapshot": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9",
+      "candidate_snapshot": "f74deb232127a910f84a997b17fee8e250bca37d9be7b321f761d144900280ab",
       "checkpoint": ".deliver/checkpoints/T05L-final-fix3/manifest.json",
       "latest_checkpoint": ".deliver/checkpoints/T05L-fix4-claude-review/manifest.json",
       "failed_criteria": [
