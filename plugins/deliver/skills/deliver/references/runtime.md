@@ -108,6 +108,24 @@ verification evidence moves to `evidence_history`, and callers must collect fres
 Runtime receipt files remain outside the code commit. Before `finish`, adopt a candidate whose
 recorded Execution state and hash are the current `in-review` state.
 
+If preparation becomes stale before the commit, cancel that exact preparation while `HEAD`
+still names its recorded parent and the index is clean:
+
+```text
+node <runtime> commit-cancel --run <run-id> --token <returned-token> \
+  --expected-revision <current-revision> --reason "Why this preparation is no longer usable"
+```
+
+Cancellation requires the original branch, unchanged protected Git state and a passing cumulative
+scope check. It archives the complete preparation and reason in cancellation history, then clears
+the pending slot. It does not edit source, move Git state, record an adopted commit, change attempt
+counters or grant evidence. Run `commit-prepare` again after cancellation. If `HEAD` has advanced,
+reconcile it to the reported prepared parent outside the runtime before retrying cancellation.
+
+Any state-changing Execution transition or `correct-course` operation refuses a pending preparation
+and reports the exact cancellation command. A same-state Execution resume that would write nothing
+remains a no-op.
+
 Runs created before Git anchors keep their original baseline. The runtime accepts that baseline
 only when the legacy metadata digest still matches exactly, including initialized submodules.
 The first successful commit preparation records the current anchor and the legacy baseline

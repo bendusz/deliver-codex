@@ -1,0 +1,40 @@
+{
+  "id": "T04F",
+  "objective": "Repair stale commit-preparation recovery with audited cancellation while preserving completed T04 lineage and cumulative spent attempts",
+  "read_paths": [
+    "AGENTS.md",
+    "docs/plans/2026-09-09-upstream-parity.md",
+    "docs/plans/2026-09-10-review-repairs-proposal.md",
+    "docs/plans/parity-contracts/review-repair-authorization.md",
+    "docs/plans/parity-contracts/architecture-state.md"
+  ],
+  "touches": [
+    "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+    "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+    "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+    "plugins/deliver/skills/deliver/references/runtime.md",
+    "plugins/deliver/skills/deliver/references/recovery.md",
+    "tests/transitions.test.mjs",
+    "tests/current-lifecycle.test.mjs",
+    "tests/commit-cancellation.test.mjs"
+  ],
+  "acceptance": [
+    {
+      "id": "T04F-AC1",
+      "text": "Audited commit-cancel requires exact run/token/revision, original ref and parent, clean index, unchanged protected Git state and passing cumulative scope; archives cancelled preparation without creating adopted-commit evidence or changing source, baseline, original histories or attempt counters."
+    },
+    {
+      "id": "T04F-AC2",
+      "text": "State-changing Execution transition/correction refuses a pending preparation before story/run writes or attempt spending; true no-op resume remains no-op. PM cancellation and normal reprepare/adopt/finish work without a new permission checkpoint."
+    },
+    {
+      "id": "T04F-AC3",
+      "text": "Real disposable Git regressions cover source changes, previously legal correction leaving stale pending, fresh-process cancellation, stale token/revision, moved HEAD/ref, staged index and protected metadata rejection, and successful full adoption after reconciliation. Earlier T04 lifecycle and cumulative evidence invariants remain enforced."
+    }
+  ],
+  "commands": {
+    "test": "npm test",
+    "validate": "npm run validate"
+  },
+  "specs": []
+}

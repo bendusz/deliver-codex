@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T04F-AC1",
+      "status": "PASS",
+      "evidence": "cancelPreparedCommit requires a UUID token and mandatory safe integer expected revision, then under the run lock verifies an active current binding, the exact pending token, shared PM binding, HEAD equal to the prepared parent, the original symbolic ref, a clean index, the prepared protected-anchor hash and a passing cumulative scope check with only the pending-adoption allowance. It structured-clones the full preparation into cancellation history with a bounded reason and timestamp, clears only pending, and adds an audit event; it does not touch source, the original baseline, adopted history, evidence history or attempt counters. State validation accepts old adoption records without a cancellations field and validates every new archived preparation and reason."
+    },
+    {
+      "id": "T04F-AC2",
+      "status": "PASS",
+      "evidence": "transitionCurrentExecution computes the same no-op condition used by buildExecutionTransition and rejects a pending preparation for every state-changing transition before creating the two-file journal. Both current fix/retry correction and generic plan correction reach the pending guard before story/run mutation, plan replacement, evidence archival or counter increments. Status supplies the exact run/token/current-revision continuation, and the disposable-repository regression proves byte-identical run/story state for a same-state no-op, unchanged counters on rejected transition/fix/plan operations, then successful cancellation, reprepare, direct-child adoption, fresh evidence and finish without another approval step."
+    },
+    {
+      "id": "T04F-AC3",
+      "status": "PASS",
+      "evidence": "The new real-Git suite contributes nine cancellation cases: combined source edits and a previously legal correction, fresh-process status/cancellation, stale token and revision, missing revision and invalid reason, moved HEAD with both commit IDs reported, moved ref, staged index, protected exclude drift, out-of-scope drift, and successful reprepare/adopt/finish while preserving the prior fix count and baseline. Existing T04 tests continue to cover exact tree/index/index-flag adoption, pre-start dirt, recovery pair validation, effective hooks, recursive submodules, stale evidence and legal lifecycle transitions. Coordinator evidence records npm test PASS with 153/153 tests in test-76400719-37eb-4a6b-b2d6-06b71421c8a9.log and npm run validate PASS in validate-f1b97877-378a-4715-874f-296e1169857d.log; both have exit_code 0, clean scope and snapshot a0f9aafd948b2b2a1ce6d9432b01d70c3f0941f4aea102da7b8d2799e490c866."
+    }
+  ]
+}
