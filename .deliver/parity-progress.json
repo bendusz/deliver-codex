@@ -114,7 +114,7 @@
       "integration_commit": "4c419a7c948642b9a5e35e3cc59a4b03b2b8d806"
     },
     "T05L": {
-      "status": "fix2 full gates PASS; independent re-review and Managed verification active",
+      "status": "final fix3 dispatched after independent round3 FAIL; retries1 preserved",
       "worktree": "/tmp/deliver-parity-t05l",
       "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
       "builder": "/root/t01_builder",
@@ -126,11 +126,12 @@
         "Independent review round1: integration record ID/path is not canonical or bound to source run.",
         "Independent review round1: adopted P/E/H/reporting proof and truthful escaped findings are incomplete.",
         "Independent review round2: clean initialized scoped submodule manifests mismatch and protected I metadata incorrectly freezes legitimate M gitlink changes.",
-        "Independent review round2 minor: fresh M handoff can omit unresolved source C concerns retained in the report."
+        "Independent review round2 minor: fresh M handoff can omit unresolved source C concerns retained in the report.",
+        "Independent review round3: nested submodule scopes lack committed ancestor gitlinks; unbound initialized submodules can hide wrong M content through ignore=all after protectedShape removes nested content. Root-link and source-concern fixes resolved."
       ],
-      "builder_checkpoint": "Fix2 frozen; focused32/32, root npm test148/148 and validate PASS at candidate. Independent re-review dispatched. Source baseline and all previous findings retained.",
+      "builder_checkpoint": "Actual FAIL review/verification/check archived round3 and recorded; fix3 recorded at revision18 before dispatch. Same baseline, retries1, final permitted fix round. Required scope-recursive manifests and separate repository-wide initialized submodule M proof.",
       "snapshot": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3",
-      "fixes": 2,
+      "fixes": 3,
       "candidate_snapshot": "1475f6e6676d9b95fe255e0e2d6500fbdf1a6fc6f24f1315be8bc4ae0248a315"
     },
     "T05R": {
