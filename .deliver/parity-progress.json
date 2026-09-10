@@ -114,16 +114,21 @@
       "integration_commit": "4c419a7c948642b9a5e35e3cc59a4b03b2b8d806"
     },
     "T05L": {
-      "status": "full gates passed; independent review/verification in progress",
+      "status": "fix1 dispatched after independent review; retries1 preserved",
       "worktree": "/tmp/deliver-parity-t05l",
       "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
       "builder": "/root/t01_builder",
       "retries": 1,
       "findings": [
-        "Native host returned selected model at capacity; retry1 recorded before resuming same agent/model, preserving in-scope partial source."
+        "Native host returned selected model at capacity; retry1 recorded before resuming same agent/model, preserving in-scope partial source.",
+        "Independent review round1: evidence-only M refresh and no-M failure record missing.",
+        "Independent review round1: actual live M bytes, gate logs and prior failure receipts are not durably bound.",
+        "Independent review round1: integration record ID/path is not canonical or bound to source run.",
+        "Independent review round1: adopted P/E/H/reporting proof and truthful escaped findings are incomplete."
       ],
-      "builder_checkpoint": "Final combined focused26/26 and packaging validation PASS; source frozen. Root full gates PASS. Acceptance pending independent review.",
-      "snapshot": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3"
+      "builder_checkpoint": "Actual FAIL review/verification archived round1; runtime review and verification recorded, then fix1 recorded at revision8 before dispatch. Source baseline unchanged.",
+      "snapshot": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3",
+      "fixes": 1
     },
     "T05R": {
       "status": "reviewed, verified, integrated after fix1",
