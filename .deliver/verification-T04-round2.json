@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T04-AC1",
+      "status": "PASS",
+      "evidence": "The legal claimed-to-building-to-built-to-in-review path, blocked handling and bounded fix/retry return to building are implemented with MAX story/run counters before publication. Recovery now parses and validates both complete images and regenerates their exact legal result; tests reject criterion, contract, binding and counter changes and preserve conflicting live bytes."
+    },
+    {
+      "id": "T04-AC2",
+      "status": "FAIL",
+      "evidence": "Direct-parent HEAD, expected tree/index tree, branch, root protected metadata, cumulative baseline, stale evidence and pre-start dirty work receive meaningful checks. However pending adoption does not bind prepared index_flags or prove every audited changed source entry appears in the prepared tree, and the current anchor replaces recursive baseline Git metadata with root-only metadata. Index flags and initialized-submodule protected metadata can therefore be accepted without a corresponding audited commit."
+    },
+    {
+      "id": "T04-AC3",
+      "status": "FAIL",
+      "evidence": "Coordinator npm test and npm run validate both passed with runtime provenance at snapshot 875e8f2ce514173cd99aa70cc04d18bd320767a8fb2821d1622487ae6c6398a2. The temporary-repository suite covers the main lifecycle, dirty-work correction, exact transition recovery, stale evidence, unauthorized commits, ignored source and root protected metadata. It lacks acceptance-critical regressions for index-flag changes and complete changed-entry coverage across adoption, and for protected metadata changes inside an initialized submodule under a declared touch."
+    }
+  ]
+}

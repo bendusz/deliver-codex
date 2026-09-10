@@ -302,12 +302,12 @@ export function preparePmBinding(state, packet, storyPath) {
   return null;
 }
 
-export function assertPmBinding(state) {
+export function assertPmBinding(state, options = {}) {
   if (!state.pm_binding) {
     if (detectProjectFormat(state.project_root) === 'current') fail('current project run is missing its shared story binding');
     return;
   }
-  if (state.pm_binding.format === 'current') return assertCurrentBinding(state);
+  if (state.pm_binding.format === 'current') return assertCurrentBinding(state, options);
   return assertLegacyBinding(state);
 }
 

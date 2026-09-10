@@ -9,6 +9,7 @@ import { isValidGitBranchName, parseStory, readStory, replaceStoryExecution, sto
 const APPROVAL = 'docs/approval.json';
 const PLAN = 'docs/plan.md';
 const JOURNAL = '.deliver/current-pm-transaction.json';
+const TRANSITION_JOURNAL = '.deliver/transition-transaction.json';
 const MAX_BYTES = 8 * 1024 * 1024;
 const record = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const fail = (message) => { throw new DeliverError(message, 66); };
@@ -188,6 +189,13 @@ function applyJournal(root, journal) {
 
 export function assertCurrentPmReady(root) {
   if (read(root, JOURNAL) !== null) fail('interrupted current project transaction; run pm.mjs recover before continuing');
+  let transition;
+  try { transition = fs.lstatSync(path.join(rootPath(root), TRANSITION_JOURNAL)); }
+  catch (error) { if (error.code !== 'ENOENT') throw error; }
+  if (transition) {
+    if (!transition.isFile() || transition.isSymbolicLink()) fail('invalid Execution transition journal');
+    fail('interrupted Execution transition; run pm.mjs recover before continuing');
+  }
 }
 
 function transact(root, makeWrites) {
@@ -422,7 +430,7 @@ export function prepareCurrentBinding(state, packet, storyPath) {
   };
 }
 
-export function assertCurrentBinding(state) {
+export function assertCurrentBinding(state, { allowBlocked = false } = {}) {
   const binding = state.pm_binding;
   if (!binding || binding.format !== 'current') fail('run has no current project binding');
   const actor = currentActorId(state.project_root);
@@ -436,8 +444,11 @@ export function assertCurrentBinding(state) {
   if (document.id !== binding.story || document.contractHash !== binding.contract_hash || document.executionHash !== binding.execution_hash) {
     fail('current story contract or execution claim changed; reconcile before continuing');
   }
+  const allowedStatuses = allowBlocked
+    ? ['claimed', 'building', 'built', 'in-review', 'blocked']
+    : ['claimed', 'building', 'built', 'in-review'];
   if (!execution || execution.owner !== binding.actor || execution.builder !== binding.builder
-    || execution.branch !== binding.branch || !['claimed', 'building'].includes(execution.status)) {
+    || execution.branch !== binding.branch || !allowedStatuses.includes(execution.status)) {
     fail('current story ownership, route, branch or status changed');
   }
   if (currentBranch(state.project_root) !== binding.branch) fail('checked-out branch differs from the current story claim');
