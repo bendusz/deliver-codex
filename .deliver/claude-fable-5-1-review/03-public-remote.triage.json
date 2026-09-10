@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "source_receipt": ".deliver/claude-fable-5-1-review/03-public-remote.receipt.json",
+  "source_receipt_sha256": "9d4f7be559e5bda7253bec65464cb914bbef9ae442874d9bdbc5a761940680f0",
+  "method": "Coordinator read-only source and contract inspection; no provider calls or production edits",
+  "findings": [
+    {
+      "source_finding": 1,
+      "verdict": "CONFIRMED",
+      "classification": "regression_guard_gap",
+      "task_mapping": "T14",
+      "evidence": "scripts/validate.mjs:93 only matches an unindented key. Actual role templates contain no sandbox_mode override. This is a validator gap, not a current sandbox default regression."
+    },
+    {
+      "source_finding": 2,
+      "verdict": "OBSERVED",
+      "classification": "diagnostic_recommendation",
+      "task_mapping": "T05B",
+      "evidence": "remote.mjs:427-491 accepts exit0 structured empty arrays after a fresh CLEAN view. The supplemental remote contract explicitly processes valid exit0 arrays normally. Pin and label this outcome; no evidence of false check PASS."
+    },
+    {
+      "source_finding": 3,
+      "verdict": "OBSERVED",
+      "classification": "intended_strict_lookup_with_usability_cost",
+      "task_mapping": "T05B",
+      "evidence": "remote.mjs:345-379 validates all entries and rejects multiple historical exact matches. remote-design.md:26-27 explicitly requires ambiguous handling. Selecting an OPEN historical match would revise the accepted policy; assess during full lifecycle work."
+    },
+    {
+      "source_finding": 4,
+      "verdict": "CONFIRMED",
+      "classification": "remote_identity_consistency_gap",
+      "task_mapping": "T05B",
+      "evidence": "remote.mjs derives repo from the single push URL at preflight but uses the remote name for ls-remote at line703. Distinct fetch/push URLs are not excluded. Use the validated destination for the final proof or reject this remote configuration. No real remote was called."
+    },
+    {
+      "source_finding": 5,
+      "verdict": "OBSERVED",
+      "classification": "diagnostic_recommendation",
+      "task_mapping": "T05B",
+      "evidence": "remote.mjs:172-183 maps only ENOENT to UNAVAILABLE and preserves other command failures in stage-specific diagnostics. Improve categorization if useful; failures remain non-completion outcomes."
+    },
+    {
+      "source_finding": 6,
+      "verdict": "OBSERVED",
+      "classification": "conservative_policy_and_pending_retry_wiring",
+      "task_mapping": "T05B",
+      "evidence": "remote.mjs:423-424 requires MERGEABLE and CLEAN. The remote contract also demands a fresh exact-head/CLEAN check before merge. Bounded full-lifecycle polling remains T05B; do not silently weaken this gate."
+    },
+    {
+      "source_finding": 7,
+      "verdict": "PARTLY_REJECTED",
+      "classification": "instruction_precedence_and_known_pending_docs",
+      "task_mapping": "T14/T08/T05B",
+      "evidence": "Latest user AGENTS explicitly requires pm/ as upstream-compatible project progress authority. Claude cannot override that with earlier plan wording. There is a real documentation reconciliation task and pending remote/hook wiring, but retiring pm/ is not authorized by this review."
+    },
+    {
+      "source_finding": 8,
+      "verdict": "CONFIRMED",
+      "classification": "adapter_provenance_and_scanner_limitations",
+      "task_mapping": "T14",
+      "evidence": "claude-review.mjs writes the bare validated receipt; the coordinator has now retained hashed packets and invocation sidecars for this review. Third secret regex lacks a closing quote after a JSON key. The scanner is explicitly heuristic, so this is hardening rather than proof that reviewed packets exposed secrets."
+    },
+    {
+      "source_finding": 9,
+      "verdict": "NOT_FULLY_VERIFIED",
+      "classification": "test_coverage_recommendation",
+      "task_mapping": "T05B",
+      "evidence": "The listed scenarios are suitable fake-runner coverage additions during full remote lifecycle work. No real service invocation is needed. This triage did not independently exercise every proposed missing case."
+    }
+  ]
+}

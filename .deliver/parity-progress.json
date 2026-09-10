@@ -111,10 +111,11 @@
       ],
       "fixes": 3,
       "commit": "8bdd6f1367141add5af69c9b7bce19da3e1a46ab",
-      "integration_commit": "4c419a7c948642b9a5e35e3cc59a4b03b2b8d806"
+      "integration_commit": "4c419a7c948642b9a5e35e3cc59a4b03b2b8d806",
+      "post_acceptance_review_finding": "Requested Claude review independently reproduced stale commit-preparation deadlock after legal correction. Additional bounded follow-up requires retained lineage/counters; original finished run remains historical evidence."
     },
     "T05L": {
-      "status": "explicit user-approved extra fix4 active; then requested Claude Fable5.1 high-effort review",
+      "status": "NOT ACCEPTED: fix4 gates PASS; requested Claude review and independent reproduction FAIL",
       "worktree": "/tmp/deliver-parity-t05l",
       "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
       "builder": "/root/t01_builder",
@@ -128,13 +129,21 @@
         "Independent review round2: clean initialized scoped submodule manifests mismatch and protected I metadata incorrectly freezes legitimate M gitlink changes.",
         "Independent review round2 minor: fresh M handoff can omit unresolved source C concerns retained in the report.",
         "Independent review round3: nested submodule scopes lack committed ancestor gitlinks; unbound initialized submodules can hide wrong M content through ignore=all after protectedShape removes nested content. Root-link and source-concern fixes resolved.",
-        "Independent final fix3 review: empty canonical uninitialized gitlink directory is misclassified as unsafe nested root, blocking unrelated integration. All earlier findings resolved."
+        "Independent final fix3 review: empty canonical uninitialized gitlink directory is misclassified as unsafe nested root, blocking unrelated integration. All earlier findings resolved.",
+        "Requested Claude review, independently reproduced: adopted P/E/H proof depends on live process environment/finalization, preventing resume or recovery after evidence refresh.",
+        "Requested Claude review, independently reproduced: panel parser silently discards supplied top-level findings."
       ],
-      "builder_checkpoint": "User authorized exactly one extra bounded fix. Locked state amendment recorded at revision23, preserving baseline/run/history and incrementing spent fixes3 to4. Runtime default cap unchanged. Builder dispatched for empty canonical uninitialized gitlink directory only.",
+      "builder_checkpoint": "Frozen at snapshot10c782; revision29 records actual FAIL review/verification. Prior eight findings resolved. New adopted-proof recovery blocker and panel aggregate loss remain open. No fix5 spent.",
       "snapshot": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3",
       "fixes": 4,
-      "candidate_snapshot": "260df67738389280469cf5f365537764a040ddcc9f117d32fd3394d9fe46cdff",
-      "checkpoint": ".deliver/checkpoints/T05L-final-fix3/manifest.json"
+      "candidate_snapshot": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9",
+      "checkpoint": ".deliver/checkpoints/T05L-final-fix3/manifest.json",
+      "latest_checkpoint": ".deliver/checkpoints/T05L-fix4-claude-review/manifest.json",
+      "failed_criteria": [
+        "T05L-AC2",
+        "T05L-AC3",
+        "T05L-AC5"
+      ]
     },
     "T05R": {
       "status": "reviewed, verified, integrated after fix1",
@@ -150,7 +159,7 @@
       "integration_commit": "10e6c2260c59faad6802988932efcfcd189e088b"
     }
   },
-  "next": "Finish authorized T05L fix4, full gates/native review, then run requested Claude Fable5.1 high-effort code review against project specs/idea. Preserve original parity objective and pending tasks.",
+  "next": "User decision: one additional bounded repair round for T04 stale commit preparation and T05L frozen artifact proof/panel aggregate consistency. Preserve spent counters, baselines/lineage and failure history. Then continue pending parity tasks.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
@@ -173,10 +182,18 @@
     "model": "claude-fable-5-1",
     "effort": "high",
     "authorization": "Explicit user request in current turn",
-    "status": "preparing bounded packets after T05L fix",
+    "status": "COMPLETE: FAIL; native triage complete",
     "sources": [
       "https://platform.claude.com/docs/en/models/overview",
       "https://code.claude.com/docs/en/env-vars"
-    ]
+    ],
+    "report_directory": ".deliver/claude-fable-5-1-review",
+    "results": {
+      "01-runtime": "FAIL",
+      "02-integration": "FAIL",
+      "03-public-remote": "PASS with minor findings",
+      "04-planning-support": "PASS with minor findings"
+    },
+    "report": "docs/reviews/2026-09-10-claude-fable-5-1.md"
   }
 }

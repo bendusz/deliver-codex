@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "reviewed_snapshot": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9",
+  "preserves": {
+    "triage": {
+      "path": ".deliver/claude-fable-5-1-review/02-integration.triage.json",
+      "sha256": "64a40034675804b2563288000e608d0522e000a5955de5ad29a8169c69465a61"
+    },
+    "native_review": {
+      "path": ".deliver/claude-fable-5-1-review/02-integration.native-review.json",
+      "sha256": "0f688e2ec4846d03c3b47ab10e805a2b2de7957a23a282533f7a56dc37d51032"
+    },
+    "native_verification": {
+      "path": ".deliver/claude-fable-5-1-review/02-integration.native-verification.json",
+      "sha256": "7e60d5b8b8d94b707d19cf0fa3e110b27fddfb8fca6a6d7edb598087103ba80f"
+    }
+  },
+  "coordinated_with": "benchmark_builder",
+  "dispositions": [
+    {
+      "source_finding": 2,
+      "prior_classification": "missing_recovery_operation",
+      "correctness": "The missing stale-preparation recovery operation is real, but it is pending functionality outside frozen T05L acceptance.",
+      "scope": [
+        {
+          "condition": "A clean prepared integration record becomes stale because integration tip I advances or a provider/base race occurs.",
+          "owner": "T05B",
+          "criterion": "T05B-AC2",
+          "rationale": "T05B-AC2 explicitly owns reconciliation of an advanced integration tip with real Git proof. T05L-AC2 covers unchanged-boundary and fresh-process continuation of the local C/M/P/E/H record, not external base-race supersession."
+        },
+        {
+          "condition": "A genuine failed no-M I/C conflict requires a corrected source candidate and new integration attempt.",
+          "owner": "T05C",
+          "criterion": "T05C-AC1 through T05C-AC3",
+          "rationale": "T05L-AC4 leaves actual source findings unresolved for T05C, whose accepted contract binds and continues the failed no-M record while retaining lineage and budgets."
+        }
+      ],
+      "t05l_disposition": "PENDING_DEPENDENCY_SCOPE",
+      "t05l_acceptance_effect": "Do not count source finding 2 as a T05L defect or as additional T05L-AC2 failure evidence. Preserve it as an open project item for T05B/T05C."
+    }
+  ],
+  "retained_t05l_failures": [
+    {
+      "source_finding": 1,
+      "severity": "block",
+      "criteria": [
+        "T05L-AC2",
+        "T05L-AC3"
+      ],
+      "status": "CONFIRMED",
+      "reason": "Fresh-process environment changes and post-P evidence mutation deadlock adopted P/E/H proof validation."
+    },
+    {
+      "source_finding": 7,
+      "severity": "minor",
+      "criteria": [
+        "T05L-AC5"
+      ],
+      "status": "CONFIRMED",
+      "reason": "Panel parsing accepts and discards a top-level findings aggregate that differs from member-derived findings."
+    }
+  ],
+  "summary": "Scope reconciliation removes stale-I/no-M supersession from the T05L defect set without changing any issued receipt. T05L remains FAIL for the confirmed P/E/H block and panel aggregate bug. Advanced-I reconciliation belongs T05B-AC2; failed no-M correction belongs T05C."
+}

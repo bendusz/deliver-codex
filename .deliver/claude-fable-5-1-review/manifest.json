@@ -1,0 +1,786 @@
+{
+  "model": "claude-fable-5-1",
+  "effort": "high",
+  "effort_environment": {
+    "CLAUDE_CODE_EFFORT_LEVEL": "high"
+  },
+  "status": "COMPLETE_FAIL",
+  "review_basis": {
+    "review_kind": "Interim independent code and project-design review; this is not final parity acceptance.",
+    "root_commit": "e6d9c44b60b3c5a951396f83e93b0359b5ba6750",
+    "overlay_snapshot": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9",
+    "overlay_source_base": "a18e851375c37ac4c99e62a55fe0e9ff1f1e937d",
+    "overlay_paths": [
+      "plugins/deliver/skills/deliver/SKILL.md",
+      "plugins/deliver/skills/deliver/assets/operations.json",
+      "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
+      "plugins/deliver/skills/deliver/references/compatibility.md",
+      "plugins/deliver/skills/deliver/references/shipping.md",
+      "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+      "plugins/deliver/skills/deliver/scripts/pm.mjs",
+      "tests/current-roundtrip.test.mjs",
+      "tests/integration.test.mjs",
+      "tests/operations.test.mjs",
+      "tests/reporting.test.mjs",
+      "tests/review-panel.test.mjs"
+    ],
+    "implemented_and_accepted": [
+      "T00",
+      "T01",
+      "T02",
+      "T03",
+      "T04",
+      "T06",
+      "T06B",
+      "T07",
+      "T00B",
+      "T13A",
+      "T05R"
+    ],
+    "current_candidate": "T05L local integration; 153/153 coordinator tests and packaging validation passed; native re-review pending.",
+    "known_pending": [
+      "T05C correction-run creation",
+      "T05B full remote lifecycle wiring",
+      "T08 readiness enforcement/resume/doctor",
+      "T09 migration",
+      "T10 retrospectives",
+      "T11 knowledge/scoped review",
+      "T11P completion report",
+      "T12 parallel lifecycle",
+      "T13B live benchmark workflow",
+      "T14 final packaging/docs/native trial"
+    ],
+    "combination_status": "Root contains accepted remote adapter; L supplies frozen candidate file overlay. Combined tree has not yet been integrated or tested as a whole.",
+    "known_carried_documentation": "T14 owns outdated active progress guidance and legacy hook/anchor reconciliation wording; T11 owns replacing opaque role instruction hash pins. Do not mistake these known pending items for a completed release claim.",
+    "user_intent": "Replicate upstream Deliver 0.25.1 functionality in native Codex with dependency-free Node runtime, persistent progress, practical orchestration, default no sandbox, standing authorized scoped commits/pushes/PRs/verified merges. Builders do not integrate Git. Preserve custom config and unrelated work.",
+    "evidence_boundary": "Receipts are local attestations, not authentication. Review concrete promised stale-state, ownership, byte and recovery checks; do not demand cryptographic authentication against a user who controls the whole evidence store."
+  },
+  "packets": [
+    {
+      "name": "01-runtime",
+      "path": ".deliver/claude-fable-5-1-review/01-runtime.packet.json",
+      "bytes": 247724,
+      "sha256": "efb3cbf15dfe19fd9594cd4c669035926252352ee404ca0e8bace22568e1c6bb",
+      "contexts": [
+        {
+          "path": "review-context/project-status.json",
+          "bytes": 2879,
+          "sha256": "2e0632adbd8cbfefd3223549598b5f05f54d35384ed6f51ea228cc2699ba3e65"
+        },
+        {
+          "path": "AGENTS.md",
+          "bytes": 1822,
+          "sha256": "880f8a032e9e90eead7c3aef538b7c6d8dabf4b50e607405df4a45c20ad66392"
+        },
+        {
+          "path": "docs/plans/2026-09-09-upstream-parity.md",
+          "bytes": 29569,
+          "sha256": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+        },
+        {
+          "path": "docs/parity-contract.json",
+          "bytes": 10114,
+          "sha256": "85e82c0b50551fe862db8854f45d3904db53b075e7ea5d6db0368391ec62de42"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+          "bytes": 28284,
+          "sha256": "899be1dfa79b663de9990724d04796a6ed11409188a771eb42856f9d1821f60e"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+          "bytes": 21440,
+          "sha256": "ae1fbe7ab3f2f80efc18e9745f2a3b2504ea75f7daf344f08623799e7bb101f3"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/pm.mjs",
+          "bytes": 11327,
+          "sha256": "9a6acbc19f60998c0584dde10292aa98015fc4ee91ecd1ec1bbd1743a375637c"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/story.mjs",
+          "bytes": 14269,
+          "sha256": "cad0f9457cbe02865108fb179db3ddcce62b1f222eb02a75799f0277a79e1d98"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/project-state.mjs",
+          "bytes": 18908,
+          "sha256": "5c69402512a6422f88136f7ab6b758e194f1e317caa511282f73f25e1d95b3ff"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+          "bytes": 22370,
+          "sha256": "d4a3b49f77e4ff29a8ab0c048c0a071a4d3763f995d1076c7b9f072d7c191905"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+          "bytes": 29108,
+          "sha256": "ca85b02c9ea059bc39d37ee08e1d588d60923da5b13582c3e0833ce5978c7303"
+        },
+        {
+          "path": "tests/current-lifecycle.test.mjs",
+          "bytes": 15957,
+          "sha256": "54299b6cdfd5238972f09a10184b640b283d27055eb6c41badb35e6b6744b050"
+        },
+        {
+          "path": "tests/project-state.test.mjs",
+          "bytes": 14219,
+          "sha256": "f37ac20382b22e9368fdabbdc8a43748f2b0d346dc853736bc5db70b97b24b3d"
+        },
+        {
+          "path": "review-context/T05L-runtime.patch",
+          "bytes": 16850,
+          "sha256": "3d809879b522769e9b2b40ba99c543d5872865e226e0e2cd16291cdb2ef6bbc5"
+        }
+      ]
+    },
+    {
+      "name": "02-integration",
+      "path": ".deliver/claude-fable-5-1-review/02-integration.packet.json",
+      "bytes": 248424,
+      "sha256": "57206bdb6730caa6527dca540962102c445793174d7006524e8accecfb82b28b",
+      "contexts": [
+        {
+          "path": "review-context/project-status.json",
+          "bytes": 2879,
+          "sha256": "2e0632adbd8cbfefd3223549598b5f05f54d35384ed6f51ea228cc2699ba3e65"
+        },
+        {
+          "path": "AGENTS.md",
+          "bytes": 1822,
+          "sha256": "880f8a032e9e90eead7c3aef538b7c6d8dabf4b50e607405df4a45c20ad66392"
+        },
+        {
+          "path": "docs/plans/2026-09-09-upstream-parity.md",
+          "bytes": 29569,
+          "sha256": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+          "bytes": 74187,
+          "sha256": "6dd9354604956298988db090c62b6f716f78e38a18a8d03d248088280227b4cc"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+          "bytes": 5047,
+          "sha256": "3690f7b6813010d48e7fd8b0f8f26273052aad138a36544b26f6e24c51b33a88"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+          "bytes": 4837,
+          "sha256": "53a949cdb0e6957b1f97e7e2928df2a177e64c333adf1e963af344d159651837"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+          "bytes": 28284,
+          "sha256": "899be1dfa79b663de9990724d04796a6ed11409188a771eb42856f9d1821f60e"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/story.mjs",
+          "bytes": 14269,
+          "sha256": "cad0f9457cbe02865108fb179db3ddcce62b1f222eb02a75799f0277a79e1d98"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/scope.mjs",
+          "bytes": 24645,
+          "sha256": "1d022432902104bb0eadbb4ba5116ef3b326b76f4c9d24a44fdcee06b2dedce6"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/gates.mjs",
+          "bytes": 5512,
+          "sha256": "097a86b03827a4cab1668ca4038879155e4d30c8d92007e2e32d2a79e829367c"
+        },
+        {
+          "path": "tests/integration.test.mjs",
+          "bytes": 37073,
+          "sha256": "63f2f0f3c869b584f578d3a091804865a4a1ec19cb6927caa95e2ea22fab0d38"
+        },
+        {
+          "path": "tests/reporting.test.mjs",
+          "bytes": 3454,
+          "sha256": "0dc0f794c406068ad8e973819e1fcc64f9b3188369892c455b333177a631c088"
+        },
+        {
+          "path": "tests/review-panel.test.mjs",
+          "bytes": 1789,
+          "sha256": "40f910fd821df24a4c254f286493879366a29c4e2205e49f381b6dfef6e183c1"
+        },
+        {
+          "path": "tests/current-roundtrip.test.mjs",
+          "bytes": 2325,
+          "sha256": "d8af9e29e3d3639b8c7dcad14436accb8c76da1e5792d26d1ace2e6af50ca56a"
+        },
+        {
+          "path": "review-context/T05L-state.patch",
+          "bytes": 3919,
+          "sha256": "396ba4141dbda280042dc58056d4bfff5e1ec29872031c193c0fe85b2f499dc0"
+        }
+      ]
+    },
+    {
+      "name": "03-public-remote",
+      "path": ".deliver/claude-fable-5-1-review/03-public-remote.packet.json",
+      "bytes": 255712,
+      "sha256": "f14420654b55b64819d1f542e7fc95f262bc0396f6e8073c0e11b9359bffaf9b",
+      "contexts": [
+        {
+          "path": "review-context/project-status.json",
+          "bytes": 2879,
+          "sha256": "2e0632adbd8cbfefd3223549598b5f05f54d35384ed6f51ea228cc2699ba3e65"
+        },
+        {
+          "path": "AGENTS.md",
+          "bytes": 1822,
+          "sha256": "880f8a032e9e90eead7c3aef538b7c6d8dabf4b50e607405df4a45c20ad66392"
+        },
+        {
+          "path": "docs/plans/2026-09-09-upstream-parity.md",
+          "bytes": 29569,
+          "sha256": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+        },
+        {
+          "path": "README.md",
+          "bytes": 8661,
+          "sha256": "c5627680bfccb102c3ec5f5440f5f10ff0a627a317123435c4aeda0940a0953a"
+        },
+        {
+          "path": "package.json",
+          "bytes": 740,
+          "sha256": "b940bba2da59045db4c25d7493a6ef8927d7c52a77507c8f2a33d3e81b8b9a7c"
+        },
+        {
+          "path": "docs/parity-contract.json",
+          "bytes": 10114,
+          "sha256": "85e82c0b50551fe862db8854f45d3904db53b075e7ea5d6db0368391ec62de42"
+        },
+        {
+          "path": "docs/plans/parity-contracts/remote-design.md",
+          "bytes": 11696,
+          "sha256": "6b690355365b7dd65611be21163d71421f186d5ecafe1d331136e50aa8ee0faa"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/references/runtime.md",
+          "bytes": 7733,
+          "sha256": "7465e22a6e7cdafd9b62650c2fd210f260c0f837e195e78e3b7701cf7192523f"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/claude-review.mjs",
+          "bytes": 17126,
+          "sha256": "1a1d9271a74b4079353de0651f19c8cf159e3a8ed3f497329ec87c41ccf920cf"
+        },
+        {
+          "path": "bin/deliver.mjs",
+          "bytes": 16116,
+          "sha256": "6a417373d0df05ba24464665d4dd9c758e504d8168f23d7257d4e74846f4f0c3"
+        },
+        {
+          "path": "scripts/validate.mjs",
+          "bytes": 6009,
+          "sha256": "b7e922fae146e438c28a72956b5ab90e93250495463c2a8e3d108fa2492009cf"
+        },
+        {
+          "path": "tests/setup.test.mjs",
+          "bytes": 6060,
+          "sha256": "6ce8238f45e9ecc6b33eb060794054b746e1d0bd9364e35d14f6bd4472c62096"
+        },
+        {
+          "path": "tests/launcher-integration.test.mjs",
+          "bytes": 5625,
+          "sha256": "faa8fc096ae55c3c57b03b3ccbd1c575f6683c7dafe426f5ec0e117963f8ba98"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/SKILL.md",
+          "bytes": 4231,
+          "sha256": "d2f5aa3004648eac530b9cafae75c4e3a68f4614ab576a6d84d1946aa588fd9e"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/operations.json",
+          "bytes": 13842,
+          "sha256": "b3a23ed104859f4c56e154e9a459d6180799f901383a545bb42684c498a04623"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
+          "bytes": 1181,
+          "sha256": "75bae28f381a94be7ed4f80646d66b28ff5333899dbe92dc62c9688ccf2e66f5"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/references/compatibility.md",
+          "bytes": 7020,
+          "sha256": "9c7670ae2356a5d7e512d504673e4df546b91eb08672d982841e8644ac3f6d16"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/references/shipping.md",
+          "bytes": 6077,
+          "sha256": "6b10e26ecb008013e6cda7fc6d97df87dd133cd799fc29028daf9ad4b1232f97"
+        },
+        {
+          "path": "tests/operations.test.mjs",
+          "bytes": 7605,
+          "sha256": "3c6bc110c2983eef8c931c4369a123ae9ef4cb858258784f693bc276c42e5eb9"
+        },
+        {
+          "path": "review-context/T05R-9009f71.patch",
+          "bytes": 61171,
+          "sha256": "3ae4c47416c6dfa65d83b84ef78140c7d7c37d08cc9f615088ad9cd0f473dc41"
+        },
+        {
+          "path": "review-context/T05L-public.patch",
+          "bytes": 8981,
+          "sha256": "d6541351a848b9f056e050818660ce933f7bd8d23a380848799eb3f1a454faeb"
+        },
+        {
+          "path": "review-context/explicit-coverage-limitation.json",
+          "bytes": 385,
+          "sha256": "287b806247df3795d4f34a503c11e9c504f156d484a0251085405eae442fbcb2"
+        },
+        {
+          "path": "plugins/deliver/hooks/context.mjs",
+          "bytes": 2187,
+          "sha256": "41ad585d4951f565ea30983b7abaf54fbfcee5a14601dc43367fe8c038fd02a4"
+        },
+        {
+          "path": "plugins/deliver/hooks/hooks.json",
+          "bytes": 328,
+          "sha256": "f9a2302b52033fa6af046fa4651b981c4c00d1842e798df569a3dd62acbcb987"
+        },
+        {
+          "path": "plugins/deliver/.codex-plugin/plugin.json",
+          "bytes": 721,
+          "sha256": "d40d65e4854068d62bd8a9be1b7fa09f1d8d959c1867078953b6a4e1c7018ddd"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/agents/openai.yaml",
+          "bytes": 177,
+          "sha256": "0b0770232401e052f05911e92ff824b44cf5be438f942d170448600a97026e98"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/references/claude-review.md",
+          "bytes": 2423,
+          "sha256": "ad1fff062eefbb7049c34e898675c1277dbae14c3ca78bb5d77134ccfcd5a4d1"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/references/operations.md",
+          "bytes": 1406,
+          "sha256": "8b5d0f782e20147cb62390096fd594cf543efd084f52d8044bfe4259b0700f4e"
+        }
+      ]
+    },
+    {
+      "name": "04-planning-support",
+      "path": ".deliver/claude-fable-5-1-review/04-planning-support.packet.json",
+      "bytes": 261233,
+      "sha256": "d9e59dbe0625e103a7f74f2716e5b1f197b31c51f87e86b42eacef96ee00265b",
+      "contexts": [
+        {
+          "path": "review-context/project-status.json",
+          "bytes": 2879,
+          "sha256": "2e0632adbd8cbfefd3223549598b5f05f54d35384ed6f51ea228cc2699ba3e65"
+        },
+        {
+          "path": "AGENTS.md",
+          "bytes": 1822,
+          "sha256": "880f8a032e9e90eead7c3aef538b7c6d8dabf4b50e607405df4a45c20ad66392"
+        },
+        {
+          "path": "docs/plans/2026-09-09-upstream-parity.md",
+          "bytes": 29569,
+          "sha256": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+        },
+        {
+          "path": "docs/evaluation.md",
+          "bytes": 2619,
+          "sha256": "6d2279f74f772d980261545244c24a0af5e01b22d53ca5bb46646052cf780e67"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/analyze.mjs",
+          "bytes": 2505,
+          "sha256": "927712768fa406df2237961b35032a97acc6044734f97390b185bba243cac7b3"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/analyze.mjs",
+          "bytes": 50235,
+          "sha256": "aaab86b26c5b137b327fdbf7b7159b3c1cbe45341ce05ac8b98e592b054e17c5"
+        },
+        {
+          "path": "tests/analysis.test.mjs",
+          "bytes": 17080,
+          "sha256": "e72f51441639f20b1aeb87985a82a4c1c2444dfd4dc68646eb86fe28c566f9ca"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/benchmark.mjs",
+          "bytes": 1270,
+          "sha256": "cbc58df431d1d4ba86dc4aadaf6c057077d43555e9defe86dd8f4434fc91d099"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/benchmark.mjs",
+          "bytes": 15155,
+          "sha256": "599ff7c875e4a0e1de23bd7da16a8ed8989589690bde6be62f601401ceee3ff0"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/benchmark-result.schema.json",
+          "bytes": 3673,
+          "sha256": "2733b412ed03d5d5300a8591214e603cbcb843c80913cf62382993c8b8762f28"
+        },
+        {
+          "path": "tests/benchmark.test.mjs",
+          "bytes": 8353,
+          "sha256": "b350ad5413baac73c7558556b8ca3c97b5d27d62e04d540c8227ccef8aa1ae8b"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/contracts.mjs",
+          "bytes": 4039,
+          "sha256": "a251f7f98ac1475463cfc557fde86aa042a1ad5ff993ede65e225204f4753cc2"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/pm.mjs",
+          "bytes": 22625,
+          "sha256": "ae097d29de9b5f4b3fd2d59eb9cd8952ea79d6bc3f49cb54475ce4272436fd26"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/specdd.mjs",
+          "bytes": 25912,
+          "sha256": "bfae9d5eb24f1784d264e7d70dc0821b4f41a9828d3d473a0346b4ee498ac9c0"
+        },
+        {
+          "path": "tests/role-policy.test.mjs",
+          "bytes": 3915,
+          "sha256": "ece1cddfc9c290330e328e2db5154f93c96192670c6bab813730a9c635d242c0"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/references/discovery.md",
+          "bytes": 1265,
+          "sha256": "6ca3b2e4e31f48f046b9d95aec6bc73fac1209d0a1d3f1b8c967f90621401a6f"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/references/decomposition.md",
+          "bytes": 1920,
+          "sha256": "aa36f1e27a01333629c8e36c3fc9fa653f980b065360b8b767bedc65ba745f68"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/references/governance.md",
+          "bytes": 4268,
+          "sha256": "cc372b7a60823ba5f9071633d7c0b9e244bc00ea9a83d81e4fd557dfcfc709e2"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/references/knowledge.md",
+          "bytes": 1398,
+          "sha256": "c71b90e563decd626fc5e10256194be794ae85b9dfa33e09f920a982aeac55c5"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/references/parallel.md",
+          "bytes": 1781,
+          "sha256": "b46b95edfd32c5c486d86d0897726830f54e2e654e6590416d03686ea5ab132b"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/references/planning.md",
+          "bytes": 2620,
+          "sha256": "ebf852da0258012528ea937e9302f580747671c92b16213ab1f76c91b711c20e"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/references/recovery.md",
+          "bytes": 2052,
+          "sha256": "3c4fd34bb36cb356e07285aa529730abef557a5b438ba8803914b4206f79189d"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/references/scale-profiles.md",
+          "bytes": 3238,
+          "sha256": "42c08d624392888a20061a9a18faf61c7bfc6be82edc5284d6d7d2d081e9fe91"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/references/specdd.md",
+          "bytes": 3193,
+          "sha256": "7f379875904acda43c7a197784e96602fd796ccb28da95e1c37faeac840edadc"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/references/specification.md",
+          "bytes": 1807,
+          "sha256": "5469cbc552858712622b77517ba8734322e6b2b11ce691986534d1114d8b9a11"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/references/workflow.md",
+          "bytes": 5180,
+          "sha256": "883b594ee96df35b340912ba69417c5d439a5e09c3d7a3ff4827174478cb669d"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/specdd/bootstrap.md",
+          "bytes": 1158,
+          "sha256": "50db90f302d0167930cbad84fabb1461b0ad6e2fc9e65b6b50dfa21027e11687"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/codex-agents/deliver-librarian.toml",
+          "bytes": 733,
+          "sha256": "2f374ceea41385aae9170bc147190ae5286e84f248b27c2b465d609fd1cac26a"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/specdd/root.sdd",
+          "bytes": 624,
+          "sha256": "26f1f3f07f5eb173fd0791a6c6404c980686a9567ca0f3af01504d4102767955"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/specdd/module.sdd",
+          "bytes": 607,
+          "sha256": "88f343d6e95ed72e1989863ea72340f7683bf50162a6d72e53fc1a33134c9ce1"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/specdd/bootstrap.md.template",
+          "bytes": 842,
+          "sha256": "29075149fe2e0c7bbad76374f137dd460cc5b0faf2002b7e3beeaf14f18a16e6"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/specdd/module.sdd.template",
+          "bytes": 366,
+          "sha256": "d61c9152b875b407185d05b13d3eee1703caa6288f20d4218a6f00db69d380af"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/specdd/root.sdd.template",
+          "bytes": 379,
+          "sha256": "b43e572f3831dfeb3b23e0787366073f5ebe805db8947e6fb840c3927acde437"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/codex-agents/deliver-verifier.toml",
+          "bytes": 852,
+          "sha256": "a776cc1bde5da656ef5e5abee4036ea8584f5351fd5342dd329d38bb3658fdd0"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/codex-agents/deliver-claude-reviewer.toml",
+          "bytes": 855,
+          "sha256": "acbc55f4e601a05cff1ffb6b86339acb28e04989565fc6f3dd9848a0efb85f76"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/codex-agents/deliver-explorer.toml",
+          "bytes": 541,
+          "sha256": "d3eeea764c9547be95c2e284262988190f63cf10d11f39e935eac9c7b366aa0a"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/codex-agents/deliver-builder.toml",
+          "bytes": 941,
+          "sha256": "90a875b6ddab5e7c5a7f09163bb880c32c39b19ee1a7c922c5cb22288d93596e"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/codex-agents/deliver-reviewer.toml",
+          "bytes": 1103,
+          "sha256": "f5d104358894e5bfaa6e1338590069af60c6dc4f7aab6f5b3624f6df69998e86"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/codex-agents/deliver-spec-architect.toml",
+          "bytes": 882,
+          "sha256": "0ac7d6d7fd59bcbe10f08f8174bbda340ae0688e95529b9551f2c7393d6bc6b3"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/codex-agents/deliver-architecture.toml",
+          "bytes": 591,
+          "sha256": "b1593f47eb67e12c76f6a9b16f31c4b37da14b3f9017a16bade6c47be2c1a1cb"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/codex-agents/deliver-test-engineer.toml",
+          "bytes": 575,
+          "sha256": "479ed373405dde5fdf265f140829a3d8f27e88a425fcd3599335488df851f905"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/codex-agents/deliver-researcher.toml",
+          "bytes": 586,
+          "sha256": "b514e1c74d964ceb4cdcd0a3faa1e6880ed854bdcb06051339fb2011878c5f63"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/codex-agents/deliver-security.toml",
+          "bytes": 659,
+          "sha256": "c71af097a8b5fb3d6f3d8b6d3420ee53ad0aa0ee07cdf9f8b1b452d617656594"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/codex-agents/deliver-technical-writer.toml",
+          "bytes": 584,
+          "sha256": "7d6f8c26947421eff4517d8082e8a50437096e06b7bc393d2bf15dfe8abefccd"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/codex-agents/deliver-debugger.toml",
+          "bytes": 567,
+          "sha256": "2d2596f8b91fdc7f96ee51584533790a905a558b3a074cdecc41b19d9f478e87"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/templates/checklist-story-readiness.md.template",
+          "bytes": 1760,
+          "sha256": "23d09f511665383ee640b31963066e3c36a0c033c97ec98184085c89752e7b01"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/templates/spec.md.template",
+          "bytes": 1021,
+          "sha256": "d22b061f0b7b253ffbf5d22a3e2015dbefc83c4b3ddd4dd5d064fd2e67f68129"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/templates/checklist-verification-quality.md.template",
+          "bytes": 1288,
+          "sha256": "8af9c1b1e5a352e89383e79c937d451851c86b922cfdbed571926eae6e0f37ad"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/templates/AGENTS.md.template",
+          "bytes": 360,
+          "sha256": "1c437085281939246e1519ddd9efa5ab0bcbdd6124b946fb9cd4916f5d9a7202"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/templates/checklist-spec-quality.md.template",
+          "bytes": 1169,
+          "sha256": "d93f8412dcc5669fea74c79b6c977dd574ed4bf6948a0608aa46739e5947b423"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/templates/plan.md.template",
+          "bytes": 1162,
+          "sha256": "894763dd8a4a3815bf70398a2c76c4cd4abcd591b0df2047bca1d3133a34c9dc"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/templates/completion-report.md.template",
+          "bytes": 1125,
+          "sha256": "7f4ffaa30a2827146a600e198b74851b323a1a5be389b484f1c5067a8637f3d2"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/templates/checklist-plan-quality.md.template",
+          "bytes": 1210,
+          "sha256": "7a49ed878197d353c3319f15fdf229438392b654d9abfd9a589407b1c5689e55"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/templates/constitution.md.template",
+          "bytes": 662,
+          "sha256": "5aa9c9533b1c3c9e9d532f06002e7267c7e3cb8dfdb52e033eaa3d867789a687"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
+          "bytes": 1181,
+          "sha256": "75bae28f381a94be7ed4f80646d66b28ff5333899dbe92dc62c9688ccf2e66f5"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/templates/story.md.template",
+          "bytes": 992,
+          "sha256": "978eaa0ea415e0b58b7076eea602a1ffc31618dc20e4bfc9a5890aa3947a4c0c"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/templates/approval.json.template",
+          "bytes": 129,
+          "sha256": "91465c46c86cf5ea709a772cc2ae4c8aee72e187dfce994adbab5fc3c030dbca"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/review.example.json",
+          "bytes": 41,
+          "sha256": "44ca24764896b56c10a97a0f8df84d4bc1d46ff34ec0f87c0c8d1fb5de75f98b"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/task.example.json",
+          "bytes": 376,
+          "sha256": "0ce2fce1d34fa454d4e9fd0b1b40533b17dc61939bd7adca1849cd2108b32c8e"
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/assets/verification.example.json",
+          "bytes": 198,
+          "sha256": "12e375d51e1ff51b35afb1ad42cd3e442000efdb0f1d383207e57656ee16bb74"
+        },
+        {
+          "path": "review-context/coverage-manifest.json",
+          "bytes": 1156,
+          "sha256": "e52bd8482a257ff384dac4b532f5ba7f911a51abbab11bf66671e152334fe9d4"
+        }
+      ]
+    }
+  ],
+  "coverage_omissions": [
+    "tests/claude-review.test.mjs"
+  ],
+  "coverage_manifest": {
+    "production_coverage": "Four packets supply shipped runtime/CLI, hook, launcher/validator, roles/templates and public instructions as complete files or complete added-file diffs. Each call sees only its own packet.",
+    "scope_dependency": "Packet01 was already dispatched before partition refinement; scope.mjs is supplied in packet02, not packet01.",
+    "omitted_tests": [
+      "tests/hooks-and-environment.test.mjs",
+      "tests/contracts-integration.test.mjs",
+      "tests/claude-review.test.mjs",
+      "tests/transitions.test.mjs",
+      "tests/template-compatibility.test.mjs",
+      "tests/story.test.mjs",
+      "tests/runtime.test.mjs",
+      "tests/upstream-contract.test.mjs",
+      "tests/scope-regressions.test.mjs",
+      "tests/pm-compatibility.test.mjs",
+      "tests/specdd.test.mjs"
+    ],
+    "other_exclusions": "Pinned upstream fixtures, legal texts, .deliver histories/config/credentials and future task design documents beyond the supplied plan/remote contract. These are not claimed inspected.",
+    "diff_basis": "New analyze/benchmark files and unchanged legacy PM/SpecDD are supplied whole. Integration/public/remote diffs are in packets01\u201303."
+  },
+  "provider_results": [
+    {
+      "packet": "01-runtime",
+      "status": "FAIL",
+      "findings": 11,
+      "receipt_sha256": "26a4b7cb6028487fb570f4dab594c59a98962cb4f114946816cd5ae0a67d42f1",
+      "attempt": 1,
+      "exit_code": 0
+    },
+    {
+      "packet": "02-integration",
+      "status": "FAIL",
+      "findings": 8,
+      "receipt_sha256": "28ed3e07794210f1e89008a4716d050622168768bacdfc86c5eb36c9226be40d",
+      "attempt": 1,
+      "exit_code": 0
+    },
+    {
+      "packet": "03-public-remote",
+      "status": "PASS",
+      "findings": 9,
+      "receipt_sha256": "9d4f7be559e5bda7253bec65464cb914bbef9ae442874d9bdbc5a761940680f0",
+      "attempt": 1,
+      "exit_code": 0
+    },
+    {
+      "packet": "04-planning-support",
+      "status": "PASS",
+      "findings": 8,
+      "receipt_sha256": "0187ca120d8b0ace7d8a479111bb8852f9cf01f915e1e310dcd4630e9bfaf8f7",
+      "attempt": 1,
+      "exit_code": 0
+    }
+  ],
+  "report": "docs/reviews/2026-09-10-claude-fable-5-1.md",
+  "outcome": "Two reproduced recovery defects and panel finding loss require repair before acceptance.",
+  "native_acceptance": {
+    "task": "T05L",
+    "revision": 29,
+    "snapshot": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9",
+    "review": "FAIL",
+    "failed_criteria": [
+      "T05L-AC2",
+      "T05L-AC3",
+      "T05L-AC5"
+    ],
+    "fixes_spent": 4,
+    "retries_spent": 1
+  },
+  "scope_disposition": "Stale integration preparation is required pending T05C/T05B work, not an additional T05L defect. Raw native receipts remain unchanged; final scope disposition is supplemental.",
+  "evidence_files_sha256": {
+    "01-runtime.invocation.json": "df0fe6066c4750269c03b8589c8143bf4aa23adc0be333dba36787624c2e8b74",
+    "01-runtime.packet.json": "efb3cbf15dfe19fd9594cd4c669035926252352ee404ca0e8bace22568e1c6bb",
+    "01-runtime.policy-triage.json": "3b0d35a7b49990ea1899397d23ca3f80ee83fb2bd1a46efb1ad55771b4daf793",
+    "01-runtime.receipt.json": "26a4b7cb6028487fb570f4dab594c59a98962cb4f114946816cd5ae0a67d42f1",
+    "01-runtime.recovery-reproduction.log": "00b1655aee5e8af02bb328bba632a1509cd78e2030a83206a6b077f65e5925ef",
+    "01-runtime.recovery-triage.json": "0cd646c4813d466b4f3ff4f7018eb10f4173898495bbc48cdd3f06f33eebed9d",
+    "02-integration.invocation.json": "9ea6bcdfb8ae3287d0f3c7c3114d9d3420b92c4418fcf087c8b4f9e7b7254d58",
+    "02-integration.native-review.json": "0f688e2ec4846d03c3b47ab10e805a2b2de7957a23a282533f7a56dc37d51032",
+    "02-integration.native-verification.json": "7e60d5b8b8d94b707d19cf0fa3e110b27fddfb8fca6a6d7edb598087103ba80f",
+    "02-integration.packet.json": "57206bdb6730caa6527dca540962102c445793174d7006524e8accecfb82b28b",
+    "02-integration.policy-triage.json": "88a612d9ae6d274374d394110ec9c45c8da1ee53eac8d1d6839203d155a413ea",
+    "02-integration.provider.log": "af7ce674b99985f77abb5b924b3aa6a3c1625d8b4f8855a2e3e9a4dd294f3511",
+    "02-integration.receipt.json": "28ed3e07794210f1e89008a4716d050622168768bacdfc86c5eb36c9226be40d",
+    "02-integration.reproduction.log": "6b53b635d3410ba45addb33f6ce51656e7573fea2b26ead92fcc8ab3a5675758",
+    "02-integration.scope-disposition.json": "aa221318a64c10de0f816734f06c7df6725e0e95135604710b667be8903667ed",
+    "02-integration.triage.json": "64a40034675804b2563288000e608d0522e000a5955de5ad29a8169c69465a61",
+    "03-public-remote.invocation.json": "271f8022e732e8e020ff9cf1344eb0df4724f05f363a9c2550d904cc90455046",
+    "03-public-remote.packet.json": "f14420654b55b64819d1f542e7fc95f262bc0396f6e8073c0e11b9359bffaf9b",
+    "03-public-remote.provider.log": "dfa995fee761e075527f1efd4a5f70ecdb8c8209ab6dfc81a8fc0da0e93e741c",
+    "03-public-remote.receipt.json": "9d4f7be559e5bda7253bec65464cb914bbef9ae442874d9bdbc5a761940680f0",
+    "03-public-remote.triage.json": "345181004adfaa7f7d632ff1d599043a2a107c219d99f79931aafc6ac59578b4",
+    "04-planning-support.invocation.json": "df8bfb191891ade1db63745e6c775db7c8b92ba43aed614080d692cd30eb21a5",
+    "04-planning-support.packet.json": "d9e59dbe0625e103a7f74f2716e5b1f197b31c51f87e86b42eacef96ee00265b",
+    "04-planning-support.provider.log": "a769e9a5a3f2269dae1a04d2426544490de977f2792a16779f3a5a39e81455b2",
+    "04-planning-support.receipt.json": "0187ca120d8b0ace7d8a479111bb8852f9cf01f915e1e310dcd4630e9bfaf8f7",
+    "04-planning-support.triage.json": "4393f04bce55388b37b7339931b29d5c1bac6c7482b795d7fb30b581f0e8176d"
+  }
+}
