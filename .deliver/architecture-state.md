@@ -342,3 +342,21 @@ original clean checkout precondition. No broad dirty exemption or pretend authen
 T05 implementation is split into L local integration/reporting/panel, R provider port, C tokenized
 source correction, and B final remote wiring. L and R can begin in separate worktrees after T04
 PASS. C starts from integrated L. B starts after L/R/C; no dependency merges into active runs.
+
+## T05L mutation and receipt boundaries
+
+Use audited prepare/adopt records around PM-executed local Git M/P/E/H commits. PM executes
+the documented commands under standing authorization; no fresh user checkpoint. Merge preparation
+binds I/C/common repository/branches and expected clean merge tree before `git merge --no-ff
+--no-edit C`; post-M evidence preparation/adoption proves the actual result. P/E/H preparation
+binds exact bytes/paths/parent, adoption proves the commit, and typed persisted records expose
+interrupted stages. Preparing a token is not permission for an arbitrary source mutation.
+
+Provide explicit integration-record gate/review/verify/finalize API and CLI operations. They
+bind immutable receipts/actors to exact M snapshot/manifest and never mutate the finished source
+run or call its review/verify commands. Unresolved blocking/major findings block finalization;
+source findings remain actionable inputs to T05C. Document the full executable PM command sequence.
+
+Standard reporting opt-in is `--verification-report` at integration preparation, persisted as
+reporting=requested. Large/regulated are required and tiny/small skipped. Do not drop a requested
+report partway through adoption. This is a per-integration choice, not a global configuration edit.
