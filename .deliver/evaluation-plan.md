@@ -24,3 +24,25 @@ Release verification must inspect the actual combined release diff and package c
 cross-task API compatibility, current state defaults, no-sandbox launcher behavior, PM authority,
 legacy migration and optional-provider limitations. Retain any unavailable platform/provider trial
 as an explicit limitation. The draft PR remains draft until required release work passes.
+
+## Bounded trial scenario
+
+Use a dependency-free task-summary module in a disposable project. Sprint 1 has one story:
+`countTasks(tasks)` returns exact open/done counts, accepts an empty array, rejects malformed
+records/unknown statuses, and does not mutate caller data. A later sprint story adds a CLI;
+it remains unclaimed for the next-story handoff check. The first sprint is small enough for
+actual native review while the project intentionally uses standard scale to exercise required
+artifacts, semantic readiness and retrospective behavior.
+
+Create acceptance tests before the builder implementation. Run them once against the initial
+skeleton and record the real missing-implementation failure, then dispatch the builder and
+record the passing gate after implementation. Do not manufacture a regression in completed
+code merely to obtain a failure receipt. Preserve exact raw gate output and the original
+attempt as historical evidence. Exercise fresh-process resume between meaningful steps;
+interruption recovery is demonstrated by persisted CLI state, not a transcript assertion.
+
+Use the three existing native agents as distinct trial participants: one implements the trial
+application, one reviews it, and the third verifies its acceptance. Their contributions to the
+Deliver runtime itself do not make them authors of this separate trial application. Root owns
+trial setup, approval records within the approved evaluation scope, gates and integration.
+Report actual identities in the eventual evidence; these assignments are planning, not receipts.

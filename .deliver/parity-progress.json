@@ -51,12 +51,17 @@
       "commit": "2fdde58b35cdea33c1c95190c18d98d91e827881"
     },
     "T07": {
-      "status": "full gates PASS; independent review underway; claim wiring remains T08",
+      "status": "reviewed, verified, integrated after fix round1; first-claim enforcement remains T08",
       "worktree": "/tmp/deliver-parity-t07-ready",
       "run": "0261fffc-4137-4075-bad3-d3c7e89bb554",
       "builder": "/root/benchmark_builder",
       "deferred_run": "a2f04e07-4d9b-435b-8016-2cbdb97881ca",
-      "snapshot": "0887ac7021de0a8e34e70cb0272ec07d446a2983339c04a5292cc6d34d82b279"
+      "snapshot": "823d14c5c7a5566376e2fc3ad2adef00bb3b38bce6cb9927372eef261aee9949",
+      "fixes": 1,
+      "findings": [
+        "Large/regulated preimplementation prerequisites missing from factual readiness; story-declared SpecDD files absent from analysis identity at every scale."
+      ],
+      "commit": "64d66f80d249410a6b373d27ce96a9b872540a3c"
     },
     "T03": {
       "status": "reviewed, verified, integrated after fix round 1",
@@ -80,11 +85,15 @@
       "snapshot": "ca84692b0e44143e661d1ca03b971a0e1281db9ebe44b72c933d3757c1fd1a69"
     },
     "T00B": {
-      "status": "full gates PASS; queued for independent review",
+      "status": "reviewed, verified, integrated; nonblocking test-maintenance finding carried to T11",
       "worktree": "/tmp/deliver-parity-t00b",
       "run": "0d50b3f1-52c0-450d-9685-9450e53b7daf",
       "builder": "/root/benchmark_builder",
-      "snapshot": "d97ae2d5090b3cf645ded54b109a960c978d9f25f1ca3ad2615fac86ed51fef6"
+      "snapshot": "d97ae2d5090b3cf645ded54b109a960c978d9f25f1ca3ad2615fac86ed51fef6",
+      "commit": "5bd847292d1c70df822338006db24b68d2cf33eb",
+      "findings": [
+        "Minor: replace opaque developer-instruction hash pins with direct duty-boundary assertions in planned T11 role updates."
+      ]
     },
     "T04": {
       "status": "implementation underway",
@@ -93,7 +102,7 @@
       "builder": "/root/t01_builder"
     }
   },
-  "next": "Review T07/T00B; T04 implementation underway, then T05 sequential integration.",
+  "next": "T04 regressions and independent review, then T05 integration/reporting. T08 semantic readiness, T09 migration, T10 retrospectives, T11 knowledge/review, T12 parallel, T13B comparisons and T14 release remain.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
@@ -105,10 +114,10 @@
     "Unused pre-dispatch T02 baseline 1cb0b0fd-76f5-462a-8df2-4a5a8d18f39f was archived under .deliver/aborted after initial sequencing error; no worker ran, no budgets spent, no evidence reused."
   ],
   "latest_integrated_validation": {
-    "task": "T06B",
-    "tests": 103,
-    "passed": 103,
+    "commit": "2129c9230814e8310b61d725b56d33d5f226b648",
+    "tests": 109,
+    "passed": 109,
     "validate": "PASS",
-    "snapshot": "ca84692b0e44143e661d1ca03b971a0e1281db9ebe44b72c933d3757c1fd1a69"
+    "scope": "Combined integrated T00/T00B/T01/T02/T03/T06/T06B/T13A; T04 and T07 not yet integrated"
   }
 }

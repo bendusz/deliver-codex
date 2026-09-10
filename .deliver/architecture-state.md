@@ -165,3 +165,101 @@ native_reference mapping while upstream next_reference remains unchanged.
 Material correct-course must revoke shared approval with recoverable before-image publication
 and retain all spent retries/fixes and historical evidence. A new baseline requires explicit
 reconciliation; it cannot reset an active story budget or resurrect an old PASS.
+
+T14 documentation correction: legacy `references/specdd.md` opening still says not to enable
+SpecDD merely because a project is large. Reconcile with the approved large/regulated mandatory
+contracts policy and `scale-profiles.md`; ordinary lower-scale use remains optional and official
+plugin installation remains optional. T07 analyzer must honor the approved scale requirements.
+
+## T08/T13B independent design review accepted refinements
+
+T08 artifact review requires a dedicated bounded schema before any run exists:
+`{schema_version, stage: pre-claim, story_id, analysis_identity, content_identity, reviewer,
+items, findings}`. `pm claim --semantic-review <regular-json>` recomputes T07 analysis live,
+requires exact identity/stage/story, complete coverage of required semantic items, no FAIL/UNKNOWN
+or unresolved block/major, and persists receipt hash/provenance before claim publication.
+Reviewer identity is an attestation, not authentication. Existing code review receipts cannot
+serve as artifact analysis, and caller-supplied analysis never replaces recomputation.
+
+Large/regulated preclaim checklists: `docs/checklists/spec-quality.md`, `plan-quality.md`,
+`story-readiness-<id>.md`, with checked non-placeholder Evidence and semantic assessment.
+`verification-<id>.md`, durable verification reports and wiki lint are later-phase requirements.
+T07 binds all prerequisite bytes; T08 consumes semantic coverage, not mere file existence.
+
+Material correction revokes the shared approval marker first through recoverable publication,
+then updates the selected run under revision lock. Preserve superseded gate/review/verification
+identities in history, retain MAX counters, clear only active pointers. A crash between steps is
+safely revoked and doctor reports reconciliation. Never update the run first. Observational
+diagnostics use noncreating store readers, bounded regular run enumeration and unique matching
+pm_binding selection; ambiguity remains explicit. Environment report goes to stdout; writing
+`tmp/environment-check.md` is an explicit caller action.
+
+T13B uses a separate workflow manifest in `tmp/builder-benchmark/<id>/`, not the T13A result
+schema as restart state. Manifest binds full base OID, story/contract, two effective configurations,
+unique non-pm/S branches/worktrees, dispatch state/token/attempt/timestamps, HEAD/snapshot, exact
+gate receipts/logs, scope result, panel receipt hashes and exposed/null usage. Derive aggregate
+metrics from actual evidence; never trust adapter summary counts.
+
+Document a real native protocol: prepare validates both positively available configurations and
+immutable inputs before creating either worktree; dispatch-prepare persists a deterministic
+candidate/attempt token before host spawn; host invokes the actual named native role/model;
+record-dispatch/result binds actual agent identity/evidence; gate/review/finalize derive results.
+Pending dispatch after interruption is UNKNOWN and never automatically resent. Fake adapters
+exercise the same protocol as tests only. Installed TOML alone is not positive host model
+availability. Both candidates get byte-identical approved story/task/gates/panel and full base,
+scope is checked before gates, no route/Execution/approval mutation, no merge/push, one separately
+persisted clarification retry. Clarification can restate existing immutable artifacts only;
+material change blocks both. Operations/SKILL route updates added to T13B packet.
+
+## T05 durable reporting phase (independent architecture clarification)
+
+Large/regulated story closure uses C -> M -> P -> E -> H. P adds only
+`docs/verification/<story-id>.md` and `docs/checklists/verification-<story-id>.md` after
+proven M. Standard may opt in; tiny/small skip. The report references verified source C,
+source snapshot and actual gate/review/distinct-verifier receipt identities, and Integrated as M.
+It never embeds P or its own hash. Reporting preparation stores exact expected bytes/blob hashes
+externally; reporting adoption verifies exact direct-child P of M and only these paths.
+Every PASS must map to actual current C evidence and every acceptance ID; UNKNOWN/FAIL remains
+blocking, required lenses/separation hold, and checklist evidence is concrete. Exact deterministic
+report generation is preferable to pretending arbitrary prose claims can be machine-proven.
+
+P does not relabel source evidence or rerun source gates when it proves source/contract/story
+bytes unchanged and exact reporting/evidence lineage. Any extra path or changed evidence exits
+the reporting exception. E remains story-only merged Execution and requires valid P at the
+applicable scale. T08 only diagnoses/routes missing/stale reports; it never writes them.
+
+Project-level regulated wiki lint follows final story closure and required retrospectives, not
+every claim/story. T11 will provide a bounded read-only wiki manifest/lint identity over tracked
+regular docs/wiki files, with tool/version, commit and located findings; semantic review remains
+explicit where needed. A final completion report after these terminal story runs references
+actual story lineages and current wiki lint. Allocate the complete project-reporting operation
+after T10/T11 against their actual APIs, not inside T05 before those dependencies exist.
+It is scoped reporting work, never a broad documentation exemption from evidence checks.
+
+Ordinary story handoff BASE_COMMIT points E. After additional validated project-level reporting,
+it points the latest non-handoff closure/reporting commit. The handoff-only commit never refers
+to its own hash. Future wiki changes invalidate the matching wiki lint identity; source changes
+require their own authorized story/evidence, never retroactive rewriting of an old report.
+
+## Structured review evidence interface for T05/T11
+
+Runtime currently strips every input review field except status/findings/summary. Extend it
+with a bounded optional `panel: {snapshot_hash, members: [{lens, reviewer, verdict, findings}]}`
+whose verdict is PASS/CONCERNS/FAIL. Every member binds the same snapshot, all safe identities
+are validated, and aggregate top-level verdict/findings are derived from all members. Never
+trust an underreported aggregate or infer lens proof from prose. Preserve original member
+CONCERNS and all minor findings in a runtime PASS-with-minors aggregate.
+
+Existing no-panel receipts remain compatible for legacy/standalone. Current large/regulated
+reporting P needs exact story-declared lens coverage plus code-integrity-reviewer always and
+security-auditor for regulated; no invented panel evidence. Native role names and persisted
+upstream lens names are distinct; document their explicit dispatch mapping. T11's adapter
+must feed the actual runtime parser/state, not merely emit disconnected examples.
+
+T05 introduces the retained panel contract and reporting consumption; T11 supplies the full
+pure source-verdict/aggregation/scoped-review adapter and actual runtime integration. Packets
+now contain review.mjs, runtime/state and focused review-panel tests as applicable.
+
+T08 packet includes existing current transition/integration/reporting/remote fixtures solely
+for supplying real required readiness artifacts when first-claim enforcement arrives. Keep
+behavioral assertions; no hidden bypass or wholesale scale downgrading to avoid the new gate.

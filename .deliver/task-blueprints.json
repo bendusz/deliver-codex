@@ -206,7 +206,12 @@
       "plugins/deliver/skills/deliver/references/shipping.md",
       "tests/integration.test.mjs",
       "tests/remote.test.mjs",
-      "tests/current-roundtrip.test.mjs"
+      "tests/current-roundtrip.test.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+      "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
+      "tests/reporting.test.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+      "tests/review-panel.test.mjs"
     ],
     "acceptance": [
       {
@@ -220,6 +225,10 @@
       {
         "id": "T05-AC3",
         "text": "PM remote adapter pushes scoped branches, creates/updates PRs and merges only exact verified heads with passing required checks under standing authorization; fake remote tests cover missing auth, pending/failure, races and merge result mismatch without real remote/model calls."
+      },
+      {
+        "id": "T05-AC4",
+        "text": "Large/regulated closure requires a separately prepared and adopted evidence-derived verification report/checklist commit P between proven integration M and story-only closure E; exact report paths and C/M/evidence references avoid self-referential hashes, unsupported PASS claims and hidden source changes."
       }
     ],
     "commands": {
@@ -245,7 +254,14 @@
       "plugins/deliver/hooks/context.mjs",
       "tests/diagnostics.test.mjs",
       "tests/hooks-and-environment.test.mjs",
-      "tests/current-lifecycle.test.mjs"
+      "tests/current-lifecycle.test.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/artifact-review.mjs",
+      "tests/artifact-review.test.mjs",
+      "tests/transitions.test.mjs",
+      "tests/integration.test.mjs",
+      "tests/reporting.test.mjs",
+      "tests/current-roundtrip.test.mjs",
+      "tests/remote.test.mjs"
     ],
     "acceptance": [
       {
@@ -360,7 +376,16 @@
       "plugins/deliver/skills/deliver/scripts/review-scope.mjs",
       "tests/review-scope.test.mjs",
       "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
-      "tests/review-adapter.test.mjs"
+      "tests/review-adapter.test.mjs",
+      "plugins/deliver/skills/deliver/assets/operations.json",
+      "plugins/deliver/skills/deliver/SKILL.md",
+      "tests/role-policy.test.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/wiki.mjs",
+      "plugins/deliver/skills/deliver/scripts/wiki.mjs",
+      "tests/wiki.test.mjs",
+      "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+      "tests/review-panel.test.mjs"
     ],
     "acceptance": [
       {
@@ -428,7 +453,9 @@
       "plugins/deliver/skills/deliver/scripts/lib/benchmark-workflow.mjs",
       "plugins/deliver/skills/deliver/scripts/benchmark-run.mjs",
       "plugins/deliver/skills/deliver/scripts/lib/benchmark.mjs",
-      "tests/benchmark-workflow.test.mjs"
+      "tests/benchmark-workflow.test.mjs",
+      "plugins/deliver/skills/deliver/assets/operations.json",
+      "plugins/deliver/skills/deliver/SKILL.md"
     ],
     "acceptance": [
       {
@@ -476,7 +503,8 @@
       "bin/deliver.mjs",
       "tests/setup.test.mjs",
       "tests/operations.test.mjs",
-      "tests/packaging.test.mjs"
+      "tests/packaging.test.mjs",
+      "plugins/deliver/skills/deliver/references/specdd.md"
     ],
     "acceptance": [
       {
