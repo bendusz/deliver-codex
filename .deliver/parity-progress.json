@@ -114,7 +114,7 @@
       "integration_commit": "4c419a7c948642b9a5e35e3cc59a4b03b2b8d806"
     },
     "T05L": {
-      "status": "fix1 dispatched after independent review; retries1 preserved",
+      "status": "fix1 full gates PASS; independent re-review and Managed verification active",
       "worktree": "/tmp/deliver-parity-t05l",
       "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
       "builder": "/root/t01_builder",
@@ -126,9 +126,10 @@
         "Independent review round1: integration record ID/path is not canonical or bound to source run.",
         "Independent review round1: adopted P/E/H/reporting proof and truthful escaped findings are incomplete."
       ],
-      "builder_checkpoint": "Actual FAIL review/verification archived round1; runtime review and verification recorded, then fix1 recorded at revision8 before dispatch. Source baseline unchanged.",
+      "builder_checkpoint": "All four round1 major groups corrected; builder focused31/31. Root npm test147/147 and validate PASS at frozen candidate. Independent review/verification dispatched; acceptance pending.",
       "snapshot": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3",
-      "fixes": 1
+      "fixes": 1,
+      "candidate_snapshot": "477c3fb8d6ae901dc3c6160406acab0834ab7123c3c65a9b7c8cffbf499dab92"
     },
     "T05R": {
       "status": "reviewed, verified, integrated after fix1",
@@ -144,7 +145,7 @@
       "integration_commit": "10e6c2260c59faad6802988932efcfcd189e088b"
     }
   },
-  "next": "Finish independent review and integration of active T05L/T05R; then T05C/T05B, T08, T09, T10, T11/T11P, T12, T13B and T14.",
+  "next": "Accept and integrate active T05L; then T05C/T05B, T08, T09, T10, T11/T11P, T12, T13B and T14. T05R is accepted and integrated.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
