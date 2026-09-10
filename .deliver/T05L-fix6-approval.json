@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "approved_by": "Ben",
+  "at": "2026-09-10T14:21:56.676493+00:00",
+  "instruction": "Approved",
+  "proposal": "docs/plans/2026-09-10-legacy-reconciliation-follow-up.md",
+  "proposal_sha256": "1f5c846e912dc9b7f5472837b6cc4720c40d8d572e5fc7dc959295214d667780",
+  "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
+  "previous_fixes": 5,
+  "authorized_fixes": 6,
+  "retries": 1,
+  "scope": "One bounded T05L active-evidence legacy reconciliation correction, fresh full gates and independent review; integrate after PASS and run combined acceptance. Preserve run, original baseline and all evidence/counters. No paid provider calls."
+}
