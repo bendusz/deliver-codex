@@ -114,14 +114,16 @@
       "integration_commit": "4c419a7c948642b9a5e35e3cc59a4b03b2b8d806"
     },
     "T05L": {
-      "status": "resumed after native model capacity interruption",
+      "status": "full gates passed; independent review/verification in progress",
       "worktree": "/tmp/deliver-parity-t05l",
       "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
       "builder": "/root/t01_builder",
       "retries": 1,
       "findings": [
         "Native host returned selected model at capacity; retry1 recorded before resuming same agent/model, preserving in-scope partial source."
-      ]
+      ],
+      "builder_checkpoint": "Final combined focused26/26 and packaging validation PASS; source frozen. Root full gates PASS. Acceptance pending independent review.",
+      "snapshot": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3"
     },
     "T05R": {
       "status": "reviewed, verified, integrated after fix1",
