@@ -96,7 +96,7 @@
       ]
     },
     "T04": {
-      "status": "fix2 full gates PASS; independent review in progress",
+      "status": "independent fix2 FAIL recorded; final fix round3 authorized",
       "worktree": "/tmp/deliver-parity-t04",
       "run": "9e5faaea-1973-4a63-b57c-6c943bf4c5d0",
       "builder": "/root/t01_builder",
@@ -104,9 +104,11 @@
       "findings": [
         "Independent diagnosis: current snapshot Git metadata schema changed; real old metadata exactly matches baseline. Add exact legacy-v1 comparison for pre-anchor runs without loosening actual Git drift checks.",
         "Review: commit preparation includes unchanged pre-start dirty paths under touches.",
-        "Review: recovery validates path-shaped images but not the full legal story/run before-after transition."
+        "Review: recovery validates path-shaped images but not the full legal story/run before-after transition.",
+        "Fix2 review: prepared/adopted index flags and complete audited changed-entry tree coverage are missing.",
+        "Fix2 review: current anchor suppresses recursive baseline Git metadata but does not protect initialized submodule metadata."
       ],
-      "fixes": 2
+      "fixes": 3
     }
   },
   "next": "T04 independent fix2 review, then T05L local integration and T05R provider port. T05C corrections/T05B wiring, T08 readiness/resume, T09 migration, T10 retrospectives, T11 knowledge/review, T11P completion report, T12 parallel, T13B comparisons and T14 release remain.",

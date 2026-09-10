@@ -299,7 +299,10 @@
       "plugins/deliver/skills/deliver/scripts/migrate.mjs",
       "plugins/deliver/skills/deliver/references/migration.md",
       "tests/migration.test.mjs",
-      "tests/fixtures/migration"
+      "tests/fixtures/migration",
+      "plugins/deliver/skills/deliver/assets/operations.json",
+      "plugins/deliver/skills/deliver/SKILL.md",
+      "tests/operations.test.mjs"
     ],
     "acceptance": [
       {
@@ -333,7 +336,11 @@
       "plugins/deliver/skills/deliver/assets/templates/retro.md.template",
       "plugins/deliver/skills/deliver/scripts/lib/retrospective.mjs",
       "plugins/deliver/skills/deliver/scripts/retro.mjs",
-      "tests/retrospective.test.mjs"
+      "tests/retrospective.test.mjs",
+      "plugins/deliver/skills/deliver/assets/operations.json",
+      "plugins/deliver/skills/deliver/SKILL.md",
+      "tests/operations.test.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/diagnostics.mjs"
     ],
     "acceptance": [
       {
@@ -628,7 +635,10 @@
       "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
       "tests/reporting.test.mjs",
       "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
-      "tests/review-panel.test.mjs"
+      "tests/review-panel.test.mjs",
+      "plugins/deliver/skills/deliver/assets/operations.json",
+      "plugins/deliver/skills/deliver/SKILL.md",
+      "tests/operations.test.mjs"
     ],
     "acceptance": [
       {
@@ -752,7 +762,10 @@
       "plugins/deliver/skills/deliver/references/compatibility.md",
       "tests/remote.test.mjs",
       "tests/remote-lifecycle.test.mjs",
-      "tests/current-roundtrip.test.mjs"
+      "tests/current-roundtrip.test.mjs",
+      "plugins/deliver/skills/deliver/assets/operations.json",
+      "plugins/deliver/skills/deliver/SKILL.md",
+      "tests/operations.test.mjs"
     ],
     "acceptance": [
       {
@@ -789,7 +802,10 @@
       "plugins/deliver/skills/deliver/assets/templates/completion-report.md.template",
       "plugins/deliver/skills/deliver/assets/operations.json",
       "plugins/deliver/skills/deliver/SKILL.md",
-      "tests/project-report.test.mjs"
+      "tests/project-report.test.mjs",
+      "tests/operations.test.mjs",
+      "plugins/deliver/skills/deliver/references/shipping.md",
+      "plugins/deliver/skills/deliver/scripts/lib/diagnostics.mjs"
     ],
     "acceptance": [
       {

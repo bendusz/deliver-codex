@@ -360,3 +360,11 @@ source findings remain actionable inputs to T05C. Document the full executable P
 Standard reporting opt-in is `--verification-report` at integration preparation, persisted as
 reporting=requested. Large/regulated are required and tiny/small skipped. Do not drop a requested
 report partway through adoption. This is a per-integration choice, not a global configuration edit.
+
+## Native operation routing ownership
+
+T05L/B, T09 and T10 own operations.json, SKILL.md and operation tests so their new references
+become the actual installed user routes. T08's native continuation resolves available operation
+references separately from upstream next_reference. T10 can update diagnostics when its dedicated
+retrospective reference arrives. T11P can update diagnostics/shipping when project reporting lands.
+Do not leave new modules reachable only through undocumented helper calls until final packaging.
