@@ -112,6 +112,18 @@
       "fixes": 3,
       "commit": "8bdd6f1367141add5af69c9b7bce19da3e1a46ab",
       "integration_commit": "4c419a7c948642b9a5e35e3cc59a4b03b2b8d806"
+    },
+    "T05L": {
+      "status": "implementation in progress",
+      "worktree": "/tmp/deliver-parity-t05l",
+      "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
+      "builder": "/root/t01_builder"
+    },
+    "T05R": {
+      "status": "implementation in progress",
+      "worktree": "/tmp/deliver-parity-t05r",
+      "run": "722c47ba-d20f-410d-a201-e093f9315254",
+      "builder": "/root/benchmark_builder"
     }
   },
   "next": "T05L local integration and T05R provider port can dispatch. Then T05C/T05B, T08, T09, T10, T11/T11P, T12, T13B and T14.",
