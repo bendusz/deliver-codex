@@ -362,6 +362,10 @@ export function transitionCurrentExecution(runArg, { to, attempt, reason, expect
     assertPmBinding(state, { allowBlocked: true });
     const document = readStory(root, state.pm_binding.story_path);
     const execution = document.execution;
+    const trueNoop = execution.status === to && attempt === undefined
+      && Math.max(execution.retries, state.counters.retries) === execution.retries
+      && Math.max(execution.rounds, state.counters.fixes) === execution.rounds;
+    if (state.commit_adoption?.pending && !trueNoop) rejectPendingCommitMutation(state);
     const built = buildExecutionTransition(state, document, {
       to,
       attempt,
@@ -429,6 +433,17 @@ function anchorProtectionHash(anchor) {
     protected_hash: anchor.protected_hash,
     submodules: anchor.submodules || {},
   }));
+}
+
+export function commitCancellationContinuation(state) {
+  const pending = state.commit_adoption?.pending;
+  if (!pending) return null;
+  return `node plugins/deliver/skills/deliver/scripts/deliver.mjs commit-cancel --run ${state.run_id} --token ${pending.token} --expected-revision ${state.revision} --reason "Cancel stale preparation before changing Execution"`;
+}
+
+function rejectPendingCommitMutation(state) {
+  const command = commitCancellationContinuation(state);
+  if (command) fail(`commit adoption is pending; cancel it before changing Execution: ${command}`);
 }
 
 function expectedIndex(root, parent, paths) {
@@ -548,10 +563,75 @@ export function prepareCommitAdoption(runArg, expectedRevision, cwd = process.cw
       paths: intended,
       prepared_at: now(),
     };
-    state.commit_adoption = { pending, history: [...(state.commit_adoption?.history || [])] };
+    state.commit_adoption = {
+      pending,
+      history: [...(state.commit_adoption?.history || [])],
+      cancellations: [...(state.commit_adoption?.cancellations || [])],
+    };
     state.events.push({ at: now(), type: 'commit_prepared', token: pending.token, parent: pending.parent, paths: pending.paths });
     return pending;
   });
+}
+
+export function cancelPreparedCommit(runArg, { token, reason, expectedRevision } = {}, cwd = process.cwd()) {
+  if (typeof token !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(token)) {
+    fail('--token must be the commit preparation token', 64);
+  }
+  if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 0) {
+    fail('commit cancellation requires --expected-revision', 64);
+  }
+  if (typeof reason !== 'string' || !reason.trim() || reason.length > 1000
+    || /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(reason)) {
+    fail('--reason must be printable and at most 1000 characters', 64);
+  }
+  const loaded = readRun(runArg, cwd);
+  return updateRun(loaded.file, expectedRevision, (state) => {
+    if (state.phase !== 'active' || state.pm_binding?.format !== 'current') {
+      fail('commit cancellation requires an active current-bound run');
+    }
+    const pending = state.commit_adoption?.pending;
+    if (!pending || pending.token !== token) fail('commit preparation token is missing or stale');
+    assertPmBinding(state);
+    const root = state.project_root;
+    const head = git(root, ['rev-parse', '--verify', 'HEAD']);
+    if (head !== pending.parent) {
+      fail(`commit cancellation requires HEAD at prepared parent ${pending.parent}; current HEAD is ${head}`);
+    }
+    const anchor = captureGitAnchor(root);
+    if (anchor.ref !== pending.ref) {
+      fail(`commit cancellation requires original ref ${pending.ref}; current ref is ${anchor.ref}`);
+    }
+    if (!gitSucceeds(root, ['diff', '--cached', '--quiet', '--'])) {
+      fail('commit cancellation requires a clean index');
+    }
+    if (anchorProtectionHash(anchor) !== pending.protected_hash) {
+      fail('protected Git config, hooks, index flags or submodule metadata changed after commit preparation');
+    }
+    const checked = inspectScope(state, { allowPendingAdoption: true });
+    if (!checked.report.ok) fail('commit cancellation requires a passing cumulative scope check', 74);
+    const cancelled = {
+      preparation: structuredClone(pending),
+      reason,
+      cancelled_at: now(),
+    };
+    state.commit_adoption.pending = null;
+    if (!Array.isArray(state.commit_adoption.cancellations)) state.commit_adoption.cancellations = [];
+    state.commit_adoption.cancellations.push(cancelled);
+    state.events.push({
+      at: cancelled.cancelled_at,
+      type: 'commit_cancelled',
+      token: pending.token,
+      parent: pending.parent,
+      ref: pending.ref,
+      paths: [...pending.paths],
+      reason,
+    });
+    return cancelled;
+  });
+}
+
+export function assertNoPendingCommitMutation(state) {
+  rejectPendingCommitMutation(state);
 }
 
 export function adoptPreparedCommit(runArg, { token, commit, expectedRevision } = {}, cwd = process.cwd()) {
