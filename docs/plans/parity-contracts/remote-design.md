@@ -133,3 +133,16 @@ Exhaustion preserves published closure and reports incomplete handoff reconcilia
 ## Structured checks exit status clarification
 
 The current GitHub CLI checks source exports JSON before applying the human-output failed/pending exit statuses. Treat exit0 structured output according to each bucket, including failure and pending. Nonzero structured output remains a provider error/UNKNOWN and never READY. The narrow exact no-check exit1 exception above occurs before JSON export and remains valid. Source: https://github.com/cli/cli/blob/trunk/pkg/cmd/pr/checks/checks.go (reviewed 2026-09-10). This clarifies the active T05R dispatch; its frozen task input copy is unchanged.
+
+## T05B already-merged provider reconciliation
+
+Independent T05R review confirmed the direct adapter returns PR_MERGED from initial lookup
+and intentionally does not treat that label as completion. Its public PR result currently omits
+mergeCommit, so B cannot claim restart/queue recovery using that result alone. Before wiring
+remote lifecycle completion, B must add a read-only already-merged reconciliation operation
+in remote.mjs: exact expected PR repository/owner/head/base/number, current MERGED status and full
+merge commit, followed by remote-base proof. It must issue no second merge command or push.
+An advanced base needs actual fetched Git ancestry proof in B. Malformed/missing data stays
+UNKNOWN; queued/open remains pending. Persist the returned actual proof against the original
+prepared lifecycle record. Exercise interruption after provider merge and before local receipt,
+and queue completion on a later process, using the fake provider plus real Git history.
