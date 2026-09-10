@@ -84,10 +84,13 @@ assert(roles.length >= 6);
 for (const file of roles) {
   const text = read(file);
   const name = text.match(/^name = "([^"]+)"$/m)?.[1];
+  const instructionsAt = text.indexOf("developer_instructions = '''");
   assert.equal(name, path.basename(file, '.toml'));
   assert.match(text, /^description = "[^\n]+"$/m);
   assert.match(text, /^model = "gpt-5\.6-(?:sol|luna|terra)"$/m);
   assert.match(text, /^model_reasoning_effort = "(?:medium|high|xhigh)"$/m);
+  assert(instructionsAt >= 0, `${file}: missing developer instructions`);
+  assert(!/^sandbox_mode[ \t]*=/m.test(text.slice(0, instructionsAt)), `${file}: role-level sandbox override`);
   assert.match(text, /developer_instructions = '''\n[\s\S]+\n'''\n?$/);
 }
 validateTaskPacket(json(path.join(skill, 'assets/task.example.json')));
