@@ -242,7 +242,8 @@
     "objective": "Unify phase-aware resume, read-only doctor/hooks and current-scale first-claim readiness without resetting state",
     "read_paths": [
       "AGENTS.md",
-      "docs/plans/2026-09-09-upstream-parity.md"
+      "docs/plans/2026-09-09-upstream-parity.md",
+      "docs/plans/parity-contracts/architecture-state.md"
     ],
     "touches": [
       "plugins/deliver/skills/deliver/references/recovery.md",
@@ -292,7 +293,9 @@
     "objective": "Preview and apply explicit conflict-aware migration from legacy tmp/flat/actor PM formats while preserving historical evidence and spent budgets",
     "read_paths": [
       "AGENTS.md",
-      "docs/plans/2026-09-09-upstream-parity.md"
+      "docs/plans/2026-09-09-upstream-parity.md",
+      "docs/plans/parity-contracts/migration-design.md",
+      "docs/plans/parity-contracts/migration-findings.md"
     ],
     "touches": [
       "plugins/deliver/skills/deliver/scripts/lib/migration.mjs",
@@ -329,7 +332,8 @@
     "objective": "Require evidence-based completed-sprint retrospectives and explicit carried-over findings",
     "read_paths": [
       "AGENTS.md",
-      "docs/plans/2026-09-09-upstream-parity.md"
+      "docs/plans/2026-09-09-upstream-parity.md",
+      "docs/plans/parity-contracts/retrospective-design.md"
     ],
     "touches": [
       "plugins/deliver/skills/deliver/references/retrospective.md",
@@ -368,7 +372,8 @@
     "read_paths": [
       "AGENTS.md",
       "docs/plans/2026-09-09-upstream-parity.md",
-      ".deliver/project-report-design.md"
+      "docs/plans/parity-contracts/project-report-design.md",
+      "docs/plans/parity-contracts/knowledge-design.md"
     ],
     "touches": [
       "plugins/deliver/skills/deliver/references/knowledge.md",
@@ -428,7 +433,8 @@
     "objective": "Support independent shared-story worktrees, collision checks, serial integration and interruption recovery",
     "read_paths": [
       "AGENTS.md",
-      "docs/plans/2026-09-09-upstream-parity.md"
+      "docs/plans/2026-09-09-upstream-parity.md",
+      "docs/plans/parity-contracts/parallel-design.md"
     ],
     "touches": [
       "plugins/deliver/skills/deliver/references/parallel.md",
@@ -462,7 +468,8 @@
     "objective": "Execute two explicitly selected native builder comparisons from the same approved story/base in isolated preserved worktrees with fake adapter tests",
     "read_paths": [
       "AGENTS.md",
-      "docs/plans/2026-09-09-upstream-parity.md"
+      "docs/plans/2026-09-09-upstream-parity.md",
+      "docs/plans/parity-contracts/architecture-state.md"
     ],
     "touches": [
       "plugins/deliver/skills/deliver/references/benchmark.md",
@@ -498,7 +505,8 @@
     "objective": "Package and document verified upstream parity with truthful evidence matrix, preserved setup upgrades and an installed end-to-end example",
     "read_paths": [
       "AGENTS.md",
-      "docs/plans/2026-09-09-upstream-parity.md"
+      "docs/plans/2026-09-09-upstream-parity.md",
+      "docs/plans/parity-contracts/evaluation-plan.md"
     ],
     "touches": [
       "README.md",
@@ -618,8 +626,8 @@
     "read_paths": [
       "AGENTS.md",
       "docs/plans/2026-09-09-upstream-parity.md",
-      ".deliver/architecture-state.md",
-      ".deliver/integration-correction-design.md"
+      "docs/plans/parity-contracts/architecture-state.md",
+      "docs/plans/parity-contracts/integration-correction-design.md"
     ],
     "touches": [
       "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
@@ -675,7 +683,7 @@
     "read_paths": [
       "AGENTS.md",
       "docs/plans/2026-09-09-upstream-parity.md",
-      ".deliver/remote-design.md"
+      "docs/plans/parity-contracts/remote-design.md"
     ],
     "touches": [
       "plugins/deliver/skills/deliver/scripts/lib/remote.mjs",
@@ -707,8 +715,8 @@
     "read_paths": [
       "AGENTS.md",
       "docs/plans/2026-09-09-upstream-parity.md",
-      ".deliver/architecture-state.md",
-      ".deliver/integration-correction-design.md"
+      "docs/plans/parity-contracts/architecture-state.md",
+      "docs/plans/parity-contracts/integration-correction-design.md"
     ],
     "touches": [
       "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
@@ -748,9 +756,9 @@
     "read_paths": [
       "AGENTS.md",
       "docs/plans/2026-09-09-upstream-parity.md",
-      ".deliver/architecture-state.md",
-      ".deliver/remote-design.md",
-      ".deliver/integration-correction-design.md"
+      "docs/plans/parity-contracts/architecture-state.md",
+      "docs/plans/parity-contracts/remote-design.md",
+      "docs/plans/parity-contracts/integration-correction-design.md"
     ],
     "touches": [
       "plugins/deliver/skills/deliver/scripts/lib/remote.mjs",
@@ -794,7 +802,7 @@
     "read_paths": [
       "AGENTS.md",
       "docs/plans/2026-09-09-upstream-parity.md",
-      ".deliver/project-report-design.md"
+      "docs/plans/parity-contracts/project-report-design.md"
     ],
     "touches": [
       "plugins/deliver/skills/deliver/scripts/lib/project-report.mjs",

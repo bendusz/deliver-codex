@@ -123,13 +123,14 @@
   "pull_request": "https://github.com/bendusz/deliver-codex/pull/2",
   "coordinator_notes": [
     "Do not use git push -u during active runs: shared tracking-config mutation invalidates their protected Git metadata. Use explicit remote/branch pushes.",
-    "Unused pre-dispatch T02 baseline 1cb0b0fd-76f5-462a-8df2-4a5a8d18f39f was archived under .deliver/aborted after initial sequencing error; no worker ran, no budgets spent, no evidence reused."
+    "Unused pre-dispatch T02 baseline 1cb0b0fd-76f5-462a-8df2-4a5a8d18f39f was archived under .deliver/aborted after initial sequencing error; no worker ran, no budgets spent, no evidence reused.",
+    "Runtime task read_paths cannot include .deliver. Frozen supplemental design copies live under docs/plans/parity-contracts; coordinator progress/evidence stays under .deliver."
   ],
   "latest_integrated_validation": {
-    "commit": "6d23fec",
-    "tests": 119,
-    "passed": 119,
+    "commit": "9599c2a",
+    "tests": 133,
+    "passed": 133,
     "validate": "PASS",
-    "scope": "Combined integrated T00/T00B/T01/T02/T03/T06/T06B/T07/T13A; T04 fix2 not yet integrated"
+    "scope": "Combined integrated foundations through T04 and T07, plus T13A scorer"
   }
 }
