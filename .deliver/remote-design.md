@@ -70,3 +70,21 @@ arbitrary stderr/malformed output separately.
 Temporary-body details: fresh os.tmpdir directory mode0700; wx file mode0600; exact bounded UTF-8
 body; absolute path passed to gh; finally cleanup on success, nonzero exit and runner throw.
 Fake runner inspects bytes/mode during call and tests verify no worktree/.deliver body file.
+
+## Provider result and publish details
+
+Export a closed stage/state vocabulary beside the adapter factory. Omit a redundant ok boolean.
+Stages are preflight/lookup/publish/checks/merge/postmerge. Preserve distinct PUBLISHED, READY and
+MERGED outcomes, missing versus ambiguous remote, unavailable executable versus Git failure,
+and PR lookup failure versus absence. Diagnostics use fixed safe codes/messages, never raw
+stderr. Invalid caller targets/options throw DeliverError 64/66; expected provider outcomes
+return discriminated results. T05B switches explicitly and never treats an unknown state as ready.
+
+Publishing an existing PR may begin with an older remote head. Verify exact PR repository,
+owner, branch, base and eligible state before pushing; require the expected head after push.
+Inspect/readiness and merge always require the exact expected head. Do not prevent ordinary
+scoped PR updates by demanding that an unpushed local commit already be the PR head.
+
+Default runner suppresses terminal credential prompts and bounds time/output. SSH git@host
+is valid; embedded HTTPS credentials are rejected. Provider URLs are same-host HTTPS or omitted.
+Root must be a real directory. Validate JSON fields/types rather than trusting a partial object.

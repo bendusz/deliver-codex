@@ -121,10 +121,10 @@
     "Unused pre-dispatch T02 baseline 1cb0b0fd-76f5-462a-8df2-4a5a8d18f39f was archived under .deliver/aborted after initial sequencing error; no worker ran, no budgets spent, no evidence reused."
   ],
   "latest_integrated_validation": {
-    "commit": "2129c9230814e8310b61d725b56d33d5f226b648",
-    "tests": 109,
-    "passed": 109,
+    "commit": "6d23fec",
+    "tests": 119,
+    "passed": 119,
     "validate": "PASS",
-    "scope": "Combined integrated T00/T00B/T01/T02/T03/T06/T06B/T13A; T04 and T07 not yet integrated"
+    "scope": "Combined integrated T00/T00B/T01/T02/T03/T06/T06B/T07/T13A; T04 fix2 not yet integrated"
   }
 }

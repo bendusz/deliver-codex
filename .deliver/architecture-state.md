@@ -308,6 +308,12 @@ never claim old C gates ran at M. This preserves independently completed sibling
 while testing their actual combined tree. Prior I may contain legitimate imported upstream
 completion without native journals.
 
+Candidate C manifest must also match the actual bound input content certified by its source
+snapshot, not merely equal M's committed manifest. T04 can preserve pre-start dirty user work.
+If such bytes affect touches/read_paths/specs, a review of that worktree is not automatically a
+review of C's committed blobs. Require that match or fresh M review/verification; do not erase
+or commit the pre-existing work. Unrelated unbound dirty files do not justify a blanket rejection.
+
 Proposed pure boundaries: prepareIntegrationEvidence(runArg,{integrationRoot,candidateCommit,
 integrationCommit}); runIntegrationGates(preparation,{expectedPreparationHash}) rechecks before
 each exact command; finalizeIntegrationEvidence(preparation,gateReceipts) recomputes lineage/
