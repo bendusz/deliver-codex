@@ -46,3 +46,5 @@ application, one reviews it, and the third verifies its acceptance. Their contri
 Deliver runtime itself do not make them authors of this separate trial application. Root owns
 trial setup, approval records within the approved evaluation scope, gates and integration.
 Report actual identities in the eventual evidence; these assignments are planning, not receipts.
+
+Coordinator prepared `/tmp/deliver-parity-trial-artifacts.py` and a preview at `/tmp/deliver-parity-trial-preview-20260910`. The script creates standard plan/spec, two sprint stories and counter acceptance tests only; it neither installs nor records approval/claim/evidence. Preview post-decomposition analysis found only the deliberately absent approval marker; semantic review remains unassessed. Create a fresh final installed trial after T14, using this scaffold as preparation rather than trial evidence.
