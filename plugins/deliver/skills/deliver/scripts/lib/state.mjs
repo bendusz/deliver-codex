@@ -36,6 +36,50 @@ export function readJsonFile(file, label = file) {
 
 const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const isStringArray = (value) => Array.isArray(value) && value.every((item) => typeof item === 'string');
+const safeBranch = (value) => typeof value === 'string' && value && value.length <= 512 && value !== '@'
+  && !value.startsWith('-') && !value.startsWith('/') && !value.endsWith('/') && !value.endsWith('.')
+  && !value.includes('..') && !value.includes('//') && !value.includes('@{')
+  && !/[\x00-\x20\x7f~^:?*[\\\]]/.test(value)
+  && value.split('/').every((part) => part && !part.startsWith('.') && !part.endsWith('.lock'));
+const safeRef = (value) => typeof value === 'string' && value.startsWith('refs/heads/') && safeBranch(value.slice('refs/heads/'.length));
+const safeRelativePath = (value) => typeof value === 'string' && value && !path.isAbsolute(value)
+  && !/[\x00-\x1f\x7f]/.test(value) && !value.split(/[\\/]/).some((part) => !part || part === '.' || part === '..')
+  && !/^(?:\.git|\.deliver)(?:[\\/]|$)/.test(value);
+const oid = (value) => typeof value === 'string' && /^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(value);
+const digest = (value) => typeof value === 'string' && /^[0-9a-f]{64}$/.test(value);
+
+function validNestedAnchor(anchor) {
+  if (!isObject(anchor) || !['head', 'tree', 'index_tree', 'index_flags', 'protected_hash']
+    .every((key) => typeof anchor[key] === 'string')
+    || !oid(anchor.head) || !oid(anchor.tree) || !oid(anchor.index_tree)
+    || !digest(anchor.index_flags) || !digest(anchor.protected_hash)
+    || (anchor.metadata_version !== undefined && anchor.metadata_version !== 'protected-v2')) return false;
+  if (anchor.submodules === undefined) return true;
+  return isObject(anchor.submodules) && Object.entries(anchor.submodules)
+    .every(([rel, nested]) => safeRelativePath(rel) && validNestedAnchor(nested));
+}
+
+export function archiveEvidence(state, reason, details = {}, archivedAt = new Date().toISOString()) {
+  if (!isObject(state) || typeof reason !== 'string' || !reason.trim() || !isObject(details)
+    || typeof archivedAt !== 'string' || Number.isNaN(Date.parse(archivedAt))) {
+    throw new DeliverError('cannot archive evidence without a state, reason and detail object', 66);
+  }
+  const hasEvidence = state.gates.length > 0 || state.review !== null || state.verification !== null;
+  if (hasEvidence) {
+    if (state.evidence_history === undefined) state.evidence_history = [];
+    state.evidence_history.push({
+      at: archivedAt,
+      reason,
+      details: structuredClone(details),
+      gates: structuredClone(state.gates),
+      review: structuredClone(state.review),
+      verification: structuredClone(state.verification),
+    });
+  }
+  state.gates = [];
+  state.review = null;
+  state.verification = null;
+}
 
 export function validateTaskPacket(packet) {
   if (!isObject(packet)) throw new DeliverError('task packet must be a JSON object', 66);
@@ -78,7 +122,7 @@ export function validateTaskPacket(packet) {
   };
 }
 
-function validateState(state) {
+export function validateRunState(state) {
   const fail = (message) => { throw new DeliverError(`invalid run state: ${message}`, 66); };
   if (!isObject(state)) fail('root must be an object');
   if (state.schema_version !== STATE_VERSION) fail(`schema_version must be ${STATE_VERSION}`);
@@ -106,11 +150,6 @@ function validateState(state) {
     const binding = state.pm_binding;
     const safeActor = (value) => typeof value === 'string' && /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?-[a-f0-9]{12}$/.test(value);
     const safeStoryPath = (value) => typeof value === 'string' && /^docs\/stories\/S\d+-\d+-[^/\\]+\.md$/.test(value);
-    const safeBranch = (value) => typeof value === 'string' && value && value.length <= 512 && value !== '@'
-      && !value.startsWith('-') && !value.startsWith('/') && !value.endsWith('/') && !value.endsWith('.')
-      && !value.includes('..') && !value.includes('//') && !value.includes('@{')
-      && !/[\x00-\x20\x7f~^:?*[\\\]]/.test(value)
-      && value.split('/').every((part) => part && !part.startsWith('.') && !part.endsWith('.lock'));
     if (!isObject(binding)) fail('bad PM binding');
     if (binding.format === 'current') {
       if (!['actor', 'story', 'story_path', 'contract_hash', 'execution_hash', 'plan_digest', 'branch', 'builder', 'integration_branch']
@@ -125,6 +164,67 @@ function validateState(state) {
       if (!['actor', 'story', 'story_path', 'story_hash', 'integration_branch', 'actor_path'].every((key) => typeof binding[key] === 'string')) fail('bad legacy PM binding');
       if (!safeActor(binding.actor) || binding.actor_path !== `pm/actors/${binding.actor}.json`
         || !binding.story_path.startsWith('docs/stories/') || binding.story_path.split(/[\\/]/).includes('..')) fail('unsafe legacy PM binding');
+    }
+  }
+  if (state.git_anchor !== undefined && state.git_anchor !== null) {
+    const anchor = state.git_anchor;
+    if (!isObject(anchor) || !['head', 'ref', 'tree', 'index_tree', 'index_flags', 'protected_hash']
+      .every((key) => typeof anchor[key] === 'string')) fail('bad git anchor');
+    if (!oid(anchor.head) || !oid(anchor.tree) || !oid(anchor.index_tree)
+      || !digest(anchor.index_flags) || !digest(anchor.protected_hash)
+      || !safeRef(anchor.ref)
+      || (anchor.metadata_version !== undefined && anchor.metadata_version !== 'protected-v2')
+      || (anchor.submodules !== undefined && (!isObject(anchor.submodules) || !Object.entries(anchor.submodules)
+        .every(([rel, nested]) => safeRelativePath(rel) && validNestedAnchor(nested))))) fail('unsafe git anchor');
+  }
+  if (state.baseline_metadata_version !== undefined
+    && (state.baseline_metadata_version !== 'legacy-v1' || !state.git_anchor)) fail('bad baseline metadata compatibility marker');
+  if (state.execution_audit !== undefined && state.execution_audit !== null) {
+    const audit = state.execution_audit;
+    if (!isObject(audit) || typeof audit.story_path !== 'string' || typeof audit.contract_hash !== 'string'
+      || !(audit.original_entry === null || /^file:(?:644|755):[0-9a-f]{64}$/.test(audit.original_entry))
+      || !/^file:(?:644|755):[0-9a-f]{64}$/.test(audit.current_entry) || !Array.isArray(audit.transitions)
+      || !/^docs\/stories\/S\d+-\d+-[^/\\]+\.md$/.test(audit.story_path)
+      || !/^[0-9a-f]{64}$/.test(audit.contract_hash)) fail('bad Execution audit');
+    for (const item of audit.transitions) {
+      if (!isObject(item) || !['from', 'to', 'before_hash', 'after_hash', 'at'].every((key) => typeof item[key] === 'string')
+        || !['claimed', 'building', 'built', 'in-review', 'blocked'].includes(item.from)
+        || !['claimed', 'building', 'built', 'in-review', 'blocked'].includes(item.to)
+        || !/^[0-9a-f]{64}$/.test(item.before_hash) || !/^[0-9a-f]{64}$/.test(item.after_hash)
+        || !(item.reason === null || typeof item.reason === 'string')
+        || (item.attempt !== null && item.attempt !== undefined && !['fix', 'retry'].includes(item.attempt))) fail('bad Execution transition receipt');
+    }
+  }
+  if (state.commit_adoption !== undefined && state.commit_adoption !== null) {
+    const adoption = state.commit_adoption;
+    if (!isObject(adoption) || !Array.isArray(adoption.history) || !(adoption.pending === null || isObject(adoption.pending))) fail('bad commit adoption state');
+    if (adoption.pending) {
+      const pending = adoption.pending;
+      if (!['token', 'parent', 'ref', 'expected_tree', 'expected_index_flags', 'content_hash', 'protected_hash', 'prepared_at'].every((key) => typeof pending[key] === 'string')
+        || !Array.isArray(pending.paths) || !isStringArray(pending.paths) || !pending.paths.every(safeRelativePath)
+        || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(pending.token)
+        || ![pending.parent, pending.expected_tree].every((value) => /^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(value))
+        || ![pending.expected_index_flags, pending.content_hash, pending.protected_hash].every(digest)
+        || !safeRef(pending.ref)) fail('bad pending commit adoption');
+    }
+    for (const item of adoption.history) {
+      if (!isObject(item) || typeof item.commit !== 'string' || typeof item.parent !== 'string'
+        || !/^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(item.commit)
+        || !/^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(item.parent)
+        || typeof item.tree !== 'string' || !/^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(item.tree)
+        || !safeRef(item.ref) || !isStringArray(item.paths) || !item.paths.every(safeRelativePath)
+        || !['claimed', 'building', 'built', 'in-review'].includes(item.execution_status)
+        || typeof item.execution_hash !== 'string' || !/^[0-9a-f]{64}$/.test(item.execution_hash)
+        || typeof item.adopted_at !== 'string') fail('bad commit adoption receipt');
+    }
+  }
+  if (state.evidence_history !== undefined) {
+    if (!Array.isArray(state.evidence_history)) fail('bad evidence history');
+    for (const item of state.evidence_history) {
+      if (!isObject(item) || typeof item.at !== 'string' || typeof item.reason !== 'string' || !item.reason.trim()
+        || !isObject(item.details)
+        || !Array.isArray(item.gates) || !(item.review === null || isObject(item.review))
+        || !(item.verification === null || isObject(item.verification))) fail('bad evidence history item');
     }
   }
   if (state.completion_snapshot !== undefined) {
@@ -187,11 +287,9 @@ export function syncPlan(state) {
   const hash = currentPlanHash(state);
   if (hash === null) throw new DeliverError(`plan is missing or unreadable: ${state.plan.path}`, 66);
   if (hash !== state.plan.hash) {
+    archiveEvidence(state, 'plan_changed', { previous_plan_hash: state.plan.hash, next_plan_hash: hash });
     state.plan.hash = hash;
     state.approval = null;
-    state.gates = [];
-    state.review = null;
-    state.verification = null;
     state.events.push({ at: new Date().toISOString(), type: 'plan_changed', plan_hash: hash });
   }
   return hash;
@@ -274,6 +372,7 @@ export function createRun(projectRoot, mode, planPath = null) {
     gates: [],
     review: null,
     verification: null,
+    evidence_history: [],
     checkpoints: [],
     counters: { retries: 0, fixes: 0, corrections: 0 },
     events: [{ at: now, type: 'initialized', mode, plan_hash: planHash }],
@@ -321,7 +420,7 @@ export function readRun(runArg, cwd = process.cwd()) {
     if (error instanceof DeliverError) throw error;
     throw new DeliverError(`cannot read run state: ${error.message}`, 66);
   }
-  const state = validateState(readJsonFile(file, 'run state'));
+  const state = validateRunState(readJsonFile(file, 'run state'));
   let actualRoot;
   try { actualRoot = fs.realpathSync(state.project_root); } catch { throw new DeliverError('run project root no longer exists', 66); }
   if (actualRoot !== state.project_root || actualRoot !== lexicalRoot) throw new DeliverError('run project root identity changed', 66);
@@ -352,7 +451,7 @@ export function updateRun(runArg, expectedRevision, mutate, cwd = process.cwd())
     const result = mutate(state);
     state.revision += 1;
     state.updated_at = new Date().toISOString();
-    validateState(state);
+    validateRunState(state);
     atomicWrite(file, state);
     return { state, file, result };
   } finally { unlock(); }

@@ -1,0 +1,30 @@
+{
+  "status": "FAIL",
+  "findings": [
+    {
+      "severity": "major",
+      "message": "Resolved from round 1: commit preparation now derives intended paths from the cumulative baseline delta plus the audited story Execution path. The temporary-repository regression proves unchanged pre-start unstaged work is excluded and preserved, while a pre-start staged index is rejected without mutation.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+      "resolved": true
+    },
+    {
+      "severity": "major",
+      "message": "Resolved from round 1: recovery parses both story and run images, regenerates the exact legal transition from the before images, compares the complete generated after images, and rejects changed criteria, contract identity, binding and counters without applying either write.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+      "resolved": true
+    },
+    {
+      "severity": "major",
+      "message": "Commit preparation does not prove complete index coverage of the audited source delta, and adoption does not bind index flags across prepare, commit and adopt. The pending record omits the prepared anchor's index_flags and adoption never compares them. An assume-unchanged or skip-worktree flag can therefore be introduced and adopted; a later changed source path is present in the scope snapshot but absent from Git status, so intended staging can omit it while a story-only commit and worktree content hash still pass. Bind exact index flags through adoption and prove every cumulative changed source entry is represented by the prepared tree, rejecting unsupported index states without changing user index data.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "Current Git anchors are root-only, so enabling an anchor disables recursive Git-metadata protection for initialized submodules. inspectScope ignores the baseline git_meta whenever state.git_anchor exists, while captureGitAnchor and protectedGitMetadata inspect only the root. A nested submodule config, hook or index-flag change becomes an ordinary changed submodule entry; when the task touches that submodule it is treated as in scope and can remain through a story-only adopted commit. Protect initialized submodule Git metadata recursively, or reject submodule mutation deterministically; declared touches must never authorize Git config, hooks or index flags.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/scope.mjs",
+      "resolved": false
+    }
+  ],
+  "summary": "The round-1 dirty-work and recovery-integrity findings are fixed, and coordinator npm test plus npm run validate passed at the exact frozen snapshot. The complete review found two remaining commit-integrity gaps: prepared/adopted index flags and changed-entry coverage are incomplete, and current anchors lose recursive submodule metadata protection. T04 acceptance remains failed."
+}

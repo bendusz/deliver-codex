@@ -14,6 +14,7 @@ import {
   recoverCurrentPm,
   revokeCurrentPm,
 } from './lib/current-pm.mjs';
+import { recoverExecutionTransition, transitionCurrentExecution } from './lib/transitions.mjs';
 
 const help = `Shared Deliver project state
   pm.mjs init [--name PROJECT] [--format current|legacy]
@@ -22,6 +23,7 @@ const help = `Shared Deliver project state
   pm.mjs approve --approver ACTUAL_USER
   pm.mjs revoke [--reason TEXT]
   pm.mjs claim --story docs/stories/S1-1-example.md [--branch pm/S1-1-example]
+  pm.mjs transition --run RUN --to building|built|in-review|blocked [--attempt fix|retry] [--reason TEXT]
   pm.mjs complete --run UUID --commit FULL_INTEGRATION_SHA --next "Next ready story or decision"
   pm.mjs recover
 
@@ -47,7 +49,7 @@ try {
   const [command = 'help', ...rest] = process.argv.slice(2);
   if (['help', '--help', '-h'].includes(command)) process.stdout.write(help);
   else {
-    const allowed = { init: ['--name', '--format'], status: [], 'actor-id': [], approve: ['--approver'], revoke: ['--reason'], claim: ['--story', '--branch'], complete: ['--run', '--commit', '--next'], recover: [] };
+    const allowed = { init: ['--name', '--format'], status: [], 'actor-id': [], approve: ['--approver'], revoke: ['--reason'], claim: ['--story', '--branch'], transition: ['--run', '--to', '--attempt', '--reason', '--expected-revision'], complete: ['--run', '--commit', '--next'], recover: [] };
     if (!Object.hasOwn(allowed, command)) throw new DeliverError('unknown shared PM command', 64);
     const options = {};
     for (let i = 0; i < rest.length; i += 2) {
@@ -86,12 +88,31 @@ try {
     }
     else if (command === 'claim') result = format === 'current'
       ? claimCurrentPm(root, options['--story'], options['--branch']) : claimPm(root, options['--story'], options['--branch']);
+    else if (command === 'transition') {
+      if (format !== 'current') throw new DeliverError('Execution transitions require a current-format project', 66);
+      const revision = options['--expected-revision'];
+      if (revision !== undefined && !/^(0|[1-9][0-9]*)$/.test(revision)) throw new DeliverError('--expected-revision must be a non-negative integer', 64);
+      const transitioned = transitionCurrentExecution(options['--run'], {
+        to: options['--to'], attempt: options['--attempt'], reason: options['--reason'],
+        expectedRevision: revision === undefined ? undefined : Number(revision),
+      }, root);
+      result = {
+        run_id: transitioned.state.run_id,
+        revision: transitioned.state.revision,
+        story: transitioned.state.pm_binding.story,
+        status: transitioned.execution.status,
+        rounds: transitioned.execution.rounds,
+        retries: transitioned.execution.retries,
+        noop: transitioned.noop,
+      };
+    }
     else if (command === 'complete') {
       if (format === 'current') throw new DeliverError('current story completion requires the integration workflow', 66);
       result = completePm(root, options['--run'], options['--commit'], options['--next'], snapshot);
     }
     else {
-      result = recoverCurrentPm(root);
+      result = recoverExecutionTransition(root);
+      if (!result.recovered) result = recoverCurrentPm(root);
       if (!result.recovered) result = recoverPm(root);
     }
     process.stdout.write(`${JSON.stringify({ ok: true, ...result })}\n`);

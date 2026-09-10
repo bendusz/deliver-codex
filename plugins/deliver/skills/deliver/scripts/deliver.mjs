@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {
+  archiveEvidence,
   DeliverError,
   approvalIsCurrent,
   createRun,
@@ -13,11 +14,12 @@ import {
   updateRun,
   validateTaskPacket,
 } from './lib/state.mjs';
-import { baselineDirtyPaths, gitRoot, inspectScope, snapshot, validateTaskPaths } from './lib/scope.mjs';
+import { baselineDirtyPaths, captureGitAnchor, gitRoot, inspectScope, snapshot, validateTaskPaths } from './lib/scope.mjs';
 import { executeGate, gateIsCurrent, parseEnvironment } from './lib/gates.mjs';
 import { captureContracts } from './lib/contracts.mjs';
 import { preparePmBinding } from './lib/pm.mjs';
 import { detectProjectFormat, inspectProjectState } from './lib/project-state.mjs';
+import { adoptPreparedCommit, assertFinalCandidate, prepareCommitAdoption, transitionCurrentExecution } from './lib/transitions.mjs';
 
 const HELP = `Deliver deterministic runtime
 
@@ -34,6 +36,8 @@ Usage:
   deliver.mjs verify --run <run> --snapshot <sha256> --verifier <id> --results <json>
   deliver.mjs checkpoint --run <run> --label <text>
   deliver.mjs correct-course --run <run> --kind retry|fix|plan --reason <text> [--plan <file>]
+  deliver.mjs commit-prepare --run <run>
+  deliver.mjs commit-adopt --run <run> --token <uuid> --commit <full-sha>
   deliver.mjs finish --run <run>
 
 All mutating commands accept --expected-revision <n>. Output is one JSON object.
@@ -45,6 +49,7 @@ const VALUE_FLAGS = new Set([
   '--mode', '--plan', '--run', '--approver', '--task', '--builder', '--expected-revision',
   '--name', '--command', '--cwd', '--env', '--reviewer', '--receipt', '--verifier', '--results',
   '--label', '--kind', '--reason', '--snapshot', '--story',
+  '--token', '--commit',
 ]);
 
 function args(argv) {
@@ -151,12 +156,6 @@ function parseVerification(file, acceptance) {
   return criteria;
 }
 
-function invalidateEvidence(state) {
-  state.gates = [];
-  state.review = null;
-  state.verification = null;
-}
-
 function summarize(state, file) {
   const planHash = currentPlanHash(state);
   let scope = null;
@@ -261,6 +260,11 @@ function main() {
       const dirtyPaths = baselineDirtyPaths(state.project_root);
       const baselineSnapshot = snapshot(state.project_root, [...packet.touches, ...packet.read_paths, ...packet.specs]);
       state.baseline = { captured_at: new Date().toISOString(), snapshot: baselineSnapshot, dirty_paths: dirtyPaths };
+      if (state.pm_binding?.format === 'current') {
+        state.git_anchor = captureGitAnchor(state.project_root);
+        state.execution_audit = null;
+        state.commit_adoption = { pending: null, history: [] };
+      }
       state.phase = 'active';
       event(state, 'baseline_captured', { snapshot_hash: baselineSnapshot.hash, dirty_paths: dirtyPaths });
     });
@@ -347,6 +351,12 @@ function main() {
     const reason = required(o, '--reason');
     if (!['retry', 'fix', 'plan'].includes(kind)) throw new DeliverError('--kind must be retry, fix, or plan', 64);
     if (reason.length > 1000 || /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(reason)) throw new DeliverError('reason must be printable and at most 1000 characters', 64);
+    const current = readRun(run);
+    if (kind !== 'plan' && detectProjectFormat(current.state.project_root) === 'current') {
+      const transitioned = transitionCurrentExecution(run, { to: 'building', attempt: kind, reason, expectedRevision: o.expectedRevision });
+      output(summarize(transitioned.state, transitioned.file));
+      return;
+    }
     const updated = updateRun(run, o.expectedRevision, (state) => {
       if (state.phase === 'finished') throw new DeliverError('finished runs cannot be corrected', 66);
       if (kind === 'plan') {
@@ -362,10 +372,22 @@ function main() {
         if (state.counters[counter] >= limit) throw new DeliverError(`${kind} limit of ${limit} has been reached`, 66);
         state.counters[counter] += 1;
       }
-      invalidateEvidence(state);
+      archiveEvidence(state, 'correct_course', { kind, reason, plan_hash: state.plan.hash });
       event(state, 'correct_course', { kind, reason, plan_hash: state.plan.hash });
     });
     output(summarize(updated.state, updated.file));
+    return;
+  }
+  if (command === 'commit-prepare') {
+    const prepared = prepareCommitAdoption(run, o.expectedRevision);
+    output({ ...summarize(prepared.state, prepared.file), preparation: prepared.result });
+    return;
+  }
+  if (command === 'commit-adopt') {
+    const adopted = adoptPreparedCommit(run, {
+      token: required(o, '--token'), commit: required(o, '--commit'), expectedRevision: o.expectedRevision,
+    });
+    output({ ...summarize(adopted.state, adopted.file), adoption: adopted.result });
     return;
   }
   if (command === 'finish') {
@@ -375,6 +397,7 @@ function main() {
       requireCurrentApproval(state);
       const checked = inspectScope(state);
       if (!checked.report.ok) throw new DeliverError('scope check failed', 74, checked.report);
+      assertFinalCandidate(state);
       if (checked.report.changed.length === 0) throw new DeliverError('cannot finish without a worktree change after the baseline', 66);
       const requiredCommands = Object.entries(state.task.packet.commands);
       for (const [name, commandText] of requiredCommands) {
