@@ -1,0 +1,128 @@
+diff --git a/plugins/deliver/skills/deliver/scripts/lib/integration.mjs b/plugins/deliver/skills/deliver/scripts/lib/integration.mjs
+index 32b7952..a9afcc6 100644
+--- a/plugins/deliver/skills/deliver/scripts/lib/integration.mjs
++++ b/plugins/deliver/skills/deliver/scripts/lib/integration.mjs
+@@ -732,6 +732,30 @@ function assertEvidenceMutable(record) {
+   if (artifactStarted(record)) fail('integration evidence is frozen by an artifact preparation or commit');
+ }
+ 
++function assertActiveReconciliationEvidence(record) {
++  const declared = Object.entries(record.source.packet.commands).sort(([left], [right]) => left.localeCompare(right));
++  if (record.evidence.gates.length !== declared.length) {
++    fail('LEGACY_ACTIVE_EVIDENCE_MISSING: current gate slots do not cover the declared gates exactly');
++  }
++  for (const [name, command] of declared) {
++    const matches = record.evidence.gates.filter((gate) => gate.name === name && gate.command === command);
++    if (matches.length !== 1) {
++      fail(`LEGACY_ACTIVE_EVIDENCE_MISSING: current gate slot is missing or ambiguous: ${name}`);
++    }
++  }
++  if (record.evidence.review === null && record.evidence.review_history.length) {
++    fail('LEGACY_ACTIVE_EVIDENCE_MISSING: current review pointer is absent after retained review history');
++  }
++  if (record.evidence.verification === null && record.evidence.verification_history.length) {
++    fail('LEGACY_ACTIVE_EVIDENCE_MISSING: current verification pointer is absent after retained verification history');
++  }
++  const active = assertEvidenceReady(record);
++  const reviewSnapshot = record.evidence.review ? record.evidence.snapshot_hash : record.source.snapshot_hash;
++  parseReviewReceipt(active.review, { expectedSnapshot: reviewSnapshot });
++  parseVerificationResults({ criteria: active.verification.criteria }, record.source.packet.acceptance);
++  return active;
++}
++
+ function legacyFinalizationCandidates(record) {
+   const descriptors = [];
+   if (record.evidence.finalized) {
+@@ -789,6 +813,7 @@ export function reconcileIntegrationEvidence(recordArg, { expectedRecordHash } =
+     const current = readIntegrationRecord(loaded.file);
+     if (current.hash !== expectedRecordHash) fail('integration record changed concurrently');
+     assertRecordSource(current.record);
++    assertActiveReconciliationEvidence(current.record);
+     const selected = legacyFinalizationCandidates(current.record);
+     const before = structuredClone(current.record);
+     current.record.evidence.finalization = selected.finalization;
+diff --git a/tests/integration.test.mjs b/tests/integration.test.mjs
+index d4aebe5..0b09223 100644
+--- a/tests/integration.test.mjs
++++ b/tests/integration.test.mjs
+@@ -680,6 +680,80 @@ test('explicit reconciliation recovers retained post-P legacy provenance and rej
+   legacy.evidence.effective_verification_identity = null;
+   delete legacy.evidence.finalization;
+   delete legacy.report.proof.finalization_identity;
++  const sign = (receipt) => {
++    const value = structuredClone(receipt);
++    delete value.identity;
++    value.identity = sha256(canonical(value));
++    return value;
++  };
++  const archivedLogPath = `.deliver/logs/integration-${f.runId}/archived-failure.log`;
++  const archivedLog = 'command: node -e "process.exit(1)"\nexit: 1\n';
++  write(f.integration, archivedLogPath, archivedLog);
++  legacy.evidence.gate_history.unshift(sign({
++    ...structuredClone(oldGate), status: 'FAIL', exit_code: 1, error: 'earlier resolved gate failure',
++    log_path: archivedLogPath, log_hash: sha256(archivedLog),
++  }));
++  const logDirectory = path.join(f.integration, '.deliver', 'logs', `integration-${f.runId}`);
++  const capture = () => ({
++    record: fs.readFileSync(state.file),
++    logs: fs.readdirSync(logDirectory).sort().map((name) => [name, sha256(fs.readFileSync(path.join(logDirectory, name)))]),
++    refs: git(f.integration, 'show-ref', '--head'),
++    status: git(f.integration, 'status', '--porcelain=v1', '-z', '--untracked-files=all'),
++    artifacts: legacy.report.proof.writes.map((item) => [item.path, sha256(fs.readFileSync(path.join(f.integration, item.path)))]),
++  });
++  const assertVeto = (label, change, pattern) => {
++    const invalid = structuredClone(legacy);
++    change(invalid);
++    const invalidHash = sha256(canonical(invalid));
++    write(f.integration, path.relative(f.integration, state.file), invalid);
++    const beforeState = capture();
++    const result = integrationCall(f, 'integrate-reconcile', '--integration', state.file, '--expected-record', invalidHash);
++    assert.notEqual(result.status, 0, `${label}: ${result.stdout}`);
++    assert.match(result.stdout, pattern, label);
++    assert.deepEqual(capture(), beforeState, `${label} changed durable record, logs, artifacts or refs`);
++  };
++
++  assertVeto('active failed gate', (value) => {
++    value.evidence.gates[0] = sign({ ...value.evidence.gates[0], status: 'FAIL', exit_code: 1, error: 'current failure' });
++  }, /fresh integration gate is missing or failed/);
++  assertVeto('active gate with wrong snapshot binding', (value) => {
++    value.evidence.gates[0] = sign({ ...value.evidence.gates[0], snapshot_hash: 'b'.repeat(64) });
++  }, /fresh integration gate is missing or failed/);
++  assertVeto('active gate with wrong M binding', (value) => {
++    value.evidence.gates[0] = sign({ ...value.evidence.gates[0], integration_commit: value.integration.base });
++  }, /fresh integration gate is missing or failed/);
++  assertVeto('active gate with wrong command binding', (value) => {
++    value.evidence.gates[0] = sign({ ...value.evidence.gates[0], command: 'node -e "process.exit(1)"' });
++  }, /LEGACY_ACTIVE_EVIDENCE_MISSING/);
++  assertVeto('missing active gate', (value) => { value.evidence.gates = []; }, /LEGACY_ACTIVE_EVIDENCE_MISSING/);
++  assertVeto('duplicate active gate', (value) => { value.evidence.gates.push(structuredClone(value.evidence.gates[0])); }, /LEGACY_ACTIVE_EVIDENCE_MISSING/);
++  assertVeto('stale active gate identity', (value) => { value.evidence.gates[0].identity = '0'.repeat(64); }, /receipt identity is invalid/);
++  assertVeto('active failed review', (value) => {
++    value.evidence.review = sign({ status: 'FAIL', findings: [], reviewer: 'current-reviewer',
++      snapshot_hash: value.evidence.snapshot_hash, recorded_at: new Date(0).toISOString() });
++  }, /unresolved review findings/);
++  assertVeto('active unresolved blocking review', (value) => {
++    value.evidence.review = sign({ status: 'FAIL', reviewer: 'current-reviewer',
++      snapshot_hash: value.evidence.snapshot_hash, recorded_at: new Date(0).toISOString(),
++      findings: [{ severity: 'block', message: 'Current blocking finding.', resolved: false }] });
++  }, /unresolved review findings/);
++  assertVeto('missing active review pointer after history', (value) => {
++    value.evidence.review_history.push(structuredClone(value.source.review));
++  }, /current review pointer is absent/);
++  for (const status of ['FAIL', 'UNKNOWN']) {
++    assertVeto(`active ${status} verification`, (value) => {
++      value.evidence.verification = sign({ verifier: 'current-verifier', snapshot_hash: value.evidence.snapshot_hash,
++        recorded_at: new Date(0).toISOString(), criteria: [{ id: 'AC-1', status, evidence: 'Current result.' }] });
++    }, /acceptance verification is incomplete/);
++  }
++  assertVeto('active incomplete verification', (value) => {
++    value.evidence.verification = sign({ verifier: 'current-verifier', snapshot_hash: value.evidence.snapshot_hash,
++      recorded_at: new Date(0).toISOString(), criteria: [] });
++  }, /cover each acceptance id exactly once/);
++  assertVeto('missing active verification pointer after history', (value) => {
++    value.evidence.verification_history.push(structuredClone(value.source.verification));
++  }, /current verification pointer is absent/);
++
+   const legacyHash = sha256(canonical(legacy));
+   write(f.integration, path.relative(f.integration, state.file), legacy);
+ 

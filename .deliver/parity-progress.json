@@ -120,7 +120,7 @@
       }
     },
     "T05L": {
-      "status": "Approved fix6 implementing active-evidence legacy reconciliation veto",
+      "status": "NOT_ACCEPTED: fix6 full158/158 tests and validate PASS; independent review FAIL on actor separation",
       "worktree": "/tmp/deliver-parity-t05l",
       "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
       "builder": "/root/benchmark_builder",
@@ -137,20 +137,19 @@
         "Independent final fix3 review: empty canonical uninitialized gitlink directory is misclassified as unsafe nested root, blocking unrelated integration. All earlier findings resolved.",
         "Requested Claude review, independently reproduced: adopted P/E/H proof depends on live process environment/finalization, preventing resume or recovery after evidence refresh.",
         "Requested Claude review, independently reproduced: panel parser silently discards supplied top-level findings.",
-        "Independent fix5 review: legacy reconciliation ignores contradictory current active FAIL evidence when selecting an older PASS finalization."
+        "Independent fix5 review: legacy reconciliation ignores contradictory current active FAIL evidence when selecting an older PASS finalization.",
+        "Independent fix6 review: active identity-valid PASS review with reviewer equal to source.builder is accepted by legacy reconciliation. Prior active FAIL-veto defect resolved."
       ],
-      "builder_checkpoint": "User approved sixth round; revision35, original baseline unchanged, fix5 FAIL retained in evidence_history and checkpoint.",
+      "builder_checkpoint": "Frozen revision39, fixes6/retries1, all issued FAIL receipts preserved. Awaiting bounded seventh-round decision; no integration.",
       "snapshot": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3",
       "fixes": 6,
-      "candidate_snapshot": "f74deb232127a910f84a997b17fee8e250bca37d9be7b321f761d144900280ab",
+      "candidate_snapshot": "d9f901fa13b3900566fb62663ac9a4874b41a0fdbb21e0d0737d530a63cebca4",
       "checkpoint": ".deliver/checkpoints/T05L-final-fix3/manifest.json",
-      "latest_checkpoint": ".deliver/checkpoints/T05L-fix5-native-review/manifest.json",
+      "latest_checkpoint": ".deliver/checkpoints/T05L-fix6/manifest.json",
       "failed_criteria": [
-        "T05L-AC1",
-        "T05L-AC3",
         "T05L-AC4"
       ],
-      "next_proposal": "docs/plans/2026-09-10-legacy-reconciliation-follow-up.md",
+      "next_proposal": "docs/plans/2026-09-10-reconciliation-identity-follow-up.md",
       "approval": ".deliver/T05L-fix6-approval.json"
     },
     "T05R": {
@@ -182,7 +181,7 @@
       ]
     }
   },
-  "next": "Complete approved T05L fix6, fresh full gates and independent review; integrate only after PASS, then combined acceptance with distinct verifier.",
+  "next": "Decide on bounded T05L fix7 identity/separation correction with independent regression tests first. Hold T05L and combined acceptance until fresh independent PASS.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",

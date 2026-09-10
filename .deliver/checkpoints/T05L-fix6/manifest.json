@@ -1,0 +1,50 @@
+{
+  "status": "NOT_ACCEPTED",
+  "task": "T05L",
+  "run_id": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
+  "base_commit": "a18e851375c37ac4c99e62a55fe0e9ff1f1e937d",
+  "snapshot": "d9f901fa13b3900566fb62663ac9a4874b41a0fdbb21e0d0737d530a63cebca4",
+  "revision": 39,
+  "counters": {
+    "retries": 1,
+    "fixes": 6,
+    "corrections": 0
+  },
+  "baseline_and_task_preserved": true,
+  "native_tests": {
+    "total": 158,
+    "passed": 158,
+    "validate": "PASS",
+    "duration_ms": 288435.952625
+  },
+  "native_review": "FAIL",
+  "native_verification": {
+    "T05L-AC1": "PASS",
+    "T05L-AC2": "PASS",
+    "T05L-AC3": "PASS",
+    "T05L-AC4": "FAIL",
+    "T05L-AC5": "PASS"
+  },
+  "finding": "Active identity-valid PASS review attributed to source builder is accepted by legacy reconciliation, which changes the record.",
+  "probe_method": "Disposable copy of current regression with a synthetic identity-valid active PASS review whose reviewer equals source.builder. Actual integrate-reconcile succeeds, causing expected-refusal assertion to fail. Empty-verifier assertion is in the patch but was not reached; other identity variants are inferred from code inspection.",
+  "patch_validation": "PASS: git apply --cached --check at original base using disposable index",
+  "next_proposal": "docs/plans/2026-09-10-reconciliation-identity-follow-up.md",
+  "next_decision": "One bounded seventh correction round with independent regression tests first; no further round authorized or dispatched.",
+  "files_sha256": {
+    "active-identity-probe.log": "36356b7bb01b2b09965101f675b4be76a143b85c2e9de98c4f9d29f256e48eb8",
+    "active-identity-probe.patch": "9d3120de9d4172eff347b0267c1b49a4ffb7ac60dca7b7ef08e5964982e8b9ec",
+    "approval.json": "a1f14d1d687360199788aaa4344818e33a2aa0ec5c9980f44f061582fbb2a164",
+    "builder-assessment.md": "040ba508bb5e6b857fd28e1face632aed902b3e995cfa69007efb1a9a672a249",
+    "check.json": "4e3c22f2f7aa45002c3987915832d1ca1b93823713856b11cd4f28b4361feabf",
+    "fix6.patch": "0aa0ad7fa212f6b98779dbc8d9b068293e9719bd2ea7615b1822c4ef347e234e",
+    "logs/test-d379620e-4a10-43f5-a581-d63e66297936.log": "b0046d9cdcb34c347cbfba86f5700f195dfc48fa4779474ab82f67c2e0882bc4",
+    "logs/validate-cd573670-f3f0-415a-93c8-8f002bf887bc.log": "6a9d29999babb41701b7ba908808b6cef152d4665fbd656bf0ffaa58337d20c5",
+    "native-review.json": "13942785a2f2907a1926d234e972401d97f1b9033f3bc8154c9576b47a7451e1",
+    "native-verification.json": "1b4c9b219a2c2a19c8defde6c407d602e472d127ee5b8d4ace0718ab0b2e16f7",
+    "run-before-final-review.json": "b31cee223f97b3d4dc6401191314a470114751b99f580e4f3580e0fe412dd249",
+    "run.json": "84170aae7432930476abde4b7f5ffe5e18376dbe7f0a780b42b803f50be87b5a",
+    "source-delta.json": "81f92095d0a796e007b6aa279fc392c74e0a2ebac7a9c8e8343f14e8d2864f7c",
+    "source.patch": "9c074e59fc93ba29bb2d24de2dfd4ffa68c0101c21631c7be2e0c48214895edc",
+    "task.json": "ef5ca47b913e4f4778073fbec61e4a84c96698abf8376b48acb02ec87ee0b901"
+  }
+}

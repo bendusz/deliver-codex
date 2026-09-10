@@ -1,0 +1,13 @@
+command: npm run validate
+cwd: /private/tmp/deliver-parity-t05l
+started: 2026-09-10T14:42:19.584Z
+exit: 0
+
+[stdout]
+
+> deliver-codex@0.1.0 validate
+> node scripts/validate.mjs
+
+Deliver validation passed: manifest, skill routes, 13 roles, JSON and JavaScript syntax.
+
+[stderr]
