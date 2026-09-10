@@ -30,7 +30,7 @@
       "commit": "ad3e0e46d6f325b51900ff26fe1869a241adc2a7"
     },
     "T02": {
-      "status": "fix round 1 full gates passed; independent re-review underway",
+      "status": "reviewed, verified, integrated after fix round 1",
       "worktree": "/tmp/deliver-parity-t02-ready",
       "run": "f3ab27ff-119d-4ffd-b529-c83e84869d39",
       "builder": "/root/t01_builder",
@@ -39,7 +39,8 @@
         "Completion must not report done when shared approval implementation_ready is false, including missing/null plan digest and untracked approval/plan.",
         "Story Execution and plan branch names must reject Git-invalid references consistently."
       ],
-      "fixes": 1
+      "fixes": 1,
+      "commit": "b25f8f3b94e9921332d9b07f5e512035c5a45d0e"
     },
     "T13A": {
       "status": "reviewed, verified, integrated; full T13 workflow remains pending",
@@ -50,10 +51,49 @@
       "commit": "2fdde58b35cdea33c1c95190c18d98d91e827881"
     },
     "T07": {
-      "status": "read-only implementation preparation; analyzer library first, claim wiring requires later core integration"
+      "status": "full gates PASS; independent review underway; claim wiring remains T08",
+      "worktree": "/tmp/deliver-parity-t07-ready",
+      "run": "0261fffc-4137-4075-bad3-d3c7e89bb554",
+      "builder": "/root/benchmark_builder",
+      "deferred_run": "a2f04e07-4d9b-435b-8016-2cbdb97881ca",
+      "snapshot": "0887ac7021de0a8e34e70cb0272ec07d446a2983339c04a5292cc6d34d82b279"
+    },
+    "T03": {
+      "status": "reviewed, verified, integrated after fix round 1",
+      "worktree": "/tmp/deliver-parity-t03",
+      "run": "b00463b7-eb08-432c-b428-43009ffb3be0",
+      "builder": "/root/t01_builder",
+      "snapshot": "68bf0a95c015bd9b3bce8ddc523b493621c0fe850a52f8632569b355aab82c26",
+      "fixes": 1,
+      "findings": [
+        "Missing/null binding must block all active shared-project continuation operations.",
+        "Same-owner pm claim resume must validate clean integration checkout before returning."
+      ],
+      "commit": "54ef0fa5c934b35bf3d95d295760e3933a9d572f"
+    },
+    "T06B": {
+      "status": "reviewed, verified, integrated",
+      "worktree": "/tmp/deliver-parity-t06b",
+      "run": "eba21310-ebb6-4e5e-b590-d11afb881af3",
+      "builder": "/root/benchmark_builder",
+      "commit": "4beba2c453335687c3db96b21dadf8fed67e2ace",
+      "snapshot": "ca84692b0e44143e661d1ca03b971a0e1281db9ebe44b72c933d3757c1fd1a69"
+    },
+    "T00B": {
+      "status": "full gates PASS; queued for independent review",
+      "worktree": "/tmp/deliver-parity-t00b",
+      "run": "0d50b3f1-52c0-450d-9685-9450e53b7daf",
+      "builder": "/root/benchmark_builder",
+      "snapshot": "d97ae2d5090b3cf645ded54b109a960c978d9f25f1ca3ad2615fac86ed51fef6"
+    },
+    "T04": {
+      "status": "implementation underway",
+      "worktree": "/tmp/deliver-parity-t04",
+      "run": "9e5faaea-1973-4a63-b57c-6c943bf4c5d0",
+      "builder": "/root/t01_builder"
     }
   },
-  "next": "Review corrected T02, then dispatch T03 approval/claims and T07 artifact analysis from the integrated reader baseline.",
+  "next": "Review T07/T00B; T04 implementation underway, then T05 sequential integration.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
@@ -63,5 +103,12 @@
   "coordinator_notes": [
     "Do not use git push -u during active runs: shared tracking-config mutation invalidates their protected Git metadata. Use explicit remote/branch pushes.",
     "Unused pre-dispatch T02 baseline 1cb0b0fd-76f5-462a-8df2-4a5a8d18f39f was archived under .deliver/aborted after initial sequencing error; no worker ran, no budgets spent, no evidence reused."
-  ]
+  ],
+  "latest_integrated_validation": {
+    "task": "T06B",
+    "tests": 103,
+    "passed": 103,
+    "validate": "PASS",
+    "snapshot": "ca84692b0e44143e661d1ca03b971a0e1281db9ebe44b72c933d3757c1fd1a69"
+  }
 }
