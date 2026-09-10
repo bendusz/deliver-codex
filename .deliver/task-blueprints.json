@@ -737,15 +737,15 @@
     "acceptance": [
       {
         "id": "T05C-AC1",
-        "text": "Correction preparation binds an actual failed/non-clean integration record and unchanged approved contract to an immutable token; free-form failures, stale identities, changed scope and duplicate active work fail before mutation."
+        "text": "Correction preparation binds an actual failed M result or a discriminated no-M I/C conflict probe record to an immutable token and unchanged approved contract; free-form failures, stale identities, changed scope and duplicate work fail before mutation."
       },
       {
         "id": "T05C-AC2",
-        "text": "Correction start verifies the exact clean M checkout on its unique correction branch and atomically publishes only the narrow Execution/run changes, retaining original finished runs and maximum spent budgets across generations; limit exhaustion and invalid journal images cannot mutate state."
+        "text": "Correction start verifies the exact clean recorded M or no-M I checkout on its unique branch and publishes only a typed legal Execution/run pair, retaining original finished runs, actual starting story state and MAX spent budgets across generations; exhausted attempts and invalid journals cannot mutate state."
       },
       {
         "id": "T05C-AC3",
-        "text": "Fresh correction gates/review/distinct verification retain and resolve all inherited findings before a new C2 integration. Real temporary Git regressions exercise multi-generation budgets, crash recovery, races and rejected drift without unbound Quick or baseline reset."
+        "text": "Fresh correction gates/review/distinct verification cover the full original task lineage and inherited findings before C2 integration; temporary Git regressions exercise both basis variants, unclaimed/older I, active duplicates, raised MAX, torn token/story/run recovery and rejected drift without baseline or budget reset."
       }
     ],
     "commands": {
