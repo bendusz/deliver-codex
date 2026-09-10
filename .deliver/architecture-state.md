@@ -272,15 +272,15 @@ validate both identities against the actual intended task content before review;
 or worktree review cannot silently certify omitted earlier task commits. Full task review uses
 the original cumulative task scope/base, even after intermediate commit adoption.
 
-## Proposed T05 task split, pending remote-port interface
+## T05 task split
 
-After T04 independent PASS, T05 may split into T05L local C/M/P/E/H + panel evidence and T05R
+After T04 independent PASS, T05 splits into T05L local C/M/P/E/H + panel evidence and T05R
 standalone GitHub provider port (remote.mjs/tests/remote.test.mjs) in parallel. A fresh T05B
-after both integrate wires the actual remote CLI and exercises the complete remote lifecycle.
+after both and T05C integrate wires the actual remote CLI and exercises the complete remote lifecycle.
 Do not import an absent remote module in the local-only task or merge sibling source commits
 into an active run to satisfy dependencies: that changes its protected baseline. T05R tests
 the same real adapter protocol with injected fake runner; it is not by itself the complete
-remote user operation. No split packets/runs exist yet; finalize exact interfaces/scopes first.
+remote user operation. Split blueprints exist; create actual packets/runs only after dependencies pass.
 
 ## T04 first coordinator check diagnosis
 

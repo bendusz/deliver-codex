@@ -360,7 +360,8 @@
     "objective": "Complete native knowledge/research/review/advice operations with honest review finding adaptation",
     "read_paths": [
       "AGENTS.md",
-      "docs/plans/2026-09-09-upstream-parity.md"
+      "docs/plans/2026-09-09-upstream-parity.md",
+      ".deliver/project-report-design.md"
     ],
     "touches": [
       "plugins/deliver/skills/deliver/references/knowledge.md",
@@ -403,6 +404,10 @@
       {
         "id": "T11-AC3",
         "text": "Native advice remains bounded and read-only; upstream CONCERNS maps to retained minor findings, and optional external review remains tool-less/explicit with no gate-execution claims."
+      },
+      {
+        "id": "T11-AC4",
+        "text": "A bounded current wiki lint manifest identifies factual source/link/index defects and semantic review needs without invented clean verdicts; explicit scoped librarian remediation and rerun are usable by the later completion operation. Standard+ report readiness requires current lint, regulated requires clean lint."
       }
     ],
     "commands": {
@@ -761,6 +766,43 @@
       {
         "id": "T05B-AC3",
         "text": "Fake provider and real temporary Git repositories exercise full publish, readiness, exact merge, integration gates, reporting where required, merged Execution and fresh-process handoff; no disconnected helper is presented as an implemented user operation."
+      }
+    ],
+    "commands": {
+      "test": "npm test",
+      "validate": "npm run validate"
+    },
+    "specs": []
+  },
+  "T11P": {
+    "id": "T11P",
+    "objective": "Prepare, validate and adopt the final project completion report from actual story, retrospective and wiki evidence",
+    "read_paths": [
+      "AGENTS.md",
+      "docs/plans/2026-09-09-upstream-parity.md",
+      ".deliver/project-report-design.md"
+    ],
+    "touches": [
+      "plugins/deliver/skills/deliver/scripts/lib/project-report.mjs",
+      "plugins/deliver/skills/deliver/scripts/project-report.mjs",
+      "plugins/deliver/skills/deliver/references/documentation.md",
+      "plugins/deliver/skills/deliver/assets/templates/completion-report.md.template",
+      "plugins/deliver/skills/deliver/assets/operations.json",
+      "plugins/deliver/skills/deliver/SKILL.md",
+      "tests/project-report.test.mjs"
+    ],
+    "acceptance": [
+      {
+        "id": "T11P-AC1",
+        "text": "Read-only report preparation binds current approval, completed story lineages, required retrospectives, requirement and acceptance evidence, and current wiki lint without changing upstream-compatible done/next_reference semantics or fabricating imported evidence."
+      },
+      {
+        "id": "T11P-AC2",
+        "text": "Standard/large reports retain current wiki lint concerns; regulated blocks until clean. Exact report draft bytes receive factual validation and independent documentation review against the frozen manifest, with unsupported claims remaining UNKNOWN."
+      },
+      {
+        "id": "T11P-AC3",
+        "text": "Adoption accepts only a direct report-only commit with unchanged source/project inputs and exact reviewed bytes; real temporary Git tests reject stale lint, missing retros, extra paths and source drift, and optional handoff targets the report commit."
       }
     ],
     "commands": {

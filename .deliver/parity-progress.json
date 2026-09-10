@@ -96,11 +96,11 @@
       ]
     },
     "T04": {
-      "status": "independent FAIL recorded; fix round2 authorized",
+      "status": "fix2 full gates PASS; independent review in progress",
       "worktree": "/tmp/deliver-parity-t04",
       "run": "9e5faaea-1973-4a63-b57c-6c943bf4c5d0",
       "builder": "/root/t01_builder",
-      "snapshot": "5d760a5e70c0d61eb3df4cf71f63c7705f56b2262118e070b77a646e0b817499",
+      "snapshot": "875e8f2ce514173cd99aa70cc04d18bd320767a8fb2821d1622487ae6c6398a2",
       "findings": [
         "Independent diagnosis: current snapshot Git metadata schema changed; real old metadata exactly matches baseline. Add exact legacy-v1 comparison for pre-anchor runs without loosening actual Git drift checks.",
         "Review: commit preparation includes unchanged pre-start dirty paths under touches.",
@@ -109,7 +109,7 @@
       "fixes": 2
     }
   },
-  "next": "T04 regressions and independent review, then T05 integration/reporting. T08 semantic readiness, T09 migration, T10 retrospectives, T11 knowledge/review, T12 parallel, T13B comparisons and T14 release remain.",
+  "next": "T04 independent fix2 review, then T05L local integration and T05R provider port. T05C corrections/T05B wiring, T08 readiness/resume, T09 migration, T10 retrospectives, T11 knowledge/review, T11P completion report, T12 parallel, T13B comparisons and T14 release remain.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
