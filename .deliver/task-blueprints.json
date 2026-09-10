@@ -264,7 +264,9 @@
       "tests/current-roundtrip.test.mjs",
       "tests/remote.test.mjs",
       "plugins/deliver/skills/deliver/scripts/lib/analyze.mjs",
-      "tests/analysis.test.mjs"
+      "tests/analysis.test.mjs",
+      "tests/integration-correction.test.mjs",
+      "tests/remote-lifecycle.test.mjs"
     ],
     "acceptance": [
       {

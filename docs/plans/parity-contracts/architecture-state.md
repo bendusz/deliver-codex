@@ -410,3 +410,5 @@ pure continuation with no environment probes. Until dedicated later references e
 migration -> compatibility.md, retrospective/done -> recovery.md, implementation -> workflow.md;
 never return a nonexistent upstream filename as the native route. Later owning tasks update
 these native routes when their references are implemented.
+
+T08 also owns prerequisite fixture updates in tests/integration-correction.test.mjs and tests/remote-lifecycle.test.mjs once C/B have landed. First-claim readiness must be exercised with genuine valid artifacts in those dependent lifecycle regressions; no hidden bypass or scale downgrade. These are future packet paths, not changes to any active task scope.
