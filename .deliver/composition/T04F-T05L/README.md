@@ -1,0 +1,1 @@
+Prepared import-conflict resolution from the T04F/T05L fix5 merge probe. T05L fix5 failed independent review and is not integrated. This file is a proposed composition artifact, not accepted runtime source. Before reuse, compare actual merge-stage blobs with resolution.json and obtain fresh combined gates, independent review and distinct verification.

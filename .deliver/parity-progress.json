@@ -120,7 +120,7 @@
       }
     },
     "T05L": {
-      "status": "fix5 full158/158 tests and validate PASS; independent review pending",
+      "status": "NOT_ACCEPTED: fix5 full158/158 tests and validate PASS; independent review FAIL",
       "worktree": "/tmp/deliver-parity-t05l",
       "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
       "builder": "/root/benchmark_builder",
@@ -136,19 +136,21 @@
         "Independent review round3: nested submodule scopes lack committed ancestor gitlinks; unbound initialized submodules can hide wrong M content through ignore=all after protectedShape removes nested content. Root-link and source-concern fixes resolved.",
         "Independent final fix3 review: empty canonical uninitialized gitlink directory is misclassified as unsafe nested root, blocking unrelated integration. All earlier findings resolved.",
         "Requested Claude review, independently reproduced: adopted P/E/H proof depends on live process environment/finalization, preventing resume or recovery after evidence refresh.",
-        "Requested Claude review, independently reproduced: panel parser silently discards supplied top-level findings."
+        "Requested Claude review, independently reproduced: panel parser silently discards supplied top-level findings.",
+        "Independent fix5 review: legacy reconciliation ignores contradictory current active FAIL evidence when selecting an older PASS finalization."
       ],
-      "builder_checkpoint": "Approval recorded; prior FAIL evidence archived; original baseline retained. Repair finalization/legacy evidence recovery and panel aggregate consistency.",
+      "builder_checkpoint": "Frozen at revision34, fixes5/retries1. Raw FAIL receipts and reproducible patch preserved; awaiting decision on bounded fix6.",
       "snapshot": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3",
       "fixes": 5,
       "candidate_snapshot": "f74deb232127a910f84a997b17fee8e250bca37d9be7b321f761d144900280ab",
       "checkpoint": ".deliver/checkpoints/T05L-final-fix3/manifest.json",
-      "latest_checkpoint": ".deliver/checkpoints/T05L-fix4-claude-review/manifest.json",
+      "latest_checkpoint": ".deliver/checkpoints/T05L-fix5-native-review/manifest.json",
       "failed_criteria": [
-        "T05L-AC2",
+        "T05L-AC1",
         "T05L-AC3",
-        "T05L-AC5"
-      ]
+        "T05L-AC4"
+      ],
+      "next_proposal": "docs/plans/2026-09-10-legacy-reconciliation-follow-up.md"
     },
     "T05R": {
       "status": "reviewed, verified, integrated after fix1",
@@ -179,7 +181,7 @@
       ]
     }
   },
-  "next": "Finish approved T05L fix5, fresh full gates/review, then integrate and run distinct combined verification before continuing parity.",
+  "next": "Decide on bounded T05L fix6 for contradictory active legacy evidence. T04F is integrated. Hold T05L and combined acceptance until fresh independent PASS.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
