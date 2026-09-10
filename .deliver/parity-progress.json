@@ -124,15 +124,17 @@
       ]
     },
     "T05R": {
-      "status": "fix1 dispatched after independent AC2 temporary-body failure",
+      "status": "reviewed, verified, integrated after fix1",
       "worktree": "/tmp/deliver-parity-t05r",
       "run": "722c47ba-d20f-410d-a201-e093f9315254",
       "builder": "/root/benchmark_builder",
-      "snapshot": "ec1d3e38373cffe052fcdeac99ff3f1d3d94c51fd45fe3745fa6b5f60fcff263",
+      "snapshot": "7f2fb09ebbdf1f8818e5a114b14d42384b76047aac2a2a0d3979336475fd2a9d",
       "fixes": 1,
       "findings": [
         "Independent review: relative TMPDIR makes body argv relative; restrictive umask prevents exact0600. Actual failed review/verification archived round1 before fix1 dispatch."
-      ]
+      ],
+      "commit": "9009f71d26ed081cd47a0d0b4fc73a2ebd7418e1",
+      "integration_commit": "10e6c2260c59faad6802988932efcfcd189e088b"
     }
   },
   "next": "Finish independent review and integration of active T05L/T05R; then T05C/T05B, T08, T09, T10, T11/T11P, T12, T13B and T14.",
@@ -148,10 +150,10 @@
     "Runtime task read_paths cannot include .deliver. Frozen supplemental design copies live under docs/plans/parity-contracts; coordinator progress/evidence stays under .deliver."
   ],
   "latest_integrated_validation": {
-    "commit": "9599c2a",
-    "tests": 133,
-    "passed": 133,
+    "commit": "10e6c2260c59faad6802988932efcfcd189e088b",
+    "tests": 144,
+    "passed": 144,
     "validate": "PASS",
-    "scope": "Combined integrated foundations through T04 and T07, plus T13A scorer"
+    "scope": "All production/test/package files identical to T05R frozen gate snapshot; intervening root differences are coordinator/planning docs only. Source through T04/T07 plus T13A and T05R."
   }
 }
