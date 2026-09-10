@@ -88,3 +88,44 @@ scoped PR updates by demanding that an unpushed local commit already be the PR h
 Default runner suppresses terminal credential prompts and bounds time/output. SSH git@host
 is valid; embedded HTTPS credentials are rejected. Provider URLs are same-host HTTPS or omitted.
 Root must be a real directory. Validate JSON fields/types rather than trusting a partial object.
+
+## T05B protected-branch closure publication
+
+After remote source merge M, prepare a unique `pm/<story-id>-closure-<token>` checkout from
+exact fetched M. Adopt local P/E/H there using the existing per-commit contracts. P is required
+for large/regulated, requested for standard, otherwise skipped. E changes only merged Execution
+and names source merge M. H changes only the actor handoff and uses BASE_COMMIT E. Local adoption
+is provisional publication evidence; the remote story remains in-review until closure is proven.
+
+T05B validates the exact M/P/E/H topology/allowlist and passes the closure branch as the generic
+adapter's storyBranch with expectedHead H. No PM/state imports are added to standalone T05R.
+Publish one ordinary non-draft PR, obey actual checks, and merge with the normal merge-commit
+method plus match-head-commit. No admin/force or silent squash/rebase fallback. If merge commits
+are prohibited, leave an explicit MERGE_METHOD_UNSUPPORTED reconciliation state and preserve
+branch/PR. Document this provider limitation; do not claim remote closure is complete.
+
+Check the remote base is M before publication and again before merge. Fetch actual result R
+and require integration ref R, parents M/H, tree(R)=tree(H), and preserved P/E/H ancestry.
+R is a publication wrapper recorded in external evidence, not a new source snapshot/adoption.
+Only then report remote completion. E names M; the external receipt records R. Because diff
+E..R contains only H in this normal case, upstream handoff freshness accepts BASE_COMMIT E.
+
+The provider's match-head-commit does not lock the base. An external base race must not invent
+PASS. If actual R still proves exact report/story publication without conflict rewrite, record
+closure_published/handoff_stale and use an executable bounded handoff-only prepare/publish/reconcile
+operation from the current integration tip. Never rerun/relabel source gates for a handoff repair.
+Ambiguous or changed closure bytes stay unresolved. B owns CLI closure prepare/publish/reconcile
+and its exact local proof, extending L APIs only from a fresh task baseline.
+
+Tests use real temporary Git and a fake provider for large P/E/H and small E/H, disallowed merge
+method, checks/head failures, base race with honest stale handoff and actual repair path, and
+rejection of extra paths/conflict rewrites. No test calls real remotes or bypasses branch rules.
+
+`prepareHandoffRepair(closureRecord,{integrationRoot})` requires published E reachable on the
+fetched integration ref, absent/stale handoff, clean checkout and exact current head N. Create
+a fresh branch at N; adopt H2 direct child with only the actor handoff and BASE_COMMIT N. Use
+normal provider push/PR/check/merge. Result S must have parents N/H2, tree(S)=tree(H2), and diff
+N..S only the handoff. Persist every token/attempt/result; another base race is HANDOFF_BASE_RACE.
+Cap automatic publication retries at two in this durable record. These are publication attempts,
+not new builder dispatches; never reset or rewrite completed source/story attempt counters.
+Exhaustion preserves published closure and reports incomplete handoff reconciliation.
