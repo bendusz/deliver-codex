@@ -368,3 +368,18 @@ become the actual installed user routes. T08's native continuation resolves avai
 references separately from upstream next_reference. T10 can update diagnostics when its dedicated
 retrospective reference arrives. T11P can update diagnostics/shipping when project reporting lands.
 Do not leave new modules reachable only through undocumented helper calls until final packaging.
+
+## T04 final correction protocol checks
+
+Fix3 binds expected flags from the audited temporary index, not raw pre-staging flags, so intended
+adds/deletes remain valid. Prove every cumulative changed source entry against the prepared tree
+independently of Git status. A root gitlink cannot prove uncommitted nested bytes; compare exact
+nested committed content with clean nested state or reject that source mutation before commit.
+
+Recursive protected metadata includes effective hooksPath, entry kind, executable mode and
+bytes/target. Chmod of an active hook changes Git behavior even with identical content. Preserve
+the exact legacy-v1 hashing algorithm separately. Old baselines did not record hook modes; never
+claim retrospective proof for missing data. Refuse unsafe upgrades, while unchanged old runs with
+no active hooks keep exact represented-metadata checks and fresh strengthened snapshot identities.
+Inactive *.sample entries are allowed because Git does not invoke those names. Capture their
+current type/mode in the new versioned anchor; explicitly record where stronger checks begin.
