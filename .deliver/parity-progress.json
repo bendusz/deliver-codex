@@ -96,10 +96,17 @@
       ]
     },
     "T04": {
-      "status": "implementation underway",
+      "status": "independent FAIL recorded; fix round2 authorized",
       "worktree": "/tmp/deliver-parity-t04",
       "run": "9e5faaea-1973-4a63-b57c-6c943bf4c5d0",
-      "builder": "/root/t01_builder"
+      "builder": "/root/t01_builder",
+      "snapshot": "5d760a5e70c0d61eb3df4cf71f63c7705f56b2262118e070b77a646e0b817499",
+      "findings": [
+        "Independent diagnosis: current snapshot Git metadata schema changed; real old metadata exactly matches baseline. Add exact legacy-v1 comparison for pre-anchor runs without loosening actual Git drift checks.",
+        "Review: commit preparation includes unchanged pre-start dirty paths under touches.",
+        "Review: recovery validates path-shaped images but not the full legal story/run before-after transition."
+      ],
+      "fixes": 2
     }
   },
   "next": "T04 regressions and independent review, then T05 integration/reporting. T08 semantic readiness, T09 migration, T10 retrospectives, T11 knowledge/review, T12 parallel, T13B comparisons and T14 release remain.",

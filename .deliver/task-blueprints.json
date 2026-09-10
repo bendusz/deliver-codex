@@ -275,6 +275,10 @@
       {
         "id": "T08-AC3",
         "text": "Material correction revokes shared approval and retains spent budgets, while applicable-scale first claims require current artifact analysis and explicit semantic review; seeded blocking findings prevent claim without creating state or treating regex scans as semantic PASS."
+      },
+      {
+        "id": "T08-AC4",
+        "text": "Current PM recovery validates the unique legal init/approve/revoke/claim before/after operation before any write, including genuine already-applied images; arbitrary story creation, criteria/merged mutation, mixed writes and invalid approval transitions remain untouched. Legacy v1 journals recover only when a unique valid operation can be inferred. Claim preconditions normalize only the exact validated journal after-image."
       }
     ],
     "commands": {
@@ -587,6 +591,176 @@
       {
         "id": "T00B-AC3",
         "text": "Installed-copy regression and package validation reject reintroduced default role sandbox overrides without calling real model services or changing user configuration."
+      }
+    ],
+    "commands": {
+      "test": "npm test",
+      "validate": "npm run validate"
+    },
+    "specs": []
+  },
+  "T05L": {
+    "id": "T05L",
+    "objective": "Implement verified local integration, fresh integration evidence, reporting and story closure with handoff",
+    "read_paths": [
+      "AGENTS.md",
+      "docs/plans/2026-09-09-upstream-parity.md",
+      ".deliver/architecture-state.md",
+      ".deliver/integration-correction-design.md"
+    ],
+    "touches": [
+      "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/pm.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+      "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+      "plugins/deliver/skills/deliver/scripts/pm.mjs",
+      "plugins/deliver/skills/deliver/references/compatibility.md",
+      "plugins/deliver/skills/deliver/references/shipping.md",
+      "tests/integration.test.mjs",
+      "tests/current-roundtrip.test.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+      "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
+      "tests/reporting.test.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+      "tests/review-panel.test.mjs"
+    ],
+    "acceptance": [
+      {
+        "id": "T05L-AC1",
+        "text": "Finish alone leaves claims active; every current shared-project completion requires a verifier distinct from both builder and reviewer, regardless of runtime mode/scale; merged Execution is recorded only after checking real integration against fresh verified evidence, retaining identity, criteria and spent counters."
+      },
+      {
+        "id": "T05L-AC2",
+        "text": "Both current upstream/Codex story-boundary directions and fresh-process interruption/resume pass against unchanged pinned reader; handoff BASE_COMMIT matches the recorded integration and tolerates its own handoff-only commit."
+      },
+      {
+        "id": "T05L-AC3",
+        "text": "Large/regulated closure requires a separately prepared and adopted evidence-derived verification report/checklist commit P between proven integration M and story-only closure E; exact report paths and C/M/evidence references avoid self-referential hashes, unsupported PASS claims and hidden source changes."
+      },
+      {
+        "id": "T05L-AC4",
+        "text": "Integration always runs exact declared gates at actual M; C review is reusable only for proven clean composition and identical bound manifests. Fresh independent M review and distinct verification can resolve evidence-only drift without rewriting finished C. Actual source findings remain explicit and unresolved pending the T05C correction operation."
+      },
+      {
+        "id": "T05L-AC5",
+        "text": "Structured panel receipts retain exact member identities/verdicts/findings and required lens coverage, while standalone legacy receipt compatibility remains."
+      }
+    ],
+    "commands": {
+      "test": "npm test",
+      "validate": "npm run validate"
+    },
+    "specs": []
+  },
+  "T05R": {
+    "id": "T05R",
+    "objective": "Implement standalone GitHub provider port for exact scoped branch publish and verified PR merge",
+    "read_paths": [
+      "AGENTS.md",
+      "docs/plans/2026-09-09-upstream-parity.md",
+      ".deliver/remote-design.md"
+    ],
+    "touches": [
+      "plugins/deliver/skills/deliver/scripts/lib/remote.mjs",
+      "tests/remote.test.mjs"
+    ],
+    "acceptance": [
+      {
+        "id": "T05R-AC1",
+        "text": "Injected command runner implements the accepted inspect/publish/merge protocol with exact checkout/head/remote/PR identity, bounded output and precise distinct failure states. No shell or real remote calls occur in tests."
+      },
+      {
+        "id": "T05R-AC2",
+        "text": "Publish pushes only the expected head without force or tracking configuration changes, creates/updates exactly one PR, preserves draft policy and passes exact bounded bodies through temporary mode0600 body files cleaned on every outcome."
+      },
+      {
+        "id": "T05R-AC3",
+        "text": "Merge requires exact head plus passing required checks or the documented positively proven no-required-checks+CLEAN result, uses normal server protections and match-head-commit, and requires actual merged commit and remote integration proof. Races, ambiguity, queueing, failures and malformed output never report completion."
+      }
+    ],
+    "commands": {
+      "test": "npm test",
+      "validate": "npm run validate"
+    },
+    "specs": []
+  },
+  "T05C": {
+    "id": "T05C",
+    "objective": "Continue failed integrations through token-bound correction runs without resetting claims, scope or attempts",
+    "read_paths": [
+      "AGENTS.md",
+      "docs/plans/2026-09-09-upstream-parity.md",
+      ".deliver/architecture-state.md",
+      ".deliver/integration-correction-design.md"
+    ],
+    "touches": [
+      "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+      "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+      "plugins/deliver/skills/deliver/scripts/pm.mjs",
+      "plugins/deliver/skills/deliver/references/shipping.md",
+      "tests/integration-correction.test.mjs",
+      "tests/integration.test.mjs",
+      "tests/current-lifecycle.test.mjs"
+    ],
+    "acceptance": [
+      {
+        "id": "T05C-AC1",
+        "text": "Correction preparation binds an actual failed/non-clean integration record and unchanged approved contract to an immutable token; free-form failures, stale identities, changed scope and duplicate active work fail before mutation."
+      },
+      {
+        "id": "T05C-AC2",
+        "text": "Correction start verifies the exact clean M checkout on its unique correction branch and atomically publishes only the narrow Execution/run changes, retaining original finished runs and maximum spent budgets across generations; limit exhaustion and invalid journal images cannot mutate state."
+      },
+      {
+        "id": "T05C-AC3",
+        "text": "Fresh correction gates/review/distinct verification retain and resolve all inherited findings before a new C2 integration. Real temporary Git regressions exercise multi-generation budgets, crash recovery, races and rejected drift without unbound Quick or baseline reset."
+      }
+    ],
+    "commands": {
+      "test": "npm test",
+      "validate": "npm run validate"
+    },
+    "specs": []
+  },
+  "T05B": {
+    "id": "T05B",
+    "objective": "Wire the GitHub provider into native PM shipping and prove the complete remote lifecycle",
+    "read_paths": [
+      "AGENTS.md",
+      "docs/plans/2026-09-09-upstream-parity.md",
+      ".deliver/architecture-state.md",
+      ".deliver/remote-design.md",
+      ".deliver/integration-correction-design.md"
+    ],
+    "touches": [
+      "plugins/deliver/skills/deliver/scripts/lib/remote.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+      "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+      "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+      "plugins/deliver/skills/deliver/scripts/pm.mjs",
+      "plugins/deliver/skills/deliver/references/shipping.md",
+      "plugins/deliver/skills/deliver/references/compatibility.md",
+      "tests/remote.test.mjs",
+      "tests/remote-lifecycle.test.mjs",
+      "tests/current-roundtrip.test.mjs"
+    ],
+    "acceptance": [
+      {
+        "id": "T05B-AC1",
+        "text": "PM remote adapter pushes scoped branches, creates/updates PRs and merges only exact verified heads with passing required checks under standing authorization; fake remote tests cover missing auth, pending/failure, races and merge result mismatch without real remote/model calls."
+      },
+      {
+        "id": "T05B-AC2",
+        "text": "Actual CLI/API wiring consumes fresh source and integration evidence, reconciles provider merge/squash/rebase lineage and advanced integration tip only with real Git proof, and performs P/E/H closure under standing authority. Unsupported or pending states stay explicit without resetting claims or budgets."
+      },
+      {
+        "id": "T05B-AC3",
+        "text": "Fake provider and real temporary Git repositories exercise full publish, readiness, exact merge, integration gates, reporting where required, merged Execution and fresh-process handoff; no disconnected helper is presented as an implemented user operation."
       }
     ],
     "commands": {

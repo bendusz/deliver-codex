@@ -263,3 +263,76 @@ now contain review.mjs, runtime/state and focused review-panel tests as applicab
 T08 packet includes existing current transition/integration/reporting/remote fixtures solely
 for supplying real required readiness artifacts when first-claim enforcement arrives. Keep
 behavioral assertions; no hidden bypass or wholesale scale downgrading to avoid the new gate.
+
+Panel implementation detail: retain each member's actual snapshot identity (or an equally explicit
+validated source receipt identity), require it to match the panel/runtime snapshot, and never
+replace an old member identity while aggregating. T11 standalone review-scope content identities
+are not automatically interchangeable with runtime snapshots. Runtime dispatch must capture and
+validate both identities against the actual intended task content before review; generic recent
+or worktree review cannot silently certify omitted earlier task commits. Full task review uses
+the original cumulative task scope/base, even after intermediate commit adoption.
+
+## Proposed T05 task split, pending remote-port interface
+
+After T04 independent PASS, T05 may split into T05L local C/M/P/E/H + panel evidence and T05R
+standalone GitHub provider port (remote.mjs/tests/remote.test.mjs) in parallel. A fresh T05B
+after both integrate wires the actual remote CLI and exercises the complete remote lifecycle.
+Do not import an absent remote module in the local-only task or merge sibling source commits
+into an active run to satisfy dependencies: that changes its protected baseline. T05R tests
+the same real adapter protocol with injected fake runner; it is not by itself the complete
+remote user operation. No split packets/runs exist yet; finalize exact interfaces/scopes first.
+
+## T04 first coordinator check diagnosis
+
+Actual original baseline Git metadata is unchanged. New gitMetadata fields/ls-files format
+changed its digest shape and falsely reject pre-T04 no-anchor runs. Independent architect
+recomputed the exact old algorithm and matched stored baseline f69f8e0908e... . Fix round1
+must compare exact legacy-v1 metadata only for pre-anchor persisted runs, recursively including
+initialized submodules, while retaining new-format snapshots for fresh evidence. Baseline bytes
+are immutable; no blanket old-run exemption. Regression must prove old baseline acceptance and
+continued HEAD/index flags/config drift rejection. Actual failed check saved with task evidence.
+
+## T05 combined integration evidence contract
+
+Always execute declared task gates on actual combined integration M. Preserve C review/verifier
+only when a committed binding manifest is identical at C/M and composition is a proven clean
+merge of prior integration I and candidate C. Manifest expands exact mode/blob/missing entries
+for touches, read_paths and specs, plus story contract, approved plan/marker, packet, actor/route
+and source receipt identities. Recompute the clean merge tree with Git plumbing and compare
+M exactly; conflict/manual content is not clean composition.
+
+A separate .deliver/integrations record binds original source run/C/snapshot/manifest/review/
+verifier, destination checkout/I/M/tree/method/manifest, and fresh M/tree/environment/log-bound
+gates. Never mutate original run.project_root, baseline, completion snapshot or C evidence;
+never claim old C gates ran at M. This preserves independently completed sibling local receipts
+while testing their actual combined tree. Prior I may contain legitimate imported upstream
+completion without native journals.
+
+Proposed pure boundaries: prepareIntegrationEvidence(runArg,{integrationRoot,candidateCommit,
+integrationCommit}); runIntegrationGates(preparation,{expectedPreparationHash}) rechecks before
+each exact command; finalizeIntegrationEvidence(preparation,gateReceipts) recomputes lineage/
+manifest/receipt digests. Only a PASS receipt tied to M permits P/E. Changed bound inputs,
+manual/conflict composition, unknown lineage or failed M gates requires fresh source evidence.
+
+Resolved correction protocol is recorded in integration-correction-design.md. T05L supports
+fresh independent review and distinct verification of M when only evidence needs refreshing.
+T05C supplies token-bound correction branches/runs for actual source findings, after T05L.
+Normal claim/start and completed source-run immutability remain unchanged. T05 is incomplete
+until L, R, C and final remote wiring B all pass their own acceptance.
+
+## T08 current PM journal correction
+
+Independent read-only audit confirmed current-pm validateJournal/applyJournal checks paths and
+string equality but permits arbitrary approval/story after-images. T08 owns operation-specific
+validation for init/approve/revoke/claim before every recovery write. Init is canonical pending;
+approval/revocation preserve unknown fields and validate their exact legal field deltas and live
+tracked plan policy/digest; claim preserves contract and creates only exact claimed Execution
+with owner/route/zero counters after its original readiness and conflict checks. Reject new
+story creation, merged/criteria mutation and mixed/two-story journals. Existing v1 recovery may
+infer one unique legal operation, otherwise report ambiguity without mutation. Genuine applied
+claim images may normalize only the exact validated after-image to before when proving the
+original clean checkout precondition. No broad dirty exemption or pretend authentication.
+
+T05 implementation is split into L local integration/reporting/panel, R provider port, C tokenized
+source correction, and B final remote wiring. L and R can begin in separate worktrees after T04
+PASS. C starts from integrated L. B starts after L/R/C; no dependency merges into active runs.
