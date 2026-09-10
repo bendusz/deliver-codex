@@ -391,3 +391,30 @@ CLI instanceof/exit-code contract. It must not use PM/runtime state operations o
 This resolves the frozen design's broad no-state-import wording against its already-required
 DeliverError64/66 behavior. The shared class/module has no import-time I/O. Frozen worker read
 contracts remain unchanged; this clarification was sent to builder and independent reviewer.
+
+## T08 implementation-readiness refinements
+
+The independent architecture check identified narrow analyzer ownership needed for genuine
+already-applied claim recovery. T08 may add a read-only exact-path in-memory read override for
+one validated journal story before-image in lib/analyze.mjs and its tests. Recovery first proves
+one unique legal before/after operation; only then may it analyze that before-story. Normal
+claim never accepts a caller substitute for live inputs. No general virtual filesystem, disk
+rewind, broad dirty exemption or test bypass. The same analyzer serves normal claim/recovery.
+
+Artifact receipt items are `{id,status:PASS|FAIL|UNKNOWN,evidence}` with exact unique ID-set
+coverage of recomputed semantic_review.items. Findings are `{severity:block|major|minor,message,
+resolved,location?}`. Reviewer is a bounded string; every item must PASS and no unresolved
+block/major remains. Compute receipt_hash as SHA256 of canonical normalized receipt without
+its hash. Persist normalized receipt plus hash in the unknown-safe pm-exec.artifact_review
+extension in the same claim journal, preserving upstream compatibility and shared provenance.
+Tiny/small still require factual READY and may omit it. Existing same-owner claims resume
+stored evidence/counters without reapplying an unclaimed-story rule.
+
+Pure diagnostics APIs: inspectContinuation(root,{runId?,storyId?}) and
+inspectDoctor(root,{runId?,storyId?,environment?}). Return bounded checks with code,
+status OK|MISSING|DRIFT|UNKNOWN, path and message, plus selection and existing native_reference.
+Project routes are pm.mjs resume|doctor; deliver.mjs status remains run-specific. Hook calls
+pure continuation with no environment probes. Until dedicated later references exist use
+migration -> compatibility.md, retrospective/done -> recovery.md, implementation -> workflow.md;
+never return a nonexistent upstream filename as the native route. Later owning tasks update
+these native routes when their references are implemented.
