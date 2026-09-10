@@ -42,7 +42,7 @@ Developer command-handling rule: create a bounded mode0600 temporary body file a
 pass its path to --body-file and clean up. Fake runner reads its exact bytes during invocation.
 This preserves multiline bodies without shell expansion or escaping transformations.
 
-T05R owns only scripts/lib/remote.mjs and tests/remote.test.mjs. No PM/state/transition imports.
+T05R owns only scripts/lib/remote.mjs and tests/remote.test.mjs. No PM/runtime state operations or transition imports. Only the shared DeliverError class may be imported from state.mjs for existing CLI error interoperability.
 Scripted fake runner asserts exact argv/body bytes, missing binaries/auth before push, multiple
 URLs, malicious-looking names/body, lookup races/ambiguity/history, push/PR/draft/ready failures,
 empty/pass/skipping/pending/fail/malformed checks, changed head, refused/queued merge and absent/
@@ -129,3 +129,7 @@ N..S only the handoff. Persist every token/attempt/result; another base race is 
 Cap automatic publication retries at two in this durable record. These are publication attempts,
 not new builder dispatches; never reset or rewrite completed source/story attempt counters.
 Exhaustion preserves published closure and reports incomplete handoff reconciliation.
+
+## Structured checks exit status clarification
+
+The current GitHub CLI checks source exports JSON before applying the human-output failed/pending exit statuses. Treat exit0 structured output according to each bucket, including failure and pending. Nonzero structured output remains a provider error/UNKNOWN and never READY. The narrow exact no-check exit1 exception above occurs before JSON export and remains valid. Source: https://github.com/cli/cli/blob/trunk/pkg/cmd/pr/checks/checks.go (reviewed 2026-09-10). This clarifies the active T05R dispatch; its frozen task input copy is unchanged.

@@ -33,6 +33,11 @@ must appear in the new review input and be resolved with evidence before PASS. T
 produces C2 on the correction branch. Gates/review/distinct verification are fully fresh at C2;
 T05 performs a new integration attempt. Never relabel old PASS or reset attempt budgets.
 
+Fresh correction review packets cover the complete original task from its root baseline, as
+well as inherited findings and the new correction delta. The new audit baseline at M does not
+justify showing reviewers only the final fix while certifying the whole task. Preserve the
+root baseline/lineage identity so T11 can build this full scoped review input explicitly.
+
 Ownership: integration.mjs prepares tokens and validates integration records; current-pm.mjs
 publishes the narrow recoverable Execution/binding pair and computes MAX counters; state.mjs
 validates optional correction bindings; pm/runtime CLI wires correction-prepare/start. T08 only

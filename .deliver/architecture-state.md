@@ -383,3 +383,11 @@ claim retrospective proof for missing data. Refuse unsafe upgrades, while unchan
 no active hooks keep exact represented-metadata checks and fresh strengthened snapshot identities.
 Inactive *.sample entries are allowed because Git does not invoke those names. Capture their
 current type/mode in the new versioned anchor; explicitly record where stronger checks begin.
+
+## T05R shared error clarification
+
+The port may import only DeliverError from state.mjs so invalid caller inputs retain the existing
+CLI instanceof/exit-code contract. It must not use PM/runtime state operations or story bindings.
+This resolves the frozen design's broad no-state-import wording against its already-required
+DeliverError64/66 behavior. The shared class/module has no import-time I/O. Frozen worker read
+contracts remain unchanged; this clarification was sent to builder and independent reviewer.
