@@ -115,10 +115,10 @@
       "post_acceptance_review_finding": "Requested Claude review independently reproduced stale commit-preparation deadlock after legal correction. Additional bounded follow-up requires retained lineage/counters; original finished run remains historical evidence."
     },
     "T05L": {
-      "status": "NOT ACCEPTED: fix4 gates PASS; requested Claude review and independent reproduction FAIL",
+      "status": "implementing approved fix5",
       "worktree": "/tmp/deliver-parity-t05l",
       "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
-      "builder": "/root/t01_builder",
+      "builder": "/root/benchmark_builder",
       "retries": 1,
       "findings": [
         "Native host returned selected model at capacity; retry1 recorded before resuming same agent/model, preserving in-scope partial source.",
@@ -133,9 +133,9 @@
         "Requested Claude review, independently reproduced: adopted P/E/H proof depends on live process environment/finalization, preventing resume or recovery after evidence refresh.",
         "Requested Claude review, independently reproduced: panel parser silently discards supplied top-level findings."
       ],
-      "builder_checkpoint": "Frozen at snapshot10c782; revision29 records actual FAIL review/verification. Prior eight findings resolved. New adopted-proof recovery blocker and panel aggregate loss remain open. No fix5 spent.",
+      "builder_checkpoint": "Approval recorded; prior FAIL evidence archived; original baseline retained. Repair finalization/legacy evidence recovery and panel aggregate consistency.",
       "snapshot": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3",
-      "fixes": 4,
+      "fixes": 5,
       "candidate_snapshot": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9",
       "checkpoint": ".deliver/checkpoints/T05L-final-fix3/manifest.json",
       "latest_checkpoint": ".deliver/checkpoints/T05L-fix4-claude-review/manifest.json",
@@ -157,9 +157,18 @@
       ],
       "commit": "9009f71d26ed081cd47a0d0b4fc73a2ebd7418e1",
       "integration_commit": "10e6c2260c59faad6802988932efcfcd189e088b"
+    },
+    "T04F": {
+      "status": "implementing approved recovery repair",
+      "worktree": "/tmp/deliver-parity-t04f",
+      "run": "8ba60517-eee5-486d-96db-cf86b1aebf49",
+      "builder": "/root/t04_repair_builder",
+      "fixes": 4,
+      "retries": 0,
+      "source_run": "9e5faaea-1973-4a63-b57c-6c943bf4c5d0"
     }
   },
-  "next": "User decision: one additional bounded repair round for T04 stale commit preparation and T05L frozen artifact proof/panel aggregate consistency. Preserve spent counters, baselines/lineage and failure history. Then continue pending parity tasks.",
+  "next": "Finish independent T04F and T05L fixes against unchanged per-task baselines, then integrate and run fresh combined gates/review before continuing parity.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",

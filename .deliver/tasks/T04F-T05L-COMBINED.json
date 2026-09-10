@@ -1,0 +1,33 @@
+{
+  "id": "T04F-T05L-COMBINED",
+  "objective": "Independently verify the actual integrated T04F and T05L repairs without changing production code",
+  "read_paths": [
+    "AGENTS.md",
+    "plugins/deliver",
+    "bin",
+    "scripts",
+    "tests",
+    "docs/plans/2026-09-10-review-repairs-proposal.md",
+    "docs/plans/parity-contracts/architecture-state.md"
+  ],
+  "touches": [],
+  "acceptance": [
+    {
+      "id": "COMBINED-AC1",
+      "text": "Actual integration commit includes the accepted T04F and T05L commits with all repaired source and tests retained. Any conflict resolution is explicitly reviewed against both parent diffs and original failure lineage."
+    },
+    {
+      "id": "COMBINED-AC2",
+      "text": "Full repository tests and packaging validation pass at the exact combined snapshot. Commit cancellation and transition refusal coexist with frozen integration evidence, historical record repair and panel aggregate validation; all three reproduced review defects remain fixed."
+    },
+    {
+      "id": "COMBINED-AC3",
+      "text": "Independent review and a distinct verifier assess the exact combined tree and original findings. No source/baseline/counter/history weakening, sandbox default change or new PM permission checkpoint is introduced."
+    }
+  ],
+  "commands": {
+    "test": "npm test",
+    "validate": "npm run validate"
+  },
+  "specs": []
+}
