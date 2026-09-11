@@ -120,7 +120,7 @@
       }
     },
     "T05L": {
-      "status": "reviewed, verified, committed after approved fix7; combined integration pending",
+      "status": "reviewed, verified and integrated after approved fix7 and distinct combined acceptance",
       "worktree": "/tmp/deliver-parity-t05l",
       "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
       "builder": "/root/benchmark_builder",
@@ -150,7 +150,8 @@
       "next_proposal": "docs/plans/2026-09-10-reconciliation-identity-follow-up.md",
       "approval": ".deliver/T05L-fix7-approval.json",
       "test_author": "/root/identity_tests",
-      "commit": "3f0d3b283dc628a629395878f065ea999d8c44ac"
+      "commit": "3f0d3b283dc628a629395878f065ea999d8c44ac",
+      "integration_commit": "2a6def04575447fe777737a44aede6d7d8b7540f"
     },
     "T05R": {
       "status": "reviewed, verified, integrated after fix1",
@@ -179,9 +180,27 @@
       "findings": [
         "Inherited nonblocking legacy active-hook documentation limitation remains assigned T14."
       ]
+    },
+    "T04F-T05L-COMBINED": {
+      "status": "finished, independently reviewed, distinctly verified and integrated",
+      "worktree": "/tmp/deliver-parity-combined",
+      "branch": "feat/parity-combined",
+      "run": "4056ee0f-712a-45dc-97f1-059a07a9c02e",
+      "snapshot": "a91dc0c3024b7e109aafc9b0556f2d88def20ec326d4cc0718da26672ad54cc2",
+      "source_commit": "b84a045433f77644d541875ad5630915bf7f0c2d",
+      "composition_coordinator": "/root",
+      "reviewer": "/root/state_architecture",
+      "verifier": "/root/combined_verifier",
+      "source_only_snapshot": "5b4cb70bb73ecb9cacf63a13b38fa21daefa96d5718848bf99a11ee73f5a57ab",
+      "report": "docs/reviews/2026-09-11-combined-repairs.md",
+      "source_unchanged": true,
+      "commit": "2a6def04575447fe777737a44aede6d7d8b7540f",
+      "tests": 211,
+      "validate": "PASS",
+      "checkpoint": ".deliver/checkpoints/T04F-T05L-COMBINED/manifest.json"
     }
   },
-  "next": "Compose accepted T05L and T04F, record exact file/proof manifest, run fresh combined full gates, independent review and distinct verification.",
+  "next": "T05C: freeze correction interfaces, establish independent acceptance regressions, then implement failed-integration correction while preserving lineage and MAX budgets.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
@@ -191,14 +210,16 @@
   "coordinator_notes": [
     "Do not use git push -u during active runs: shared tracking-config mutation invalidates their protected Git metadata. Use explicit remote/branch pushes.",
     "Unused pre-dispatch T02 baseline 1cb0b0fd-76f5-462a-8df2-4a5a8d18f39f was archived under .deliver/aborted after initial sequencing error; no worker ran, no budgets spent, no evidence reused.",
-    "Runtime task read_paths cannot include .deliver. Frozen supplemental design copies live under docs/plans/parity-contracts; coordinator progress/evidence stays under .deliver."
+    "Runtime task read_paths cannot include .deliver. Frozen supplemental design copies live under docs/plans/parity-contracts; coordinator progress/evidence stays under .deliver.",
+    "Run gate and finish through the same coordinator launch environment; subprocess cwd does not itself normalize inherited environment. Combined source-only evidence remains archived; scoped acceptance report made the verification task finishable without runtime or baseline relaxation."
   ],
   "latest_integrated_validation": {
-    "commit": "2fff9e6a58c65f92bd7315ea91c0fe10c50fd4b6",
-    "tests": 153,
-    "passed": 153,
+    "commit": "2a6def04575447fe777737a44aede6d7d8b7540f",
+    "tests": 211,
+    "passed": 211,
     "validate": "PASS",
-    "scope": "Integrated production/test/package source is byte-identical to accepted T04F tree; actual full gates ran in its worktree. T05L remains separate and pending."
+    "snapshot": "a91dc0c3024b7e109aafc9b0556f2d88def20ec326d4cc0718da26672ad54cc2",
+    "scope": "Integrated production/contracts/report bytes match the completed combined candidate. Full gates executed in /tmp/deliver-parity-combined, followed by independent review and distinct verification."
   },
   "requested_external_review": {
     "model": "claude-fable-5-1",
