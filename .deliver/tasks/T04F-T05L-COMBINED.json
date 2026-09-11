@@ -8,7 +8,9 @@
     "scripts",
     "tests",
     "docs/plans/2026-09-10-review-repairs-proposal.md",
-    "docs/plans/parity-contracts/architecture-state.md"
+    "docs/plans/parity-contracts/architecture-state.md",
+    "docs/plans/2026-09-10-legacy-reconciliation-follow-up.md",
+    "docs/plans/2026-09-10-reconciliation-identity-follow-up.md"
   ],
   "touches": [],
   "acceptance": [
@@ -18,7 +20,7 @@
     },
     {
       "id": "COMBINED-AC2",
-      "text": "Full repository tests and packaging validation pass at the exact combined snapshot. Commit cancellation and transition refusal coexist with frozen integration evidence, historical record repair and panel aggregate validation; all three reproduced review defects remain fixed."
+      "text": "Full repository tests and packaging validation pass at the exact combined snapshot. Commit cancellation and transition refusal coexist with frozen integration evidence, historical record repair, active failing/incomplete evidence refusal, declared actor identity/separation checks and panel aggregate validation. Original review defects and the subsequent legacy-reconciliation regressions remain fixed."
     },
     {
       "id": "COMBINED-AC3",
