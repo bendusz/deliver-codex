@@ -131,9 +131,9 @@
       "name": "complete",
       "aliases": ["ship", "integrate"],
       "arguments": [{ "name": "story-or-project", "required": false, "description": "The verified story or completed project, inferred only when unambiguous." }],
-      "output": { "kind": "completion", "paths": ["docs/verification/<story-id>.md", "docs/completion-report.md"], "description": "Verified integration status and completion evidence." },
-      "mutation": { "mode": "delivery-write", "paths": ["docs/stories/", "docs/verification/", "docs/completion-report.md", "docs/handoff/", ".deliver/"], "external": ["git-commit", "git-push", "pull-request-create-or-update", "verified-merge"] },
-      "reference": "references/workflow.md"
+      "output": { "kind": "completion", "paths": ["docs/stories/<story-id>-<slug>.md", "docs/verification/<story-id>.md", "docs/checklists/verification-<story-id>.md", "docs/handoff/<actor-id>.md"], "description": "A verified C/M/P/E/H story boundary and current handoff." },
+      "mutation": { "mode": "delivery-write", "paths": ["docs/stories/", "docs/verification/", "docs/checklists/", "docs/handoff/", ".deliver/"], "external": ["git-commit", "git-push", "pull-request-create-or-update", "verified-merge"] },
+      "reference": "references/shipping.md"
     },
     {
       "name": "status",

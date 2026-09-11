@@ -63,6 +63,13 @@ test('installed operation map resolves every native operation and its one refere
   assert.deepEqual(byName.analyze.mutation, { mode: 'read-only', paths: [], external: [] });
   assert.deepEqual(byName.status.mutation, { mode: 'read-only', paths: [], external: [] });
   assert(byName.complete.mutation.external.includes('verified-merge'));
+  assert.equal(byName.complete.reference, 'references/shipping.md');
+  assert.deepEqual(byName.complete.output.paths, [
+    'docs/stories/<story-id>-<slug>.md',
+    'docs/verification/<story-id>.md',
+    'docs/checklists/verification-<story-id>.md',
+    'docs/handoff/<actor-id>.md',
+  ]);
 
   const operationContract = read(skill, 'references/operations.md');
   assert.match(operationContract, /Read only its `reference`/);
@@ -136,4 +143,9 @@ test('installed planning templates preserve identifiers, scale choices and uncla
   for (const route of ['operations', 'discovery', 'specification', 'planning', 'scale-profiles', 'decomposition']) {
     assert.match(entry, new RegExp(`references/${route}\\.md`));
   }
+  assert.match(entry, /references\/shipping\.md/);
+  const shipping = read(skill, 'references/shipping.md');
+  assert.match(shipping, /integrate-prepare[\s\S]*git merge --no-ff --no-edit[\s\S]*integrate-adopt/);
+  assert.match(shipping, /report-prepare[\s\S]*close-prepare[\s\S]*handoff-prepare/);
+  assert.match(shipping, /standing authority/);
 });

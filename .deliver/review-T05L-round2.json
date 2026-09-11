@@ -1,0 +1,40 @@
+{
+  "status": "FAIL",
+  "findings": [
+    {
+      "severity": "major",
+      "message": "Integration preparation makes the accepted evidence-refresh and conflict-correction routes unreachable. boundManifest throws when the source snapshot's bound live bytes differ from committed C, and prepareLocalIntegration throws when a clean expected M manifest differs from C, labelling both as source correction even though fresh independent M review and distinct verification are the specified resolution for evidence-only drift. expectedMergeTree also throws before persisting any record on a real non-clean composition, so T05C has no validated failure input. Persist whether C evidence is reusable separately from the actual M manifest and permit fresh M evidence when it is not; for a merge-tree conflict, persist a discriminated failure token bound to actual I, finished C, the failed probe and attempt provenance without claiming that M exists.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true
+    },
+    {
+      "severity": "major",
+      "message": "Fresh integration gates are not bound to the live bytes or durable logs they claim to test. assertClean trusts porcelain status and write-tree, so assume-unchanged or skip-worktree changes can be invisible while a gate executes bytes different from recorded M; a review reproduction produced empty status and an index tree equal to HEAD while the live bound file contained different content. assertEvidenceReady validates only the receipt's stored log_hash and never reads, type-checks or hashes log_path, so deleted or altered logs still finalize. Re-running a gate filters out the previous same-name receipt, erasing failed evidence rather than retaining gate history. Bind the actual executable worktree to M before and after every gate, validate exact bounded regular log bytes at consumption, and retain prior gate receipts as immutable history.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true
+    },
+    {
+      "severity": "major",
+      "message": "The integration record is not confined to its canonical per-source-run path. validateRecord accepts any string id, recordPath interpolates it through path.join, and assertRecordSource never requires record.id === record.source.run_id. Traversal components can therefore normalize outside destination/.deliver/integrations while readIntegrationRecord's equality check still succeeds, after which withRecord locks and rewrites that escaped JSON path. Require the canonical run-id grammar and equality to source.run_id, resolve the expected basename under the real integrations directory, and reject every lexical or realpath escape before locking or mutation.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true
+    },
+    {
+      "severity": "major",
+      "message": "P/E/H proofs and their user-visible evidence are not durable after adoption. Adoption clears the only pending parent/path/hash data and later stages trust report.commit, closure.commit and reporting without re-proving their commit topology or deriving reporting from scale and the persisted standard opt-in. A coherent-looking record changed to reporting=skipped or report.commit=M can bypass required P, and handoff preparation trusts an arbitrary recorded closure commit without checking the merged story. The generated report also omits retained panel findings and inserts multiline verifier evidence as raw Markdown, allowing injected headings/check boxes; handoff always states OPEN_FINDINGS: none even when a PASS panel retains unresolved minor CONCERNS. Retain and revalidate adopted parent/tree/mode/path/blob proofs, bind the derived reporting choice, render bounded escaped evidence plus retained findings, and make the handoff's open findings reflect effective evidence.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true
+    },
+    {
+      "severity": "major",
+      "message": "A clean initialized submodule inside a task-bound touch/read/spec scope cannot reach adopted M. The committed manifest encodes its gitlink as `gitlink:<oid>` at integration.mjs:108-123, while scope.snapshot encodes the same clean checkout as `gitlink:<oid>:<nested-git-meta>` and adds nested entries at scope.mjs:309-321. snapshotManifest carries those incompatible live entries into executableProof, which therefore rejects exact clean M at integration.mjs:97-105. A temporary repository probe reproduced these two shapes for the same gitlink. In addition, protectedShape compares nested HEAD/tree/index at I with M, so a legitimate gitlink update would remain rejected even after normalizing the manifest. Define one comparable committed/live gitlink identity, validate the initialized checkout against M's gitlink while retaining recursive dirty/index/metadata protection, and add an initialized scoped-submodule integration regression.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs"
+    },
+    {
+      "severity": "minor",
+      "message": "When bound drift requires a fresh M review, handoff OPEN_FINDINGS considers only that effective M review. An unresolved minor retained in the source C review can therefore remain listed as open in the deterministic report while H says `OPEN_FINDINGS: none` if the fresh M receipt omits it. Preserve or explicitly resolve retained source concerns consistently across the report and handoff.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs"
+    }
+  ],
+  "summary": "T05L fix1 remains FAIL at frozen snapshot 477c3fb8d6ae901dc3c6160406acab0834ab7123c3c65a9b7c8cffbf499dab92. The four archived blocker groups are resolved for ordinary files: evidence-only drift and no-M states are durable, gates bind live M and retained logs, record paths are canonical, and P/E/H/reporting proofs survive restart and tampering checks. The unchanged upstream boundary, distinct current verifier, structured panels, reporting and normal C/M/P/E/H lifecycle are demonstrated. Integration still cannot adopt an otherwise exact M when a bound scope contains an initialized submodule because committed and live manifest formats are incompatible; legitimate changed gitlinks also conflict with the I-to-M protected-shape comparison. Coordinator npm test passed 147/147 and npm run validate passed at the exact snapshot with clean declared scope, but no scoped-submodule integration regression covers this failure."
+}

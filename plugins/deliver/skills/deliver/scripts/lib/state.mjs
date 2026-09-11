@@ -242,6 +242,28 @@ export function validateRunState(state) {
   if (state.review !== null && (!isObject(state.review) || !['PASS', 'FAIL'].includes(state.review.status)
     || typeof state.review.builder !== 'string' || typeof state.review.reviewer !== 'string'
     || !Array.isArray(state.review.findings) || typeof state.review.snapshot_hash !== 'string')) fail('bad review');
+  if (state.review?.panel !== undefined) {
+    const panel = state.review.panel;
+    if (!isObject(panel) || panel.snapshot_hash !== state.review.snapshot_hash || !Array.isArray(panel.members)
+      || !panel.members.length || panel.members.length > 16) fail('bad review panel');
+    for (const member of panel.members) {
+      if (!isObject(member) || typeof member.lens !== 'string' || !/^[a-z][a-z0-9-]{0,63}$/.test(member.lens)
+        || typeof member.reviewer !== 'string' || !['PASS', 'CONCERNS', 'FAIL'].includes(member.verdict)
+        || member.snapshot_hash !== panel.snapshot_hash || !Array.isArray(member.findings)) fail('bad review panel member');
+      for (const finding of member.findings) {
+        if (!isObject(finding) || !['block', 'major', 'minor'].includes(finding.severity)
+          || typeof finding.message !== 'string' || !finding.message.trim() || typeof finding.resolved !== 'boolean') fail('bad review panel finding');
+      }
+      if (member.verdict === 'PASS' && member.findings.some((finding) => !finding.resolved && finding.severity !== 'minor')) fail('invalid PASS panel member');
+      if (member.verdict === 'CONCERNS' && !member.findings.some((finding) => !finding.resolved)) fail('invalid CONCERNS panel member');
+    }
+    if (new Set(panel.members.map((member) => member.lens)).size !== panel.members.length) fail('duplicate review panel lens');
+    const derivedFindings = panel.members.flatMap((member) => member.findings
+      .map((finding) => ({ ...finding, lens: member.lens, reviewer: member.reviewer })));
+    const derivedStatus = panel.members.some((member) => member.verdict === 'FAIL')
+      || derivedFindings.some((finding) => !finding.resolved && finding.severity !== 'minor') ? 'FAIL' : 'PASS';
+    if (state.review.status !== derivedStatus || canonical(state.review.findings) !== canonical(derivedFindings)) fail('review panel aggregate is inconsistent');
+  }
   if (state.verification !== null && (!isObject(state.verification) || typeof state.verification.verifier !== 'string'
     || !Array.isArray(state.verification.criteria) || typeof state.verification.snapshot_hash !== 'string')) fail('bad verification');
   if (['active', 'finished'].includes(state.phase) && (!state.task || !state.baseline)) fail('active/finished run needs a task and baseline');
@@ -261,6 +283,13 @@ export function validateRunState(state) {
     }).sort();
     if (canonical(actual) !== canonical(expected)) fail('verification criteria do not match acceptance');
     if (state.verification.verifier === state.task.builder) fail('verification identity violates separation');
+    if (state.pm_binding?.format === 'current' && state.review?.reviewer === state.verification.verifier) {
+      fail('current shared-project verifier must differ from reviewer');
+    }
+    if (state.pm_binding?.format === 'current'
+      && state.review?.panel?.members.some((member) => member.reviewer === state.verification.verifier)) {
+      fail('current shared-project verifier must differ from every panel reviewer');
+    }
   }
   if (state.contracts !== undefined && state.contracts !== null) {
     if (!isObject(state.contracts) || !isObject(state.contracts.hashes) || !isStringArray(state.contracts.specs)

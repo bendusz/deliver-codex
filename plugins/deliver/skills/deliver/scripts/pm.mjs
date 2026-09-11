@@ -15,6 +15,21 @@ import {
   revokeCurrentPm,
 } from './lib/current-pm.mjs';
 import { recoverExecutionTransition, transitionCurrentExecution } from './lib/transitions.mjs';
+import {
+  adoptIntegrationHandoff,
+  adoptLocalIntegration,
+  adoptStoryClosure,
+  adoptVerificationReport,
+  finalizeIntegrationEvidence,
+  prepareIntegrationHandoff,
+  prepareLocalIntegration,
+  prepareStoryClosure,
+  prepareVerificationReport,
+  reconcileIntegrationEvidence,
+  recordIntegrationReview,
+  recordIntegrationVerification,
+  runIntegrationGate,
+} from './lib/integration.mjs';
 
 const help = `Shared Deliver project state
   pm.mjs init [--name PROJECT] [--format current|legacy]
@@ -24,10 +39,22 @@ const help = `Shared Deliver project state
   pm.mjs revoke [--reason TEXT]
   pm.mjs claim --story docs/stories/S1-1-example.md [--branch pm/S1-1-example]
   pm.mjs transition --run RUN --to building|built|in-review|blocked [--attempt fix|retry] [--reason TEXT]
+  pm.mjs integrate-prepare --run RUN [--verification-report]
+  pm.mjs integrate-adopt --integration FILE --expected-record HASH --token TOKEN --commit SHA
+  pm.mjs integrate-gate --integration FILE --expected-record HASH --name GATE
+  pm.mjs integrate-review --integration FILE --expected-record HASH --reviewer ID --receipt JSON
+  pm.mjs integrate-verify --integration FILE --expected-record HASH --verifier ID --results JSON
+  pm.mjs integrate-finalize --integration FILE --expected-record HASH
+  pm.mjs integrate-reconcile --integration FILE --expected-record HASH
+  pm.mjs report-prepare|close-prepare --integration FILE --expected-record HASH
+  pm.mjs report-adopt|close-adopt --integration FILE --expected-record HASH --token TOKEN --commit SHA
+  pm.mjs handoff-prepare --integration FILE --expected-record HASH [--next TEXT]
+  pm.mjs handoff-adopt --integration FILE --expected-record HASH --token TOKEN --commit SHA
   pm.mjs complete --run UUID --commit FULL_INTEGRATION_SHA --next "Next ready story or decision"
   pm.mjs recover
 
 Run in the project checkout. These commands never commit, merge, push or execute a model.
+The explicit integrate-gate command executes only a gate declared by the finished source task.
 Complete records a verified, committed story boundary, not an unmerged implementation.
 Recover completes an interrupted journal only when every file matches its before/after image.
 `;
@@ -49,12 +76,27 @@ try {
   const [command = 'help', ...rest] = process.argv.slice(2);
   if (['help', '--help', '-h'].includes(command)) process.stdout.write(help);
   else {
-    const allowed = { init: ['--name', '--format'], status: [], 'actor-id': [], approve: ['--approver'], revoke: ['--reason'], claim: ['--story', '--branch'], transition: ['--run', '--to', '--attempt', '--reason', '--expected-revision'], complete: ['--run', '--commit', '--next'], recover: [] };
+    const allowed = {
+      init: ['--name', '--format'], status: [], 'actor-id': [], approve: ['--approver'], revoke: ['--reason'], claim: ['--story', '--branch'],
+      transition: ['--run', '--to', '--attempt', '--reason', '--expected-revision'], complete: ['--run', '--commit', '--next'], recover: [],
+      'integrate-prepare': ['--run', '--verification-report'], 'integrate-adopt': ['--integration', '--expected-record', '--token', '--commit'],
+      'integrate-gate': ['--integration', '--expected-record', '--name'], 'integrate-review': ['--integration', '--expected-record', '--reviewer', '--receipt'],
+      'integrate-verify': ['--integration', '--expected-record', '--verifier', '--results'], 'integrate-finalize': ['--integration', '--expected-record'],
+      'integrate-reconcile': ['--integration', '--expected-record'],
+      'report-prepare': ['--integration', '--expected-record'], 'report-adopt': ['--integration', '--expected-record', '--token', '--commit'],
+      'close-prepare': ['--integration', '--expected-record'], 'close-adopt': ['--integration', '--expected-record', '--token', '--commit'],
+      'handoff-prepare': ['--integration', '--expected-record', '--next'], 'handoff-adopt': ['--integration', '--expected-record', '--token', '--commit'],
+    };
     if (!Object.hasOwn(allowed, command)) throw new DeliverError('unknown shared PM command', 64);
     const options = {};
-    for (let i = 0; i < rest.length; i += 2) {
-      if (!allowed[command].includes(rest[i]) || !rest[i + 1] || Object.hasOwn(options, rest[i])) throw new DeliverError('unknown, duplicate or missing PM option', 64);
-      options[rest[i]] = rest[i + 1];
+    for (let i = 0; i < rest.length;) {
+      const flag = rest[i++];
+      if (!allowed[command].includes(flag) || Object.hasOwn(options, flag)) throw new DeliverError('unknown, duplicate or missing PM option', 64);
+      if (flag === '--verification-report') options[flag] = true;
+      else {
+        if (!rest[i]) throw new DeliverError('unknown, duplicate or missing PM option', 64);
+        options[flag] = rest[i++];
+      }
     }
     const root = gitRoot(process.cwd());
     const format = detectProjectFormat(root);
@@ -110,6 +152,45 @@ try {
       if (format === 'current') throw new DeliverError('current story completion requires the integration workflow', 66);
       result = completePm(root, options['--run'], options['--commit'], options['--next'], snapshot);
     }
+    else if (command === 'integrate-prepare') result = prepareLocalIntegration(options['--run'], {
+      integrationRoot: root, verificationReport: options['--verification-report'] === true,
+    }, root);
+    else if (command === 'integrate-adopt') result = adoptLocalIntegration(options['--integration'], {
+      expectedRecordHash: options['--expected-record'], token: options['--token'], commit: options['--commit'],
+    }, root);
+    else if (command === 'integrate-gate') result = runIntegrationGate(options['--integration'], {
+      expectedRecordHash: options['--expected-record'], name: options['--name'],
+    }, root);
+    else if (command === 'integrate-review') result = recordIntegrationReview(options['--integration'], {
+      expectedRecordHash: options['--expected-record'], reviewer: options['--reviewer'], receipt: options['--receipt'],
+    }, root);
+    else if (command === 'integrate-verify') result = recordIntegrationVerification(options['--integration'], {
+      expectedRecordHash: options['--expected-record'], verifier: options['--verifier'], results: options['--results'],
+    }, root);
+    else if (command === 'integrate-finalize') result = finalizeIntegrationEvidence(options['--integration'], {
+      expectedRecordHash: options['--expected-record'],
+    }, root);
+    else if (command === 'integrate-reconcile') result = reconcileIntegrationEvidence(options['--integration'], {
+      expectedRecordHash: options['--expected-record'],
+    }, root);
+    else if (command === 'report-prepare') result = prepareVerificationReport(options['--integration'], {
+      expectedRecordHash: options['--expected-record'],
+    }, root);
+    else if (command === 'report-adopt') result = adoptVerificationReport(options['--integration'], {
+      expectedRecordHash: options['--expected-record'], token: options['--token'], commit: options['--commit'],
+    }, root);
+    else if (command === 'close-prepare') result = prepareStoryClosure(options['--integration'], {
+      expectedRecordHash: options['--expected-record'],
+    }, root);
+    else if (command === 'close-adopt') result = adoptStoryClosure(options['--integration'], {
+      expectedRecordHash: options['--expected-record'], token: options['--token'], commit: options['--commit'],
+    }, root);
+    else if (command === 'handoff-prepare') result = prepareIntegrationHandoff(options['--integration'], {
+      expectedRecordHash: options['--expected-record'], next: options['--next'],
+    }, root);
+    else if (command === 'handoff-adopt') result = adoptIntegrationHandoff(options['--integration'], {
+      expectedRecordHash: options['--expected-record'], token: options['--token'], commit: options['--commit'],
+    }, root);
     else {
       result = recoverExecutionTransition(root);
       if (!result.recovered) result = recoverCurrentPm(root);
