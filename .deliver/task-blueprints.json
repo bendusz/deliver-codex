@@ -720,7 +720,8 @@
       "AGENTS.md",
       "docs/plans/2026-09-09-upstream-parity.md",
       "docs/plans/parity-contracts/architecture-state.md",
-      "docs/plans/parity-contracts/integration-correction-design.md"
+      "docs/plans/parity-contracts/integration-correction-design.md",
+      "docs/plans/parity-contracts/integration-correction-interface.md"
     ],
     "touches": [
       "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
