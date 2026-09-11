@@ -198,9 +198,17 @@
       "tests": 211,
       "validate": "PASS",
       "checkpoint": ".deliver/checkpoints/T04F-T05L-COMBINED/manifest.json"
+    },
+    "T05C": {
+      "status": "independent acceptance tests in progress; production preparation read-only",
+      "worktree": "/tmp/deliver-parity-t05c",
+      "run": "5050e142-81ad-42a9-b60e-e21dce156bd5",
+      "builder": "/root/benchmark_builder",
+      "test_author": "/root/correction_tests",
+      "base_commit": "e57e54f"
     }
   },
-  "next": "T05C: freeze correction interfaces, establish independent acceptance regressions, then implement failed-integration correction while preserving lineage and MAX budgets.",
+  "next": "T05C: freeze independent red acceptance tests, implement token-bound integration correction, then run full gates and independent review.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
