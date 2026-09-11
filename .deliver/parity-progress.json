@@ -200,12 +200,21 @@
       "checkpoint": ".deliver/checkpoints/T04F-T05L-COMBINED/manifest.json"
     },
     "T05C": {
-      "status": "independent acceptance tests in progress; production preparation read-only",
+      "status": "implementation in progress after independent red acceptance tests",
       "worktree": "/tmp/deliver-parity-t05c",
       "run": "5050e142-81ad-42a9-b60e-e21dce156bd5",
       "builder": "/root/benchmark_builder",
       "test_author": "/root/correction_tests",
-      "base_commit": "e57e54f"
+      "base_commit": "e57e54f",
+      "independent_test_sha256": "839818a6601f2703868e7010abfddb6c968be4542ca07b6497282ba781fd24fa",
+      "red_tests": {
+        "total": 16,
+        "pass": 0,
+        "fail": 16,
+        "duration_ms": 88619.656666,
+        "qualification": "Real Git fixtures reached absent APIs; full raw output retained in independent-red checkpoint. Fixture-only deltas recorded separately."
+      },
+      "checkpoint": ".deliver/checkpoints/T05C-independent-red"
     }
   },
   "next": "T05C: freeze independent red acceptance tests, implement token-bound integration correction, then run full gates and independent review.",

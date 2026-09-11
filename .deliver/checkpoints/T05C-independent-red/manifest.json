@@ -1,0 +1,17 @@
+{
+  "author": "/root/correction_tests",
+  "test_sha256": "839818a6601f2703868e7010abfddb6c968be4542ca07b6497282ba781fd24fa",
+  "initial_red_sha256": "526a578466a8e9f005ff96bf5589c2758692bdbc7d22d76c482ab6e74e8170cd",
+  "red": {
+    "command": "node --test tests/integration-correction.test.mjs",
+    "exit": 1,
+    "tests": 16,
+    "pass": 0,
+    "fail": 16,
+    "duration_ms": 88619.656666,
+    "stderr": ""
+  },
+  "provenance": "Raw output copied by coordinator from independent author messages; author role restricted writes to tests. Initial red file retained. Four-line fixture-only change seeds matching unknown metadata in source C; no rerun represented after production dispatch.",
+  "full_red_log_sha256": "eae86df37a68c580d5e0acfd38bc90c746328940b0e883d180ab760acad942c0",
+  "additional_setup_correction": "Use existing top-level run.git_anchor rather than incorrect baseline.git_anchor. Author reported syntax PASS; no runtime rerun."
+}

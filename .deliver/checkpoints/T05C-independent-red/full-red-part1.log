@@ -1,0 +1,107 @@
+Command: node --test tests/integration-correction.test.mjs
+Exit: 1
+
+✖ correction preparation binds only an actual failed M and keeps the immutable approved lineage (9837.920083ms)
+▶ correction preparation binds a real no-M conflict for both nullable and older I before-images
+  ✖ unclaimed (6998.557ms)
+  ✖ older (7070.727292ms)
+✖ correction preparation binds a real no-M conflict for both nullable and older I before-images (14089.049875ms)
+▶ preparation rejects invented failure, contract drift and exhausted MAX before correction mutation
+  ✖ invented failure (7181.85475ms)
+  ✖ changed story contract (6972.420042ms)
+  ✖ exhausted fixes (9731.879125ms)
+✖ preparation rejects invented failure, contract drift and exhausted MAX before correction mutation (23910.467916ms)
+▶ correction start publishes the exact legal run/story pair and requires fresh complete evidence
+  ✖ failed-integration (9782.017125ms)
+  ✖ composition-conflict-no-m (6972.666917ms)
+✖ correction start publishes the exact legal run/story pair and requires fresh complete evidence (16772.538125ms)
+▶ correction start rejects dirty, moved and duplicate checkouts without consuming its token
+  ✖ dirty exact branch (6984.844041ms)
+  ✖ moved branch (9890.5395ms)
+  ✖ second attached checkout (7067.000917ms)
+✖ correction start rejects dirty, moved and duplicate checkouts without consuming its token (23968.779166ms)
+✖ dedicated correction journal recovers every torn run/story publication and rejects tampering (0.203334ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 0
+ℹ fail 16
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 88619.656666
+
+✖ failing tests:
+
+test at tests/integration-correction.test.mjs:276:1
+✖ correction preparation binds only an actual failed M and keeps the immutable approved lineage (9837.920083ms)
+  AssertionError [ERR_ASSERTION]: integration.mjs must export the T05C public function prepareIntegrationCorrection
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at requireFunction (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:43:10)
+      at correctionPrepare (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:234:19)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:279:20)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration-correction.test.mjs:313:13
+✖ unclaimed (6998.557ms)
+  AssertionError [ERR_ASSERTION]: integration.mjs must export the T05C public function prepareIntegrationCorrection
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at requireFunction (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:43:10)
+      at correctionPrepare (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:234:19)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:315:24)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:313:13)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration-correction.test.mjs:313:13
+✖ older (7070.727292ms)
+  AssertionError [ERR_ASSERTION]: integration.mjs must export the T05C public function prepareIntegrationCorrection
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at requireFunction (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:43:10)
+      at correctionPrepare (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:234:19)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:315:24)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:313:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

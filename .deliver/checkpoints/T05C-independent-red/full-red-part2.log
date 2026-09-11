@@ -1,0 +1,127 @@
+test at tests/integration-correction.test.mjs:336:11
+✖ invented failure (7181.85475ms)
+  AssertionError [ERR_ASSERTION]: integration.mjs must export the T05C public function prepareIntegrationCorrection
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at requireFunction (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:43:10)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:342:21)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:336:11)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration-correction.test.mjs:349:11
+✖ changed story contract (6972.420042ms)
+  AssertionError [ERR_ASSERTION]: integration.mjs must export the T05C public function prepareIntegrationCorrection
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at requireFunction (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:43:10)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:354:21)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:349:11)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration-correction.test.mjs:362:11
+✖ exhausted fixes (9731.879125ms)
+  AssertionError [ERR_ASSERTION]: integration.mjs must export the T05C public function prepareIntegrationCorrection
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at requireFunction (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:43:10)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:365:21)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:362:11)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration-correction.test.mjs:375:13
+✖ failed-integration (9782.017125ms)
+  AssertionError [ERR_ASSERTION]: integration.mjs must export the T05C public function prepareIntegrationCorrection
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at requireFunction (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:43:10)
+      at correctionPrepare (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:234:19)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:377:24)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:375:13)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration-correction.test.mjs:375:13
+✖ composition-conflict-no-m (6972.666917ms)
+  AssertionError [ERR_ASSERTION]: integration.mjs must export the T05C public function prepareIntegrationCorrection
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at requireFunction (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:43:10)
+      at correctionPrepare (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:234:19)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:377:24)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:375:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
