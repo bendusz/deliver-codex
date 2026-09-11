@@ -1,0 +1,21 @@
+{
+  "run": "4056ee0f-712a-45dc-97f1-059a07a9c02e",
+  "check": {
+    "ok": true,
+    "run_id": "4056ee0f-712a-45dc-97f1-059a07a9c02e",
+    "revision": 2,
+    "snapshot_hash": "5b4cb70bb73ecb9cacf63a13b38fa21daefa96d5718848bf99a11ee73f5a57ab",
+    "changed": [],
+    "added": [],
+    "deleted": [],
+    "renames": [],
+    "out_of_scope": [],
+    "preexisting_dirty_changed": [],
+    "symlink_escapes": [],
+    "git_metadata_changed": false,
+    "ignored_advisory_changed": [],
+    "coordinator_execution_changed": null,
+    "git_metadata_compatibility": null,
+    "contracts_changed": []
+  }
+}

@@ -1,0 +1,43 @@
+diff --git a/plugins/deliver/skills/deliver/scripts/lib/state.mjs b/plugins/deliver/skills/deliver/scripts/lib/state.mjs
+index 0feb6c8..61e2583 100644
+--- a/plugins/deliver/skills/deliver/scripts/lib/state.mjs
++++ b/plugins/deliver/skills/deliver/scripts/lib/state.mjs
+@@ -198,15 +198,16 @@ export function validateRunState(state) {
+   if (state.commit_adoption !== undefined && state.commit_adoption !== null) {
+     const adoption = state.commit_adoption;
+     if (!isObject(adoption) || !Array.isArray(adoption.history) || !(adoption.pending === null || isObject(adoption.pending))) fail('bad commit adoption state');
+-    if (adoption.pending) {
+-      const pending = adoption.pending;
++    const validPreparation = (pending) => {
+       if (!['token', 'parent', 'ref', 'expected_tree', 'expected_index_flags', 'content_hash', 'protected_hash', 'prepared_at'].every((key) => typeof pending[key] === 'string')
+         || !Array.isArray(pending.paths) || !isStringArray(pending.paths) || !pending.paths.every(safeRelativePath)
+         || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(pending.token)
+         || ![pending.parent, pending.expected_tree].every((value) => /^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(value))
+         || ![pending.expected_index_flags, pending.content_hash, pending.protected_hash].every(digest)
+-        || !safeRef(pending.ref)) fail('bad pending commit adoption');
+-    }
++        || !safeRef(pending.ref)) return false;
++      return true;
++    };
++    if (adoption.pending && !validPreparation(adoption.pending)) fail('bad pending commit adoption');
+     for (const item of adoption.history) {
+       if (!isObject(item) || typeof item.commit !== 'string' || typeof item.parent !== 'string'
+         || !/^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(item.commit)
+@@ -217,6 +218,17 @@ export function validateRunState(state) {
+         || typeof item.execution_hash !== 'string' || !/^[0-9a-f]{64}$/.test(item.execution_hash)
+         || typeof item.adopted_at !== 'string') fail('bad commit adoption receipt');
+     }
++    if (adoption.cancellations !== undefined) {
++      if (!Array.isArray(adoption.cancellations)) fail('bad commit cancellation history');
++      for (const item of adoption.cancellations) {
++        if (!isObject(item) || !isObject(item.preparation) || !validPreparation(item.preparation)
++          || typeof item.reason !== 'string' || !item.reason.trim() || item.reason.length > 1000
++          || /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(item.reason)
++          || typeof item.cancelled_at !== 'string' || Number.isNaN(Date.parse(item.cancelled_at))) {
++          fail('bad commit cancellation receipt');
++        }
++      }
++    }
+   }
+   if (state.evidence_history !== undefined) {
+     if (!Array.isArray(state.evidence_history)) fail('bad evidence history');

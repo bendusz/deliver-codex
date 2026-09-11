@@ -1,0 +1,22 @@
+{
+  "reason": "Runtime finish rejects a task with no scoped worktree change. Source-only checks all passed; the authorized optional review report will now be produced and reverified.",
+  "premature_evidence_commit": "018a2c29d1a175196c81b4f6b1a5f5ef353e2cf2",
+  "preserved_ref": "backup/combined-source-evidence-018a2c2",
+  "restored_source_head": "b84a045433f77644d541875ad5630915bf7f0c2d",
+  "evidence_commit_changed_only": [
+    ".deliver/checkpoints/T04F-T05L-COMBINED/gates.json",
+    ".deliver/checkpoints/T04F-T05L-COMBINED/logs/test-8ee35c23-d13c-440f-97e2-b3e602236730.log",
+    ".deliver/checkpoints/T04F-T05L-COMBINED/logs/validate-e785983f-fde5-4fe5-8412-ec0eb2c9b303.log",
+    ".deliver/composition/accepted-T04F-T05L/manifest.json",
+    ".deliver/composition/accepted-T04F-T05L/plugins__deliver__skills__deliver__scripts__deliver.mjs.vs-T04F.diff",
+    ".deliver/composition/accepted-T04F-T05L/plugins__deliver__skills__deliver__scripts__deliver.mjs.vs-T05L.diff",
+    ".deliver/composition/accepted-T04F-T05L/plugins__deliver__skills__deliver__scripts__lib__state.mjs.vs-T04F.diff",
+    ".deliver/composition/accepted-T04F-T05L/plugins__deliver__skills__deliver__scripts__lib__state.mjs.vs-T05L.diff",
+    ".deliver/composition/accepted-T04F-T05L/start.json",
+    ".deliver/review-T04F-T05L-COMBINED.json",
+    ".deliver/runs/4056ee0f-712a-45dc-97f1-059a07a9c02e.json",
+    ".deliver/verification-T04F-T05L-COMBINED.json"
+  ],
+  "method": "Preserved exact unpushed coordinator-owned evidence commit on backup ref; mixed reset restored original HEAD/index while retaining all evidence worktree bytes. No production, task, baseline, counters or histories reset.",
+  "scope": "Only docs/reviews/2026-09-11-combined-repairs.md may change; source-only raw receipts and logs retained."
+}
