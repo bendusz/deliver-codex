@@ -120,7 +120,7 @@
       }
     },
     "T05L": {
-      "status": "NOT_ACCEPTED: fix6 full158/158 tests and validate PASS; independent review FAIL on actor separation",
+      "status": "Approved fix7: independent identity regression tests first",
       "worktree": "/tmp/deliver-parity-t05l",
       "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
       "builder": "/root/benchmark_builder",
@@ -140,9 +140,9 @@
         "Independent fix5 review: legacy reconciliation ignores contradictory current active FAIL evidence when selecting an older PASS finalization.",
         "Independent fix6 review: active identity-valid PASS review with reviewer equal to source.builder is accepted by legacy reconciliation. Prior active FAIL-veto defect resolved."
       ],
-      "builder_checkpoint": "Frozen revision39, fixes6/retries1, all issued FAIL receipts preserved. Awaiting bounded seventh-round decision; no integration.",
+      "builder_checkpoint": "User approved seventh round; revision40 fixes7/retries1. Production frozen while independent tests establish failure. Original baseline/task and raw fix6 FAIL retained.",
       "snapshot": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3",
-      "fixes": 6,
+      "fixes": 7,
       "candidate_snapshot": "d9f901fa13b3900566fb62663ac9a4874b41a0fdbb21e0d0737d530a63cebca4",
       "checkpoint": ".deliver/checkpoints/T05L-final-fix3/manifest.json",
       "latest_checkpoint": ".deliver/checkpoints/T05L-fix6/manifest.json",
@@ -150,7 +150,8 @@
         "T05L-AC4"
       ],
       "next_proposal": "docs/plans/2026-09-10-reconciliation-identity-follow-up.md",
-      "approval": ".deliver/T05L-fix6-approval.json"
+      "approval": ".deliver/T05L-fix7-approval.json",
+      "test_author": "/root/identity_tests"
     },
     "T05R": {
       "status": "reviewed, verified, integrated after fix1",
@@ -181,7 +182,7 @@
       ]
     }
   },
-  "next": "Decide on bounded T05L fix7 identity/separation correction with independent regression tests first. Hold T05L and combined acceptance until fresh independent PASS.",
+  "next": "Complete independent failing regressions, then bounded T05L identity implementation, full gates and independent review. Integrate after PASS; combined acceptance with distinct verifier follows.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
