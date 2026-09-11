@@ -28,6 +28,7 @@ import {
   prepareCommitAdoption,
   transitionCurrentExecution,
 } from './lib/transitions.mjs';
+import { parseReviewReceipt } from './lib/review.mjs';
 
 const HELP = `Deliver deterministic runtime
 
@@ -124,26 +125,6 @@ function requireCurrentApproval(state) {
   }
   if (state.mode !== 'quick' && !approvalIsCurrent(state)) throw new DeliverError(`${state.mode} mode needs explicit approval for the current plan`, 66);
   return null;
-}
-
-function parseReceipt(file) {
-  const receipt = readJsonFile(file, 'review receipt');
-  if (!receipt || typeof receipt !== 'object' || Array.isArray(receipt) || !['PASS', 'FAIL'].includes(receipt.status) || !Array.isArray(receipt.findings)) {
-    throw new DeliverError('review receipt must contain status PASS|FAIL and a findings array', 66);
-  }
-  const findings = receipt.findings.map((finding, index) => {
-    if (!finding || typeof finding !== 'object' || Array.isArray(finding) || !['block', 'major', 'minor'].includes(finding.severity) || typeof finding.message !== 'string' || finding.message.trim() === '') {
-      throw new DeliverError(`invalid review finding at index ${index}`, 66);
-    }
-    if (finding.path !== undefined && typeof finding.path !== 'string') throw new DeliverError(`review finding ${index} path must be a string`, 66);
-    if (finding.resolved !== undefined && typeof finding.resolved !== 'boolean') throw new DeliverError(`review finding ${index} resolved must be boolean`, 66);
-    return { severity: finding.severity, message: finding.message, ...(finding.path === undefined ? {} : { path: finding.path }), resolved: finding.resolved === true };
-  });
-  if (receipt.summary !== undefined && typeof receipt.summary !== 'string') throw new DeliverError('review summary must be a string', 66);
-  if (receipt.status === 'PASS' && findings.some((finding) => !finding.resolved && finding.severity !== 'minor')) {
-    throw new DeliverError('a PASS review may not contain unresolved block or major findings', 66);
-  }
-  return { status: receipt.status, findings, ...(receipt.summary === undefined ? {} : { summary: receipt.summary }) };
 }
 
 function parseVerification(file, acceptance) {
@@ -316,7 +297,7 @@ function main() {
   if (command === 'review') {
     const reviewer = actor(required(o, '--reviewer'), '--reviewer');
     const reviewedSnapshot = snapshotArgument(o);
-    const receipt = parseReceipt(required(o, '--receipt'));
+    const receipt = parseReviewReceipt(required(o, '--receipt'), { expectedSnapshot: reviewedSnapshot });
     const updated = updateRun(run, o.expectedRevision, (state) => {
       active(state);
       syncPlan(state);
@@ -339,6 +320,10 @@ function main() {
       syncPlan(state);
       requireCurrentApproval(state);
       if (verifier === state.task.builder) throw new DeliverError('verifier must differ from builder', 66);
+      if (state.pm_binding?.format === 'current' && state.review?.reviewer === verifier) throw new DeliverError('current shared-project verifier must differ from reviewer', 66);
+      if (state.pm_binding?.format === 'current' && state.review?.panel?.members.some((member) => member.reviewer === verifier)) {
+        throw new DeliverError('current shared-project verifier must differ from every panel reviewer', 66);
+      }
       if (state.mode === 'governed' && state.review?.reviewer === verifier) throw new DeliverError('governed verifier must differ from reviewer', 66);
       const criteria = parseVerification(required(o, '--results'), state.task.packet.acceptance);
       const checked = inspectScope(state);
@@ -437,6 +422,7 @@ function main() {
         throw new DeliverError('acceptance verification is missing, non-PASS, or stale', 66);
       }
       if (state.verification.verifier === state.task.builder) throw new DeliverError('verifier must differ from builder', 66);
+      if (state.pm_binding?.format === 'current' && state.verification.verifier === state.review.reviewer) throw new DeliverError('current shared-project verifier must differ from reviewer', 66);
       if (state.mode === 'governed' && state.verification.verifier === state.review.reviewer) throw new DeliverError('governed verifier must differ from reviewer', 66);
       state.phase = 'finished';
       state.completion_snapshot = checked.current;

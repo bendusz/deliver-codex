@@ -1,0 +1,29 @@
+{
+  "criteria": [
+    {
+      "id": "T05L-AC1",
+      "status": "PASS",
+      "evidence": "Finish retains the current shared claim until proven integration closure, and source plus integration evidence enforce a verifier distinct from the builder, top-level reviewer and every panel reviewer. Fix7 applies the same explicit actor grammar and separation to active, source-fallback and selected historical receipts; invalid identities refuse before durable mutation. Identity, criteria and spent counters remain bound in the source and integration records."
+    },
+    {
+      "id": "T05L-AC2",
+      "status": "PASS",
+      "evidence": "Current/upstream story roundtrips, fresh-process P/E/H continuation and handoff BASE_COMMIT topology remain covered by the cumulative integration suite. Frozen finalization is independent of later terminal environment, reconciliation is explicit and hash-bound, and valid legacy source fallback still succeeds. Advanced-I reprepare and failed-no-M correction remain the documented T05B/T05C boundary."
+    },
+    {
+      "id": "T05L-AC3",
+      "status": "PASS",
+      "evidence": "Large/regulated reporting derives required P before E/H and binds its exact paths, C/M/evidence references, adopted topology and immutable finalization identity. Reporting policy cannot be downgraded in the record, evidence mutation freezes before artifact effects, and recovery rejects missing, ambiguous, contradictory or identity-invalid provenance."
+    },
+    {
+      "id": "T05L-AC4",
+      "status": "PASS",
+      "evidence": "Declared gates run at verified live M with durable validated logs and retained gate history. C evidence reuse requires matching bound source/C/M manifests and checkout proofs; evidence-only drift requires fresh M review and verification. The fix7 34-case regression matrix proves active and selected historical reviewer/verifier identity failures are rejected while valid same-M replacements and source fallback remain usable."
+    },
+    {
+      "id": "T05L-AC5",
+      "status": "PASS",
+      "evidence": "Structured panel parsing retains normalized member identities, verdicts, findings and required lens coverage with exact aggregate multiplicity, while legacy no-panel receipts remain compatible. Fix7 rejects malformed or builder-owned panel identities and verifier collisions without requiring reviewer actors to be mutually distinct or forbidding one reviewer from covering multiple unique lenses."
+    }
+  ]
+}

@@ -47,7 +47,8 @@ Do not silently substitute models or require Claude.
 | Constitution, plan or approval | `references/planning.md` |
 | Project scale or checkpoint policy | `references/scale-profiles.md` |
 | Decompose an approved plan or check story readiness | `references/decomposition.md` |
-| Build, gate, review, verify, integrate or complete | `references/workflow.md` |
+| Build, gate, review or verify | `references/workflow.md` |
+| Integrate, produce verification reports, close stories or write final handoffs | `references/shipping.md` |
 | Execute state, scope, gate or receipt commands | `references/runtime.md` |
 | Resume, handoff, doctor or correct-course | `references/recovery.md` |
 | SpecDD skeleton, contracts or contract-aware change | `references/specdd.md` |

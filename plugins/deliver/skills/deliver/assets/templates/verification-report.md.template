@@ -1,36 +1,39 @@
-<!-- Write to docs/verification/<story-id>.md when the scale requires a durable report. -->
-# Verification: <story-id> "<Title>"
+<!-- Generated deterministically at P as docs/verification/<story-id>.md. -->
+# Verification: <story-id>
 
-- Date: <YYYY-MM-DD>
 - Story: docs/stories/<story-file>.md
-- Covers: <FR-..., AC-...>
-- Branch: <story branch> into <integration branch>
-- Code identity: <verified commit or snapshot>
-
-## Changed files
-
-- <Path.>
+- Candidate C: <full source candidate commit>
+- Source snapshot: <source snapshot SHA-256>
+- Integrated M: <full integration commit>
+- Manifest: <bound C/M manifest SHA-256>
+- Gate receipts: <immutable receipt identities or none declared>
+- Review receipt: <immutable receipt identity>
+- Verification receipt: <immutable receipt identity>
 
 ## Gates
 
 | Gate | Command | Result |
 | --- | --- | --- |
-| test | `<command or N/A>` | PASS / FAIL / N/A |
-| lint | `<command or N/A>` | PASS / FAIL / N/A |
-| build | `<command or N/A>` | PASS / FAIL / N/A |
+| <declared name> | `<exact declared command>` | PASS |
 
-## Independent review
+## Review panel
 
-| Lens | Verdict | Open findings |
+| Lens | Reviewer | Verdict |
 | --- | --- | --- |
-| code-integrity-reviewer | PASS / CONCERNS / FAIL | <none or finding IDs> |
+| code-integrity-reviewer | <identity> | PASS |
+
+## Retained findings
+
+| Evidence | Lens | Reviewer | Status | Finding |
+| --- | --- | --- | --- | --- |
+| Source C or effective M | <lens> | <identity> | minor / open | <escaped single-line finding> |
 
 ## Acceptance verification
 
-- Status: PASS / FAIL / UNKNOWN
-- AC-001: PASS / FAIL / UNKNOWN. Evidence: <command or inspected behavior and result>.
-- Action for FAIL or UNKNOWN: <required fix or missing evidence>.
+| Criterion | Result | Evidence |
+| --- | --- | --- |
+| <criterion-id> | PASS | <escaped single-line current evidence> |
 
 ## Integration status
 
-<SHIPPED on YYYY-MM-DD through commit or pull request, or BLOCKED with reason.>
+Integrated at M <full integration commit>. This report does not identify its own commit P.

@@ -89,20 +89,15 @@ or live concurrent editing of PM coordination records is supported by this bridg
 
 Runtime `finish` records reviewed and verified code only. It does not release the shared claim,
 mark the actor merged, or perform Git integration. Under the approved delivery authority, the PM
-commits the scoped result, pushes its story branch, creates or updates its pull request, and merges
-only after required checks pass. After verifying the real integration result, check out the clean
-integration branch and run:
+commits candidate C and follows `references/shipping.md`. Current-format projects use the audited
+local C/M/P/E/H protocol or the separately installed remote path. Every declared gate runs again
+at actual M. Different bound content needs fresh M evidence or an explicit source correction; an
+old PASS is never relabeled. Only story-only closure E records `merged` and releases the claim.
+H writes `docs/handoff/<actor-id>.md` with `BASE_COMMIT: E`, so the unchanged upstream reader
+accepts its own handoff-only commit.
 
-```text
-node <pm> complete --run <run-id> --commit <full-integration-HEAD-sha> --next "Continue with the next ready story"
-```
-
-The integrated file contents must match the retained verified snapshot. Different integration
-content needs fresh verification; never relabel an old PASS. The helper then records `merged` and
-`PASS`, exports counters, clears `resolved_builder`, releases only this story's claim, appends the
-log and writes a current handoff. Story documents and other actors stay unchanged. Commit these
-PM records under the approved delivery authority so they travel with a clone. Do not advance the sprint
-without checking all its stories. The original framework reads the resulting files directly.
+The older `pm complete` command remains for tagged legacy 0.22 bindings. It updates legacy actor
+and PM files after exact verified integration. It cannot close a current story.
 
 ## Recovery and limits
 
