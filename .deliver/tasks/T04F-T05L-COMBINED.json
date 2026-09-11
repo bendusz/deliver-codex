@@ -3,14 +3,17 @@
   "objective": "Independently verify the actual integrated T04F and T05L repairs without changing production code",
   "read_paths": [
     "AGENTS.md",
+    "package.json",
+    "README.md",
+    "NOTICE.md",
+    "LICENSE",
+    ".gitattributes",
+    ".gitignore",
     "plugins/deliver",
     "bin",
     "scripts",
     "tests",
-    "docs/plans/2026-09-10-review-repairs-proposal.md",
-    "docs/plans/parity-contracts/architecture-state.md",
-    "docs/plans/2026-09-10-legacy-reconciliation-follow-up.md",
-    "docs/plans/2026-09-10-reconciliation-identity-follow-up.md"
+    "docs"
   ],
   "touches": [
     "docs/reviews/2026-09-11-combined-repairs.md"

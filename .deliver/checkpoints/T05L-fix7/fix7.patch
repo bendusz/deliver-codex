@@ -1,0 +1,324 @@
+diff --git a/plugins/deliver/skills/deliver/scripts/lib/integration.mjs b/plugins/deliver/skills/deliver/scripts/lib/integration.mjs
+index a9afcc6..5f423bf 100644
+--- a/plugins/deliver/skills/deliver/scripts/lib/integration.mjs
++++ b/plugins/deliver/skills/deliver/scripts/lib/integration.mjs
+@@ -14,6 +14,7 @@ import { captureGitAnchor, snapshot } from './scope.mjs';
+ const OID = /^[0-9a-f]{40}(?:[0-9a-f]{24})?$/;
+ const HASH = /^[0-9a-f]{64}$/;
+ const RUN_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
++const ACTOR_ID = /^[A-Za-z0-9][A-Za-z0-9._@-]{0,127}$/;
+ const MAX_RECORD_BYTES = 8 * 1024 * 1024;
+ const NO_MUTATION = Symbol('no-mutation');
+ const fail = (message, code = 66) => { throw new DeliverError(message, code); };
+@@ -644,6 +645,25 @@ function verificationReceiptPool(record) {
+   return [record.evidence.verification, ...record.evidence.verification_history, record.source.verification];
+ }
+ 
++function assertEvidenceActors(record, review, verification, label = 'integration') {
++  if (typeof review?.reviewer !== 'string' || !ACTOR_ID.test(review.reviewer)) {
++    fail(`${label} reviewer identity must be explicit and valid`);
++  }
++  if (review.reviewer === record.source.builder) fail(`${label} reviewer must differ from the builder`);
++  const panelReviewers = (review.panel?.members || []).map((member) => member?.reviewer);
++  if (panelReviewers.some((reviewer) => typeof reviewer !== 'string' || !ACTOR_ID.test(reviewer))) {
++    fail(`${label} panel reviewer identities must be explicit and valid`);
++  }
++  if (panelReviewers.includes(record.source.builder)) fail(`${label} panel reviewers must differ from the builder`);
++  if (typeof verification?.verifier !== 'string' || !ACTOR_ID.test(verification.verifier)) {
++    fail(`${label} verifier identity must be explicit and valid`);
++  }
++  if (verification.verifier === record.source.builder
++    || verification.verifier === review.reviewer || panelReviewers.includes(verification.verifier)) {
++    fail(`${label} verifier must differ from the builder and every reviewer`);
++  }
++}
++
+ function validateFinalizationReceipts(record, gateIdentities, reviewIdentity, verificationIdentity) {
+   const declared = Object.entries(record.source.packet.commands).sort(([left], [right]) => left.localeCompare(right));
+   if (!Array.isArray(gateIdentities) || gateIdentities.length !== declared.length) {
+@@ -669,10 +689,7 @@ function validateFinalizationReceipts(record, gateIdentities, reviewIdentity, ve
+   if (verification.snapshot_hash !== verificationSnapshot || verification.criteria.some((item) => item.status !== 'PASS')) {
+     fail('frozen integration verification is incomplete');
+   }
+-  const reviewers = new Set([review.reviewer, ...(review.panel?.members || []).map((item) => item.reviewer)]);
+-  if (verification.verifier === record.source.builder || reviewers.has(verification.verifier)) {
+-    fail('frozen integration verifier is not distinct from builder and reviewers');
+-  }
++  assertEvidenceActors(record, review, verification, 'frozen integration');
+   return { gates, review, verification };
+ }
+ 
+@@ -1234,10 +1251,7 @@ function assertEvidenceReady(record, { finalized = false } = {}) {
+     || verification.criteria.some((item) => item.status !== 'PASS')) {
+     fail('integration acceptance verification is incomplete');
+   }
+-  const reviewers = new Set([review.reviewer, ...(review.panel?.members || []).map((item) => item.reviewer)]);
+-  if (verification.verifier === record.source.builder || reviewers.has(verification.verifier)) {
+-    fail('integration verifier is not distinct from builder and reviewers');
+-  }
++  assertEvidenceActors(record, review, verification);
+   return { review, verification };
+ }
+ 
+diff --git a/tests/integration.test.mjs b/tests/integration.test.mjs
+index 0b09223..211e4cf 100644
+--- a/tests/integration.test.mjs
++++ b/tests/integration.test.mjs
+@@ -189,7 +189,7 @@ function mutateRecord(f, state, command, ...args) {
+   return result.json.result;
+ }
+ 
+-function finalizedIntegration(t, { verificationReport = false } = {}) {
++function finalizedIntegration(t, { verificationReport = false, freshEvidence = false } = {}) {
+   const f = finishedCandidate(t);
+   const args = ['integrate-prepare', '--run', f.runFile, ...(verificationReport ? ['--verification-report'] : [])];
+   const prepared = integrationCall(f, ...args);
+@@ -198,6 +198,21 @@ function finalizedIntegration(t, { verificationReport = false } = {}) {
+   git(f.integration, 'merge', '--no-ff', '--no-edit', f.candidate);
+   mutateRecord(f, state, 'integrate-adopt', '--token', state.record.integration.token, '--commit', git(f.integration, 'rev-parse', 'HEAD'));
+   mutateRecord(f, state, 'integrate-gate', '--name', 'test');
++  if (freshEvidence) {
++    write(f.integration, '.deliver/integration-review.json', {
++      status: 'PASS', findings: [], panel: { snapshot_hash: state.record.evidence.snapshot_hash, members: [{
++        lens: 'code-integrity-reviewer', reviewer: 'historical-panel-reviewer', verdict: 'PASS',
++        snapshot_hash: state.record.evidence.snapshot_hash, findings: [],
++      }] },
++    });
++    mutateRecord(f, state, 'integrate-review', '--reviewer', 'historical-reviewer',
++      '--receipt', '.deliver/integration-review.json');
++    write(f.integration, '.deliver/integration-verification.json', {
++      criteria: [{ id: 'AC-1', status: 'PASS', evidence: 'The declared gate passed against actual M.' }],
++    });
++    mutateRecord(f, state, 'integrate-verify', '--verifier', 'historical-verifier',
++      '--results', '.deliver/integration-verification.json');
++  }
+   mutateRecord(f, state, 'integrate-finalize');
+   return { f, state };
+ }
+@@ -654,7 +669,7 @@ test('frozen artifact evidence survives a new terminal and refuses every later e
+   assert.equal(resumed.json.result.finalization_identity, state.record.evidence.finalization.identity);
+ });
+ 
+-test('explicit reconciliation recovers retained post-P legacy provenance and rejects missing evidence unchanged', (t) => {
++test('explicit reconciliation recovers retained post-P legacy provenance and rejects missing evidence unchanged', async (t) => {
+   const { f, state } = finalizedIntegration(t, { verificationReport: true });
+   const report = mutateRecord(f, state, 'report-prepare');
+   git(f.integration, 'add', '--', ...report.writes.map((item) => item.path));
+@@ -708,10 +723,28 @@ test('explicit reconciliation recovers retained post-P legacy provenance and rej
+     write(f.integration, path.relative(f.integration, state.file), invalid);
+     const beforeState = capture();
+     const result = integrationCall(f, 'integrate-reconcile', '--integration', state.file, '--expected-record', invalidHash);
+-    assert.notEqual(result.status, 0, `${label}: ${result.stdout}`);
++    assert.notEqual(result.status, 0, `${label}: command unexpectedly succeeded`);
+     assert.match(result.stdout, pattern, label);
+     assert.deepEqual(capture(), beforeState, `${label} changed durable record, logs, artifacts or refs`);
+   };
++  const activeReview = (value, { reviewer = 'current-reviewer', includeReviewer = true,
++    panelReviewer = 'current-panel-reviewer', panelReviewers = [panelReviewer] } = {}) => sign({
++    status: 'PASS', findings: [], ...(includeReviewer ? { reviewer } : {}),
++    snapshot_hash: value.evidence.snapshot_hash, recorded_at: new Date(0).toISOString(),
++    panel: { snapshot_hash: value.evidence.snapshot_hash, members: panelReviewers.map((member, index) => ({
++      lens: index === 0 ? 'code-integrity-reviewer' : `additional-lens-${index}`, reviewer: member, verdict: 'PASS',
++      snapshot_hash: value.evidence.snapshot_hash, findings: [],
++    })) },
++  });
++  const activeVerification = (value, { verifier = 'current-verifier', includeVerifier = true } = {}) => sign({
++    ...(includeVerifier ? { verifier } : {}), snapshot_hash: value.evidence.snapshot_hash,
++    recorded_at: new Date(0).toISOString(),
++    criteria: [{ id: 'AC-1', status: 'PASS', evidence: 'Current result.' }],
++  });
++  const setActivePass = (value, options = {}) => {
++    value.evidence.review = activeReview(value, options);
++    value.evidence.verification = activeVerification(value, options);
++  };
+ 
+   assertVeto('active failed gate', (value) => {
+     value.evidence.gates[0] = sign({ ...value.evidence.gates[0], status: 'FAIL', exit_code: 1, error: 'current failure' });
+@@ -728,6 +761,40 @@ test('explicit reconciliation recovers retained post-P legacy provenance and rej
+   assertVeto('missing active gate', (value) => { value.evidence.gates = []; }, /LEGACY_ACTIVE_EVIDENCE_MISSING/);
+   assertVeto('duplicate active gate', (value) => { value.evidence.gates.push(structuredClone(value.evidence.gates[0])); }, /LEGACY_ACTIVE_EVIDENCE_MISSING/);
+   assertVeto('stale active gate identity', (value) => { value.evidence.gates[0].identity = '0'.repeat(64); }, /receipt identity is invalid/);
++  const malformedActorValues = [
++    ['slash', 'invalid/reviewer'],
++    ['array', []],
++    ['object', {}],
++    ['number', 7],
++    ['null', null],
++    ['overlong', 'r'.repeat(129)],
++    ['trailing newline', 'current-reviewer\n'],
++  ];
++  const reviewerIdentityCases = [
++    ['active builder self-review', { reviewer: legacy.source.builder }, /reviewer.*(?:differ|distinct).*builder/i],
++    ['active missing reviewer identity', { includeReviewer: false }, /reviewer.*explicit|reviewer.*identity/i],
++    ['active empty reviewer identity', { reviewer: '' }, /reviewer.*explicit|reviewer.*identity/i],
++    ...malformedActorValues.map(([kind, reviewer]) => [
++      `active malformed reviewer identity (${kind})`, { reviewer }, /reviewer.*explicit|reviewer.*identity/i,
++    ]),
++    ['active builder panel member', { panelReviewer: legacy.source.builder }, /panel.*(?:differ|distinct).*builder/i],
++  ];
++  for (const [label, options, pattern] of reviewerIdentityCases) {
++    await t.test(label, () => assertVeto(label, (value) => setActivePass(value, options), pattern));
++  }
++  const verifierIdentityCases = [
++    ['active missing verifier identity', { includeVerifier: false }, /verifier.*explicit|verifier.*identity/i],
++    ['active empty verifier identity', { verifier: '' }, /verifier.*explicit|verifier.*identity/i],
++    ...malformedActorValues.map(([kind, verifier]) => [
++      `active malformed verifier identity (${kind})`, { verifier }, /verifier.*explicit|verifier.*identity/i,
++    ]),
++    ['active verifier equals builder', { verifier: legacy.source.builder }, /verifier.*(?:differ|distinct).*builder.*reviewer/i],
++    ['active verifier equals top reviewer', { verifier: 'current-reviewer' }, /verifier.*(?:differ|distinct).*builder.*reviewer/i],
++    ['active verifier equals panel reviewer', { verifier: 'current-panel-reviewer' }, /verifier.*(?:differ|distinct).*builder.*reviewer/i],
++  ];
++  for (const [label, options, pattern] of verifierIdentityCases) {
++    await t.test(label, () => assertVeto(label, (value) => setActivePass(value, options), pattern));
++  }
+   assertVeto('active failed review', (value) => {
+     value.evidence.review = sign({ status: 'FAIL', findings: [], reviewer: 'current-reviewer',
+       snapshot_hash: value.evidence.snapshot_hash, recorded_at: new Date(0).toISOString() });
+@@ -754,6 +821,35 @@ test('explicit reconciliation recovers retained post-P legacy provenance and rej
+     value.evidence.verification_history.push(structuredClone(value.source.verification));
+   }, /current verification pointer is absent/);
+ 
++  const currentPass = structuredClone(legacy);
++  setActivePass(currentPass);
++  const currentPassHash = sha256(canonical(currentPass));
++  write(f.integration, path.relative(f.integration, state.file), currentPass);
++  const currentRepaired = integrationCall(f, 'integrate-reconcile', '--integration', state.file,
++    '--expected-record', currentPassHash);
++  assert.equal(currentRepaired.status, 0, currentRepaired.stdout);
++  assert.equal(currentRepaired.json.record.evidence.review.identity, currentPass.evidence.review.identity);
++  assert.equal(currentRepaired.json.record.evidence.verification.identity, currentPass.evidence.verification.identity);
++  assert.equal(currentRepaired.json.record.evidence.finalization.review_identity, frozen.review_identity);
++  assert.equal(currentRepaired.json.record.evidence.finalization.verification_identity, frozen.verification_identity);
++
++  for (const [label, options] of [
++    ['top-level reviewer may also be a panel member', {
++      reviewer: 'shared-current-reviewer', panelReviewer: 'shared-current-reviewer',
++    }],
++    ['one reviewer may cover multiple unique panel lenses', {
++      panelReviewers: ['shared-panel-reviewer', 'shared-panel-reviewer'],
++    }],
++  ]) {
++    const compatible = structuredClone(legacy);
++    setActivePass(compatible, options);
++    const compatibleHash = sha256(canonical(compatible));
++    write(f.integration, path.relative(f.integration, state.file), compatible);
++    const accepted = integrationCall(f, 'integrate-reconcile', '--integration', state.file,
++      '--expected-record', compatibleHash);
++    assert.equal(accepted.status, 0, `${label}: ${accepted.stdout}`);
++  }
++
+   const legacyHash = sha256(canonical(legacy));
+   write(f.integration, path.relative(f.integration, state.file), legacy);
+ 
+@@ -785,6 +881,110 @@ test('explicit reconciliation recovers retained post-P legacy provenance and rej
+   assert.deepEqual(fs.readFileSync(state.file), before);
+ });
+ 
++test('explicit reconciliation validates selected historical receipt identities and keeps valid current replacements', async (t) => {
++  const { f, state } = finalizedIntegration(t, { freshEvidence: true });
++  const historicalReview = structuredClone(state.record.evidence.review);
++  const historicalVerification = structuredClone(state.record.evidence.verification);
++  const frozen = structuredClone(state.record.evidence.finalization);
++
++  write(f.integration, '.deliver/integration-review-replacement.json', {
++    status: 'PASS', findings: [], panel: { snapshot_hash: state.record.evidence.snapshot_hash, members: [{
++      lens: 'code-integrity-reviewer', reviewer: 'current-panel-reviewer', verdict: 'PASS',
++      snapshot_hash: state.record.evidence.snapshot_hash, findings: [],
++    }] },
++  });
++  mutateRecord(f, state, 'integrate-review', '--reviewer', 'current-reviewer',
++    '--receipt', '.deliver/integration-review-replacement.json');
++  write(f.integration, '.deliver/integration-verification-replacement.json', {
++    criteria: [{ id: 'AC-1', status: 'PASS', evidence: 'The replacement evidence covers actual M.' }],
++  });
++  mutateRecord(f, state, 'integrate-verify', '--verifier', 'current-verifier',
++    '--results', '.deliver/integration-verification-replacement.json');
++
++  const legacy = structuredClone(state.record);
++  delete legacy.evidence.finalization;
++  legacy.evidence.finalized = true;
++  legacy.evidence.finalized_at = new Date(0).toISOString();
++  legacy.evidence.effective_review_identity = '0'.repeat(64);
++  legacy.evidence.effective_verification_identity = '0'.repeat(64);
++  delete legacy.evidence.finalization_history[0].finalization;
++  const sign = (receipt) => {
++    const value = structuredClone(receipt);
++    delete value.identity;
++    value.identity = sha256(canonical(value));
++    return value;
++  };
++  const capture = () => ({
++    record: fs.readFileSync(state.file),
++    logs: fs.readdirSync(path.join(f.integration, '.deliver', 'logs', `integration-${f.runId}`)).sort()
++      .map((name) => [name, sha256(fs.readFileSync(path.join(f.integration, '.deliver', 'logs', `integration-${f.runId}`, name)))]),
++    refs: git(f.integration, 'show-ref', '--head'),
++    status: git(f.integration, 'status', '--porcelain=v1', '-z', '--untracked-files=all'),
++  });
++  const assertHistoricalVeto = (label, change, pattern) => {
++    const invalid = structuredClone(legacy);
++    change(invalid);
++    const invalidHash = sha256(canonical(invalid));
++    write(f.integration, path.relative(f.integration, state.file), invalid);
++    const before = capture();
++    const result = integrationCall(f, 'integrate-reconcile', '--integration', state.file,
++      '--expected-record', invalidHash);
++    assert.notEqual(result.status, 0, `${label}: command unexpectedly succeeded`);
++    assert.match(result.stdout, pattern, label);
++    assert.deepEqual(capture(), before, `${label} changed durable record, logs or refs`);
++  };
++  const replaceHistoricalReview = (value, change) => {
++    const receipt = structuredClone(historicalReview);
++    change(receipt);
++    value.evidence.review_history[0] = sign(receipt);
++    value.evidence.finalization_history[0].review_identity = value.evidence.review_history[0].identity;
++  };
++  const replaceHistoricalVerification = (value, change) => {
++    const receipt = structuredClone(historicalVerification);
++    change(receipt);
++    value.evidence.verification_history[0] = sign(receipt);
++    value.evidence.finalization_history[0].verification_identity = value.evidence.verification_history[0].identity;
++  };
++  const historicalCases = [
++    ['selected historical builder self-review', (value) => replaceHistoricalReview(value,
++      (receipt) => { receipt.reviewer = value.source.builder; })],
++    ['selected historical missing reviewer', (value) => replaceHistoricalReview(value,
++      (receipt) => { delete receipt.reviewer; })],
++    ['selected historical malformed reviewer', (value) => replaceHistoricalReview(value,
++      (receipt) => { receipt.reviewer = 'historical-reviewer\n'; })],
++    ['selected historical builder panel member', (value) => replaceHistoricalReview(value,
++      (receipt) => { receipt.panel.members[0].reviewer = value.source.builder; })],
++    ['selected historical missing verifier', (value) => replaceHistoricalVerification(value,
++      (receipt) => { delete receipt.verifier; })],
++    ['selected historical malformed verifier', (value) => replaceHistoricalVerification(value,
++      (receipt) => { receipt.verifier = 'historical-verifier\n'; })],
++    ['selected historical verifier equals builder', (value) => replaceHistoricalVerification(value,
++      (receipt) => { receipt.verifier = value.source.builder; })],
++    ['selected historical verifier equals top reviewer', (value) => replaceHistoricalVerification(value,
++      (receipt) => { receipt.verifier = historicalReview.reviewer; })],
++    ['selected historical verifier equals panel reviewer', (value) => replaceHistoricalVerification(value,
++      (receipt) => { receipt.verifier = historicalReview.panel.members[0].reviewer; })],
++  ];
++  for (const [label, change] of historicalCases) {
++    await t.test(label, () => assertHistoricalVeto(label, change, /LEGACY_FINALIZATION_MISSING/));
++  }
++
++  const compatible = structuredClone(legacy);
++  compatible.evidence.review_history.push(sign({
++    ...historicalReview, reviewer: compatible.source.builder, recorded_at: new Date(1).toISOString(),
++  }));
++  const compatibleHash = sha256(canonical(compatible));
++  write(f.integration, path.relative(f.integration, state.file), compatible);
++  const repaired = integrationCall(f, 'integrate-reconcile', '--integration', state.file,
++    '--expected-record', compatibleHash);
++  assert.equal(repaired.status, 0, repaired.stdout);
++  assert.equal(repaired.json.record.evidence.finalization.identity, frozen.identity);
++  assert.equal(repaired.json.record.evidence.finalization.review_identity, historicalReview.identity);
++  assert.equal(repaired.json.record.evidence.finalization.verification_identity, historicalVerification.identity);
++  assert.equal(repaired.json.record.evidence.review.reviewer, 'current-reviewer');
++  assert.equal(repaired.json.record.evidence.verification.verifier, 'current-verifier');
++});
++
+ test('closure-only preparations freeze evidence and legacy repair fails closed on ambiguity', (t) => {
+   const { f, state } = finalizedIntegration(t);
+   const closure = mutateRecord(f, state, 'close-prepare');

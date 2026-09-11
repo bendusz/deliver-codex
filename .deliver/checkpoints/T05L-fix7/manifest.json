@@ -1,0 +1,47 @@
+{
+  "status": "ACCEPTED_CANDIDATE_PENDING_COMBINED_VERIFICATION",
+  "task": "T05L",
+  "run_id": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
+  "base_commit": "a18e851375c37ac4c99e62a55fe0e9ff1f1e937d",
+  "candidate_commit": "3f0d3b283dc628a629395878f065ea999d8c44ac",
+  "snapshot": "bfa2a3254597c6eeadb5f8acdf5903a80b233ea6496f334efbe1ede849a1b8b2",
+  "revision": 45,
+  "counters": {
+    "retries": 1,
+    "fixes": 7,
+    "corrections": 0
+  },
+  "baseline_and_task_preserved": true,
+  "native_tests": {
+    "total": 191,
+    "passed": 191,
+    "validate": "PASS",
+    "duration_ms": 335085.713292
+  },
+  "native_review": "PASS",
+  "native_verification": {
+    "T05L-AC1": "PASS",
+    "T05L-AC2": "PASS",
+    "T05L-AC3": "PASS",
+    "T05L-AC4": "PASS",
+    "T05L-AC5": "PASS"
+  },
+  "test_author": "/root/identity_tests",
+  "production_builder": "/root/benchmark_builder",
+  "reviewer_and_managed_verifier": "/root/state_architecture",
+  "prior_failures": "Immutable fix3/fix4/fix5/fix6 checkpoints and runtime evidence_history retained.",
+  "files_sha256": {
+    "approval.json": "004ede801c621d7b644dbcd7f0798c5a85236df8e5d6a87c076b05b9c32b3929",
+    "fix7.patch": "f47211582ca54f453c33773f25fd670785e155aa0eb0091e04e7b761ca8272fb",
+    "identity-red.log": "8bcd5276092cbc875e1ded4aaebdcc52576f4d1a3a4bd26df59a630e5ca2c051",
+    "independent-identity-tests.mjs": "62511b6815f00834e0c3b782aaa41b24dd34b7932f8a477ab7ba281d61627915",
+    "logs/test-75d5b597-4988-49a6-8796-49cbd47af709.log": "a2b27231dedeaaac8419434807f3054f4fd76ca420db857707df7d73a1d3ca3f",
+    "logs/validate-d89153d1-34fa-484d-aaf4-0c37530526c2.log": "cbd738f9a0c329915edf0cae9ad659e97c0e045fb0b7398c6bb169a70ab5e0c5",
+    "native-review.json": "a6ef246a2ec2b8180642fe453b9731f8e713a8493752da8d657ccaa168f0cc0b",
+    "native-verification.json": "8e3ae96b462d6c66984c4f1e08d650db0cc4917f3f618063fd30d27c04881bda",
+    "red-test-manifest.json": "1de471081a57f774f4bc871934b6a0b528d8654859f21e4af68ddb83062c9410",
+    "run.json": "19fed4f1b4a5fa69eee1f803d694e983548bd01e6528a4b3263149964253c1f6",
+    "source-delta.json": "3fe103892b78e6dc060551a76b0ccdaffdff003f0387269a27dc110ce47684e5",
+    "task.json": "ef5ca47b913e4f4778073fbec61e4a84c96698abf8376b48acb02ec87ee0b901"
+  }
+}

@@ -120,7 +120,7 @@
       }
     },
     "T05L": {
-      "status": "Fix7 independent regressions reproduced 26 defects; production implementation underway",
+      "status": "reviewed, verified, committed after approved fix7; combined integration pending",
       "worktree": "/tmp/deliver-parity-t05l",
       "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
       "builder": "/root/benchmark_builder",
@@ -140,18 +140,17 @@
         "Independent fix5 review: legacy reconciliation ignores contradictory current active FAIL evidence when selecting an older PASS finalization.",
         "Independent fix6 review: active identity-valid PASS review with reviewer equal to source.builder is accepted by legacy reconciliation. Prior active FAIL-veto defect resolved."
       ],
-      "builder_checkpoint": "Independent test file frozen sha62511b6815f00834e0c3b782aaa41b24dd34b7932f8a477ab7ba281d61627915; red evidence retained at .deliver/checkpoints/T05L-fix7/. Builder owns only integration.mjs, same run rev40 fixes7/retries1.",
-      "snapshot": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3",
+      "builder_checkpoint": "Finished original run at revision45, fixes7/retries1. Independent authored red regressions became green unchanged; full191/191 tests and validate plus independent all5AC PASS.",
+      "snapshot": "bfa2a3254597c6eeadb5f8acdf5903a80b233ea6496f334efbe1ede849a1b8b2",
       "fixes": 7,
-      "candidate_snapshot": "d9f901fa13b3900566fb62663ac9a4874b41a0fdbb21e0d0737d530a63cebca4",
+      "candidate_snapshot": "bfa2a3254597c6eeadb5f8acdf5903a80b233ea6496f334efbe1ede849a1b8b2",
       "checkpoint": ".deliver/checkpoints/T05L-final-fix3/manifest.json",
-      "latest_checkpoint": ".deliver/checkpoints/T05L-fix6/manifest.json",
-      "failed_criteria": [
-        "T05L-AC4"
-      ],
+      "latest_checkpoint": ".deliver/checkpoints/T05L-fix7/manifest.json",
+      "failed_criteria": [],
       "next_proposal": "docs/plans/2026-09-10-reconciliation-identity-follow-up.md",
       "approval": ".deliver/T05L-fix7-approval.json",
-      "test_author": "/root/identity_tests"
+      "test_author": "/root/identity_tests",
+      "commit": "3f0d3b283dc628a629395878f065ea999d8c44ac"
     },
     "T05R": {
       "status": "reviewed, verified, integrated after fix1",
@@ -182,7 +181,7 @@
       ]
     }
   },
-  "next": "Complete independent failing regressions, then bounded T05L identity implementation, full gates and independent review. Integrate after PASS; combined acceptance with distinct verifier follows.",
+  "next": "Compose accepted T05L and T04F, record exact file/proof manifest, run fresh combined full gates, independent review and distinct verification.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
