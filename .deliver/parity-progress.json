@@ -120,7 +120,7 @@
       }
     },
     "T05L": {
-      "status": "Approved fix7: independent identity regression tests first",
+      "status": "Fix7 independent regressions reproduced 26 defects; production implementation underway",
       "worktree": "/tmp/deliver-parity-t05l",
       "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
       "builder": "/root/benchmark_builder",
@@ -140,7 +140,7 @@
         "Independent fix5 review: legacy reconciliation ignores contradictory current active FAIL evidence when selecting an older PASS finalization.",
         "Independent fix6 review: active identity-valid PASS review with reviewer equal to source.builder is accepted by legacy reconciliation. Prior active FAIL-veto defect resolved."
       ],
-      "builder_checkpoint": "User approved seventh round; revision40 fixes7/retries1. Production frozen while independent tests establish failure. Original baseline/task and raw fix6 FAIL retained.",
+      "builder_checkpoint": "Independent test file frozen sha62511b6815f00834e0c3b782aaa41b24dd34b7932f8a477ab7ba281d61627915; red evidence retained at .deliver/checkpoints/T05L-fix7/. Builder owns only integration.mjs, same run rev40 fixes7/retries1.",
       "snapshot": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3",
       "fixes": 7,
       "candidate_snapshot": "d9f901fa13b3900566fb62663ac9a4874b41a0fdbb21e0d0737d530a63cebca4",
