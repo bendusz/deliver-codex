@@ -1,0 +1,15 @@
+{
+  "task": "T05B",
+  "kind": "Coordinator fixture ruling during independent fix3 authoring; no production scope change",
+  "reported_by": "/root/correction_regressions",
+  "observation": "The executable-story rerun exposed a real prerequisite conflict, not the target remote artifact code: although the story is committed 100755 before claim, current-pm claim/transition atomic rewrites normalize it to 100644; re-chmod after in-review is then rejected by commit-prepare as `audited Execution entry does not match the original baseline or current story`.",
+  "ruling": "Keep genuine source C at644. Let fake provider create actual source merge commit, then a real descendant remote commit changing only the same story mode to100755. Reconcile as MERGED_BASE_ADVANCED and run fresh evidence at that fetched M. Its story bytes, source contract and Execution remain exact, while E parent mode is755. This directly exercises the supported advanced-M remote artifact contract without fabricating a finished C or rebinding source evidence.",
+  "assertions": [
+    "C actual story mode644; fetched M actual story mode755.",
+    "Story text/contract/Execution unchanged across source merge to advancedM mode-only edge.",
+    "Source lineage and freshM gate/review/verification/finalization succeed before E preparation.",
+    "E/H/H2 preparation preserves allowed parent executable mode; same-text pending mode drift still refuses."
+  ],
+  "correction_to_prior_guidance": "Only actual E parent M needs755; coordinator earlier suggested both C/M755, which overconstrained the test setup.",
+  "follow_up": "Earlier current-PM/transition mode normalization is a separate observed limitation, not repaired or dismissed here. Reconcile a bounded follow-up before release; do not expand active T05B scope to include transitions.mjs."
+}
