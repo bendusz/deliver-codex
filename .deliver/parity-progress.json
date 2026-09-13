@@ -200,7 +200,7 @@
       "checkpoint": ".deliver/checkpoints/T04F-T05L-COMBINED/manifest.json"
     },
     "T05C": {
-      "status": "fix1 candidate ready; fresh full gates and independent review in progress",
+      "status": "fix2 authorized after independent protected-checkout drift reproductions and full test timeout; independent tests being expanded and optimized",
       "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05c-delivery",
       "run": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
       "builder": "/root/recover_t05c",
@@ -231,22 +231,23 @@
         "snapshot": "85356883cd3be99769fd0374a78577a5429c7a62866e4ed9a6eb02296ea3b489"
       },
       "review_findings": [
-        "Recovery accepts advanced correction HEAD and stale live preconditions",
-        "Fully rehashed journal can redirect story write away from immutable token story_path",
-        "Unrelated-history merge-tree exit128 qualifies as a composition conflict"
+        "Prior advanced-ref, redirected-story and unrelated-history findings resolved by fix1",
+        "Protected metadata drift accepted at initial correction start and journal recovery",
+        "Full npm test timed out at600s; validatePASS; repeated negative fixture setup optimization pending"
       ],
       "continuation_note": ".deliver/T05C-resume-interruption.json",
       "predecessor_run": "5050e142-81ad-42a9-b60e-e21dce156bd5",
       "recovery_worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05c-recovery",
-      "fixes": 1,
+      "fixes": 2,
       "recovery_provenance": ".deliver/T05C-successor-provenance.json",
       "reviewer": "/root/recovery_contract",
       "latest_checkpoint": ".deliver/checkpoints/T05C-fix1",
-      "failed_snapshot": "879fbda9c0437f6aa6350310e0fd5e0e8a307237cf3d8fe8a37de32357116a96",
-      "candidate_snapshot": "405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334"
+      "failed_snapshot": "405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334",
+      "candidate_snapshot": "405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334",
+      "verifier": "/root/correction_verifier"
     }
   },
-  "next": "Finish T05C full gates, independent review and distinct verification; then T05B remote lifecycle wiring.",
+  "next": "T05C fix2: independently freeze expanded regression tests, reject protected metadata drift, then full gates and fresh independent review/distinct verification; T05B remains next.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
