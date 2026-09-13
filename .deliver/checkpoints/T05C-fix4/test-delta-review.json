@@ -1,0 +1,5 @@
+{
+  "status": "PASS",
+  "findings": [],
+  "summary": "Bounded test delta passes. The frozen change adds exactly two protected-recovery groups and 102 lines without modifying prior assertions. Registration remains once through current-lifecycle.test.mjs. The recorded focused run proves one valid started-state control passes and four meaningful negative leaves fail without setup errors; every refusal case asserts record, journal, run, story, and story mode remain unchanged."
+}

@@ -200,13 +200,13 @@
       "checkpoint": ".deliver/checkpoints/T04F-T05L-COMBINED/manifest.json"
     },
     "T05C": {
-      "status": "user approved fix4; independent regression promotion underway before production repair",
+      "status": "finished, reviewed, distinctly verified and source committed; integration next",
       "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05c-delivery",
       "run": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
       "builder": "/root/recover_t05c",
       "test_author": "/root/correction_regressions",
       "base_commit": "e57e54f",
-      "independent_test_sha256": "a764d071d5123dc3b1fd9a346139364f656c715fd48a9ff24422cb500bd38137",
+      "independent_test_sha256": "4dfc6ccdabd2ee0c93225082d56693c5b0d4f43cee449e5258f72092f7ba25fb",
       "red_tests": {
         "total": 16,
         "pass": 0,
@@ -231,8 +231,7 @@
         "snapshot": "85356883cd3be99769fd0374a78577a5429c7a62866e4ed9a6eb02296ea3b489"
       },
       "review_findings": [
-        "Prior eight findings resolved by fix3; retained verbatim in independent review history.",
-        "Started publication recovery recreates missing run, republishes before-image story and accepts unrelated retained run/story hashes; four real-Git diagnostic leaf failures, exact-after control PASS."
+        "All nine inherited findings preserved verbatim and resolved in round5 review."
       ],
       "continuation_note": ".deliver/T05C-resume-interruption.json",
       "predecessor_run": "5050e142-81ad-42a9-b60e-e21dce156bd5",
@@ -242,7 +241,7 @@
       "reviewer": "/root/recovery_contract",
       "latest_checkpoint": ".deliver/checkpoints/T05C-fix4",
       "failed_snapshot": "b8c66ec574464337ae65d7b4e810d742a34b381e758f4b21f9e53964ac481d97",
-      "candidate_snapshot": "b8c66ec574464337ae65d7b4e810d742a34b381e758f4b21f9e53964ac481d97",
+      "candidate_snapshot": "6878683c7c9e3511d86a2d59507c28805816398b43ed8737740dea8a875ea0e3",
       "verifier": "/root/correction_verifier",
       "fix2_red_snapshot": "73ec06fe10b3211942a7be646ea6737f9b8c8a7bf18b46a573024ba92a99fddd",
       "full_fix2_gate": {
@@ -263,10 +262,32 @@
         "checkpoint": ".deliver/checkpoints/T05C-fix3"
       },
       "proposal": "docs/reviews/2026-09-13-correction-recovery-proposal.md",
-      "extra_fix_approval": ".deliver/T05C-fix4-approval.json"
+      "extra_fix_approval": ".deliver/T05C-fix4-approval.json",
+      "fix4_focused": {
+        "new_started": {
+          "passed": 7,
+          "total": 7,
+          "duration_ms": 62996.301292
+        },
+        "existing_torn_publication": {
+          "passed": 7,
+          "total": 7,
+          "duration_ms": 71338.478208
+        }
+      },
+      "commit": "3513e0c2146abeb88230dbfacd2c4dc68937da32",
+      "snapshot": "6878683c7c9e3511d86a2d59507c28805816398b43ed8737740dea8a875ea0e3",
+      "full_fix4_gate": {
+        "total": 294,
+        "pass": 294,
+        "fail": 0,
+        "duration_ms": 518039.657375,
+        "validate": "PASS"
+      },
+      "report": "docs/reviews/2026-09-13-correction-recovery-acceptance.md"
     }
   },
-  "next": "T05C fix4: freeze four started-publication regression failures, implement bounded repair, run full gates and whole-task independent review/distinct verification, integrate only after PASS; then T05B.",
+  "next": "Integrate accepted T05C source, prove matching bytes, then start approved T05B remote lifecycle wiring.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
