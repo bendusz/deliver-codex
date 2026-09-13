@@ -1,0 +1,13 @@
+▶ correction initialized submodule controls accept exact basis checkouts
+  ✖ standard submodule update clone (13912.537459ms)
+  ✔ shared protected Git worktree (16171.776875ms)
+✖ correction initialized submodule controls accept exact basis checkouts (30131.662292ms)
+✖ correction first start accepts a relocated checkout with the same relative hook contract (9093.253083ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 1
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 39263.389833

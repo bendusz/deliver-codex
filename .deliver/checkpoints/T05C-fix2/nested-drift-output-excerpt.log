@@ -1,0 +1,13 @@
+▶ correction first start rejects hidden initialized submodule drift unchanged
+  ✖ nested HEAD (16680.140708ms)
+  ✖ nested tracked bytes (16917.38725ms)
+  ✖ nested skip-worktree flag (16733.537042ms)
+✖ correction first start rejects hidden initialized submodule drift unchanged (50391.991417ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 0
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 50433.331709

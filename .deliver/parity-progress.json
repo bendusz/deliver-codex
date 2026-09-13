@@ -200,7 +200,7 @@
       "checkpoint": ".deliver/checkpoints/T04F-T05L-COMBINED/manifest.json"
     },
     "T05C": {
-      "status": "fix2 production implementation underway after frozen independent protected-state red and test-delta reviewPASS",
+      "status": "fix3 authorized after actual independent submodule/relocation/mode probes and ordinary source-dirt regression; tests being organized before production",
       "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05c-delivery",
       "run": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
       "builder": "/root/recover_t05c",
@@ -231,24 +231,32 @@
         "snapshot": "85356883cd3be99769fd0374a78577a5429c7a62866e4ed9a6eb02296ea3b489"
       },
       "review_findings": [
-        "Prior advanced-ref, redirected-story and unrelated-history findings resolved by fix1",
-        "Protected metadata drift accepted at initial correction start and journal recovery",
-        "Full npm test timed out at600s; validatePASS; repeated negative fixture setup optimization pending"
+        "Prior5 findings resolved, including fullsuite nowcompletedwithin600s",
+        "Initial submodule proof rejects legitimate relocation yet accepts hidden nested HEAD/bytes/index flags",
+        "Recovery masks executable mode drift on exact story after-image",
+        "Correction-only strict source check regresses ordinary baseline-dirty source integration"
       ],
       "continuation_note": ".deliver/T05C-resume-interruption.json",
       "predecessor_run": "5050e142-81ad-42a9-b60e-e21dce156bd5",
       "recovery_worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05c-recovery",
-      "fixes": 2,
+      "fixes": 3,
       "recovery_provenance": ".deliver/T05C-successor-provenance.json",
       "reviewer": "/root/recovery_contract",
       "latest_checkpoint": ".deliver/checkpoints/T05C-fix2",
-      "failed_snapshot": "405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334",
-      "candidate_snapshot": "405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334",
+      "failed_snapshot": "de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47",
+      "candidate_snapshot": "de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47",
       "verifier": "/root/correction_verifier",
-      "fix2_red_snapshot": "73ec06fe10b3211942a7be646ea6737f9b8c8a7bf18b46a573024ba92a99fddd"
+      "fix2_red_snapshot": "73ec06fe10b3211942a7be646ea6737f9b8c8a7bf18b46a573024ba92a99fddd",
+      "full_fix2_gate": {
+        "total": 276,
+        "pass": 275,
+        "fail": 1,
+        "duration_ms": 579908.718167,
+        "validate": "PASS"
+      }
     }
   },
-  "next": "T05C fix2: independently freeze expanded regression tests, reject protected metadata drift, then full gates and fresh independent review/distinct verification; T05B remains next.",
+  "next": "T05C fix3: freeze independent submodule/mode/relocation regressions, restore ordinary source-dirt integration and complete protected checkout proof, then fresh full gates and independent review/distinct verification; T05B remains queued.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
