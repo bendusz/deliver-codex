@@ -20,7 +20,9 @@
     "PM admission projects validated closure.proof.terminal_commit directly.",
     "Final evidence validation enforces the same exact acceptance and actor/panel rules as the existing remote recording API.",
     "Preserve Git executable modes100644/100755; missing new report paths use100644. Do not impose a new blanket0600 or100644 source policy.",
-    "Keep the declared npm test and npm run validate commands and600-second timeout unchanged."
+    "Keep the declared npm test and npm run validate commands and600-second timeout unchanged.",
+    "Explicit production repair: validate exact unique acceptance IDs, valid independent reviewer/verifier actors, panel member grammar/actors/unique lenses/derived aggregate, and required lens coverage for required/requested reporting P. Skipped reporting retains valid no-panel reviews.",
+    "Retain identified required-lens derivation from independently read frozen-M story, bound to source contract/Execution and finalization; terminal validation cross-checks its required set and identities without environment rehash."
   ],
   "test_optimization": {
     "actor": "/root/correction_regressions",

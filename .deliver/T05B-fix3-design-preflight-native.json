@@ -1,0 +1,20 @@
+{
+  "actor": "/root/recovery_contract",
+  "kind": "Native read-only design review, not final candidate acceptance",
+  "initial_report": {
+    "status": "FAIL",
+    "findings": [
+      {
+        "severity": "major",
+        "path": ".deliver/T05B-fix3-design-proposal-native.json",
+        "message": "The terminal receipt repair is not listed as an implementation repair; it appears only as a later reviewer requirement. Builder scope must explicitly include validation that remote verification covers every source.packet.acceptance ID exactly once with PASS, reviewer/verifier identities satisfy the actor grammar and differ from the builder and each other, every panel reviewer differs from the builder and verifier, panel lenses are unique, and the required lenses derived from the independently read frozen-M story are covered. Finalization should retain the required-lens set or its identified derivation so checkout-free terminal validation can cross-bind it."
+      }
+    ]
+  },
+  "coordinator_resolution": "Receipt validation promoted to explicit production repair. Existing mandatory panel policy applies to required/requested reporting only, preserving skipped-reporting behavior. Required-lens derivation must be retained and independently bound to frozen-M story/source identities.",
+  "final_report": {
+    "status": "PASS",
+    "findings": [],
+    "summary": "READY. No existing contract requires a mandatory panel when remote reporting is skipped. Exact required-lens coverage applies when reporting is required or requested and P is produced. Skipped reporting may retain a valid no-panel review; if a panel is supplied, its member grammar, unique lenses, aggregate verdict/findings and actor separation must still validate. Exact acceptance-ID coverage and reviewer/verifier independence remain mandatory for every finalization."
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "task": "T02F",
+  "status": "Unstarted bounded correction packet under approved story-parsing and retained-review repair scope; no implementation dispatched",
+  "authorization": ".deliver/2026-09-13-continuation-authorization.json",
+  "retained_finding": "01-runtime.policy-triage.json:minor-1",
+  "preparation": ".deliver/story-boundary-follow-up-proposal-native.json",
+  "dependency": "After T05B acceptance, before or after T08 with no overlapping active test ownership. Reconcile the accepted parent before baseline.",
+  "ruling": "For a first claim that inserts LF solely to delimit a new final Execution section, the exact versioned marked separator is Execution framing. Exclude exactly that inserted LF from the substantive contract. Every other unclaimed/unmarked byte remains hashed exactly as before. This implements the existing strict contract-preservation requirement rather than changing project scope or approval policy.",
+  "marker": {
+    "field": "deliver_contract_boundary",
+    "value": "inserted-lf-v1",
+    "scope": "Reserved pm-exec field; preserve across legitimate replacement; no inference for existing claimed stories."
+  },
+  "clarification": "A parser cannot authenticate the historical existence of a marker. Validate present marker shape and boundary exactly; replacement must refuse removal/alteration of an existing marker and changed evidence must fail its bound contract hash. Do not claim authentication of arbitrary rewritten files.",
+  "constraints": [
+    "No global newline normalization.",
+    "No new approval requests for this already authorized bounded correction.",
+    "Preserve all existing hashes, tests, criteria and unknown fields.",
+    "No pinned upstream fixture edits.",
+    "Do not start or modify active T05B/T08 tasks to absorb this scope."
+  ],
+  "evidence": {
+    "prior_blueprints_sha256": "6442314c52911f04e16997bd30d2d432383bc861f62466d35308411d9f141061",
+    "updated_blueprints_sha256": "694acd71107a2ce37b352188a8d57da3991a81c1bd6734537bafb3558d7ad504",
+    "approved_plan_sha256": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+  }
+}
