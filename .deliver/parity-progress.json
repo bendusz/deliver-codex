@@ -200,7 +200,7 @@
       "checkpoint": ".deliver/checkpoints/T04F-T05L-COMBINED/manifest.json"
     },
     "T05C": {
-      "status": "finished, reviewed, distinctly verified and source committed; integration next",
+      "status": "finished, independently reviewed, distinctly verified, committed and integrated",
       "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05c-delivery",
       "run": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
       "builder": "/root/recover_t05c",
@@ -284,10 +284,11 @@
         "duration_ms": 518039.657375,
         "validate": "PASS"
       },
-      "report": "docs/reviews/2026-09-13-correction-recovery-acceptance.md"
+      "report": "docs/reviews/2026-09-13-correction-recovery-acceptance.md",
+      "integration_commit": "e8457e0d446d170fcd4ac1222718826a0c7c1a28"
     }
   },
-  "next": "Integrate accepted T05C source, prove matching bytes, then start approved T05B remote lifecycle wiring.",
+  "next": "Start approved T05B remote lifecycle wiring from accepted T05C integrated base.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
@@ -301,12 +302,14 @@
     "Run gate and finish through the same coordinator launch environment; subprocess cwd does not itself normalize inherited environment. Combined source-only evidence remains archived; scoped acceptance report made the verification task finishable without runtime or baseline relaxation."
   ],
   "latest_integrated_validation": {
-    "commit": "2a6def04575447fe777737a44aede6d7d8b7540f",
-    "tests": 211,
-    "passed": 211,
+    "commit": "e8457e0d446d170fcd4ac1222718826a0c7c1a28",
+    "source_commit": "3513e0c2146abeb88230dbfacd2c4dc68937da32",
+    "tests": 294,
+    "passed": 294,
     "validate": "PASS",
-    "snapshot": "a91dc0c3024b7e109aafc9b0556f2d88def20ec326d4cc0718da26672ad54cc2",
-    "scope": "Integrated production/contracts/report bytes match the completed combined candidate. Full gates executed in /tmp/deliver-parity-combined, followed by independent review and distinct verification."
+    "snapshot": "6878683c7c9e3511d86a2d59507c28805816398b43ed8737740dea8a875ea0e3",
+    "scope": "Git diff is empty across all production, tests, launcher, scripts, package and exact T05C declared read paths; every changed file byte and executable mode matches the retained completion snapshot.",
+    "report": "docs/reviews/2026-09-13-correction-recovery-acceptance.md"
   },
   "requested_external_review": {
     "model": "claude-fable-5-1",
