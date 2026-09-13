@@ -288,7 +288,7 @@
       "integration_commit": "e8457e0d446d170fcd4ac1222718826a0c7c1a28"
     },
     "T05B": {
-      "status": "fix1 production repair resumed; final independent test coverage preflight READY; full gates pending",
+      "status": "fix1 source repair resumed after two fixture-only corrections; full gates pending",
       "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05b-delivery",
       "branch": "feat/parity-t05b",
       "base_commit": "7c1b68e",
@@ -319,7 +319,8 @@
       "coverage_preflight": ".deliver/T05B-fix1-test-preflight-native.json",
       "identity_clarification": ".deliver/T05B-fix1-identity-clarification.json",
       "final_test_snapshot": "bf8380731235eaceae735bb905ac4350893f0ae7d54b43cba1d9405e95817e1e",
-      "test_coverage": ".deliver/checkpoints/T05B-fix1-tests-final/coverage-ready-native.json"
+      "test_coverage": ".deliver/checkpoints/T05B-fix1-tests-final/coverage-ready-native.json",
+      "fixture_corrections": ".deliver/checkpoints/T05B-fix1-fixture-corrections"
     }
   },
   "next": "T05B fix1: complete source repair against frozen tests, then full gates, independent whole-task review and distinct verification.",

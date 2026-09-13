@@ -1,0 +1,39 @@
+diff --git a/Users/ben/code/pm-skill-codex/.deliver/checkpoints/T05B-fix1-tests-final/tests/remote-lifecycle.test.mjs b/Users/ben/code/pm-skill-codex-worktrees/t05b-delivery/tests/remote-lifecycle.test.mjs
+index 4d8701f..fc5f781 100644
+--- a/Users/ben/code/pm-skill-codex/.deliver/checkpoints/T05B-fix1-tests-final/tests/remote-lifecycle.test.mjs
++++ b/Users/ben/code/pm-skill-codex-worktrees/t05b-delivery/tests/remote-lifecycle.test.mjs
+@@ -1968,12 +1968,19 @@ test('raced closure preserves concurrent integration bytes and repairs only the
+ 
+   let repairPublishWrites = 0;
+   let repairMergeWrites = 0;
++  let repairPublicationPresent = false;
+   const interruptedRepairProvider = {
+     ...fake.provider,
++    inspect(target) {
++      if (!repairPublicationPresent) return { state: 'PR_ABSENT', expectedHead: target.expectedHead };
++      return fake.provider.inspect(target);
++    },
+     publish(target, options) {
+       repairPublishWrites += 1;
+       if (repairPublishWrites === 1) throw new Error('lost repair publish invocation before effect');
+-      return fake.provider.publish(target, options);
++      const result = fake.provider.publish(target, options);
++      repairPublicationPresent = true;
++      return result;
+     },
+     merge(target, options) {
+       repairMergeWrites += 1;
+@@ -2147,11 +2154,12 @@ test('raced closure reconciliation rejects overwritten closure paths and unprove
+     const { fixture } = result.flow;
+     const nEntry = git(fixture.remoteRoot, 'ls-tree', result.flow.fake.state.advancedBase, '--', storyRel)
+       .split(/\s+/);
++    const mEntry = git(fixture.remoteRoot, 'ls-tree', sharedRemoteBase, '--', storyRel).split(/\s+/);
+     const hEntry = git(fixture.remoteRoot, 'ls-tree', result.flow.h, '--', storyRel).split(/\s+/);
+     const rEntry = git(fixture.remoteRoot, 'ls-tree', result.mergeCommit, '--', storyRel).split(/\s+/);
+     assert.equal(nEntry[0], '100755');
+     assert.equal(hEntry[0], '100644');
+-    assert.equal(nEntry[2], hEntry[2], 'the concurrent mode change retains identical blob bytes');
++    assert.equal(nEntry[2], mEntry[2], 'the concurrent mode change retains the exact M blob bytes');
+     assert.equal(rEntry[0], '100644', 'the invalid wrapper selected H mode over N');
+   });
+ });
