@@ -1,0 +1,24 @@
+{
+  "status": "FAIL",
+  "findings": [
+    {
+      "severity": "major",
+      "message": "recoverIntegrationCorrectionStart validates the journal and integration-record hashes but never re-runs assertStartTokenCurrent or assertUniqueCorrectionCheckout before applying the recorded writes. A clean correction ref advanced beyond the token's start commit is therefore accepted during recovery and the stale run/story publication proceeds instead of refusing unchanged. The fresh regression at tests/integration-correction.test.mjs:1072 reaches Missing expected exception.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "validateIntegrationCorrectionJournal accepts any second write whose path starts with docs/stories/ and validates the parsed story bytes, but it never requires descriptor.writes[1].path to equal token.story_path. An attacker or corrupted journal can rewrite the descriptor, reconstruction and hashes consistently and redirect publication to a shadow story while the generated run remains bound to the original story. The fresh regression at tests/integration-correction.test.mjs:1097 reaches Missing expected exception.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "currentFailureBasis treats any repeatable nonzero merge-tree result with the same Git version as a composition-conflict-no-m basis. It does not distinguish content conflicts from fatal errors, so exit 128 for unrelated histories mints a correction token even though no composition conflict was proved. The fresh regression at tests/integration-correction.test.mjs:1126 reaches Missing expected exception.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": false
+    }
+  ],
+  "summary": "T05C fails independent review at successor snapshot 879fbda9c0437f6aa6350310e0fd5e0e8a307237cf3d8fe8a37de32357116a96. The recovered production bytes remain exact and the independently corrected fixture changes only the expected status for the intentional typed journal. The focused successor red run fails all three intended rejection assertions. Full npm test and npm run validate were intentionally not run at this failed-code stage, and no historical PASS is reused."
+}

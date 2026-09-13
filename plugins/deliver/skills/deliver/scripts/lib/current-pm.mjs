@@ -2,14 +2,17 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { DeliverError, canonical, internalDirectory, readRun } from './state.mjs';
+import { DeliverError, canonical, createRunState, internalDirectory, readRun, sha256, validateRunState } from './state.mjs';
 import { inspectProjectState, readApprovalMarker, readPlanPolicy } from './project-state.mjs';
 import { isValidGitBranchName, parseStory, readStory, replaceStoryExecution, storyTaskContract } from './story.mjs';
+import { baselineDirtyPaths, captureGitAnchor, snapshot } from './scope.mjs';
+import { captureContracts } from './contracts.mjs';
 
 const APPROVAL = 'docs/approval.json';
 const PLAN = 'docs/plan.md';
 const JOURNAL = '.deliver/current-pm-transaction.json';
 const TRANSITION_JOURNAL = '.deliver/transition-transaction.json';
+const CORRECTION_JOURNAL = '.deliver/integration-correction-transaction.json';
 const MAX_BYTES = 8 * 1024 * 1024;
 const record = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const fail = (message) => { throw new DeliverError(message, 66); };
@@ -43,7 +46,9 @@ function safeRel(rel) {
   const parts = rel.split(/[\\/]/);
   if (!parts.length || parts.some((part) => !part || part === '.' || part === '..')) fail('unsafe current project path');
   const normalized = parts.join('/');
-  if (normalized !== APPROVAL && normalized !== JOURNAL && !/^docs\/stories\/S\d+-\d+-[^/]+\.md$/.test(normalized)) fail('current project write is outside the transaction contract');
+  if (normalized !== APPROVAL && normalized !== JOURNAL && normalized !== CORRECTION_JOURNAL
+    && !/^docs\/stories\/S\d+-\d+-[^/]+\.md$/.test(normalized)
+    && !/^\.deliver\/runs\/[0-9a-f-]{36}\.json$/.test(normalized)) fail('current project write is outside the transaction contract');
   return normalized;
 }
 
@@ -189,12 +194,14 @@ function applyJournal(root, journal) {
 
 export function assertCurrentPmReady(root) {
   if (read(root, JOURNAL) !== null) fail('interrupted current project transaction; run pm.mjs recover before continuing');
-  let transition;
-  try { transition = fs.lstatSync(path.join(rootPath(root), TRANSITION_JOURNAL)); }
-  catch (error) { if (error.code !== 'ENOENT') throw error; }
-  if (transition) {
-    if (!transition.isFile() || transition.isSymbolicLink()) fail('invalid Execution transition journal');
-    fail('interrupted Execution transition; run pm.mjs recover before continuing');
+  for (const [rel, label] of [[TRANSITION_JOURNAL, 'Execution transition'], [CORRECTION_JOURNAL, 'integration correction']]) {
+    let pending;
+    try { pending = fs.lstatSync(path.join(rootPath(root), rel)); }
+    catch (error) { if (error.code !== 'ENOENT') throw error; }
+    if (pending) {
+      if (!pending.isFile() || pending.isSymbolicLink()) fail(`invalid ${label} journal`);
+      fail(`interrupted ${label}; run pm.mjs recover before continuing`);
+    }
   }
 }
 
@@ -455,4 +462,202 @@ export function assertCurrentBinding(state, { allowBlocked = false } = {}) {
   if (state.plan.path !== path.join(rootPath(state.project_root), 'docs', 'plan.md')) fail('runtime plan is not the approved shared plan');
   if (state.task) packetMatchesStory(state.task.packet, document);
   return binding;
+}
+
+function correctionUnknown(execution) {
+  if (!execution) return {};
+  const value = structuredClone(execution);
+  for (const key of ['owner', 'builder', 'branch', 'status', 'rounds', 'retries', 'updated']) delete value[key];
+  return value;
+}
+
+function correctionRunPath(runId) {
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(runId || '')) {
+    fail('correction run id is invalid');
+  }
+  return `.deliver/runs/${runId}.json`;
+}
+
+export function buildIntegrationCorrectionPublication({
+  correctionRoot, integrationRecord, preparedRecordHash, token, builder, capturedAt,
+}) {
+  const root = rootPath(correctionRoot);
+  safeText(builder, 'correction builder', 128);
+  if (!record(token) || !/^[0-9a-f-]{36}$/.test(token.id || '') || !/^[0-9a-f]{64}$/.test(token.identity || '')
+    || !path.isAbsolute(integrationRecord || '') || !/^[0-9a-f]{64}$/.test(preparedRecordHash || '')
+    || typeof capturedAt !== 'string' || Number.isNaN(Date.parse(capturedAt))) fail('invalid correction publication input');
+  const before = readStory(root, token.story_path);
+  if (before.id !== token.story || before.contractHash !== token.story_contract_hash
+    || canonical(before.execution) !== canonical(token.actual_start_execution)) {
+    fail('correction story no longer matches the recorded actual start state');
+  }
+  const sourceExecution = token.source_execution;
+  if (!record(sourceExecution) || sourceExecution.owner !== token.actor || sourceExecution.builder !== token.execution_builder) {
+    fail('correction source Execution lineage is invalid');
+  }
+  if (before.execution && (before.execution.owner !== sourceExecution.owner || before.execution.builder !== sourceExecution.builder
+    || before.execution.status === 'merged' || canonical(correctionUnknown(before.execution)) !== canonical(correctionUnknown(sourceExecution)))) {
+    fail('correction start has foreign, merged or conflicting Execution metadata');
+  }
+  const nextExecution = {
+    ...structuredClone(sourceExecution),
+    owner: token.actor,
+    builder: token.execution_builder,
+    branch: token.branch,
+    status: 'building',
+    rounds: token.counter_maxima.fixes + 1,
+    retries: token.counter_maxima.retries,
+    updated: capturedAt.replace('T', ' ').replace('Z', '').slice(0, 16),
+  };
+  const transition = replaceStoryExecution(before, nextExecution);
+  const anchor = captureGitAnchor(root);
+  const baselineSnapshot = snapshot(root, [...token.original_packet.touches, ...token.original_packet.read_paths,
+    ...token.original_packet.specs, token.story_path]);
+  const dirtyPaths = baselineDirtyPaths(root);
+  if (dirtyPaths.length) fail(`correction checkout must be clean: ${dirtyPaths.join(', ')}`);
+  const state = createRunState(root, token.mode, 'docs/plan.md', { fixedRunId: token.run_id, createdAt: capturedAt });
+  if (state.plan.hash !== token.plan_hash) fail('correction approved plan bytes changed');
+  state.approval = structuredClone(token.runtime_approval);
+  state.task = { packet: structuredClone(token.original_packet), builder, started_at: capturedAt };
+  state.baseline = { captured_at: capturedAt, snapshot: baselineSnapshot, dirty_paths: dirtyPaths, git_anchor: anchor };
+  state.git_anchor = anchor;
+  state.pm_binding = {
+    format: 'current', actor: token.actor, story: token.story, story_path: token.story_path,
+    contract_hash: token.story_contract_hash, execution_hash: transition.executionHash,
+    plan_digest: token.plan_digest, branch: token.branch, builder: token.execution_builder,
+    integration_branch: token.integration_branch,
+  };
+  state.contracts = captureContracts(root, token.original_packet);
+  state.execution_audit = {
+    story_path: token.story_path,
+    contract_hash: token.story_contract_hash,
+    original_entry: baselineSnapshot.entries[token.story_path] ?? null,
+    current_entry: `file:${fs.lstatSync(path.join(root, token.story_path)).mode & 0o100 ? '755' : '644'}:${sha256(transition.after)}`,
+    transitions: [],
+  };
+  state.commit_adoption = { pending: null, history: [] };
+  state.counters = {
+    retries: token.counter_maxima.retries,
+    fixes: token.counter_maxima.fixes + 1,
+    corrections: token.counter_maxima.corrections,
+  };
+  state.correction = {
+    version: 'integration-correction-v1', token_id: token.id, token_identity: token.identity,
+    basis: token.basis.kind, integration_record: integrationRecord,
+    root_run_id: token.root_run_id, source_run_id: token.original_source_run,
+    generation: token.generation, root_review_lineage: structuredClone(token.root_review_lineage),
+    required_resolutions: structuredClone(token.root_review_lineage.required_resolutions),
+  };
+  state.phase = 'active';
+  state.revision = 1;
+  state.updated_at = capturedAt;
+  state.events.push({ at: capturedAt, type: 'baseline_captured', snapshot_hash: baselineSnapshot.hash, dirty_paths: dirtyPaths });
+  state.events.push({ at: capturedAt, type: 'integration_correction_start', token: token.id,
+    basis: token.basis.kind, generation: token.generation, from: structuredClone(before.execution) });
+  validateRunState(state);
+  const descriptor = {
+    kind: 'integration-correction-start-v1', token_id: token.id, token_identity: token.identity,
+    integration_record: integrationRecord, prepared_record_hash: preparedRecordHash,
+    correction_root: root, run_id: token.run_id, branch: token.branch, builder,
+    writes: [
+      { path: correctionRunPath(token.run_id), before: null, after: json(state) },
+      { path: token.story_path, before: before.text, after: transition.after },
+    ],
+  };
+  return { descriptor, descriptor_identity: sha256(canonical(descriptor)), state, transition, anchor, baseline: state.baseline };
+}
+
+export function readIntegrationCorrectionJournal(root) {
+  root = rootPath(root);
+  const raw = read(root, CORRECTION_JOURNAL);
+  if (raw === null) return null;
+  return parseJson(raw, 'integration correction journal');
+}
+
+export function integrationCorrectionJournalConflicts(root) {
+  root = rootPath(root);
+  return [CORRECTION_JOURNAL, JOURNAL, TRANSITION_JOURNAL].filter((rel) => {
+    try { return fs.lstatSync(path.join(root, rel)).isFile(); } catch (error) { if (error.code === 'ENOENT') return false; throw error; }
+  });
+}
+
+export function validateIntegrationCorrectionJournal(root, wrapper, expectedDescriptor, token) {
+  root = rootPath(root);
+  if (!record(wrapper) || !record(wrapper.descriptor) || typeof wrapper.descriptor_identity !== 'string'
+    || !/^[0-9a-f]{64}$/.test(wrapper.expected_starting_record_hash || '')
+    || wrapper.descriptor_identity !== sha256(canonical(wrapper.descriptor))
+    || canonical(wrapper.descriptor) !== canonical(expectedDescriptor)) fail('integration correction journal descriptor is invalid');
+  const descriptor = wrapper.descriptor;
+  if (descriptor.kind !== 'integration-correction-start-v1' || descriptor.correction_root !== root
+    || !Array.isArray(descriptor.writes) || descriptor.writes.length !== 2
+    || descriptor.writes[0].path !== correctionRunPath(descriptor.run_id) || descriptor.writes[0].before !== null
+    || descriptor.writes[1].path !== token?.story_path) fail('integration correction journal story target is invalid');
+  const runState = parseJson(descriptor.writes[0].after, 'correction run after-image');
+  validateRunState(runState);
+  const beforeStory = parseStory(descriptor.writes[1].before, descriptor.writes[1].path);
+  const afterStory = parseStory(descriptor.writes[1].after, descriptor.writes[1].path);
+  if (!record(token) || token.id !== descriptor.token_id || token.identity !== descriptor.token_identity) {
+    fail('integration correction journal token is invalid');
+  }
+  const legalStory = replaceStoryExecution(beforeStory, {
+    ...structuredClone(token.source_execution), owner: token.actor, builder: token.execution_builder,
+    branch: token.branch, status: 'building', rounds: token.counter_maxima.fixes + 1,
+    retries: token.counter_maxima.retries,
+    updated: runState.created_at.replace('T', ' ').replace('Z', '').slice(0, 16),
+  });
+  const originalEntry = runState.baseline?.snapshot?.entries?.[token.story_path];
+  const originalMatch = /^file:(644|755):([0-9a-f]{64})$/.exec(originalEntry || '');
+  const expectedCurrentEntry = originalMatch
+    ? `file:${originalMatch[1]}:${sha256(descriptor.writes[1].after)}`
+    : null;
+  if (runState.run_id !== descriptor.run_id || runState.project_root !== root || runState.phase !== 'active'
+    || beforeStory.id !== token.story || afterStory.id !== token.story
+    || beforeStory.contractHash !== token.story_contract_hash || afterStory.contractHash !== token.story_contract_hash
+    || canonical(beforeStory.execution) !== canonical(token.actual_start_execution)
+    || !originalMatch || originalMatch[2] !== sha256(descriptor.writes[1].before)
+    || legalStory.after !== descriptor.writes[1].after
+    || afterStory.contractHash !== beforeStory.contractHash || runState.pm_binding?.execution_hash !== afterStory.executionHash
+    || runState.correction?.token_id !== descriptor.token_id || runState.correction?.token_identity !== descriptor.token_identity
+    || runState.task?.builder !== descriptor.builder || canonical(runState.task?.packet) !== canonical(token.original_packet)
+    || runState.pm_binding?.branch !== descriptor.branch || runState.pm_binding?.actor !== token.actor
+    || runState.pm_binding?.story !== token.story || runState.pm_binding?.story_path !== token.story_path
+    || runState.pm_binding?.contract_hash !== token.story_contract_hash || runState.pm_binding?.plan_digest !== token.plan_digest
+    || runState.git_anchor?.head !== token.basis.start_commit || runState.baseline?.snapshot?.hash === undefined
+    || runState.execution_audit?.story_path !== token.story_path
+    || runState.execution_audit?.contract_hash !== token.story_contract_hash
+    || runState.execution_audit?.original_entry !== originalEntry
+    || runState.execution_audit?.current_entry !== expectedCurrentEntry
+    || runState.counters.fixes !== token.counter_maxima.fixes + 1
+    || runState.counters.retries !== token.counter_maxima.retries
+    || runState.counters.corrections !== token.counter_maxima.corrections
+    || canonical(runState.events.find((item) => item.type === 'integration_correction_start')?.from)
+      !== canonical(token.actual_start_execution)) {
+    fail('integration correction journal after-images are not a legal bound pair');
+  }
+  return { descriptor, runState, beforeStory, afterStory };
+}
+
+export function writeIntegrationCorrectionJournal(root, wrapper, expectedDescriptor, token) {
+  root = rootPath(root);
+  const conflicts = integrationCorrectionJournalConflicts(root);
+  if (conflicts.length) fail('integration correction transaction already exists or conflicts with another journal');
+  validateIntegrationCorrectionJournal(root, wrapper, expectedDescriptor, token);
+  atomic(root, CORRECTION_JOURNAL, json(wrapper));
+}
+
+export function applyIntegrationCorrectionJournal(root, wrapper, expectedDescriptor, token) {
+  root = rootPath(root);
+  validateIntegrationCorrectionJournal(root, wrapper, expectedDescriptor, token);
+  for (const item of wrapper.descriptor.writes) {
+    const current = read(root, item.path);
+    if (current !== item.before && current !== item.after) fail(`integration correction transaction conflict at ${item.path}`);
+  }
+  for (const item of wrapper.descriptor.writes) if (read(root, item.path) !== item.after) atomic(root, item.path, item.after);
+  return wrapper.descriptor.writes;
+}
+
+export function removeIntegrationCorrectionJournal(root) {
+  root = rootPath(root);
+  const file = checkedPath(root, CORRECTION_JOURNAL);
+  try { fs.unlinkSync(file); } catch (error) { if (error.code !== 'ENOENT') throw error; }
 }

@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T05C-AC1",
+      "status": "PASS",
+      "evidence": "At exact candidate snapshot 6878683c7c9e3511d86a2d59507c28805816398b43ed8737740dea8a875ea0e3, I inspected integration.mjs:1136-1320: currentFailureBasis accepts either an exact current failed-M gate/review/verification receipt or a repeatable no-M merge-tree status-1 content conflict, while prepareIntegrationCorrection revalidates source/record identity, unchanged contract/approval/plan/ownership, duplicate work, MAX counters and creates a canonical immutable token identity before mutation. Frozen regressions cover actual M, nullable and older-I no-M, invented/free-form failure, stale/invalid authority, contract/plan/probe drift, foreign/merged/conflicting I and duplicate/exhausted cases. The fresh declared npm test gate at this snapshot passed 294/294 with 0 failures in 518039.657375ms; inspected runtime log SHA-256 62e81a7b541140575b8be913121841fa5e56cec3185cbaf22827749c02131f0c. npm run validate also passed; log SHA-256 9cf4431999ad0ad3d5a8d44774d5afd5d7d9cf16752bde102b855884fa57bea5."
+    },
+    {
+      "id": "T05C-AC2",
+      "status": "PASS",
+      "evidence": "At the same exact snapshot, I inspected integration.mjs:1334-1690 and current-pm.mjs:584-656. Start/recovery validates the sole exact branch/ref, clean ordinary index, complete relocation-safe recursive initialized-submodule checkout proof, protected metadata, frozen operational baseline and full anchor, exact story target/type/mode, counter lineage and the typed legal run/story descriptor. The fix4 started branch now binds starting_record_hash, descriptor identity, run_hash and story_hash to the journal, reads both exact bounded non-symlink regular-file after-images, and deletes the journal only after all matches; it does not replay missing/reverted files. Frozen new started recovery tests passed 7/7 in 62996.301292ms, including exact-after success and unchanged refusals for missing run, exact-before story, wrong run hash and wrong story hash; the existing torn-publication group passed 7/7 in 71338.478208ms. The full 294-test gate also covers legal publication, unique checkout, MAX lineage, raised/exhausted attempts, invalid journals, protected/config/submodule/mode drift and ordinary baseline-dirty integration compatibility."
+    },
+    {
+      "id": "T05C-AC3",
+      "status": "PASS",
+      "evidence": "I inspected the fresh exact-snapshot gate receipts and logs: npm test PASS 294/294, log SHA-256 62e81a7b541140575b8be913121841fa5e56cec3185cbaf22827749c02131f0c; npm run validate PASS, log SHA-256 9cf4431999ad0ad3d5a8d44774d5afd5d7d9cf16752bde102b855884fa57bea5. Both receipts report only the eight authorized changed paths and no out-of-scope, preexisting-dirty, symlink, Git-metadata or contract changes. I inspected fresh whole-task review .deliver/review-T05C-round5.json, SHA-256 40da688366d4c0b2a6663c3b90bfa9e2df08b46585168890e8fd6293dfde0135: PASS, all nine inherited findings retained verbatim and resolved, no unresolved or new finding, for snapshot 6878683c... in its summary. Successor provenance retains the unrecoverable predecessor honestly and the accepted base e57e54fb4996b27d94d171daf7dc82f1333afa5e; run revision 23 retains original baseline snapshot hash ff9d69069c2f635c49085fa00f7c4c30c4b2bb33e6ba6840f107b6297c4c9cf1 and counters retries 0/fixes 4/corrections 0. The fourth fix is explicitly authorized by .deliver/T05C-fix4-approval.json SHA-256 803713efbb921cb3a0d735e320ed9fb0950afe60a665ba126a86c584ae7b5af0; its recorded 124e781e... value independently recomputes as SHA-256 of the unchanged full baseline object. Builder recover_t05c, reviewer recovery_contract and verifier correction_verifier are distinct, and no earlier PASS was reused."
+    }
+  ]
+}

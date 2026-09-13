@@ -22,6 +22,7 @@ import {
   adoptVerificationReport,
   finalizeIntegrationEvidence,
   prepareIntegrationHandoff,
+  prepareIntegrationCorrection,
   prepareLocalIntegration,
   prepareStoryClosure,
   prepareVerificationReport,
@@ -29,6 +30,7 @@ import {
   recordIntegrationReview,
   recordIntegrationVerification,
   runIntegrationGate,
+  recoverIntegrationCorrectionStart,
 } from './lib/integration.mjs';
 
 const help = `Shared Deliver project state
@@ -46,6 +48,7 @@ const help = `Shared Deliver project state
   pm.mjs integrate-verify --integration FILE --expected-record HASH --verifier ID --results JSON
   pm.mjs integrate-finalize --integration FILE --expected-record HASH
   pm.mjs integrate-reconcile --integration FILE --expected-record HASH
+  pm.mjs correction-prepare --run RUN --integration FILE --expected-record HASH
   pm.mjs report-prepare|close-prepare --integration FILE --expected-record HASH
   pm.mjs report-adopt|close-adopt --integration FILE --expected-record HASH --token TOKEN --commit SHA
   pm.mjs handoff-prepare --integration FILE --expected-record HASH [--next TEXT]
@@ -83,6 +86,7 @@ try {
       'integrate-gate': ['--integration', '--expected-record', '--name'], 'integrate-review': ['--integration', '--expected-record', '--reviewer', '--receipt'],
       'integrate-verify': ['--integration', '--expected-record', '--verifier', '--results'], 'integrate-finalize': ['--integration', '--expected-record'],
       'integrate-reconcile': ['--integration', '--expected-record'],
+      'correction-prepare': ['--run', '--integration', '--expected-record'],
       'report-prepare': ['--integration', '--expected-record'], 'report-adopt': ['--integration', '--expected-record', '--token', '--commit'],
       'close-prepare': ['--integration', '--expected-record'], 'close-adopt': ['--integration', '--expected-record', '--token', '--commit'],
       'handoff-prepare': ['--integration', '--expected-record', '--next'], 'handoff-adopt': ['--integration', '--expected-record', '--token', '--commit'],
@@ -173,6 +177,9 @@ try {
     else if (command === 'integrate-reconcile') result = reconcileIntegrationEvidence(options['--integration'], {
       expectedRecordHash: options['--expected-record'],
     }, root);
+    else if (command === 'correction-prepare') result = prepareIntegrationCorrection(options['--run'], {
+      integrationRecord: options['--integration'], expectedRecordHash: options['--expected-record'],
+    }, root);
     else if (command === 'report-prepare') result = prepareVerificationReport(options['--integration'], {
       expectedRecordHash: options['--expected-record'],
     }, root);
@@ -192,7 +199,8 @@ try {
       expectedRecordHash: options['--expected-record'], token: options['--token'], commit: options['--commit'],
     }, root);
     else {
-      result = recoverExecutionTransition(root);
+      result = recoverIntegrationCorrectionStart(root);
+      if (!result.recovered) result = recoverExecutionTransition(root);
       if (!result.recovered) result = recoverCurrentPm(root);
       if (!result.recovered) result = recoverPm(root);
     }
