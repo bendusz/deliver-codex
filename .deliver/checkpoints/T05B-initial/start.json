@@ -1,0 +1,8 @@
+{
+  "task": "T05B",
+  "run_id": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "step": "started",
+  "builder": "recover_t05c",
+  "authorization": ".deliver/2026-09-13-continuation-authorization.json",
+  "approved_plan_sha256": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+}

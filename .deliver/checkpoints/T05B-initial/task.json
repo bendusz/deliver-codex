@@ -1,0 +1,47 @@
+{
+  "id": "T05B",
+  "objective": "Wire the GitHub provider into native PM shipping and prove the complete remote lifecycle",
+  "read_paths": [
+    "AGENTS.md",
+    "docs/plans/2026-09-09-upstream-parity.md",
+    "docs/plans/parity-contracts/architecture-state.md",
+    "docs/plans/parity-contracts/remote-design.md",
+    "docs/plans/parity-contracts/integration-correction-design.md",
+    "docs/plans/parity-contracts/remote-lifecycle-interface.md"
+  ],
+  "touches": [
+    "plugins/deliver/skills/deliver/scripts/lib/remote.mjs",
+    "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+    "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+    "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+    "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+    "plugins/deliver/skills/deliver/scripts/pm.mjs",
+    "plugins/deliver/skills/deliver/references/shipping.md",
+    "plugins/deliver/skills/deliver/references/compatibility.md",
+    "tests/remote.test.mjs",
+    "tests/remote-lifecycle.test.mjs",
+    "tests/current-roundtrip.test.mjs",
+    "plugins/deliver/skills/deliver/assets/operations.json",
+    "plugins/deliver/skills/deliver/SKILL.md",
+    "tests/operations.test.mjs"
+  ],
+  "acceptance": [
+    {
+      "id": "T05B-AC1",
+      "text": "PM remote adapter pushes scoped branches, creates/updates PRs and merges only exact verified heads with passing required checks under standing authorization; fake remote tests cover missing auth, pending/failure, races and merge result mismatch without real remote/model calls."
+    },
+    {
+      "id": "T05B-AC2",
+      "text": "Actual CLI/API wiring consumes fresh source and integration evidence, reconciles provider merge/squash/rebase lineage and advanced integration tip only with real Git proof, and performs P/E/H closure under standing authority. Unsupported or pending states stay explicit without resetting claims or budgets."
+    },
+    {
+      "id": "T05B-AC3",
+      "text": "Fake provider and real temporary Git repositories exercise full publish, readiness, exact merge, integration gates, reporting where required, merged Execution and fresh-process handoff; no disconnected helper is presented as an implemented user operation."
+    }
+  ],
+  "commands": {
+    "test": "npm test",
+    "validate": "npm run validate"
+  },
+  "specs": []
+}

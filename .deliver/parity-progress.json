@@ -286,9 +286,24 @@
       },
       "report": "docs/reviews/2026-09-13-correction-recovery-acceptance.md",
       "integration_commit": "e8457e0d446d170fcd4ac1222718826a0c7c1a28"
+    },
+    "T05B": {
+      "status": "started; bounded API/test dispatch preparation before implementation",
+      "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05b-delivery",
+      "branch": "feat/parity-t05b",
+      "base_commit": "7c1b68e",
+      "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+      "builder": "/root/recover_t05c",
+      "test_author": "/root/correction_regressions",
+      "reviewer": "/root/recovery_contract",
+      "verifier": "/root/correction_verifier",
+      "fixes": 0,
+      "retries": 0,
+      "checkpoint": ".deliver/checkpoints/T05B-initial",
+      "interface_preflight": ".deliver/T05B-interface-preflight.json"
     }
   },
-  "next": "Start approved T05B remote lifecycle wiring from accepted T05C integrated base.",
+  "next": "T05B remote lifecycle: align exported API and independent test dispatch within approved frozen contract, then implement and verify.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
