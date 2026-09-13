@@ -288,7 +288,7 @@
       "integration_commit": "e8457e0d446d170fcd4ac1222718826a0c7c1a28"
     },
     "T05B": {
-      "status": "fix2 production repair released against independently frozen regressions; full gates pending",
+      "status": "fix2 production repair resumed after advanced-base fixture correction; normal artifact group passes; remaining focused checks and full gates pending",
       "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05b-delivery",
       "branch": "feat/parity-t05b",
       "base_commit": "7c1b68e",
@@ -315,7 +315,7 @@
       "repair_design": ".deliver/T05B-fix2-design.json",
       "development_test_reports": ".deliver/T05B-fix1-test-reports.json",
       "fix1_red_snapshot": "eab097cc2001a7fd1238d9ac605190afb36f6bc9acdf472a8af64f5264b068b3",
-      "partial_snapshot": "45feb36bb616c473c2a2443bee48dd3f2bb4ed68d78983960f397a761fb7f8a9",
+      "partial_snapshot": "e3bd480a5db523cec8c62940ce4bc5d2684b396db61acb5280b35bcb8d67eafc",
       "coverage_preflight": ".deliver/T05B-fix1-test-preflight-native.json",
       "identity_clarification": ".deliver/T05B-fix1-identity-clarification.json",
       "final_test_snapshot": "2511cd8c1137abacb93a6421426d0b36165b1584509b2504b9bc291fdd866412",
@@ -333,7 +333,9 @@
       "latest_review": ".deliver/review-T05B-fix1.json",
       "latest_verification": ".deliver/verification-T05B-fix1.json",
       "design_preflight": ".deliver/T05B-fix2-design-preflight-native.json",
-      "fix2_red_snapshot": "4591c845188c530e6541576b82ce000f0b4419d8a00589e448a2f81e5ffed7e1"
+      "fix2_red_snapshot": "4591c845188c530e6541576b82ce000f0b4419d8a00589e448a2f81e5ffed7e1",
+      "latest_fixture_checkpoint": ".deliver/checkpoints/T05B-fix2-advanced-base-fixture",
+      "frozen_lifecycle_test_sha256": "9d1169ed592e9b80c7a0eb82f716f9ceff7f3953471edde8cb126b452600c708"
     }
   },
   "next": "T05B fix2: complete five-finding source repair, freeze candidate, run unchanged full gates, then independent whole-task review and distinct verification.",

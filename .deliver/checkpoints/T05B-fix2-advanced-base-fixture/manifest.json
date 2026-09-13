@@ -1,0 +1,16 @@
+{
+  "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "revision": 12,
+  "fixes": 2,
+  "scope": "Only the advanced-base test provider composition fixture; no production proof relaxed.",
+  "old_sha256": "2f8b5f499f32e4ba2e663b989b853b7b27add5905f92cb3f1b87c08c532b1f61",
+  "new_sha256": "9d1169ed592e9b80c7a0eb82f716f9ceff7f3953471edde8cb126b452600c708",
+  "author": "/root/correction_regressions",
+  "coordinator_inspection": "Exact narrow diff confirms advancedBase=N plus bare-repository controls for both N and C bytes before reconciliation. Wrong observed-I negative retained.",
+  "agent_reported_checks": {
+    "syntax": "PASS",
+    "whitespace": "PASS",
+    "runtime_tests": "not run"
+  },
+  "builder_released": true
+}
