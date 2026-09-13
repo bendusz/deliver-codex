@@ -76,14 +76,15 @@
   "additional_native_observations": [
     {
       "source": ".deliver/T05B-fix3-mode-fixture-ruling.json",
-      "issue": "Current claim/transition atomic writes normalize executable story mode; restoring755 after in-review conflicts with original audited Execution baseline.",
-      "status": "Confirmed by native fixture setup; source correction not dispatched. Assess and scope before release separately from T05B remote artifact mode repair.",
+      "issue": "Current claim atomic replacement normalizes an executable story; transitions inherit it and compare an expected mode rather than the live mode, leaving mode-only drift incompletely validated.",
+      "status": "Native read-only assessment confirms two publisher/audit gaps. Reconcile a separate bounded correction after future T08 journal acceptance and before release; no active task expansion.",
       "likely_paths": [
         "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
         "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
         "tests/current-lifecycle.test.mjs",
         "tests/transitions.test.mjs"
-      ]
+      ],
+      "assessment": ".deliver/story-mode-follow-up-proposal-native.json"
     }
   ]
 }

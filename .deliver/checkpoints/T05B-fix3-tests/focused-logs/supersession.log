@@ -1,0 +1,16 @@
+▶ proved premerge head or base drift supersedes reciprocally before one successor provider write
+  ✔ published source head drift prepares one linked successor and executes it on the next call (8266.152958ms)
+  ✔ pending merge base drift prepares one linked successor and executes it on the next call (5148.892625ms)
+  ✔ unknown, absent, failed and unproved mismatch observations never supersede or trigger a second write (10858.50025ms)
+✔ proved premerge head or base drift supersedes reciprocally before one successor provider write (31687.711041ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 31729.758125
+real 31.75
+user 15.91
+sys 12.01

@@ -1,0 +1,11 @@
+{
+  "status": "Reopened for bounded test-fixture correction, not production review failure",
+  "actor": "/root",
+  "builder": "held",
+  "findings": [
+    "Adopted story comparison must preserve exact committed bytes instead of trimEnd/reconstructed LF.",
+    "Final receipt semantic mutation cases must execute before artifact generations exist to avoid unrelated stale-finalization rejection masking the tested rule.",
+    "Where feasible cover report-only and checklist-only existing M paths using shared genuine source setup."
+  ],
+  "history": "Original independent test snapshot and raw logs retained. No formal fix round or baseline change."
+}

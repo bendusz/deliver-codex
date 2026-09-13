@@ -1,0 +1,38 @@
+▶ provider interruption preserves one attempt across concurrency, fresh-process ambiguity, absence replay and merge adoption
+  ✔ an executing publication rejects a concurrent provider write (2296.859166ms)
+  ✖ fresh process keeps an ended executing attempt unknown, then same-process exact absence replays its token (4105.71475ms)
+  ✔ server merge completed before transport loss is reconciled onto the same attempt without replay (3237.193208ms)
+  ✔ queued merge observation cannot replay an ended merge invocation (2750.532792ms)
+✖ provider interruption preserves one attempt across concurrency, fresh-process ambiguity, absence replay and merge adoption (19712.920625ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 3
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 19754.721375
+
+✖ failing tests:
+
+test at tests/remote-lifecycle.test.mjs:2497:11
+✖ fresh process keeps an ended executing attempt unknown, then same-process exact absence replays its token (4105.71475ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception: exact absence replay must bind the attempt expected head
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/t05b-delivery/tests/remote-lifecycle.test.mjs:2591:14)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/t05b-delivery/tests/remote-lifecycle.test.mjs:2497:11)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid remote publication evidence|transition|active|effect|disposition|replay/i,
+    operator: 'throws',
+    diff: 'simple'
+  }
+real 19.78
+user 10.00
+sys 7.40
