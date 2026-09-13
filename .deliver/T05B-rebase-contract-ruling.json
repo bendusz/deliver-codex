@@ -1,0 +1,5 @@
+{
+  "status": "PASS",
+  "findings": [],
+  "summary": "The accepted contract does not require rejecting an extra empty first-parent commit. It requires a unique established base, a nonempty bounded first-parent range, the exact final tree, and bounded source delta. The current `changed.length > 0` check and rejection test add an unsupported per-commit nonempty-delta rule. Empty commits should be accepted; intermediate unauthorized path changes, including changes later reverted before the exact final tree, must still be rejected by inspecting every first-parent edge."
+}

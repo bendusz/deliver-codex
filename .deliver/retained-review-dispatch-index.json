@@ -65,5 +65,12 @@
       "reference": "03-public-remote.triage.json:8",
       "issue": "External-review scanner limitations: T14 can document limits and retain invocation provenance; scanner source is not in T14 touches. Do not silently expand task to change it."
     }
-  ]
+  ],
+  "scope_recommendation": {
+    "agent": "/root/recovery_contract",
+    "kind": "Read-only recommendation; no acceptance or task authorization inferred",
+    "story_no_final_newline": "Separate bounded story.mjs/story.test.mjs/current-lifecycle regression correction. A T08 caller diagnostic alone is incomplete. Preserve existing newline-terminated contract hashes and Execution round trips.",
+    "packaged_module_paths": "Small prerequisite or explicit pre-baseline T14 task reconciliation for assets/specdd/module.sdd and tests/specdd.test.mjs; owned validation alone cannot repair the example.",
+    "scanner": "Handle approved honesty requirements through T11/T14 documentation and packet/invocation/receipt provenance. Source scanner hardening is optional and outside remaining touches; do not change validated receipt schema."
+  }
 }
