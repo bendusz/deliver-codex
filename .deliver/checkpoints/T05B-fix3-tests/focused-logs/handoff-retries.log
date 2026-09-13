@@ -1,0 +1,35 @@
+✖ handoff repair permits retries zero through two and exhausts only after a third proved base race (30074.111083ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 30117.42325
+
+✖ failing tests:
+
+test at tests/remote-lifecycle.test.mjs:3086:1
+✖ handoff repair permits retries zero through two and exhausts only after a third proved base race (30074.111083ms)
+  AssertionError [ERR_ASSERTION]: replacement H2 generation 1 binds the latest proved parent
+  + actual - expected
+  
+  + '1fb992f14fc407379d72d7b9524fcf2567f95b92'
+  - '7ee8f2d6424e292502f320aa330e8eeb93e38cfa'
+  
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/t05b-delivery/tests/remote-lifecycle.test.mjs:3165:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '1fb992f14fc407379d72d7b9524fcf2567f95b92',
+    expected: '7ee8f2d6424e292502f320aa330e8eeb93e38cfa',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+real 30.14
+user 15.05
+sys 11.45

@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T13A-AC1",
+      "status": "PASS",
+      "evidence": "Independent inspection of benchmark-result.schema.json and lib/benchmark.mjs confirms exactly two runs, explicit provider/model/role/reasoning configurations, distinct IDs and effective signatures, matching story and hexadecimal base commit, bounded finite gate/review/retry metrics, passed <= total, consistent first-pass fields, and nullable tokens/cost. The exact-snapshot test gate exercised valid null measurements and malformed cross-field and numeric cases."
+    },
+    {
+      "id": "T13A-AC2",
+      "status": "PASS",
+      "evidence": "scoreBenchmarkResult uses fixed arithmetic and code-unit ID ordering, filters winners to completed runs with every gate passed and zero block/major findings, and emits explicit winner, tie, or no_eligible_winner outcomes without changing a route. renderBenchmarkMarkdown normalizes line controls and escapes HTML, pipes, backslashes and Markdown punctuation in all untrusted rendered labels; focused tests cover eligible-over-higher-raw-score selection, ties, no eligible winner and table injection."
+    },
+    {
+      "id": "T13A-AC3",
+      "status": "PASS",
+      "evidence": "Independent source inspection found only built-in fs/path/url imports, no provider or Git execution path, and a direct-execution guard that leaves library and CLI imports inert. The CLI opens input nonblocking/no-follow, requires a regular file, enforces a 1 MiB limit and writes only stdout/stderr. Exact-snapshot tests verify silent side-effect-free imports, unchanged temporary directories, normal CLI reads, oversized rejection and FIFO rejection; full npm test and npm run validate gates passed."
+    }
+  ]
+}

@@ -1,0 +1,407 @@
+{
+  "schema_version": 1,
+  "run_id": "298d8b1b-27f7-4241-a61f-9b2f17f588d9",
+  "mode": "managed",
+  "revision": 7,
+  "project_root": "/private/tmp/deliver-parity-t00",
+  "created_at": "2026-09-09T22:36:21.688Z",
+  "updated_at": "2026-09-09T22:46:56.149Z",
+  "phase": "finished",
+  "plan": {
+    "path": "/private/tmp/deliver-parity-t00/docs/plans/2026-09-09-upstream-parity.md",
+    "hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+  },
+  "approval": {
+    "approver": "Ben",
+    "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb",
+    "approved_at": "2026-09-09T22:36:21.729Z"
+  },
+  "task": {
+    "packet": {
+      "id": "T00",
+      "objective": "Implement unsandboxed launcher defaults and PM standing delivery authority",
+      "acceptance": [
+        {
+          "id": "T00-AC1",
+          "text": "Default launch passes danger-full-access and approval never without modifying configuration."
+        },
+        {
+          "id": "T00-AC2",
+          "text": "An explicit sandbox option accepts only supported values and propagates as one argv value; fake-launcher tests prove defaults and override."
+        },
+        {
+          "id": "T00-AC3",
+          "text": "Instructions grant PM scoped commits, branch pushes, PR creation/update and verified merging without repeat confirmation while retaining builder/reviewer boundaries."
+        }
+      ],
+      "read_paths": [
+        "AGENTS.md",
+        "docs/plans/2026-09-09-upstream-parity.md"
+      ],
+      "touches": [
+        "README.md",
+        "bin/deliver.mjs",
+        "plugins/deliver/skills/deliver/SKILL.md",
+        "plugins/deliver/skills/deliver/references/compatibility.md",
+        "plugins/deliver/skills/deliver/references/parallel.md",
+        "plugins/deliver/skills/deliver/references/recovery.md",
+        "plugins/deliver/skills/deliver/references/workflow.md",
+        "tests/launcher-integration.test.mjs",
+        "tests/setup.test.mjs"
+      ],
+      "commands": {
+        "test": "npm test",
+        "validate": "npm run validate"
+      },
+      "specs": []
+    },
+    "builder": "t00_builder",
+    "started_at": "2026-09-09T22:36:21.770Z"
+  },
+  "baseline": {
+    "captured_at": "2026-09-09T22:36:21.871Z",
+    "snapshot": {
+      "entries": {
+        ".gitattributes": "file:644:6866769d73d3e4da4eb37df56a8f4d7c13b76931f43c98b22a0a3dca560b1c98",
+        ".gitignore": "file:644:8180e47269e938c10fac903c5b91adb9d99b17056e0aae991e6129bf77102a0e",
+        "AGENTS.md": "file:644:880f8a032e9e90eead7c3aef538b7c6d8dabf4b50e607405df4a45c20ad66392",
+        "LICENSE": "file:644:3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+        "NOTICE.md": "file:644:e611f6e7a381a5b21eb3c8b41659f5387817de0b8fdd570d6b3191bcbaddd328",
+        "README.md": "file:644:9dfec372f054676900d69319735227d41b39210ef613c803545e2fce03f9d7ba",
+        "bin/deliver.mjs": "file:755:c0237b2aec6172f6bab86f78449444a75adc862aa4e1c874fdc5473994ba9192",
+        "docs/evaluation.md": "file:644:6d2279f74f772d980261545244c24a0af5e01b22d53ca5bb46646052cf780e67",
+        "docs/plans/2026-09-09-upstream-parity.md": "file:644:d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb",
+        "package.json": "file:644:b940bba2da59045db4c25d7493a6ef8927d7c52a77507c8f2a33d3e81b8b9a7c",
+        "plugins/deliver/.codex-plugin/plugin.json": "file:644:d40d65e4854068d62bd8a9be1b7fa09f1d8d959c1867078953b6a4e1c7018ddd",
+        "plugins/deliver/LICENSE": "file:644:3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+        "plugins/deliver/NOTICE.md": "file:644:e611f6e7a381a5b21eb3c8b41659f5387817de0b8fdd570d6b3191bcbaddd328",
+        "plugins/deliver/hooks/context.mjs": "file:644:41ad585d4951f565ea30983b7abaf54fbfcee5a14601dc43367fe8c038fd02a4",
+        "plugins/deliver/hooks/hooks.json": "file:644:f9a2302b52033fa6af046fa4651b981c4c00d1842e798df569a3dd62acbcb987",
+        "plugins/deliver/skills/deliver/SKILL.md": "file:644:3a955b012d8ab4887a50734d5ae88f6302b7a360d78e5a32c381a77421857ecf",
+        "plugins/deliver/skills/deliver/agents/openai.yaml": "file:644:0b0770232401e052f05911e92ff824b44cf5be438f942d170448600a97026e98",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-architecture.toml": "file:644:040499a5f52843165d79319496b4af0a01089dd0f8321baa3d54ac41e39adebf",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-builder.toml": "file:644:90a875b6ddab5e7c5a7f09163bb880c32c39b19ee1a7c922c5cb22288d93596e",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-claude-reviewer.toml": "file:644:acbc55f4e601a05cff1ffb6b86339acb28e04989565fc6f3dd9848a0efb85f76",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-debugger.toml": "file:644:3513cff3017fb33b68518e69fef21d5ad6b87cb020def52222053e1fde64b8b3",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-explorer.toml": "file:644:85665851b45bbcb94af0398f9807fac275d688317281a91e2c739e495e42638d",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-librarian.toml": "file:644:2f374ceea41385aae9170bc147190ae5286e84f248b27c2b465d609fd1cac26a",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-researcher.toml": "file:644:beafc50a187e294d7eca7f6715637938343910594a452a264f0c983f582c8301",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-reviewer.toml": "file:644:50b8f71ce77d1cba661cf28bb28b1204e59795ee1f683de52cdc8fdd7caeeb8f",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-security.toml": "file:644:74e5917dc4b0bc6e33bd6a22ef49dd5d3cd0ffd3f49a6a87d25ef503dd844371",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-spec-architect.toml": "file:644:0ac7d6d7fd59bcbe10f08f8174bbda340ae0688e95529b9551f2c7393d6bc6b3",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-technical-writer.toml": "file:644:7d6f8c26947421eff4517d8082e8a50437096e06b7bc393d2bf15dfe8abefccd",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-test-engineer.toml": "file:644:479ed373405dde5fdf265f140829a3d8f27e88a425fcd3599335488df851f905",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-verifier.toml": "file:644:ce39c8b010675ad952a4aca3fb6cb8bcb75b6fe00f97d69646901bde765e01a1",
+        "plugins/deliver/skills/deliver/assets/review.example.json": "file:644:44ca24764896b56c10a97a0f8df84d4bc1d46ff34ec0f87c0c8d1fb5de75f98b",
+        "plugins/deliver/skills/deliver/assets/specdd/bootstrap.md": "file:644:50db90f302d0167930cbad84fabb1461b0ad6e2fc9e65b6b50dfa21027e11687",
+        "plugins/deliver/skills/deliver/assets/specdd/bootstrap.md.template": "file:644:29075149fe2e0c7bbad76374f137dd460cc5b0faf2002b7e3beeaf14f18a16e6",
+        "plugins/deliver/skills/deliver/assets/specdd/module.sdd": "file:644:88f343d6e95ed72e1989863ea72340f7683bf50162a6d72e53fc1a33134c9ce1",
+        "plugins/deliver/skills/deliver/assets/specdd/module.sdd.template": "file:644:d61c9152b875b407185d05b13d3eee1703caa6288f20d4218a6f00db69d380af",
+        "plugins/deliver/skills/deliver/assets/specdd/root.sdd": "file:644:26f1f3f07f5eb173fd0791a6c6404c980686a9567ca0f3af01504d4102767955",
+        "plugins/deliver/skills/deliver/assets/specdd/root.sdd.template": "file:644:b43e572f3831dfeb3b23e0787366073f5ebe805db8947e6fb840c3927acde437",
+        "plugins/deliver/skills/deliver/assets/task.example.json": "file:644:0ce2fce1d34fa454d4e9fd0b1b40533b17dc61939bd7adca1849cd2108b32c8e",
+        "plugins/deliver/skills/deliver/assets/verification.example.json": "file:644:12e375d51e1ff51b35afb1ad42cd3e442000efdb0f1d383207e57656ee16bb74",
+        "plugins/deliver/skills/deliver/references/claude-review.md": "file:644:ad1fff062eefbb7049c34e898675c1277dbae14c3ca78bb5d77134ccfcd5a4d1",
+        "plugins/deliver/skills/deliver/references/compatibility.md": "file:644:9117f53757feb97d68b97e6480173d2cfcffba0b3fa0fc720a694beeb869b78a",
+        "plugins/deliver/skills/deliver/references/governance.md": "file:644:43ff3086d2416d83e186006dd9881ee2cdc002b850f6bd7003c85fd4b1a178e7",
+        "plugins/deliver/skills/deliver/references/knowledge.md": "file:644:c71b90e563decd626fc5e10256194be794ae85b9dfa33e09f920a982aeac55c5",
+        "plugins/deliver/skills/deliver/references/parallel.md": "file:644:e1d1623fb40f20c6e2b1d7f0792febdc507cb9f85a09660e1dd1c150265af493",
+        "plugins/deliver/skills/deliver/references/recovery.md": "file:644:5b21e8f57ece62c5b4177da37c9d91c4905b99d4863137f559d3344a4e7b0f1e",
+        "plugins/deliver/skills/deliver/references/runtime.md": "file:644:f51ca052dc3141bad2d0057c19f576ee7f5414d50fe5e3ae99977af4cf063287",
+        "plugins/deliver/skills/deliver/references/specdd.md": "file:644:7f379875904acda43c7a197784e96602fd796ccb28da95e1c37faeac840edadc",
+        "plugins/deliver/skills/deliver/references/workflow.md": "file:644:6c12f716439d6a6b22ea17384a98bf5d2404ff0757995792c6409d35726e5362",
+        "plugins/deliver/skills/deliver/scripts/claude-review.mjs": "file:644:1a1d9271a74b4079353de0651f19c8cf159e3a8ed3f497329ec87c41ccf920cf",
+        "plugins/deliver/skills/deliver/scripts/deliver.mjs": "file:755:b2a18adbdc174bfdc835b02286aa166b45b3ad74f47e09db7ea545ceba789471",
+        "plugins/deliver/skills/deliver/scripts/lib/contracts.mjs": "file:644:a251f7f98ac1475463cfc557fde86aa042a1ad5ff993ede65e225204f4753cc2",
+        "plugins/deliver/skills/deliver/scripts/lib/gates.mjs": "file:644:097a86b03827a4cab1668ca4038879155e4d30c8d92007e2e32d2a79e829367c",
+        "plugins/deliver/skills/deliver/scripts/lib/pm.mjs": "file:644:fc3d38d7bf3dbc26ed53c145ba1bf7d0988eeb70bf3030bc9caf2a036ca73823",
+        "plugins/deliver/skills/deliver/scripts/lib/scope.mjs": "file:644:41bf71ddb82ceb0b8d36646e87b6747e19977ee1bd4d47c0fd7cce23935e0b92",
+        "plugins/deliver/skills/deliver/scripts/lib/state.mjs": "file:644:2bd4ae530ac7f7863c933ab8d578eb6049d023238f3e6f330c60f441c9e6e2ec",
+        "plugins/deliver/skills/deliver/scripts/pm.mjs": "file:644:671b2a2b1b7c9c29dc136dce17177e0242ed9b5425f17dbe88ef1849c4a8673f",
+        "plugins/deliver/skills/deliver/scripts/specdd.mjs": "file:644:bfae9d5eb24f1784d264e7d70dc0821b4f41a9828d3d473a0346b4ee498ac9c0",
+        "scripts/validate.mjs": "file:755:729e03bd0ccf5e192d4c8228d4df7252b893664134e45b1c31ba992310cb65db",
+        "tests/claude-review.test.mjs": "file:644:679c7dae6cf6973880743009ebd29c3ba3fde937e042fe87bff56da8bc22af07",
+        "tests/contracts-integration.test.mjs": "file:644:8eb3c09725dfbe514b5ecfd5ed8520d425d80dcd5d1a3bf0a4e4e78803574fe3",
+        "tests/fixtures/upstream-v0.22.0/NOTICE.md": "file:644:f43d5a7ad780077f17700936b7f7bc348567edac78d4c3be0e8de790ececace5",
+        "tests/fixtures/upstream-v0.22.0/hooks/lib.mjs": "file:644:1f9a8ff3a3f4eb300851fcbac7569509050f738a4dd56d22be2e6459f8242339",
+        "tests/fixtures/upstream-v0.22.0/hooks/session-context.mjs": "file:644:820c41410e07ef11f65ad3888971d8c862a7946a9133a2a49479c1b4b1d47c6d",
+        "tests/fixtures/upstream-v0.22.0/templates/actor-state.json.template": "file:644:ae6ae65ca6d3edb00228726b78884e920416dc854f5d0a77a723e8f30ea46d64",
+        "tests/fixtures/upstream-v0.22.0/templates/pm-state.json.template": "file:644:9bdf7ee6b341cf31b94c73ed9cbdade42293db737d6e600d17de791a086d8aa3",
+        "tests/hooks-and-environment.test.mjs": "file:644:e86d20b3c8eceeefa9608b7bf33f10c9459b1258ff4405a8d778fbcf794b06fb",
+        "tests/launcher-integration.test.mjs": "file:644:c223ce9ce25bc3d8fa6ddabacd010188b7d247100eb68b2a17ca86ca95ba122e",
+        "tests/pm-compatibility.test.mjs": "file:644:4d76aba5dbdf79c33c19a2074d2e0ea1f3ee7f9b27ed7571d3b406c3b9a2bb4d",
+        "tests/runtime.test.mjs": "file:644:98c143640801b2de4f31edf2ea09aa414cf8a51f582e14075c5869a9465aa236",
+        "tests/scope-regressions.test.mjs": "file:644:3d188432ccbd590313d465afe39753f644383b0d3284303639c469be0c7bdd70",
+        "tests/setup.test.mjs": "file:644:e68ee46a1715b9dfc4e5ee362962d5ba7fcc6a7a8a21d1710cfe2c500cb20675",
+        "tests/specdd.test.mjs": "file:644:5893857063ae810717d0d118d4bc728fecfe49350b62e81d76135eeda5c0b88b"
+      },
+      "git_meta": "58e2a9058bf1911452206c6c96d01e5257e6c2437cd020c6f0da514bfc0331ba",
+      "ignored_advisory": {},
+      "hash": "ab22baf9c6f6e8a0440d9d45be9f9f77e554bfc4630acb0bb1e6149bc5b8836f"
+    },
+    "dirty_paths": []
+  },
+  "gates": [
+    {
+      "provenance": "deliver-runtime-executed-v1",
+      "name": "test",
+      "command": "npm test",
+      "cwd": ".",
+      "environment_keys": [],
+      "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "environment_hash": "3a925bd75c9dc1250d1af8ff3993ccdee15a119375984d64d1223aa394b7cf88",
+      "snapshot_hash": "4c2c4c16523a823063118e525c346e46ba92a0cf70737c91ba84cc4c8b246f0b",
+      "status": "PASS",
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "log_path": ".deliver/logs/298d8b1b-27f7-4241-a61f-9b2f17f588d9/test-d750211c-6b54-4009-bf85-d0274e082774.log",
+      "output": {
+        "stdout_bytes": 6285,
+        "stderr_bytes": 0,
+        "truncated": false
+      },
+      "scope": {
+        "ok": true,
+        "changed": [
+          "README.md",
+          "bin/deliver.mjs",
+          "plugins/deliver/skills/deliver/SKILL.md",
+          "plugins/deliver/skills/deliver/references/compatibility.md",
+          "plugins/deliver/skills/deliver/references/parallel.md",
+          "plugins/deliver/skills/deliver/references/recovery.md",
+          "plugins/deliver/skills/deliver/references/workflow.md",
+          "tests/launcher-integration.test.mjs",
+          "tests/setup.test.mjs"
+        ],
+        "added": [],
+        "deleted": [],
+        "renames": [],
+        "out_of_scope": [],
+        "preexisting_dirty_changed": [],
+        "symlink_escapes": [],
+        "git_metadata_changed": false,
+        "ignored_advisory_changed": [],
+        "contracts_changed": []
+      },
+      "started_at": "2026-09-09T22:43:30.076Z",
+      "finished_at": "2026-09-09T22:43:42.182Z"
+    },
+    {
+      "provenance": "deliver-runtime-executed-v1",
+      "name": "validate",
+      "command": "npm run validate",
+      "cwd": ".",
+      "environment_keys": [],
+      "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "environment_hash": "3a925bd75c9dc1250d1af8ff3993ccdee15a119375984d64d1223aa394b7cf88",
+      "snapshot_hash": "4c2c4c16523a823063118e525c346e46ba92a0cf70737c91ba84cc4c8b246f0b",
+      "status": "PASS",
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "log_path": ".deliver/logs/298d8b1b-27f7-4241-a61f-9b2f17f588d9/validate-e5681a04-ca3f-4b09-9922-8339e48777ca.log",
+      "output": {
+        "stdout_bytes": 150,
+        "stderr_bytes": 0,
+        "truncated": false
+      },
+      "scope": {
+        "ok": true,
+        "changed": [
+          "README.md",
+          "bin/deliver.mjs",
+          "plugins/deliver/skills/deliver/SKILL.md",
+          "plugins/deliver/skills/deliver/references/compatibility.md",
+          "plugins/deliver/skills/deliver/references/parallel.md",
+          "plugins/deliver/skills/deliver/references/recovery.md",
+          "plugins/deliver/skills/deliver/references/workflow.md",
+          "tests/launcher-integration.test.mjs",
+          "tests/setup.test.mjs"
+        ],
+        "added": [],
+        "deleted": [],
+        "renames": [],
+        "out_of_scope": [],
+        "preexisting_dirty_changed": [],
+        "symlink_escapes": [],
+        "git_metadata_changed": false,
+        "ignored_advisory_changed": [],
+        "contracts_changed": []
+      },
+      "started_at": "2026-09-09T22:43:42.310Z",
+      "finished_at": "2026-09-09T22:43:43.030Z"
+    }
+  ],
+  "review": {
+    "status": "PASS",
+    "findings": [],
+    "summary": "Independent state_architecture review: launcher argv validation and config preservation verified; PM/worker authority boundaries consistent; both gates passed at reviewed snapshot.",
+    "builder": "t00_builder",
+    "reviewer": "state_architecture",
+    "snapshot_hash": "4c2c4c16523a823063118e525c346e46ba92a0cf70737c91ba84cc4c8b246f0b",
+    "recorded_at": "2026-09-09T22:46:54.823Z"
+  },
+  "verification": {
+    "verifier": "state_architecture",
+    "criteria": [
+      {
+        "id": "T00-AC1",
+        "status": "PASS",
+        "evidence": "Independent review: bin/deliver.mjs defaults to danger-full-access/never using session argv; launcher integration fake-provider test verifies exact args and unchanged config; coordinator gates passed."
+      },
+      {
+        "id": "T00-AC2",
+        "status": "PASS",
+        "evidence": "Independent review: launcher whitelists supported sandbox modes, rejects missing/duplicate options and uses shell:false with separate argv. Fake-launcher and setup tests cover propagation and rejection."
+      },
+      {
+        "id": "T00-AC3",
+        "status": "PASS",
+        "evidence": "Independent review: skill/workflow/parallel/recovery/compatibility grant scoped PM commit/push/PR/verified-merge authority; native builder still forbids Git integration and reviewer is read-only."
+      }
+    ],
+    "snapshot_hash": "4c2c4c16523a823063118e525c346e46ba92a0cf70737c91ba84cc4c8b246f0b",
+    "recorded_at": "2026-09-09T22:46:55.511Z"
+  },
+  "checkpoints": [],
+  "counters": {
+    "retries": 0,
+    "fixes": 0,
+    "corrections": 0
+  },
+  "events": [
+    {
+      "at": "2026-09-09T22:36:21.688Z",
+      "type": "initialized",
+      "mode": "managed",
+      "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+    },
+    {
+      "at": "2026-09-09T22:36:21.729Z",
+      "type": "approved",
+      "approver": "Ben",
+      "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+    },
+    {
+      "at": "2026-09-09T22:36:21.871Z",
+      "type": "baseline_captured",
+      "snapshot_hash": "ab22baf9c6f6e8a0440d9d45be9f9f77e554bfc4630acb0bb1e6149bc5b8836f",
+      "dirty_paths": []
+    },
+    {
+      "at": "2026-09-09T22:43:42.182Z",
+      "type": "gate_executed",
+      "name": "test",
+      "status": "PASS",
+      "snapshot_hash": "4c2c4c16523a823063118e525c346e46ba92a0cf70737c91ba84cc4c8b246f0b"
+    },
+    {
+      "at": "2026-09-09T22:43:43.030Z",
+      "type": "gate_executed",
+      "name": "validate",
+      "status": "PASS",
+      "snapshot_hash": "4c2c4c16523a823063118e525c346e46ba92a0cf70737c91ba84cc4c8b246f0b"
+    },
+    {
+      "at": "2026-09-09T22:46:54.823Z",
+      "type": "review_recorded",
+      "reviewer": "state_architecture",
+      "status": "PASS",
+      "snapshot_hash": "4c2c4c16523a823063118e525c346e46ba92a0cf70737c91ba84cc4c8b246f0b"
+    },
+    {
+      "at": "2026-09-09T22:46:55.511Z",
+      "type": "verification_recorded",
+      "verifier": "state_architecture",
+      "snapshot_hash": "4c2c4c16523a823063118e525c346e46ba92a0cf70737c91ba84cc4c8b246f0b"
+    },
+    {
+      "at": "2026-09-09T22:46:56.149Z",
+      "type": "finished",
+      "snapshot_hash": "4c2c4c16523a823063118e525c346e46ba92a0cf70737c91ba84cc4c8b246f0b"
+    }
+  ],
+  "pm_binding": null,
+  "contracts": null,
+  "completion_snapshot": {
+    "entries": {
+      ".gitattributes": "file:644:6866769d73d3e4da4eb37df56a8f4d7c13b76931f43c98b22a0a3dca560b1c98",
+      ".gitignore": "file:644:8180e47269e938c10fac903c5b91adb9d99b17056e0aae991e6129bf77102a0e",
+      "AGENTS.md": "file:644:880f8a032e9e90eead7c3aef538b7c6d8dabf4b50e607405df4a45c20ad66392",
+      "LICENSE": "file:644:3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "NOTICE.md": "file:644:e611f6e7a381a5b21eb3c8b41659f5387817de0b8fdd570d6b3191bcbaddd328",
+      "README.md": "file:644:c5627680bfccb102c3ec5f5440f5f10ff0a627a317123435c4aeda0940a0953a",
+      "bin/deliver.mjs": "file:755:6a417373d0df05ba24464665d4dd9c758e504d8168f23d7257d4e74846f4f0c3",
+      "docs/evaluation.md": "file:644:6d2279f74f772d980261545244c24a0af5e01b22d53ca5bb46646052cf780e67",
+      "docs/plans/2026-09-09-upstream-parity.md": "file:644:d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb",
+      "package.json": "file:644:b940bba2da59045db4c25d7493a6ef8927d7c52a77507c8f2a33d3e81b8b9a7c",
+      "plugins/deliver/.codex-plugin/plugin.json": "file:644:d40d65e4854068d62bd8a9be1b7fa09f1d8d959c1867078953b6a4e1c7018ddd",
+      "plugins/deliver/LICENSE": "file:644:3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "plugins/deliver/NOTICE.md": "file:644:e611f6e7a381a5b21eb3c8b41659f5387817de0b8fdd570d6b3191bcbaddd328",
+      "plugins/deliver/hooks/context.mjs": "file:644:41ad585d4951f565ea30983b7abaf54fbfcee5a14601dc43367fe8c038fd02a4",
+      "plugins/deliver/hooks/hooks.json": "file:644:f9a2302b52033fa6af046fa4651b981c4c00d1842e798df569a3dd62acbcb987",
+      "plugins/deliver/skills/deliver/SKILL.md": "file:644:412d23d18dc3052b0b47b9acf437960ad74445b7927f9da2765b706e3d250f4a",
+      "plugins/deliver/skills/deliver/agents/openai.yaml": "file:644:0b0770232401e052f05911e92ff824b44cf5be438f942d170448600a97026e98",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-architecture.toml": "file:644:040499a5f52843165d79319496b4af0a01089dd0f8321baa3d54ac41e39adebf",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-builder.toml": "file:644:90a875b6ddab5e7c5a7f09163bb880c32c39b19ee1a7c922c5cb22288d93596e",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-claude-reviewer.toml": "file:644:acbc55f4e601a05cff1ffb6b86339acb28e04989565fc6f3dd9848a0efb85f76",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-debugger.toml": "file:644:3513cff3017fb33b68518e69fef21d5ad6b87cb020def52222053e1fde64b8b3",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-explorer.toml": "file:644:85665851b45bbcb94af0398f9807fac275d688317281a91e2c739e495e42638d",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-librarian.toml": "file:644:2f374ceea41385aae9170bc147190ae5286e84f248b27c2b465d609fd1cac26a",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-researcher.toml": "file:644:beafc50a187e294d7eca7f6715637938343910594a452a264f0c983f582c8301",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-reviewer.toml": "file:644:50b8f71ce77d1cba661cf28bb28b1204e59795ee1f683de52cdc8fdd7caeeb8f",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-security.toml": "file:644:74e5917dc4b0bc6e33bd6a22ef49dd5d3cd0ffd3f49a6a87d25ef503dd844371",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-spec-architect.toml": "file:644:0ac7d6d7fd59bcbe10f08f8174bbda340ae0688e95529b9551f2c7393d6bc6b3",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-technical-writer.toml": "file:644:7d6f8c26947421eff4517d8082e8a50437096e06b7bc393d2bf15dfe8abefccd",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-test-engineer.toml": "file:644:479ed373405dde5fdf265f140829a3d8f27e88a425fcd3599335488df851f905",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-verifier.toml": "file:644:ce39c8b010675ad952a4aca3fb6cb8bcb75b6fe00f97d69646901bde765e01a1",
+      "plugins/deliver/skills/deliver/assets/review.example.json": "file:644:44ca24764896b56c10a97a0f8df84d4bc1d46ff34ec0f87c0c8d1fb5de75f98b",
+      "plugins/deliver/skills/deliver/assets/specdd/bootstrap.md": "file:644:50db90f302d0167930cbad84fabb1461b0ad6e2fc9e65b6b50dfa21027e11687",
+      "plugins/deliver/skills/deliver/assets/specdd/bootstrap.md.template": "file:644:29075149fe2e0c7bbad76374f137dd460cc5b0faf2002b7e3beeaf14f18a16e6",
+      "plugins/deliver/skills/deliver/assets/specdd/module.sdd": "file:644:88f343d6e95ed72e1989863ea72340f7683bf50162a6d72e53fc1a33134c9ce1",
+      "plugins/deliver/skills/deliver/assets/specdd/module.sdd.template": "file:644:d61c9152b875b407185d05b13d3eee1703caa6288f20d4218a6f00db69d380af",
+      "plugins/deliver/skills/deliver/assets/specdd/root.sdd": "file:644:26f1f3f07f5eb173fd0791a6c6404c980686a9567ca0f3af01504d4102767955",
+      "plugins/deliver/skills/deliver/assets/specdd/root.sdd.template": "file:644:b43e572f3831dfeb3b23e0787366073f5ebe805db8947e6fb840c3927acde437",
+      "plugins/deliver/skills/deliver/assets/task.example.json": "file:644:0ce2fce1d34fa454d4e9fd0b1b40533b17dc61939bd7adca1849cd2108b32c8e",
+      "plugins/deliver/skills/deliver/assets/verification.example.json": "file:644:12e375d51e1ff51b35afb1ad42cd3e442000efdb0f1d383207e57656ee16bb74",
+      "plugins/deliver/skills/deliver/references/claude-review.md": "file:644:ad1fff062eefbb7049c34e898675c1277dbae14c3ca78bb5d77134ccfcd5a4d1",
+      "plugins/deliver/skills/deliver/references/compatibility.md": "file:644:6f16e1ec716c434bf47025b6fe3b9fe3da6d1e83e04b93cd66630e02cf26cdc8",
+      "plugins/deliver/skills/deliver/references/governance.md": "file:644:43ff3086d2416d83e186006dd9881ee2cdc002b850f6bd7003c85fd4b1a178e7",
+      "plugins/deliver/skills/deliver/references/knowledge.md": "file:644:c71b90e563decd626fc5e10256194be794ae85b9dfa33e09f920a982aeac55c5",
+      "plugins/deliver/skills/deliver/references/parallel.md": "file:644:b46b95edfd32c5c486d86d0897726830f54e2e654e6590416d03686ea5ab132b",
+      "plugins/deliver/skills/deliver/references/recovery.md": "file:644:3c4fd34bb36cb356e07285aa529730abef557a5b438ba8803914b4206f79189d",
+      "plugins/deliver/skills/deliver/references/runtime.md": "file:644:f51ca052dc3141bad2d0057c19f576ee7f5414d50fe5e3ae99977af4cf063287",
+      "plugins/deliver/skills/deliver/references/specdd.md": "file:644:7f379875904acda43c7a197784e96602fd796ccb28da95e1c37faeac840edadc",
+      "plugins/deliver/skills/deliver/references/workflow.md": "file:644:2b829cb9083e8d6b76b02abb85ba0939c6310d5cee784b864a68b7d19b95d5b2",
+      "plugins/deliver/skills/deliver/scripts/claude-review.mjs": "file:644:1a1d9271a74b4079353de0651f19c8cf159e3a8ed3f497329ec87c41ccf920cf",
+      "plugins/deliver/skills/deliver/scripts/deliver.mjs": "file:755:b2a18adbdc174bfdc835b02286aa166b45b3ad74f47e09db7ea545ceba789471",
+      "plugins/deliver/skills/deliver/scripts/lib/contracts.mjs": "file:644:a251f7f98ac1475463cfc557fde86aa042a1ad5ff993ede65e225204f4753cc2",
+      "plugins/deliver/skills/deliver/scripts/lib/gates.mjs": "file:644:097a86b03827a4cab1668ca4038879155e4d30c8d92007e2e32d2a79e829367c",
+      "plugins/deliver/skills/deliver/scripts/lib/pm.mjs": "file:644:fc3d38d7bf3dbc26ed53c145ba1bf7d0988eeb70bf3030bc9caf2a036ca73823",
+      "plugins/deliver/skills/deliver/scripts/lib/scope.mjs": "file:644:41bf71ddb82ceb0b8d36646e87b6747e19977ee1bd4d47c0fd7cce23935e0b92",
+      "plugins/deliver/skills/deliver/scripts/lib/state.mjs": "file:644:2bd4ae530ac7f7863c933ab8d578eb6049d023238f3e6f330c60f441c9e6e2ec",
+      "plugins/deliver/skills/deliver/scripts/pm.mjs": "file:644:671b2a2b1b7c9c29dc136dce17177e0242ed9b5425f17dbe88ef1849c4a8673f",
+      "plugins/deliver/skills/deliver/scripts/specdd.mjs": "file:644:bfae9d5eb24f1784d264e7d70dc0821b4f41a9828d3d473a0346b4ee498ac9c0",
+      "scripts/validate.mjs": "file:755:729e03bd0ccf5e192d4c8228d4df7252b893664134e45b1c31ba992310cb65db",
+      "tests/claude-review.test.mjs": "file:644:679c7dae6cf6973880743009ebd29c3ba3fde937e042fe87bff56da8bc22af07",
+      "tests/contracts-integration.test.mjs": "file:644:8eb3c09725dfbe514b5ecfd5ed8520d425d80dcd5d1a3bf0a4e4e78803574fe3",
+      "tests/fixtures/upstream-v0.22.0/NOTICE.md": "file:644:f43d5a7ad780077f17700936b7f7bc348567edac78d4c3be0e8de790ececace5",
+      "tests/fixtures/upstream-v0.22.0/hooks/lib.mjs": "file:644:1f9a8ff3a3f4eb300851fcbac7569509050f738a4dd56d22be2e6459f8242339",
+      "tests/fixtures/upstream-v0.22.0/hooks/session-context.mjs": "file:644:820c41410e07ef11f65ad3888971d8c862a7946a9133a2a49479c1b4b1d47c6d",
+      "tests/fixtures/upstream-v0.22.0/templates/actor-state.json.template": "file:644:ae6ae65ca6d3edb00228726b78884e920416dc854f5d0a77a723e8f30ea46d64",
+      "tests/fixtures/upstream-v0.22.0/templates/pm-state.json.template": "file:644:9bdf7ee6b341cf31b94c73ed9cbdade42293db737d6e600d17de791a086d8aa3",
+      "tests/hooks-and-environment.test.mjs": "file:644:e86d20b3c8eceeefa9608b7bf33f10c9459b1258ff4405a8d778fbcf794b06fb",
+      "tests/launcher-integration.test.mjs": "file:644:faa8fc096ae55c3c57b03b3ccbd1c575f6683c7dafe426f5ec0e117963f8ba98",
+      "tests/pm-compatibility.test.mjs": "file:644:4d76aba5dbdf79c33c19a2074d2e0ea1f3ee7f9b27ed7571d3b406c3b9a2bb4d",
+      "tests/runtime.test.mjs": "file:644:98c143640801b2de4f31edf2ea09aa414cf8a51f582e14075c5869a9465aa236",
+      "tests/scope-regressions.test.mjs": "file:644:3d188432ccbd590313d465afe39753f644383b0d3284303639c469be0c7bdd70",
+      "tests/setup.test.mjs": "file:644:6ce8238f45e9ecc6b33eb060794054b746e1d0bd9364e35d14f6bd4472c62096",
+      "tests/specdd.test.mjs": "file:644:5893857063ae810717d0d118d4bc728fecfe49350b62e81d76135eeda5c0b88b"
+    },
+    "git_meta": "58e2a9058bf1911452206c6c96d01e5257e6c2437cd020c6f0da514bfc0331ba",
+    "ignored_advisory": {},
+    "hash": "4c2c4c16523a823063118e525c346e46ba92a0cf70737c91ba84cc4c8b246f0b"
+  },
+  "finished_at": "2026-09-09T22:46:56.149Z"
+}

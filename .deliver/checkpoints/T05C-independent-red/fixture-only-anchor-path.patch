@@ -1,0 +1,11 @@
+--- fixture-corrected-test
++++ anchor-corrected-test
+@@ -398,7 +398,7 @@
+       assert.equal(correctionRun.project_root, fs.realpathSync(correctionRoot));
+       assert.deepEqual(correctionRun.task.packet, fixture.packet, 'correction gets the exact full original packet');
+       assert.equal(correctionRun.task.builder, 'correction-builder');
+-      assert.equal(correctionRun.baseline.git_anchor.head, fixture.startCommit, 'operational baseline begins at actual I or M');
++      assert.equal(correctionRun.git_anchor.head, fixture.startCommit, 'operational Git anchor begins at actual I or M');
+       assert.equal(correctionRun.pm_binding.branch, prepared.result.branch);
+       assert.equal(correctionStory.execution.branch, prepared.result.branch);
+       assert.equal(correctionStory.execution.status, 'building');

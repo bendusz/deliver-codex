@@ -1,0 +1,90 @@
+{
+  "version": "retained-review-dispatch-index-v1",
+  "purpose": "Coordinator index of original interim Fable triage for remaining-task dispatch and final verification. Does not change original findings, task packets or approval and does not assert resolution.",
+  "sources": [
+    {
+      "path": ".deliver/claude-fable-5-1-review/01-runtime.policy-triage.json",
+      "sha256": "3b0d35a7b49990ea1899397d23ca3f80ee83fb2bd1a46efb1ad55771b4daf793",
+      "finding_count": 9
+    },
+    {
+      "path": ".deliver/claude-fable-5-1-review/01-runtime.recovery-triage.json",
+      "sha256": "0cd646c4813d466b4f3ff4f7018eb10f4173898495bbc48cdd3f06f33eebed9d",
+      "finding_count": 2
+    },
+    {
+      "path": ".deliver/claude-fable-5-1-review/02-integration.policy-triage.json",
+      "sha256": "88a612d9ae6d274374d394110ec9c45c8da1ee53eac8d1d6839203d155a413ea",
+      "finding_count": 7
+    },
+    {
+      "path": ".deliver/claude-fable-5-1-review/02-integration.triage.json",
+      "sha256": "64a40034675804b2563288000e608d0522e000a5955de5ad29a8169c69465a61",
+      "finding_count": 8
+    },
+    {
+      "path": ".deliver/claude-fable-5-1-review/03-public-remote.triage.json",
+      "sha256": "345181004adfaa7f7d632ff1d599043a2a107c219d99f79931aafc6ac59578b4",
+      "finding_count": 9
+    },
+    {
+      "path": ".deliver/claude-fable-5-1-review/04-planning-support.triage.json",
+      "sha256": "4393f04bce55388b37b7339931b29d5c1bac6c7482b795d7fb30b581f0e8176d",
+      "finding_count": 8
+    }
+  ],
+  "dispatch_notes": [
+    {
+      "task": "T05B",
+      "references": [
+        "03-public-remote.triage.json:4",
+        "02-integration.policy-triage.json:5"
+      ],
+      "action": "Builder and test engineer reminded to bind fetch/push proof destination and reject explicit verification report at tiny/small before record creation."
+    },
+    {
+      "task": "T08",
+      "references": [
+        "01-runtime.policy-triage.json:minor-3",
+        "01-runtime.policy-triage.json:minor-4",
+        "04-planning-support.triage.json:4"
+      ],
+      "action": "Architecture preparation includes claim generated-byte scanning, complete approval policy and missing headline analysis status. No story parser edit authorized by T08."
+    }
+  ],
+  "unresolved_scope_checks": [
+    {
+      "reference": "01-runtime.policy-triage.json:minor-1",
+      "issue": "No-final-newline story: story.mjs not in remaining task touches; assess bounded validation at existing owned caller or separately scoped correction before release."
+    },
+    {
+      "reference": "04-planning-support.triage.json:3",
+      "issue": "Broken packaged module.sdd example references: T14 owns packaging/reference validation but does not list the example source path; reconcile before task baseline if source change is needed."
+    },
+    {
+      "reference": "03-public-remote.triage.json:8",
+      "issue": "External-review scanner limitations: T14 can document limits and retain invocation provenance; scanner source is not in T14 touches. Do not silently expand task to change it."
+    }
+  ],
+  "scope_recommendation": {
+    "agent": "/root/recovery_contract",
+    "kind": "Read-only recommendation; no acceptance or task authorization inferred",
+    "story_no_final_newline": "Separate bounded story.mjs/story.test.mjs/current-lifecycle regression correction. A T08 caller diagnostic alone is incomplete. Preserve existing newline-terminated contract hashes and Execution round trips.",
+    "packaged_module_paths": "Small prerequisite or explicit pre-baseline T14 task reconciliation for assets/specdd/module.sdd and tests/specdd.test.mjs; owned validation alone cannot repair the example.",
+    "scanner": "Handle approved honesty requirements through T11/T14 documentation and packet/invocation/receipt provenance. Source scanner hardening is optional and outside remaining touches; do not change validated receipt schema."
+  },
+  "additional_native_observations": [
+    {
+      "source": ".deliver/T05B-fix3-mode-fixture-ruling.json",
+      "issue": "Current claim atomic replacement normalizes an executable story; transitions inherit it and compare an expected mode rather than the live mode, leaving mode-only drift incompletely validated.",
+      "status": "Native read-only assessment confirms two publisher/audit gaps. Reconcile a separate bounded correction after future T08 journal acceptance and before release; no active task expansion.",
+      "likely_paths": [
+        "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+        "tests/current-lifecycle.test.mjs",
+        "tests/transitions.test.mjs"
+      ],
+      "assessment": ".deliver/story-mode-follow-up-proposal-native.json"
+    }
+  ]
+}

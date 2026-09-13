@@ -1,0 +1,88 @@
+{
+  "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "revision": 17,
+  "counters": {
+    "retries": 0,
+    "fixes": 3,
+    "corrections": 0
+  },
+  "snapshot": "8dd1caa3402fa5abd0e89bb8a33c161abf7ac23301325de5dba720335e6c75ed",
+  "status": "Independent tests frozen on unchanged held production; not candidate acceptance",
+  "held_source_snapshot": "009feeee3ea2fee4433de2815ca869f6a54f74b186103a95ec0c902ca29a8c9f",
+  "files": {
+    "plugins/deliver/skills/deliver/SKILL.md": {
+      "sha256": "d2f5aa3004648eac530b9cafae75c4e3a68f4614ab576a6d84d1946aa588fd9e",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/assets/operations.json": {
+      "sha256": "b3a23ed104859f4c56e154e9a459d6180799f901383a545bb42684c498a04623",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/references/compatibility.md": {
+      "sha256": "746031f8813b689994d4c6d7abeca6625676fa8ceed240e1b2522bc945636b58",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/references/shipping.md": {
+      "sha256": "d40f652ec585050a98d30683d22d8142fbf2c5add24fbd7eadce2d16b7ab1d99",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/scripts/deliver.mjs": {
+      "sha256": "438c242de87b79d7261eaa7ea9db73f0530dece4bfed3b0df4574ffdd02a2905",
+      "mode": "0o755"
+    },
+    "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs": {
+      "sha256": "07ea55559cdbfdc1c5bdcd6f3fa962cac385bf02ffb32e05ce3d7067e1623e7b",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/scripts/lib/integration.mjs": {
+      "sha256": "666ae4d9ef42bf399e9450e9821c18d5ef1714a27535940aba5e68e052c55877",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/scripts/lib/remote.mjs": {
+      "sha256": "ba21914d8a131532ec38c66e40948621da9d81452449024d59ba5a837a10ea89",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/scripts/lib/state.mjs": {
+      "sha256": "37803f859278e820d66e31d2e032e07ac41d3fdaa451dd9db1c61c15e4b21699",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/scripts/pm.mjs": {
+      "sha256": "22bb33abee9deedbe9a8c5fa6fb6825f652b6c2be026f72229d7cde100920a09",
+      "mode": "0o644"
+    },
+    "tests/current-roundtrip.test.mjs": {
+      "sha256": "453327ad0a522e122ae3a39ab91564aababf3cd5425d007e2475ecc47175b0d6",
+      "mode": "0o644"
+    },
+    "tests/operations.test.mjs": {
+      "sha256": "dde1af29f017b8816b77eb8e9211aff873bcde984b469f6aabaf3d273e6dc3f8",
+      "mode": "0o644"
+    },
+    "tests/remote-lifecycle.test.mjs": {
+      "sha256": "b5e0a0c6ce4ef9914d6b52b3dcd53bc9bddcf6c6e9b97f474d5be35582a17c44",
+      "mode": "0o644"
+    },
+    "tests/remote.test.mjs": {
+      "sha256": "8b3f797e85fdbaeadad3a457232050d156d0bbaadbd02cbba3173d394af40d82",
+      "mode": "0o644"
+    }
+  },
+  "tests": {
+    "tests/current-roundtrip.test.mjs": {
+      "sha256": "453327ad0a522e122ae3a39ab91564aababf3cd5425d007e2475ecc47175b0d6",
+      "mode": "0o644"
+    },
+    "tests/operations.test.mjs": {
+      "sha256": "dde1af29f017b8816b77eb8e9211aff873bcde984b469f6aabaf3d273e6dc3f8",
+      "mode": "0o644"
+    },
+    "tests/remote-lifecycle.test.mjs": {
+      "sha256": "b5e0a0c6ce4ef9914d6b52b3dcd53bc9bddcf6c6e9b97f474d5be35582a17c44",
+      "mode": "0o644"
+    },
+    "tests/remote.test.mjs": {
+      "sha256": "8b3f797e85fdbaeadad3a457232050d156d0bbaadbd02cbba3173d394af40d82",
+      "mode": "0o644"
+    }
+  }
+}

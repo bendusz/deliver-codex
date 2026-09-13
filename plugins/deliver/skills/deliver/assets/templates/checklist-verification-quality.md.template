@@ -1,0 +1,18 @@
+# Verification quality checklist: <story ID>
+<!-- Write to docs/checklists/verification-<story ID>.md only during an authorized checklist
+operation. Check against current code identity and receipts. Missing evidence stays unchecked. -->
+
+- [ ] Every deterministic gate ran against the recorded code identity, or has an evidenced `N/A`.
+  Evidence: <gate receipt paths, commands, code identity and results>
+- [ ] Every selected review lens has an independent verdict bound to the same code identity.
+  Evidence: <review receipt paths and verdicts>
+- [ ] Every block or major finding is resolved with fresh evidence.
+  Evidence: <finding IDs, fixes and current review receipts>
+- [ ] Every acceptance criterion has PASS evidence from actual behavior; FAIL or UNKNOWN has remediation.
+  Evidence: <criterion IDs, commands or inspected behavior and results>
+- [ ] Scope inspection shows only approved story paths changed.
+  Evidence: <scope receipt, status and diff identity>
+- [ ] A distinct verifier returned PASS when the project execution contract requires one.
+  Evidence: <verification receipt and code identity>
+- [ ] Integration status names the verified commit or pull request; unfinished integration remains BLOCKED.
+  Evidence: <commit or pull request, or blocker and next action>

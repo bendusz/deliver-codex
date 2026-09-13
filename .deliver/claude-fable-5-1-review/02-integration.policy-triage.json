@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "source_receipt": ".deliver/claude-fable-5-1-review/02-integration.receipt.json",
+  "source_receipt_sha256": "28ed3e07794210f1e89008a4716d050622168768bacdfc86c5eb36c9226be40d",
+  "source_status": "FAIL",
+  "scope": {
+    "findings": [2, 3, 4, 5, 6, 7, 8],
+    "excluded_primary_block": [1]
+  },
+  "candidate_basis": {
+    "root": "accepted root including T05R commit 9009f71 and the approved parity plan",
+    "t05l_overlay": "/tmp/deliver-parity-t05l",
+    "t05l_snapshot": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9",
+    "note": "T05L remains a frozen candidate. T05C, T05B, T08, T11 and T12 are approved future tasks, not current behavior."
+  },
+  "classification_counts": {
+    "planned_future_behavior": 1,
+    "confirmed_design_risk": 1,
+    "deliberate_current_contract": 2,
+    "confirmed_bug": 2,
+    "mixed": 1
+  },
+  "findings": [
+    {
+      "receipt_finding": 2,
+      "receipt_severity": "major",
+      "classification": "planned_future_behavior",
+      "conclusion": "The dead end is real, but the proposed generic deletion/reprepare path would be unsafe. A failed no-M probe is intentionally durable correction evidence for T05C. T05C already requires a new token-bound preparation from a moved I while retaining the previous attempt. A clean prepared record made stale by an advanced I is a separate unsupported case owned by T05B's advanced-tip reconciliation. T05L's interruption contract resumes an unchanged preparation; it does not promise concurrent integration-tip advancement.",
+      "evidence": [
+        {
+          "path": "/tmp/deliver-parity-t05l/plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+          "lines": "623-734",
+          "detail": "Records are keyed by source run ID; existing failed records are returned and prepared records reject a moved base without supersession."
+        },
+        {
+          "path": "docs/plans/parity-contracts/integration-correction-design.md",
+          "lines": "13-38, 87-96",
+          "detail": "Failed M/no-M probes are immutable correction bases; a moved I requires a new preparation with the prior attempt retained."
+        },
+        {
+          "path": ".deliver/task-blueprints.json",
+          "lines": "T05B-AC2 and T05C-AC1 through T05C-AC3",
+          "detail": "T05B owns advanced integration-tip reconciliation in integration.mjs; T05C owns failed integration/probe continuation."
+        }
+      ],
+      "task_mapping": [
+        {
+          "task": "T05C",
+          "scope": "Consume and supersede failed M/no-M correction preparations with retained history."
+        },
+        {
+          "task": "T05B",
+          "scope": "Add explicit hash/token-bound supersession for a clean prepared record invalidated by an advanced integration tip."
+        }
+      ],
+      "policy_action": "Do not delete or overwrite the canonical record and do not add a generic abandon switch. Preserve the old record/preparation identity in history. T12 serial integration depends on this behavior but does not own integration.mjs, so T05B is the source owner."
+    },
+    {
+      "receipt_finding": 3,
+      "receipt_severity": "major",
+      "classification": "confirmed_design_risk",
+      "conclusion": "The static performance concern is confirmed: every whole-tree proof enumerates the tree and invokes git cat-file once per non-gitlink entry, and validation repeats those walks. Exact wall time and the claim of tens of thousands of spawns depend on repository size and were not benchmarked. The implementation remains fail-closed and each subprocess has a timeout, so this is a scalability risk rather than a correctness defect.",
+      "evidence": [
+        {
+          "path": "/tmp/deliver-parity-t05l/plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+          "lines": "23-31, 123-135, 178-220, 258-269, 536-555, 1090-1140",
+          "detail": "fingerprintBlob spawns git cat-file per blob; build and validation repeat full-tree enumeration before record mutations."
+        }
+      ],
+      "task_mapping": null,
+      "policy_action": "Retain the exact byte identities. Authorize a separate bounded performance task before replacing them with object-ID plus batched-object validation; require equivalence tests and a representative repository benchmark. No pending task explicitly promises this optimization."
+    },
+    {
+      "receipt_finding": 4,
+      "receipt_severity": "minor",
+      "classification": "deliberate_current_contract",
+      "conclusion": "Two distinct checkouts and an immutable source checkout at C are intentional. Integration operations act in the integration checkout while repeatedly proving the finished source run and C. This preserves evidence identity. The actual shipping reference implies the split but does not plainly say that the source checkout must remain parked until H, so the remaining issue is documentation and worktree orchestration rather than a local integration correctness bug.",
+      "evidence": [
+        {
+          "path": "/tmp/deliver-parity-t05l/plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+          "lines": "583-620, 623-640",
+          "detail": "Source and integration roots must share a repository but use their separately bound branches; source HEAD/branch must stay at C."
+        },
+        {
+          "path": "/tmp/deliver-parity-t05l/plugins/deliver/skills/deliver/references/shipping.md",
+          "lines": "1-13, 106-112",
+          "detail": "The reference says to operate from a clean integration checkout and revalidate adopted lineage, but does not explicitly state the two-worktree lifetime."
+        },
+        {
+          "path": "docs/plans/parity-contracts/integration-correction-design.md",
+          "lines": "3-9, 33-45",
+          "detail": "Accepted correction design keeps finished C immutable at its recorded source ref/worktree."
+        }
+      ],
+      "task_mapping": [
+        {
+          "task": "T05B",
+          "scope": "Its complete lifecycle and shipping-reference touches can state the two-checkout requirement explicitly."
+        },
+        {
+          "task": "T12",
+          "scope": "Its worktree orchestration lets another story start in a separate worktree without moving the source checkout that proves C."
+        }
+      ],
+      "policy_action": "Keep immutable C checkout validation. Document the required source/integration checkout split and let T12 create/manage additional story worktrees."
+    },
+    {
+      "receipt_finding": 5,
+      "receipt_severity": "minor",
+      "classification": "confirmed_bug",
+      "conclusion": "Tiny/small skipping P is the accepted scale contract, so the flag must not force reporting there. The bug is that an explicit --verification-report request is silently converted to skipped instead of being rejected with a clear incompatible-scale diagnostic.",
+      "evidence": [
+        {
+          "path": "/tmp/deliver-parity-t05l/plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+          "lines": "630-654",
+          "detail": "reportingRequested becomes true only for standard, discarding a true caller flag at tiny/small."
+        },
+        {
+          "path": "docs/plans/parity-contracts/architecture-state.md",
+          "lines": "214-224, 360-362",
+          "detail": "Standard may opt in, large/regulated require P and tiny/small skip; the per-integration selection must remain explicit."
+        },
+        {
+          "path": "/tmp/deliver-parity-t05l/plugins/deliver/skills/deliver/references/shipping.md",
+          "lines": "68-70",
+          "detail": "The public reference says tiny/small skip P but does not explain an invalid explicit flag."
+        }
+      ],
+      "task_mapping": {
+        "task": "T05B",
+        "basis": "T05B owns complete CLI/API shipping wiring, integration.mjs, shipping.md and lifecycle tests. It can reject the incompatible flag before any record is created."
+      },
+      "policy_action": "Fail before record creation when verificationReport is explicitly true for tiny/small; retain automatic required behavior for large/regulated and opt-in behavior for standard."
+    },
+    {
+      "receipt_finding": 6,
+      "receipt_severity": "minor",
+      "classification": "deliberate_current_contract",
+      "conclusion": "The source-reuse rule is explicitly required: reusable C evidence must describe the committed C bytes, so touched cache/coverage output correctly forces fresh M review and verification rather than gate failure by itself. Protected ignored configuration matching is intentionally conservative and can include nested dependency config files; the practical breadth is real, but narrowing it changes the accepted protected-metadata policy and lacks evidence here that a valid lifecycle is impossible.",
+      "evidence": [
+        {
+          "path": "/tmp/deliver-parity-t05l/plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+          "lines": "96-120, 220-255, 646-691",
+          "detail": "The implementation fingerprints matching ignored configuration paths and makes C evidence reusable only when source snapshot, committed C and M manifests agree."
+        },
+        {
+          "path": "docs/plans/parity-contracts/architecture-state.md",
+          "lines": "295-325, 374-385",
+          "detail": "Accepted evidence contract requires committed C to match its certified snapshot and strengthens recursive protected metadata."
+        }
+      ],
+      "task_mapping": null,
+      "policy_action": "Keep the conservative rule. If real repository evidence shows dependency caches dominate or block valid gates, authorize a separate protected-path contract refinement with hostile-config regressions; do not silently narrow the regex in C/B/T08."
+    },
+    {
+      "receipt_finding": 7,
+      "receipt_severity": "minor",
+      "policy_severity": "major",
+      "classification": "confirmed_bug",
+      "conclusion": "The parser validates top-level findings and then drops them whenever panel is present. A reproduced receipt with a top-level unresolved major, PASS panel member and status PASS returned PASS with an empty findings array. This is a false-negative evidence bug that violates the accepted rule to derive and retain aggregate findings; it must not be deferred as ordinary T11 adapter work.",
+      "evidence": [
+        {
+          "path": "/tmp/deliver-parity-t05l/plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+          "lines": "21-58",
+          "detail": "topFindings is parsed at line 26, but panel status and returned findings are derived only from member findings at lines 49-57."
+        },
+        {
+          "path": "docs/plans/parity-contracts/architecture-state.md",
+          "lines": "244-261",
+          "detail": "Aggregate verdict/findings must be derived without trusting an underreported aggregate, and all minor concerns must be retained."
+        },
+        {
+          "path": "temporary in-memory reproduction",
+          "lines": null,
+          "detail": "parseReviewReceipt accepted status PASS with one unresolved top-level major and one clean PASS panel member, returning {status:PASS, findings:[]}."
+        }
+      ],
+      "task_mapping": {
+        "task": "T05L correction",
+        "basis": "T05L introduced review.mjs and is still a frozen candidate under review. T11 later owns broader verdict adaptation, but accepting a false-PASS parser until T11 would waive T05L's own retained-panel contract."
+      },
+      "policy_action": "Before T05L acceptance, require top-level findings to be empty or canonically identical to the member-derived aggregate, and add regressions for extra, missing, reordered and contradictory blocker/minor findings. Preserve member lens/reviewer attribution."
+    },
+    {
+      "receipt_finding": 8,
+      "receipt_severity": "minor",
+      "classification": "mixed",
+      "conclusion": "The four subclaims have different dispositions. The /3 and /2 handoff denominators match the runtime's fixed current limits, though duplicating constants is maintainability debt. merge-base --is-ancestor does collapse exit 1 and operational errors; later Git proof remains fail-closed, so this is diagnostic robustness rather than a demonstrated false PASS. Requiring deinit when expected M removes an initialized submodule is a conservative executable-checkout precondition. A missing submodule object also fails closed, but its raw Git diagnostic should be made actionable.",
+      "evidence": [
+        {
+          "path": "/tmp/deliver-parity-t05l/plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+          "lines": "23-31, 184-244, 642-645, 1032-1049",
+          "detail": "Shows generic Git error wrapping, initialized submodule set enforcement, undifferentiated ancestor catch and hardcoded rendered limits."
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+          "lines": "238-248",
+          "detail": "Current retry and fix limits are fixed at 2 and 3, matching the handoff text."
+        }
+      ],
+      "task_mapping": null,
+      "policy_action": "Retain the safety checks and fixed current denominators. A bounded integration robustness correction may distinguish ancestor exit 1 from provider/Git errors and provide explicit deinit/fetch guidance. T05C should consume only discriminated real probe failures; this receipt alone does not justify expanding its acceptance to general message cleanup."
+    }
+  ],
+  "overall": {
+    "required_before_t05l_acceptance": [
+      "finding 7: panel receipts can silently discard top-level blocking findings"
+    ],
+    "allocated_future_work": {
+      "T05C": ["finding 2 failed M/no-M preparation lineage"],
+      "T05B": ["finding 2 advanced-I prepared supersession", "finding 4 shipping clarification", "finding 5 incompatible reporting flag"],
+      "T12": ["finding 4 additional story worktree orchestration"]
+    },
+    "unallocated_risk": [
+      "finding 3 whole-tree proof subprocess scalability",
+      "finding 8 diagnostic and submodule robustness refinements"
+    ],
+    "no_contract_change": [
+      "finding 4 immutable source C checkout",
+      "finding 6 committed-source reuse and protected ignored metadata"
+    ]
+  }
+}

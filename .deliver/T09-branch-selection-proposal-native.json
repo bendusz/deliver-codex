@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "ambiguity": "Migration cannot generate the permitted Integration-branch plan edit until it has an explicit branch selection.",
+  "recommendation": {
+    "selection_rule": [
+      "If all credible legacy and plan evidence names one identical safe existing local branch, select it automatically; this is preservation of an observed value.",
+      "If the value is absent, conflicting, invalid or names no existing local branch, emit a stable `integration-branch` ambiguity. Never infer the branch from HEAD, `main`, a remote default, branch count or naming convention.",
+      "The ambiguity records every raw declaration and its source identity, plus the bounded set of safe existing local branch refs after excluding identified story branches. A resolution is `{ambiguity_id,kind:'integration-branch',observed,observed_identity,choice:{branch},rationale}`. The chosen branch must exactly equal an allowed observed local ref. No branch creation or arbitrary new name is part of migration.",
+      "If no eligible local branch exists, return BLOCKED with `INTEGRATION_BRANCH_UNAVAILABLE`; branch establishment requires a separate explicit action before rerunning preview."
+    ],
+    "dependent_plan_preview": [
+      "When branch selection is required, the first mapped preview may remain BLOCKED while it emits the exact branch-dependent `plan-edit` ambiguity.",
+      "Using the selected branch, the engine generates only the allowed Integration-branch addition and optional legacy Instruction-rules removal, then reports the exact before blob, after blob and edit identity.",
+      "A final mapping must retain the integration-branch resolution and add the existing `{after_blob,edit_identity,accepted:true}` plan-edit resolution. READY requires both resolutions to match the same inventory identity and recomputed plan bytes.",
+      "Only the final complete mapping contributes mapping_hash and preview_id. The selection-only preview is read-only and cannot be applied or journaled."
+    ],
+    "validation": [
+      "A consistent observed Integration branch cannot be overridden.",
+      "A stale inventory, changed branch-ref set, changed plan before blob, different selected branch, or recomputed after-blob mismatch returns DRIFT/BLOCKED before any write.",
+      "The selected branch and all conflicting or invalid original declarations remain in retained migration evidence."
+    ]
+  },
+  "scope": "This pins selection and preview ordering only. It adds no policy, counter, authorization, branch mutation or arbitrary plan-replacement capability."
+}

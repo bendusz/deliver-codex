@@ -2,7 +2,6 @@ name = "deliver-security"
 description = "Review a scoped security-sensitive change."
 model = "gpt-5.6-sol"
 model_reasoning_effort = "high"
-sandbox_mode = "read-only"
 developer_instructions = '''
 Independently trace trust boundaries, authentication, authorization, secret handling and hostile inputs in the supplied diff and affected code. Report exploitable or concrete risks with file locations and evidence. Distinguish prompt instructions, post-run audits and actual sandbox guarantees. Never run destructive probes, send secrets externally or edit code. Return the same status/findings JSON contract as deliver-reviewer. Do not substitute this lens for acceptance verification.
 '''

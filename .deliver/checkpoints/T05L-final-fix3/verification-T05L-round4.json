@@ -1,0 +1,29 @@
+{
+  "criteria": [
+    {
+      "id": "T05L-AC1",
+      "status": "FAIL",
+      "evidence": "Current verifier separation, held claims and ordinary M/P/E/H finalization remain enforced, and fix3 now binds initialized submodules recursively to actual M. A normal empty uninitialized submodule directory is misclassified as an unexpected nested Git root during buildCheckoutProof, so integrate-prepare fails for an otherwise valid shared project before its real integration can be checked."
+    },
+    {
+      "id": "T05L-AC2",
+      "status": "PASS",
+      "evidence": "Both current upstream/Codex Execution directions preserve contract and unknown identity fields. Fresh-process pending recovery, exact story-only E, handoff-only H with BASE_COMMIT E, retained findings and unchanged pinned-reader acceptance remain covered; adopted artifact topology, paths, modes and bytes are revalidated."
+    },
+    {
+      "id": "T05L-AC3",
+      "status": "PASS",
+      "evidence": "Large/regulated and persisted standard opt-in reporting policy, exact evidence-derived report/checklist paths, C/source-snapshot/M/manifest/current receipt identities, lens/PASS requirements, escaped retained findings, direct-child P and story-only E remain enforced with coherent-tamper regressions."
+    },
+    {
+      "id": "T05L-AC4",
+      "status": "FAIL",
+      "evidence": "Fix3 resolves nested and deep committed/live scopes through gitlinks and separately proves all initialized modules against expected M, including valid advancement, tracked modes/bytes, ordinary indexes, protected ignored/config/hooks state, and status-suppressed unbound wrong HEAD before adoption and gates. But the optional module detector treats the standard empty uninitialized gitlink directory as an unsafe parent-root checkout, preventing any gate at M for otherwise valid repositories that intentionally leave unrelated submodules uninitialized."
+    },
+    {
+      "id": "T05L-AC5",
+      "status": "PASS",
+      "evidence": "Structured panel receipts still retain exact members, snapshots, verdicts and findings, derive the aggregate, enforce required reporting lenses and preserve no-panel compatibility; handoff output retains source-C and effective-M concerns. Coordinator gates passed 151/151 tests and packaging validation at snapshot 260df67738389280469cf5f365537764a040ddcc9f117d32fd3394d9fe46cdff."
+    }
+  ]
+}

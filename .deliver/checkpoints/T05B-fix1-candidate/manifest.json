@@ -1,0 +1,70 @@
+{
+  "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "snapshot": "362dc4fcaff3b952f52cde2e8388fd91359a441cf9df2e895445f6936744722a",
+  "status": "Frozen candidate, not accepted",
+  "counters": {
+    "retries": 0,
+    "fixes": 1,
+    "corrections": 0
+  },
+  "revision": 7,
+  "files": {
+    "plugins/deliver/skills/deliver/SKILL.md": {
+      "sha256": "d2f5aa3004648eac530b9cafae75c4e3a68f4614ab576a6d84d1946aa588fd9e",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/assets/operations.json": {
+      "sha256": "b3a23ed104859f4c56e154e9a459d6180799f901383a545bb42684c498a04623",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/references/compatibility.md": {
+      "sha256": "746031f8813b689994d4c6d7abeca6625676fa8ceed240e1b2522bc945636b58",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/references/shipping.md": {
+      "sha256": "d40f652ec585050a98d30683d22d8142fbf2c5add24fbd7eadce2d16b7ab1d99",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/scripts/deliver.mjs": {
+      "sha256": "438c242de87b79d7261eaa7ea9db73f0530dece4bfed3b0df4574ffdd02a2905",
+      "mode": "0o755"
+    },
+    "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs": {
+      "sha256": "07ea55559cdbfdc1c5bdcd6f3fa962cac385bf02ffb32e05ce3d7067e1623e7b",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/scripts/lib/integration.mjs": {
+      "sha256": "cb92a86f04eb5c1792b9050cad77784345c9a0a374cc34ceb9c5fa5919eb6821",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/scripts/lib/remote.mjs": {
+      "sha256": "ba21914d8a131532ec38c66e40948621da9d81452449024d59ba5a837a10ea89",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/scripts/lib/state.mjs": {
+      "sha256": "31e5a6934f03c24be7ae572ab21498215bc8cd5eaf3d5bc412ed63067ba86805",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/scripts/pm.mjs": {
+      "sha256": "22bb33abee9deedbe9a8c5fa6fb6825f652b6c2be026f72229d7cde100920a09",
+      "mode": "0o644"
+    },
+    "tests/current-roundtrip.test.mjs": {
+      "sha256": "453327ad0a522e122ae3a39ab91564aababf3cd5425d007e2475ecc47175b0d6",
+      "mode": "0o644"
+    },
+    "tests/operations.test.mjs": {
+      "sha256": "dde1af29f017b8816b77eb8e9211aff873bcde984b469f6aabaf3d273e6dc3f8",
+      "mode": "0o644"
+    },
+    "tests/remote-lifecycle.test.mjs": {
+      "sha256": "b1640d5153ffb8b0c184c264865a5a4ef3d0c30b7ffa747066806ec0840fe783",
+      "mode": "0o644"
+    },
+    "tests/remote.test.mjs": {
+      "sha256": "8b3f797e85fdbaeadad3a457232050d156d0bbaadbd02cbba3173d394af40d82",
+      "mode": "0o644"
+    }
+  },
+  "patch_sha256": "29254ece688f7dcba3f1dc948532fd6c09d5b0d3672e0e5df8f960c14de20292"
+}

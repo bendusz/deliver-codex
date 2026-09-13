@@ -11,10 +11,19 @@ Confirm the worktree exists, the plan's approved contents have not changed, and 
 counts remain in force. Reconcile live code with receipts. A completed agent thread is not
 evidence that its work survived an interruption.
 
+If status reports a pending commit preparation that cannot be used, keep its token and revision.
+With `HEAD` at the reported prepared parent, the original branch checked out, a clean index,
+unchanged protected Git state and cumulative scope still passing, run the reported `commit-cancel`
+command with a specific reason. The runtime keeps the full preparation in cancellation history.
+It does not reset Git or source. A mismatched child commit blocks cancellation and reports both
+commits; reconcile that Git state separately, then retry with the still-current token and revision.
+After cancellation, prepare, commit and adopt the current audited changes normally.
+
 A handoff is a runtime checkpoint plus a short note containing the next action, unresolved
 decision, evidence paths and blockers. Do not duplicate every state field in a second document.
-Commit durable run state with the work only if repository policy allows it and the user has
-authorized commits. Logs may stay local; missing load-bearing logs make verification UNKNOWN.
+For an approved delivery, the PM may commit durable run state with the scoped work when repository
+policy allows it. Builders and reviewers do not make that commit. Logs may stay local; missing
+load-bearing logs make verification UNKNOWN.
 
 Doctor is read-only: inspect state schema/revision, pending locks, task paths, approval, code
 identity, missing evidence, and role installation. Do not clear locks, migrate state, edit

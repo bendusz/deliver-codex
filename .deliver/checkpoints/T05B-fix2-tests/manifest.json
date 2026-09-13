@@ -1,0 +1,21 @@
+{
+  "task": "T05B",
+  "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "status": "Independently frozen fix2 regressions on unchanged unaccepted fix1 production; not acceptance",
+  "snapshot": "4591c845188c530e6541576b82ce000f0b4419d8a00589e448a2f81e5ffed7e1",
+  "revision": 12,
+  "counters": {
+    "retries": 0,
+    "fixes": 2,
+    "corrections": 0
+  },
+  "test_author": "/root/correction_regressions",
+  "files": {
+    "tests/current-roundtrip.test.mjs": "453327ad0a522e122ae3a39ab91564aababf3cd5425d007e2475ecc47175b0d6",
+    "tests/operations.test.mjs": "dde1af29f017b8816b77eb8e9211aff873bcde984b469f6aabaf3d273e6dc3f8",
+    "tests/remote-lifecycle.test.mjs": "ecab78b51c049eea3cd34579a31fb9ffc65d44375d09c16d5be67ce269609c8e",
+    "tests/remote.test.mjs": "8b3f797e85fdbaeadad3a457232050d156d0bbaadbd02cbba3173d394af40d82"
+  },
+  "production_and_docs_match": "362dc4fcaff3b952f52cde2e8388fd91359a441cf9df2e895445f6936744722a",
+  "test_delta_sha256": "1d0ad0249a230ceea428d8e505eb80e0a5bd1f2809d838d7175b244b10874397"
+}

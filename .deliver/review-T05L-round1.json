@@ -1,0 +1,30 @@
+{
+  "status": "FAIL",
+  "findings": [
+    {
+      "severity": "major",
+      "message": "Integration preparation makes the accepted evidence-refresh and conflict-correction routes unreachable. boundManifest throws when the source snapshot's bound live bytes differ from committed C, and prepareLocalIntegration throws when a clean expected M manifest differs from C, labelling both as source correction even though fresh independent M review and distinct verification are the specified resolution for evidence-only drift. expectedMergeTree also throws before persisting any record on a real non-clean composition, so T05C has no validated failure input. Persist whether C evidence is reusable separately from the actual M manifest and permit fresh M evidence when it is not; for a merge-tree conflict, persist a discriminated failure token bound to actual I, finished C, the failed probe and attempt provenance without claiming that M exists.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "Fresh integration gates are not bound to the live bytes or durable logs they claim to test. assertClean trusts porcelain status and write-tree, so assume-unchanged or skip-worktree changes can be invisible while a gate executes bytes different from recorded M; a review reproduction produced empty status and an index tree equal to HEAD while the live bound file contained different content. assertEvidenceReady validates only the receipt's stored log_hash and never reads, type-checks or hashes log_path, so deleted or altered logs still finalize. Re-running a gate filters out the previous same-name receipt, erasing failed evidence rather than retaining gate history. Bind the actual executable worktree to M before and after every gate, validate exact bounded regular log bytes at consumption, and retain prior gate receipts as immutable history.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "The integration record is not confined to its canonical per-source-run path. validateRecord accepts any string id, recordPath interpolates it through path.join, and assertRecordSource never requires record.id === record.source.run_id. Traversal components can therefore normalize outside destination/.deliver/integrations while readIntegrationRecord's equality check still succeeds, after which withRecord locks and rewrites that escaped JSON path. Require the canonical run-id grammar and equality to source.run_id, resolve the expected basename under the real integrations directory, and reject every lexical or realpath escape before locking or mutation.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "P/E/H proofs and their user-visible evidence are not durable after adoption. Adoption clears the only pending parent/path/hash data and later stages trust report.commit, closure.commit and reporting without re-proving their commit topology or deriving reporting from scale and the persisted standard opt-in. A coherent-looking record changed to reporting=skipped or report.commit=M can bypass required P, and handoff preparation trusts an arbitrary recorded closure commit without checking the merged story. The generated report also omits retained panel findings and inserts multiline verifier evidence as raw Markdown, allowing injected headings/check boxes; handoff always states OPEN_FINDINGS: none even when a PASS panel retains unresolved minor CONCERNS. Retain and revalidate adopted parent/tree/mode/path/blob proofs, bind the derived reporting choice, render bounded escaped evidence plus retained findings, and make the handoff's open findings reflect effective evidence.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": false
+    }
+  ],
+  "summary": "T05L fails review at frozen snapshot 663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3. The normal-path tests demonstrate distinct current verification, finish-with-held-claim behavior, C/M/P/E/H creation, upstream-readable closure and handoff, structured panel retention, and standalone receipt compatibility. The implementation still rejects the promised evidence-only M refresh path, cannot hand a validated no-M conflict result to T05C, does not bind gates to actual live M bytes or retained logs, accepts noncanonical integration records, and can lose or bypass required reporting/closure proof. Coordinator npm test and npm run validate passed at the exact snapshot, but the missing adversarial and drift cases are acceptance-critical."
+}

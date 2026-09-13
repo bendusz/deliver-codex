@@ -1,0 +1,38 @@
+{
+  "status": "PASS",
+  "findings": [],
+  "summary": "Preparation only. Do not normalize terminal newlines globally when hashing unclaimed stories. That would collapse two distinct contract byte sequences and invalidate any retained hash for an existing no-final-newline story. Preserve exact hashing and mark the separator inserted during first claim as Execution framing.",
+  "recommended_repair": {
+    "task": "Separate bounded T02 story-boundary follow-up",
+    "touches": [
+      "plugins/deliver/skills/deliver/scripts/lib/story.mjs",
+      "tests/story.test.mjs",
+      "tests/current-lifecycle.test.mjs",
+      "tests/current-roundtrip.test.mjs"
+    ],
+    "design": [
+      "Keep parseStory hashing every unclaimed story byte exactly as it does now.",
+      "When first claiming a story without a final newline, append LF before Execution and add a reserved versioned pm-exec field such as deliver_contract_boundary='inserted-lf-v1'.",
+      "For a final Execution section carrying exactly that marker, exclude exactly the immediately preceding inserted LF from contractText before hashing.",
+      "Preserve the marker across every legitimate Execution replacement. Reject its removal, alteration, duplication, unknown value, or use without the matching boundary.",
+      "Never infer or add the marker to existing claimed stories."
+    ]
+  },
+  "acceptance": [
+    "Every existing newline-terminated story retains its current contract hash and exact round-trip behavior.",
+    "An unclaimed no-final-newline story retains its original raw-byte contract hash before and after first claim.",
+    "Ordered criteria, prose, metadata, touches and specs remain byte-for-byte unchanged.",
+    "Repeated claim, transition, recovery and closure rewrites preserve the marker and contract hash.",
+    "Unmarked stories receive no newline normalization; malformed or conflicting markers fail before writing.",
+    "Public current-PM first claim succeeds, while stale contract hashes and unrelated evidence still refuse without writes.",
+    "The upstream-compatible parser and round-trip path preserve the namespaced unknown Execution field."
+  ],
+  "required_ruling": "Before implementation, record a narrow approved ruling that the versioned marked separator is part of Execution framing and therefore outside the substantive story contract. The existing rule that hashes the full contract with only the precisely delimited final Execution section removed otherwise remains unchanged.",
+  "evidence_implications": [
+    "No existing newline-terminated contract hash changes.",
+    "The no-final-newline story's pre-claim contract hash remains valid, so approval or analysis bound to it does not require migration.",
+    "The text hash and Execution hash change normally at claim because the separator and marker are newly published Execution data.",
+    "Claim journals must retain exact before and after bytes, including the marker, and recovery must reproduce those bytes exactly.",
+    "Existing unmarked claimed stories must not be retroactively reinterpreted or migrated."
+  ]
+}

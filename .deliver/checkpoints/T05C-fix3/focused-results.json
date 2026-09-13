@@ -1,0 +1,32 @@
+{
+  "at": "2026-09-13T09:29:13.697229+00:00",
+  "source": "native deliver-builder /root/recover_t05c reported exact executed commands and results; complete runtime gate logs will be separately retained",
+  "snapshot": "b8c66ec574464337ae65d7b4e810d742a34b381e758f4b21f9e53964ac481d97",
+  "results": [
+    {
+      "command": "node --check plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "status": "PASS"
+    },
+    {
+      "command": "node --test tests/current-lifecycle.test.mjs",
+      "status": "PASS",
+      "tests": 23,
+      "fail": 0,
+      "duration_ms": 191951.354
+    },
+    {
+      "command": "node --test tests/integration-correction.test.mjs",
+      "status": "PASS",
+      "tests": 57,
+      "fail": 0,
+      "duration_ms": 432296.180333
+    },
+    {
+      "command": "node --test --test-name-pattern='bound source-only dirt requires fresh M evidence without mutating C' tests/integration.test.mjs",
+      "status": "PASS",
+      "tests": 1,
+      "fail": 0,
+      "duration_ms": 13611.152541
+    }
+  ]
+}

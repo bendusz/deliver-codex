@@ -1,0 +1,12 @@
+{
+  "status": "FAIL",
+  "findings": [
+    {
+      "severity": "major",
+      "message": "Pre-claim analysis does not enforce or identity-bind required preimplementation artifacts. For large/regulated projects it can report factual_status=CLEAR without docs/constitution.md, the template-defined spec/plan/story checklists, or the required SpecDD skeleton/contracts. At every scale it also ignores exact .sdd files declared by a story, so a missing, nonregular, invalid or later-changed governing contract neither produces a factual diagnostic nor changes content_identity. claimReadinessFromAnalysis derives blockers only from these incomplete findings, allowing later semantic evidence to bypass scale prerequisites or become stale after contract changes. Inventory only the fixed required paths and each strict-parser-declared bounded spec; do not guess or wildcard-discover contracts. Durable verification artifacts and wiki checks belong to later phases.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/analyze.mjs",
+      "resolved": false
+    }
+  ],
+  "summary": "Independent review verified the bounded read-only analyzer, factual/semantic separation, installed checklist assets and exact-snapshot gates, but claim readiness omits required scale and declared-contract inputs. Actual first-claim runtime wiring remains deliberately assigned to T08 and was not treated as a T07 defect."
+}

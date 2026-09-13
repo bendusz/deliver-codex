@@ -1,0 +1,58 @@
+command: npm test
+cwd: /Users/ben/code/pm-skill-codex-worktrees/t05c-delivery
+started: 2026-09-13T08:04:08.222Z
+exit: 1
+
+[stdout]
+
+> deliver-codex@0.1.0 test
+> node --test tests/*.test.mjs
+
+✔ post-plan analysis is stage-aware and keeps pending approval non-blocking (11.843542ms)
+✔ pre-claim analysis binds content and leaves standard semantic review explicit (317.806792ms)
+✔ tiny scale can become structurally ready without a semantic analysis gate (204.97525ms)
+✔ large pre-claim analysis blocks missing phase prerequisites without demanding completion evidence (205.93175ms)
+✔ declared contracts are exact identity inputs below large scale (375.61975ms)
+✔ located findings cover clarifications, requirements, dependencies, scope, commands and lenses (1.512667ms)
+✔ nonregular story input becomes UNKNOWN without hanging or changing files (1.063416ms)
+✔ invalid UTF-8 is identity-bound UNKNOWN input (0.561083ms)
+✔ CLI and imports are bounded, read-only and side-effect-free (95.687625ms)
+✔ quality checklists are installed as unchecked evidence contracts (284.3535ms)
+✔ validator accepts two explicit configurations and unavailable measurements (2.387208ms)
+✔ validator rejects inconsistent identifiers, duplicate effective configurations, and invalid measurements (0.737708ms)
+✔ scorer keeps upstream quality factors and selects only an eligible run (0.556417ms)
+✔ scorer reports ties and no eligible winner explicitly (0.708333ms)
+✔ Markdown renderer escapes untrusted labels and keeps table rows intact (0.314917ms)
+✔ import has no output, provider calls, or filesystem changes (38.123958ms)
+✔ CLI scores a bounded regular file without changing its directory (46.621375ms)
+✔ CLI rejects oversized files and non-regular FIFO input without hanging (97.959125ms)
+✔ runs Claude with the safe argv and writes an exact receipt (118.901125ms)
+✔ requires consent, scans secrets, and refuses symlinked input/output (13.764208ms)
+✔ rejects output overwrite and leaves no receipt on provider failures (154.648416ms)
+✔ bounds provider time and supports validation-only dry runs (1042.360125ms)
+✔ fresh-process cancellation archives a formerly legal stale preparation and permits full adoption (17896.089208ms)
+✔ pending preparation blocks transitions and correction before writes or attempt spending (4618.59125ms)
+✔ cancellation requires exact token, revision and bounded reason without mutation (4172.62275ms)
+✔ cancellation refuses a moved HEAD and reports both prepared and current commits (4034.965083ms)
+▶ cancellation refuses a moved ref, staged index, protected metadata, and cumulative scope drift
+  ✔ moved ref (3842.486375ms)
+  ✔ staged index (3707.396625ms)
+  ✔ protected metadata (3349.240375ms)
+  ✔ out-of-scope source (3690.068417ms)
+✔ cancellation refuses a moved ref, staged index, protected metadata, and cumulative scope drift (14589.823792ms)
+✔ task start checks and freezes SpecDD authority, including additional Can modify paths (2370.240125ms)
+✔ start refuses unauthorized touches and missing governing root contracts (829.462083ms)
+✔ contract authoring cannot be hidden inside a code task (649.094792ms)
+✔ directory touches must include their own and nested contracts (2109.130459ms)
+✔ new or ignored contracts cannot be authored beneath a code directory scope (1926.216042ms)
+✔ current lifecycle binds exact approval, claim, route, branch and spent counters (8823.914625ms)
+✔ current claim refuses foreign work, explicit unavailable routes and hidden story refs without mutation (3247.578417ms)
+✔ current binding preserves every story spec and reserves same-actor parallel claims (2495.733209ms)
+✔ current recovery applies exact before images and refuses concurrent edits (440.481833ms)
+✔ upstream Execution is accepted and Codex closure remains readable upstream (1.834667ms)
+✔ Codex Execution accepts an upstream boundary update without losing identity (0.238125ms)
+✔ gate identity observes tool-specific environment changes without exposing values (0.849583ms)
+✔ optional hook emits bounded state pointers without injecting state prose (159.797791ms)
+✔ hook points at an original PM project before any Codex execution receipts exist (98.221084ms)
+
+[stderr]

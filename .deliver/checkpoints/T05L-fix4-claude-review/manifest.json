@@ -1,0 +1,52 @@
+{
+  "status": "NOT_ACCEPTED",
+  "task": "T05L",
+  "run_id": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
+  "base_commit": "a18e851375c37ac4c99e62a55fe0e9ff1f1e937d",
+  "snapshot": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9",
+  "counters": {
+    "retries": 1,
+    "fixes": 4,
+    "corrections": 0
+  },
+  "native_tests": {
+    "total": 153,
+    "passed": 153,
+    "validate": "PASS"
+  },
+  "native_review": "PASS",
+  "native_verification": "PASS",
+  "external_review": "FAIL; reproduced defects",
+  "patch_validation": "PASS: git apply --cached --check at original base in disposable index",
+  "files_sha256": {
+    "check.json": "442d591fc385be7fa297d8168c4e48f92f1bfc9ac9a273e5c4ec2da666d97c84",
+    "extra-fix-approval.json": "458f8eee34fa9abeade430b1d7e2b6bfdec23e24c1245352e05d74a96f372416",
+    "logs/test-1023d80f-42dc-49d0-b742-816a70bef680.log": "ae6379bb94f99f97c3ec6293fc84b1099fbcef1a0ca3400d4a3ee471a8a6e131",
+    "logs/test-1d5a3023-28d4-4486-8ca9-f0bd3e2a1cb3.log": "88dc58c9566c27ccd48252cfe427d3a12a709a5906f337e19f8ded4d34eacc1f",
+    "logs/test-61aa3a5d-47fc-4810-8750-0a2c0d754844.log": "44ed6e75f31bcbc263a345525f1630aa3e2d03e89b87ea123236503578d48404",
+    "logs/test-c3ebcd05-ceb2-4f48-8772-5d6b090896c9.log": "78aa3fdf80e86356ba7d0277fc95d023f040157cad9089fe87f78e182e5d51a4",
+    "logs/test-fbc880a1-e5fa-48ae-897d-d142d7b6d541.log": "c9e37b0a30922102011e23538d39eb76742b9468348902747dd6284a333e66c6",
+    "logs/validate-194627d6-c766-460d-9e46-2a4940d0e5c5.log": "88d05238fac2ef725723191c07d9962f00698a058c4aa7f2e3d71f9552f9a692",
+    "logs/validate-2095be09-b802-4e25-91e0-3a12675d2986.log": "d1b4b1d257963711fa403b92ea160cf4ea55aa3c54f69b3e7aeca59e9a0e36e0",
+    "logs/validate-3bd639ce-b269-41a8-a9e5-49072881bd54.log": "546c5d4526a64235983c91f79cb19d9198065ae7975ec449db221125533f127e",
+    "logs/validate-7167ba56-bd63-400e-8675-eac241df8007.log": "771dc04c5a13d5f694b8e0d1a9b0ac81bb61d58512c7938ba9007d49f09ec33f",
+    "logs/validate-8ad66aa4-f1d3-4011-84aa-105997797b9a.log": "803885ea597b1a211374fd118b47120b51034c43d5bb1d63da3d7eb9cbfbfedd",
+    "native-review-after-claude.json": "0f688e2ec4846d03c3b47ab10e805a2b2de7957a23a282533f7a56dc37d51032",
+    "native-review.json": "fdb137bfe174f6381b70e23626d150aeaeec9887b3827c2616fe938e4dfd7778",
+    "native-verification-after-claude.json": "7e60d5b8b8d94b707d19cf0fa3e110b27fddfb8fca6a6d7edb598087103ba80f",
+    "native-verification.json": "dd8de075175507ef489652b7c6b6abccd84fb348e83b3a13d9c56a19a82c312a",
+    "run-after-claude-triage.json": "d590ffc52817542f520288ca310b5301802a442e251c1bbb19a326da9e85ebcf",
+    "run.json": "025c9c9fa1ebcaaf116a32aaac2df3f07f45a04eb9b867017e5c1045c3d976e9",
+    "source.patch": "ac00a658f45f3cb6d7806d22cd88cf204ba29a4fb98d48ebace08919217fc058",
+    "task.json": "ef5ca47b913e4f4778073fbec61e4a84c96698abf8376b48acb02ec87ee0b901"
+  },
+  "native_review_after_claude": "FAIL",
+  "native_verification_after_claude": {
+    "T05L-AC1": "PASS",
+    "T05L-AC2": "FAIL",
+    "T05L-AC3": "FAIL",
+    "T05L-AC4": "PASS",
+    "T05L-AC5": "FAIL"
+  },
+  "next_decision": "Additional bounded repair round requires explicit authorization; fix4 remains spent."
+}

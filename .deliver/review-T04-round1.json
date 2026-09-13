@@ -1,0 +1,18 @@
+{
+  "status": "FAIL",
+  "findings": [
+    {
+      "severity": "major",
+      "message": "Commit preparation includes every unstaged dirty path under a declared touch, even when that path was already dirty before the run and its bytes have not changed from the immutable baseline. Because intended paths are selected from Git status rather than the cumulative changed set, expectedTree stages and adoption accepts the user's unchanged preexisting work. Limit intended source paths to entries actually changed from the baseline, while retaining the separately audited story Execution path. Preserve the current rejection of a non-clean real index so old staged entries can never enter a later default git commit, and cover both unchanged pre-start unstaged work inside a touched directory and pre-start staged work without altering either.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "Execution recovery accepts any two path-shaped string before/after images and never validates the journal's contract_hash, owner or branch, parses the story/run pair, or proves the after images encode the legal transition generated from the before images. If current files match a crafted or corrupt before image, recovery can overwrite story criteria, bindings or counters before later checks run. Validate the complete before/after transition and monotonic counter relationship before either write, and add a regression whose after story changes the contract while the current files still match before.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+      "resolved": false
+    }
+  ],
+  "summary": "Independent review confirmed the legacy metadata compatibility correction and found the normal transition/adoption lifecycle well covered, but commit preparation can absorb unchanged preexisting dirty work and recovery does not authenticate its own legal before/after transition. Both gaps violate the frozen acceptance despite full gates passing at the exact snapshot."
+}

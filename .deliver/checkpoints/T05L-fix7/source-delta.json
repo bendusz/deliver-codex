@@ -1,0 +1,25 @@
+{
+  "status": "FROZEN_PENDING_FULL_GATES_AND_REVIEW",
+  "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
+  "runtime_snapshot": "bfa2a3254597c6eeadb5f8acdf5903a80b233ea6496f334efbe1ede849a1b8b2",
+  "prior_snapshot": "d9f901fa13b3900566fb62663ac9a4874b41a0fdbb21e0d0737d530a63cebca4",
+  "fix6_source_tree": "9914083ea4734130af51e7b39d4bd53117bd73db",
+  "fix7_source_tree": "7930bc7c54a2380182317ba02b9c73e08bf30cdd",
+  "changed": [
+    "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+    "tests/integration.test.mjs"
+  ],
+  "patch_sha256": "f47211582ca54f453c33773f25fd670785e155aa0eb0091e04e7b761ca8272fb",
+  "test_author": "/root/identity_tests",
+  "production_builder": "/root/benchmark_builder",
+  "reviewer": "/root/state_architecture",
+  "independent_test_sha256": "62511b6815f00834e0c3b782aaa41b24dd34b7932f8a477ab7ba281d61627915",
+  "production_sha256": "939ffcb22d02af44f8227436903d3c7e73117c0106a1f4f3c0324fa4125dea16",
+  "builder_focused_tests": {
+    "status": "PASS",
+    "tests": 34,
+    "duration_seconds": 50.27,
+    "provenance": "native production-builder report; full root gates pending"
+  },
+  "approval": ".deliver/T05L-fix7-approval.json"
+}

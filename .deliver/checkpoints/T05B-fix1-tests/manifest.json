@@ -1,0 +1,22 @@
+{
+  "task": "T05B",
+  "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "status": "Independent fix1 tests frozen; known meaningful reds; not all later lifecycle assertions reached",
+  "test_author": "/root/correction_regressions",
+  "files": {
+    "tests/remote.test.mjs": "8b3f797e85fdbaeadad3a457232050d156d0bbaadbd02cbba3173d394af40d82",
+    "tests/remote-lifecycle.test.mjs": "d067eec0121a02e9dbfc52cd5ff942d4576defebd75f05038095f25c9f9e5424",
+    "tests/current-roundtrip.test.mjs": "453327ad0a522e122ae3a39ab91564aababf3cd5425d007e2475ecc47175b0d6",
+    "tests/operations.test.mjs": "dde1af29f017b8816b77eb8e9211aff873bcde984b469f6aabaf3d273e6dc3f8"
+  },
+  "snapshot": "eab097cc2001a7fd1238d9ac605190afb36f6bc9acdf472a8af64f5264b068b3",
+  "production_matches_round1": true,
+  "counters": {
+    "retries": 0,
+    "fixes": 1,
+    "corrections": 0
+  },
+  "syntax": "All four node --check exit0, agent-reported",
+  "full_suite": "Not run at red stage",
+  "tracked_patch_sha256": "35ad0f8b3c97b0cbd57e2dbcb8053b19e4709e3cd0e08c944ca5ae04c5a0d71d"
+}

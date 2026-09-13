@@ -1,0 +1,5 @@
+{
+  "status": "PASS",
+  "findings": [],
+  "summary": "The report-inclusive combined repair passes at snapshot a91dc0c3024b7e109aafc9b0556f2d88def20ec326d4cc0718da26672ad54cc2. The sole scoped change is docs/reviews/2026-09-11-combined-repairs.md (SHA-256 61d737ce1a0a65292665e525c2986aa0ba60e8f90a0e1e8c58f6f98dbcadc487), which accurately distinguishes the retained source-only evidence from the fresh report-inclusive run and matches the recorded composition, actors, test counts, receipt lineage, counters, remaining work and execution policy. HEAD remains source merge b84a045433f77644d541875ad5630915bf7f0c2d with tree 5f79ed030f9591529d2e0e038e8af5af9bdbf515. The premature evidence-only commit is preserved on backup/combined-source-evidence-018a2c2 and changed only .deliver evidence; the original baseline and source tree were restored without resetting counters or history. Fresh full gates passed 211/211 tests and packaging validation with the report as the only changed path, no out-of-scope changes, no Git metadata drift and no contract changes."
+}

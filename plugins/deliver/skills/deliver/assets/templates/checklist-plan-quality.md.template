@@ -1,0 +1,18 @@
+# Plan quality checklist: <Project>
+<!-- Write to docs/checklists/plan-quality.md only during an authorized checklist operation.
+Check a box only with evidence from the plan and source spec. Analysis never checks boxes. -->
+
+- [ ] The plan traces every declared requirement from `docs/spec.md`, or records the approved tiny-project source.
+  Evidence: <requirement IDs and docs/plan.md:lines>
+- [ ] In-scope and out-of-scope outcomes are explicit.
+  Evidence: <docs/plan.md:lines>
+- [ ] Every planned story maps to stable requirement IDs and declares dependencies and parallel safety.
+  Evidence: <story rows and docs/plan.md:lines>
+- [ ] Test, lint, build and run commands are exact, or each inapplicable command is justified as `N/A`.
+  Evidence: <commands, docs/plan.md:lines and N/A judgment>
+- [ ] Architecture decisions give reasons and every risk has a mitigation.
+  Evidence: <docs/plan.md:lines>
+- [ ] Project constitution constraints are addressed when `docs/constitution.md` exists.
+  Evidence: <rule-to-plan locations and reviewer judgment>
+- [ ] No unresolved clarification remains and sign-off reflects explicit human approval only.
+  Evidence: <docs/plan.md:lines and docs/approval.json status>

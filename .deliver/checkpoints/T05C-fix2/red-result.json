@@ -1,0 +1,14 @@
+{
+  "test_author": "correction_regressions",
+  "snapshot": "fc953ed501c8122437c6f1b58738e4d641666457193690686e2865b6d8e65642",
+  "test_sha256": "b70f11a739df002286016cea648526d97ad4f6d234817f372380d4a4c96b584c",
+  "command": "node --test --test-name-pattern='protected checkout drift|worktree config drift' tests/integration-correction.test.mjs",
+  "exit_code": 1,
+  "total": 6,
+  "pass": 1,
+  "reported_fail": 5,
+  "actual_defect_failures": 4,
+  "duration_ms": 55202.51125,
+  "qualification": "Independent author reports four Missing expected exception leaf failures and existing starting-record reconstruction refusal PASS. Author-forwarded output excerpt retained.",
+  "status": "Historical intermediate test candidate; protected run/story boundaries subsequently added before implementation."
+}

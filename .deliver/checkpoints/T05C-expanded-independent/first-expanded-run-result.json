@@ -1,0 +1,8 @@
+{
+  "command": "node --test tests/integration-correction.test.mjs",
+  "test_sha256": "ce6e9db750659173a90de8c7d88cd00601d658e7aa8abb223b90ac877d482b44",
+  "exit_code": 1,
+  "elapsed_seconds": 486.27506837504916,
+  "log": "/tmp/deliver-parity-t05c/.deliver/checkpoints/T05C-expanded-independent/first-expanded-run.log",
+  "log_sha256": "6163614c9b076cd243038d6c84d768e8353957e001439d075711238287264317"
+}

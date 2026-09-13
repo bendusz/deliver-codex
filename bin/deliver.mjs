@@ -30,12 +30,16 @@ const DEFAULT_MODEL = "gpt-6-astra";
 const DEFAULT_EFFORT = "high";
 const DEFAULT_SUBAGENT_MODEL = "gpt-5.6-sol";
 const DEFAULT_SUBAGENT_EFFORT = "high";
+const DEFAULT_SANDBOX = "danger-full-access";
+const SANDBOX_MODES = new Set(["read-only", "workspace-write", "danger-full-access"]);
 const SKILL_INSTALL_RELATIVE = join(".agents", "skills", "deliver");
 const AGENTS_RELATIVE = join(".codex", "agents");
 
 const HELP = `Usage:
   deliver setup --project PROJECT [--dry-run]
-  deliver --project PROJECT [--model MODEL] [--effort LEVEL] [--dry-run] [--] [prompt...]
+  deliver --project PROJECT [--model MODEL] [--effort LEVEL]
+          [--sandbox read-only|workspace-write|danger-full-access]
+          [--dry-run] [--] [prompt...]
 
 Commands:
   setup       Install the Deliver skill and its role agents into PROJECT.
@@ -262,15 +266,27 @@ export async function setupProject({ projectDir, dryRun = false, sourceRoot = SO
   };
 }
 
-export function buildLaunchArgs({ projectDir, model = DEFAULT_MODEL, effort = DEFAULT_EFFORT, prompt = [] } = {}) {
+export function buildLaunchArgs({
+  projectDir,
+  model = DEFAULT_MODEL,
+  effort = DEFAULT_EFFORT,
+  sandbox = DEFAULT_SANDBOX,
+  prompt = [],
+} = {}) {
   if (!projectDir) throw new Error("projectDir is required");
   if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(model)) throw new Error("Invalid model identifier");
   if (!["low", "medium", "high", "xhigh", "max", "ultra"].includes(effort)) throw new Error("Invalid reasoning effort");
+  if (!SANDBOX_MODES.has(sandbox)) throw new Error("Invalid sandbox mode");
   const promptParts = Array.isArray(prompt) ? prompt : [String(prompt)];
   const instruction = ["$deliver", ...promptParts].join(" ").trim();
+  const approvalPolicy = sandbox === "danger-full-access" ? "never" : "on-request";
   return [
     "-C",
     resolve(projectDir),
+    "--sandbox",
+    sandbox,
+    "--ask-for-approval",
+    approvalPolicy,
     "-m",
     model,
     "-c",
@@ -311,9 +327,20 @@ function parseLaunchArgs(argv) {
   let project;
   let model = DEFAULT_MODEL;
   let effort = DEFAULT_EFFORT;
+  let sandbox = DEFAULT_SANDBOX;
   let dryRun = false;
   const prompt = [];
   let promptMode = false;
+  const seen = new Set();
+  const markOnce = (option) => {
+    if (seen.has(option)) fail(`Duplicate launch option: ${option}`);
+    seen.add(option);
+  };
+  const optionValue = (option, index) => {
+    const value = argv[index + 1];
+    if (!value || value.startsWith("--")) fail(`${option} requires a value.`);
+    return value;
+  };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (promptMode) {
@@ -321,20 +348,26 @@ function parseLaunchArgs(argv) {
     } else if (arg === "--") {
       promptMode = true;
     } else if (arg === "--project") {
-      project = argv[++index];
-      if (!project) fail("--project requires a value.");
+      markOnce(arg);
+      project = optionValue(arg, index++);
     } else if (arg === "--model") {
-      model = argv[++index];
-      if (!model) fail("--model requires a value.");
+      markOnce(arg);
+      model = optionValue(arg, index++);
     } else if (arg === "--effort") {
-      effort = argv[++index];
-      if (!effort) fail("--effort requires a value.");
-    } else if (arg === "--dry-run") dryRun = true;
+      markOnce(arg);
+      effort = optionValue(arg, index++);
+    } else if (arg === "--sandbox") {
+      markOnce(arg);
+      sandbox = optionValue(arg, index++);
+    } else if (arg === "--dry-run") {
+      markOnce(arg);
+      dryRun = true;
+    }
     else if (arg === "--help" || arg === "-h") return { help: true };
     else prompt.push(arg);
   }
   if (!project) fail("launch requires --project PROJECT");
-  return { project, model, effort, dryRun, prompt };
+  return { project, model, effort, sandbox, dryRun, prompt };
 }
 
 function printableCommand(args) {

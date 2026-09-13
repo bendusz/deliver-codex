@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "receipt": {
+    "path": ".deliver/claude-fable-5-1-review/04-planning-support.receipt.json",
+    "sha256": "0187ca120d8b0ace7d8a479111bb8852f9cf01f915e1e310dcd4630e9bfaf8f7",
+    "status": "PASS",
+    "finding_count": 8
+  },
+  "basis": {
+    "method": "Read-only native triage of the current tree and frozen /tmp/deliver-parity-t05l overlay; no production or test files changed and no tests executed.",
+    "overlay_check": "The relevant analyzer, benchmark, legacy PM, story, CLI, references, asset and schema files inspected here are byte-identical between the current tree and the frozen overlay."
+  },
+  "findings": [
+    {
+      "index": 1,
+      "classification": "already pending task",
+      "task_mapping": ["T08"],
+      "disposition": "The analyzer correctly fails closed for an approved marker whose plan digest drifted. The missing explicit revision/revocation route is pending T08 correct-course work.",
+      "evidence": [
+        "plugins/deliver/skills/deliver/scripts/lib/analyze.mjs:626-653 only applies approval-stage checks to an approved marker; :660-688 computes and reports the Git plan digest mismatch.",
+        "plugins/deliver/skills/deliver/references/planning.md:27-29 permits revising the plan and marker; :43-44 says a changed plan invalidates approval before further work.",
+        "/tmp/deliver-parity-t05l/docs/plans/parity-contracts/architecture-state.md:165-167 explicitly assigns material correct-course approval revocation and history preservation to the pending recovery design; the main plan assigns that work to T08 at :226-240."
+      ]
+    },
+    {
+      "index": 2,
+      "classification": "already pending task",
+      "task_mapping": ["T14"],
+      "disposition": "The large/regulated analyzer behavior follows the approved scale policy. The contradiction is a known documentation correction, not an analyzer defect.",
+      "evidence": [
+        "plugins/deliver/skills/deliver/references/specdd.md:3-5 says SpecDD is optional merely because a project is large, while scale-profiles.md:11-13 requires contracts for large and regulated projects.",
+        "plugins/deliver/skills/deliver/scripts/lib/analyze.mjs:233-284 enforces the large/regulated SpecDD skeleton, bootstrap and per-story contract requirements.",
+        "/tmp/deliver-parity-t05l/docs/plans/parity-contracts/architecture-state.md:169-172 explicitly records the T14 documentation correction and says T07 must honor the mandatory scale requirements."
+      ]
+    },
+    {
+      "index": 3,
+      "classification": "confirmed bug",
+      "task_mapping": ["T14"],
+      "disposition": "The packaged illustrative module contract declares paths that resolve relative to its own spec directory but are absent there. This is a documentation/package example defect; it does not indicate an automatic runtime read.",
+      "evidence": [
+        "plugins/deliver/skills/deliver/assets/specdd/module.sdd:5-10 declares ./scripts/specdd.mjs, ./assets/specdd, ./tests/specdd.test.mjs and ./fixtures.",
+        "plugins/deliver/skills/deliver/references/specdd.md:15-17 defines ./ and ../ as relative to the spec directory and / as content-root-relative.",
+        "The packaged assets/specdd directory contains only bootstrap/module/root .sdd and template files; the declared scripts, tests and fixtures are not under assets/specdd. T14 owns package validation, whose acceptance requires every referenced asset/module in /tmp/deliver-parity-t05l/docs/plans/2026-09-09-upstream-parity.md:309-316."
+      ]
+    },
+    {
+      "index": 4,
+      "classification": "confirmed bug",
+      "task_mapping": ["T07"],
+      "disposition": "The report omits the top-level analysis status, creating a minor CLI/reporting usability defect. The zero exit for REVIEW_REQUIRED is separately consistent with semantic review being required rather than a deterministic blocker; claim readiness still rejects it.",
+      "evidence": [
+        "plugins/deliver/skills/deliver/scripts/lib/analyze.mjs:972-976 derives the distinct top-level REVIEW_REQUIRED status, but :1038-1057 renders only factual_status and semantic_review.status.",
+        "plugins/deliver/skills/deliver/scripts/analyze.mjs:51-54 exits nonzero only for BLOCKED or UNKNOWN.",
+        "plugins/deliver/skills/deliver/scripts/lib/analyze.mjs:1008-1014 makes REVIEW_REQUIRED ineligible for claim, so the omission does not create a claim bypass."
+      ]
+    },
+    {
+      "index": 5,
+      "classification": "confirmed bug",
+      "task_mapping": ["T13"],
+      "disposition": "The schema and validator admit elapsed_seconds=0, while the scorer grants speed=5 to every completed run whenever the fastest run is zero. That can erase real timing differences and distort a winner; it is an edge case within the still-pending full T13 benchmark workflow.",
+      "evidence": [
+        "plugins/deliver/skills/deliver/assets/benchmark-result.schema.json:51-55 sets elapsed_seconds minimum to 0; lib/benchmark.mjs:138-140 validates only a finite number.",
+        "plugins/deliver/skills/deliver/scripts/lib/benchmark.mjs:267-278 takes the minimum completed time and assigns speed 5 when run.elapsed_seconds===0 or fastest===0.",
+        "/tmp/deliver-parity-t05l/docs/plans/2026-09-09-upstream-parity.md:290-300 assigns deterministic scoring and elapsed measurement to T13."
+      ]
+    },
+    {
+      "index": 6,
+      "classification": "intended policy",
+      "task_mapping": [],
+      "disposition": "This is a conservative legacy compatibility policy, not an unrecognized implementation defect. The broad assignment regex is intentionally fail-closed and matches the pinned upstream PM scanner; it carries a documented false-positive tradeoff.",
+      "evidence": [
+        "plugins/deliver/skills/deliver/scripts/lib/pm.mjs:70-73 scans credential words followed by eight or more value characters, and :139/:157 applies it to tracked PM after-images.",
+        "/tmp/deliver-parity-t05l/tests/fixtures/upstream-v0.25.1/hooks/lib.mjs:195-218 contains the same assignment patterns and describes them as credential assignments with real-looking values.",
+        "AGENTS.md:32 and /tmp/deliver-parity-t05l/docs/plans/2026-09-09-upstream-parity.md:70-73 preserve pm/ as the upstream-compatible legacy source/reader."
+      ]
+    },
+    {
+      "index": 7,
+      "classification": "intended policy",
+      "task_mapping": ["T14"],
+      "disposition": "The current user instructions deliberately retain pm/ as the upstream-compatible progress authority, so that policy is not a defect. T14 may reconcile stale plan/reference wording for new current-format projects; no behavioral change should be inferred from this finding alone.",
+      "evidence": [
+        "AGENTS.md:32 states that pm/ is the upstream-compatible source of project progress and .deliver holds execution evidence; pm.mjs:1-2 states the same legacy contract.",
+        "plugins/deliver/skills/deliver/references/recovery.md:3-5 intentionally reads shared pm/ state first when present.",
+        "/tmp/deliver-parity-t05l/docs/plans/2026-09-09-upstream-parity.md:70-73 distinguishes authoritative current artifacts for new projects from the retained legacy pm/ reader, and :309-316 assigns documentation/package reconciliation to T14."
+      ]
+    },
+    {
+      "index": 8,
+      "classification": "missing-context false positive",
+      "task_mapping": [],
+      "disposition": "The packet omitted story.mjs, but the current implementation rejects traversal before analysis receives story.specs. safeArtifactPath is not the sole boundary; parseStory's safeRelative contract closes it at the caller.",
+      "evidence": [
+        "plugins/deliver/skills/deliver/scripts/lib/story.mjs:12-18 rejects absolute paths and every empty, '.' or '..' segment; :172-173 applies safeRelative to every parsed story Specs entry.",
+        "plugins/deliver/skills/deliver/scripts/lib/analyze.mjs:221-225 consumes only story.specs and passes those validated paths to readArtifact; :82-97's generic safeArtifactPath therefore does not receive an unchecked story spec path.",
+        "The same story.mjs is present and byte-identical in /tmp/deliver-parity-t05l, so the omitted packet context does not leave this boundary unresolved."
+      ]
+    }
+  ]
+}

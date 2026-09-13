@@ -1,0 +1,894 @@
+{
+  "schema_version": 1,
+  "run_id": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
+  "mode": "managed",
+  "revision": 18,
+  "project_root": "/Users/ben/code/pm-skill-codex-worktrees/t05c-delivery",
+  "created_at": "2026-09-13T07:50:24.185Z",
+  "updated_at": "2026-09-13T09:37:17.926Z",
+  "phase": "active",
+  "plan": {
+    "path": "/Users/ben/code/pm-skill-codex-worktrees/t05c-delivery/docs/plans/2026-09-09-upstream-parity.md",
+    "hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+  },
+  "approval": {
+    "approver": "Ben",
+    "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb",
+    "approved_at": "2026-09-13T07:50:24.272Z"
+  },
+  "task": {
+    "packet": {
+      "id": "T05C",
+      "objective": "Continue failed integrations through token-bound correction runs without resetting claims, scope or attempts",
+      "acceptance": [
+        {
+          "id": "T05C-AC1",
+          "text": "Correction preparation binds an actual failed M result or a discriminated no-M I/C conflict probe record to an immutable token and unchanged approved contract; free-form failures, stale identities, changed scope and duplicate work fail before mutation."
+        },
+        {
+          "id": "T05C-AC2",
+          "text": "Correction start verifies the exact clean recorded M or no-M I checkout on its unique branch and publishes only a typed legal Execution/run pair, retaining original finished runs, actual starting story state and MAX spent budgets across generations; exhausted attempts and invalid journals cannot mutate state."
+        },
+        {
+          "id": "T05C-AC3",
+          "text": "Fresh correction gates/review/distinct verification cover the full original task lineage and inherited findings before C2 integration; temporary Git regressions exercise both basis variants, unclaimed/older I, active duplicates, raised MAX, torn token/story/run recovery and rejected drift without baseline or budget reset."
+        }
+      ],
+      "read_paths": [
+        "AGENTS.md",
+        "docs/plans/2026-09-09-upstream-parity.md",
+        "docs/plans/parity-contracts/architecture-state.md",
+        "docs/plans/parity-contracts/integration-correction-design.md",
+        "docs/plans/parity-contracts/integration-correction-interface.md"
+      ],
+      "touches": [
+        "plugins/deliver/skills/deliver/references/shipping.md",
+        "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+        "plugins/deliver/skills/deliver/scripts/pm.mjs",
+        "tests/current-lifecycle.test.mjs",
+        "tests/integration-correction.test.mjs",
+        "tests/integration.test.mjs"
+      ],
+      "commands": {
+        "test": "npm test",
+        "validate": "npm run validate"
+      },
+      "specs": []
+    },
+    "builder": "recover_t05c",
+    "started_at": "2026-09-13T07:50:24.387Z"
+  },
+  "baseline": {
+    "captured_at": "2026-09-13T07:50:24.612Z",
+    "snapshot": {
+      "entries": {
+        ".gitattributes": "file:644:6866769d73d3e4da4eb37df56a8f4d7c13b76931f43c98b22a0a3dca560b1c98",
+        ".gitignore": "file:644:8180e47269e938c10fac903c5b91adb9d99b17056e0aae991e6129bf77102a0e",
+        "AGENTS.md": "file:644:880f8a032e9e90eead7c3aef538b7c6d8dabf4b50e607405df4a45c20ad66392",
+        "LICENSE": "file:644:3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+        "NOTICE.md": "file:644:7162a1387603b078c268f64c43f3b31a1a61a861269994541d7496400b46b80f",
+        "README.md": "file:644:c5627680bfccb102c3ec5f5440f5f10ff0a627a317123435c4aeda0940a0953a",
+        "bin/deliver.mjs": "file:755:6a417373d0df05ba24464665d4dd9c758e504d8168f23d7257d4e74846f4f0c3",
+        "docs/evaluation.md": "file:644:6d2279f74f772d980261545244c24a0af5e01b22d53ca5bb46646052cf780e67",
+        "docs/parity-contract.json": "file:644:85e82c0b50551fe862db8854f45d3904db53b075e7ea5d6db0368391ec62de42",
+        "docs/plans/2026-09-09-upstream-parity.md": "file:644:d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb",
+        "docs/plans/2026-09-10-legacy-reconciliation-follow-up.md": "file:644:1f5c846e912dc9b7f5472837b6cc4720c40d8d572e5fc7dc959295214d667780",
+        "docs/plans/2026-09-10-reconciliation-identity-follow-up.md": "file:644:33d76438a4a98703cfdcf41b75dde458b4a7a05441ae187f860df1a5818e147d",
+        "docs/plans/2026-09-10-review-repairs-proposal.md": "file:644:88695a98c6857253aa633e463ecba4690244a849197d87ae3d496ab2743cee1c",
+        "docs/plans/parity-contracts/architecture-state.md": "file:644:9983fe04490cb0f854f6b4d713bebd7f3705401b43ec9d2d21966acc29835f8b",
+        "docs/plans/parity-contracts/evaluation-plan.md": "file:644:23099481f1eaddc0a87dea6ccf8e0a9869c0a9cf66107e23c077cddb1a49b38a",
+        "docs/plans/parity-contracts/integration-correction-design.md": "file:644:7d20e7253a44012b4ff647904311b80b95b14259eb160a8ee85eb92e42d3976e",
+        "docs/plans/parity-contracts/integration-correction-interface.md": "file:644:1f40cf43052e2bda4868e1a980605870055d096f795ff53c5c7a86bca9d03599",
+        "docs/plans/parity-contracts/knowledge-design.md": "file:644:e9007986f0e81459e7c6e1bbbd2a320e9876a40d79c9905c60a804f6a30789c2",
+        "docs/plans/parity-contracts/migration-design.md": "file:644:01e3ab93aba9bea04eecc991ec563d38db707ad239133d3b0ba7190f5c24aaa3",
+        "docs/plans/parity-contracts/migration-findings.md": "file:644:f1600df3508fbe29f7e592090fae9d7d7653026ee2b4f5b72705c0ac832547cc",
+        "docs/plans/parity-contracts/parallel-design.md": "file:644:502f6759a83c042f577ae28081073813dfc56bd82db28cd2d5260aa99985e07c",
+        "docs/plans/parity-contracts/project-report-design.md": "file:644:caa4a30319864913e7828946e21d2ef7333a94e72e4ff32c160f0e1b4d5d7202",
+        "docs/plans/parity-contracts/remote-design.md": "file:644:6b690355365b7dd65611be21163d71421f186d5ecafe1d331136e50aa8ee0faa",
+        "docs/plans/parity-contracts/retrospective-design.md": "file:644:647662202a308c7f3d60029dbb53a951e1477fca2e1c2cbef336537da84c2a53",
+        "docs/plans/parity-contracts/review-repair-authorization.md": "file:644:28758977ab3f4905244d77138a71e7bb51ed3a5042d7622af8f5a4ce83aabf17",
+        "docs/reviews/2026-09-10-claude-fable-5-1.md": "file:644:eef39824b2d3d53bc8b2694f24d855a464761b93e22c0ee9cf447c8d320ff585",
+        "docs/reviews/2026-09-11-combined-repairs.md": "file:644:61d737ce1a0a65292665e525c2986aa0ba60e8f90a0e1e8c58f6f98dbcadc487",
+        "package.json": "file:644:b940bba2da59045db4c25d7493a6ef8927d7c52a77507c8f2a33d3e81b8b9a7c",
+        "plugins/deliver/.codex-plugin/plugin.json": "file:644:d40d65e4854068d62bd8a9be1b7fa09f1d8d959c1867078953b6a4e1c7018ddd",
+        "plugins/deliver/LICENSE": "file:644:3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+        "plugins/deliver/NOTICE.md": "file:644:7162a1387603b078c268f64c43f3b31a1a61a861269994541d7496400b46b80f",
+        "plugins/deliver/hooks/context.mjs": "file:644:41ad585d4951f565ea30983b7abaf54fbfcee5a14601dc43367fe8c038fd02a4",
+        "plugins/deliver/hooks/hooks.json": "file:644:f9a2302b52033fa6af046fa4651b981c4c00d1842e798df569a3dd62acbcb987",
+        "plugins/deliver/skills/deliver/SKILL.md": "file:644:d2f5aa3004648eac530b9cafae75c4e3a68f4614ab576a6d84d1946aa588fd9e",
+        "plugins/deliver/skills/deliver/agents/openai.yaml": "file:644:0b0770232401e052f05911e92ff824b44cf5be438f942d170448600a97026e98",
+        "plugins/deliver/skills/deliver/assets/benchmark-result.schema.json": "file:644:2733b412ed03d5d5300a8591214e603cbcb843c80913cf62382993c8b8762f28",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-architecture.toml": "file:644:b1593f47eb67e12c76f6a9b16f31c4b37da14b3f9017a16bade6c47be2c1a1cb",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-builder.toml": "file:644:90a875b6ddab5e7c5a7f09163bb880c32c39b19ee1a7c922c5cb22288d93596e",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-claude-reviewer.toml": "file:644:acbc55f4e601a05cff1ffb6b86339acb28e04989565fc6f3dd9848a0efb85f76",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-debugger.toml": "file:644:2d2596f8b91fdc7f96ee51584533790a905a558b3a074cdecc41b19d9f478e87",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-explorer.toml": "file:644:d3eeea764c9547be95c2e284262988190f63cf10d11f39e935eac9c7b366aa0a",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-librarian.toml": "file:644:2f374ceea41385aae9170bc147190ae5286e84f248b27c2b465d609fd1cac26a",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-researcher.toml": "file:644:b514e1c74d964ceb4cdcd0a3faa1e6880ed854bdcb06051339fb2011878c5f63",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-reviewer.toml": "file:644:f5d104358894e5bfaa6e1338590069af60c6dc4f7aab6f5b3624f6df69998e86",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-security.toml": "file:644:c71af097a8b5fb3d6f3d8b6d3420ee53ad0aa0ee07cdf9f8b1b452d617656594",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-spec-architect.toml": "file:644:0ac7d6d7fd59bcbe10f08f8174bbda340ae0688e95529b9551f2c7393d6bc6b3",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-technical-writer.toml": "file:644:7d6f8c26947421eff4517d8082e8a50437096e06b7bc393d2bf15dfe8abefccd",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-test-engineer.toml": "file:644:479ed373405dde5fdf265f140829a3d8f27e88a425fcd3599335488df851f905",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-verifier.toml": "file:644:a776cc1bde5da656ef5e5abee4036ea8584f5351fd5342dd329d38bb3658fdd0",
+        "plugins/deliver/skills/deliver/assets/operations.json": "file:644:b3a23ed104859f4c56e154e9a459d6180799f901383a545bb42684c498a04623",
+        "plugins/deliver/skills/deliver/assets/review.example.json": "file:644:44ca24764896b56c10a97a0f8df84d4bc1d46ff34ec0f87c0c8d1fb5de75f98b",
+        "plugins/deliver/skills/deliver/assets/specdd/bootstrap.md": "file:644:50db90f302d0167930cbad84fabb1461b0ad6e2fc9e65b6b50dfa21027e11687",
+        "plugins/deliver/skills/deliver/assets/specdd/bootstrap.md.template": "file:644:29075149fe2e0c7bbad76374f137dd460cc5b0faf2002b7e3beeaf14f18a16e6",
+        "plugins/deliver/skills/deliver/assets/specdd/module.sdd": "file:644:88f343d6e95ed72e1989863ea72340f7683bf50162a6d72e53fc1a33134c9ce1",
+        "plugins/deliver/skills/deliver/assets/specdd/module.sdd.template": "file:644:d61c9152b875b407185d05b13d3eee1703caa6288f20d4218a6f00db69d380af",
+        "plugins/deliver/skills/deliver/assets/specdd/root.sdd": "file:644:26f1f3f07f5eb173fd0791a6c6404c980686a9567ca0f3af01504d4102767955",
+        "plugins/deliver/skills/deliver/assets/specdd/root.sdd.template": "file:644:b43e572f3831dfeb3b23e0787366073f5ebe805db8947e6fb840c3927acde437",
+        "plugins/deliver/skills/deliver/assets/task.example.json": "file:644:0ce2fce1d34fa454d4e9fd0b1b40533b17dc61939bd7adca1849cd2108b32c8e",
+        "plugins/deliver/skills/deliver/assets/templates/AGENTS.md.template": "file:644:1c437085281939246e1519ddd9efa5ab0bcbdd6124b946fb9cd4916f5d9a7202",
+        "plugins/deliver/skills/deliver/assets/templates/approval.json.template": "file:644:91465c46c86cf5ea709a772cc2ae4c8aee72e187dfce994adbab5fc3c030dbca",
+        "plugins/deliver/skills/deliver/assets/templates/checklist-plan-quality.md.template": "file:644:7a49ed878197d353c3319f15fdf229438392b654d9abfd9a589407b1c5689e55",
+        "plugins/deliver/skills/deliver/assets/templates/checklist-spec-quality.md.template": "file:644:d93f8412dcc5669fea74c79b6c977dd574ed4bf6948a0608aa46739e5947b423",
+        "plugins/deliver/skills/deliver/assets/templates/checklist-story-readiness.md.template": "file:644:23d09f511665383ee640b31963066e3c36a0c033c97ec98184085c89752e7b01",
+        "plugins/deliver/skills/deliver/assets/templates/checklist-verification-quality.md.template": "file:644:8af9c1b1e5a352e89383e79c937d451851c86b922cfdbed571926eae6e0f37ad",
+        "plugins/deliver/skills/deliver/assets/templates/completion-report.md.template": "file:644:7f4ffaa30a2827146a600e198b74851b323a1a5be389b484f1c5067a8637f3d2",
+        "plugins/deliver/skills/deliver/assets/templates/constitution.md.template": "file:644:5aa9c9533b1c3c9e9d532f06002e7267c7e3cb8dfdb52e033eaa3d867789a687",
+        "plugins/deliver/skills/deliver/assets/templates/plan.md.template": "file:644:894763dd8a4a3815bf70398a2c76c4cd4abcd591b0df2047bca1d3133a34c9dc",
+        "plugins/deliver/skills/deliver/assets/templates/spec.md.template": "file:644:d22b061f0b7b253ffbf5d22a3e2015dbefc83c4b3ddd4dd5d064fd2e67f68129",
+        "plugins/deliver/skills/deliver/assets/templates/story.md.template": "file:644:978eaa0ea415e0b58b7076eea602a1ffc31618dc20e4bfc9a5890aa3947a4c0c",
+        "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template": "file:644:75bae28f381a94be7ed4f80646d66b28ff5333899dbe92dc62c9688ccf2e66f5",
+        "plugins/deliver/skills/deliver/assets/verification.example.json": "file:644:12e375d51e1ff51b35afb1ad42cd3e442000efdb0f1d383207e57656ee16bb74",
+        "plugins/deliver/skills/deliver/references/claude-review.md": "file:644:ad1fff062eefbb7049c34e898675c1277dbae14c3ca78bb5d77134ccfcd5a4d1",
+        "plugins/deliver/skills/deliver/references/compatibility.md": "file:644:9c7670ae2356a5d7e512d504673e4df546b91eb08672d982841e8644ac3f6d16",
+        "plugins/deliver/skills/deliver/references/decomposition.md": "file:644:aa36f1e27a01333629c8e36c3fc9fa653f980b065360b8b767bedc65ba745f68",
+        "plugins/deliver/skills/deliver/references/discovery.md": "file:644:6ca3b2e4e31f48f046b9d95aec6bc73fac1209d0a1d3f1b8c967f90621401a6f",
+        "plugins/deliver/skills/deliver/references/governance.md": "file:644:cc372b7a60823ba5f9071633d7c0b9e244bc00ea9a83d81e4fd557dfcfc709e2",
+        "plugins/deliver/skills/deliver/references/knowledge.md": "file:644:c71b90e563decd626fc5e10256194be794ae85b9dfa33e09f920a982aeac55c5",
+        "plugins/deliver/skills/deliver/references/operations.md": "file:644:8b5d0f782e20147cb62390096fd594cf543efd084f52d8044bfe4259b0700f4e",
+        "plugins/deliver/skills/deliver/references/parallel.md": "file:644:b46b95edfd32c5c486d86d0897726830f54e2e654e6590416d03686ea5ab132b",
+        "plugins/deliver/skills/deliver/references/planning.md": "file:644:ebf852da0258012528ea937e9302f580747671c92b16213ab1f76c91b711c20e",
+        "plugins/deliver/skills/deliver/references/recovery.md": "file:644:3bd14b0d6a326b546896c2948e4cf8e5081dd93286eda224c3f0c8889aec84d2",
+        "plugins/deliver/skills/deliver/references/runtime.md": "file:644:385bdcb0d4b88435c2cdb115b7daa73139db5c717953588a6db5e1c18977ed2b",
+        "plugins/deliver/skills/deliver/references/scale-profiles.md": "file:644:42c08d624392888a20061a9a18faf61c7bfc6be82edc5284d6d7d2d081e9fe91",
+        "plugins/deliver/skills/deliver/references/shipping.md": "file:644:ed1a43c97e2a7aa8d2fb6315e674531c1378fc36976538da956d4fa367baeb04",
+        "plugins/deliver/skills/deliver/references/specdd.md": "file:644:7f379875904acda43c7a197784e96602fd796ccb28da95e1c37faeac840edadc",
+        "plugins/deliver/skills/deliver/references/specification.md": "file:644:5469cbc552858712622b77517ba8734322e6b2b11ce691986534d1114d8b9a11",
+        "plugins/deliver/skills/deliver/references/workflow.md": "file:644:883b594ee96df35b340912ba69417c5d439a5e09c3d7a3ff4827174478cb669d",
+        "plugins/deliver/skills/deliver/scripts/analyze.mjs": "file:644:927712768fa406df2237961b35032a97acc6044734f97390b185bba243cac7b3",
+        "plugins/deliver/skills/deliver/scripts/benchmark.mjs": "file:644:cbc58df431d1d4ba86dc4aadaf6c057077d43555e9defe86dd8f4434fc91d099",
+        "plugins/deliver/skills/deliver/scripts/claude-review.mjs": "file:644:1a1d9271a74b4079353de0651f19c8cf159e3a8ed3f497329ec87c41ccf920cf",
+        "plugins/deliver/skills/deliver/scripts/deliver.mjs": "file:755:4af0184e72c945c373efd35fac37b0286918fd4622a162dd1034fd85613b1071",
+        "plugins/deliver/skills/deliver/scripts/lib/analyze.mjs": "file:644:aaab86b26c5b137b327fdbf7b7159b3c1cbe45341ce05ac8b98e592b054e17c5",
+        "plugins/deliver/skills/deliver/scripts/lib/benchmark.mjs": "file:644:599ff7c875e4a0e1de23bd7da16a8ed8989589690bde6be62f601401ceee3ff0",
+        "plugins/deliver/skills/deliver/scripts/lib/contracts.mjs": "file:644:a251f7f98ac1475463cfc557fde86aa042a1ad5ff993ede65e225204f4753cc2",
+        "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs": "file:644:d4a3b49f77e4ff29a8ab0c048c0a071a4d3763f995d1076c7b9f072d7c191905",
+        "plugins/deliver/skills/deliver/scripts/lib/gates.mjs": "file:644:097a86b03827a4cab1668ca4038879155e4d30c8d92007e2e32d2a79e829367c",
+        "plugins/deliver/skills/deliver/scripts/lib/integration.mjs": "file:644:939ffcb22d02af44f8227436903d3c7e73117c0106a1f4f3c0324fa4125dea16",
+        "plugins/deliver/skills/deliver/scripts/lib/pm.mjs": "file:644:ae097d29de9b5f4b3fd2d59eb9cd8952ea79d6bc3f49cb54475ce4272436fd26",
+        "plugins/deliver/skills/deliver/scripts/lib/project-state.mjs": "file:644:5c69402512a6422f88136f7ab6b758e194f1e317caa511282f73f25e1d95b3ff",
+        "plugins/deliver/skills/deliver/scripts/lib/remote.mjs": "file:644:8440a88dc633da676502dbe7fadfe96a2647223e102a6becf8842a5d86f5893d",
+        "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs": "file:644:3690f7b6813010d48e7fd8b0f8f26273052aad138a36544b26f6e24c51b33a88",
+        "plugins/deliver/skills/deliver/scripts/lib/review.mjs": "file:644:bdaba93f2445877211ffe3015f05652bcc1f1fdf841acb8b3572ac103186ea30",
+        "plugins/deliver/skills/deliver/scripts/lib/scope.mjs": "file:644:1d022432902104bb0eadbb4ba5116ef3b326b76f4c9d24a44fdcee06b2dedce6",
+        "plugins/deliver/skills/deliver/scripts/lib/state.mjs": "file:644:f6ab18e87984f9411bb9f63d75ab7897e3b7b29345515f2239c0031836b7be4f",
+        "plugins/deliver/skills/deliver/scripts/lib/story.mjs": "file:644:cad0f9457cbe02865108fb179db3ddcce62b1f222eb02a75799f0277a79e1d98",
+        "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs": "file:644:2d36874c3ebd03f55cecc937e6e35a39fda544731e96b6f481729230c95fecf4",
+        "plugins/deliver/skills/deliver/scripts/pm.mjs": "file:644:04c8a53c0462ae9db008f958c609c3456ca6d55c46dc40850130efa03a95e2ff",
+        "plugins/deliver/skills/deliver/scripts/specdd.mjs": "file:644:bfae9d5eb24f1784d264e7d70dc0821b4f41a9828d3d473a0346b4ee498ac9c0",
+        "scripts/validate.mjs": "file:755:b7e922fae146e438c28a72956b5ab90e93250495463c2a8e3d108fa2492009cf",
+        "tests/analysis.test.mjs": "file:644:e72f51441639f20b1aeb87985a82a4c1c2444dfd4dc68646eb86fe28c566f9ca",
+        "tests/benchmark.test.mjs": "file:644:b350ad5413baac73c7558556b8ca3c97b5d27d62e04d540c8227ccef8aa1ae8b",
+        "tests/claude-review.test.mjs": "file:644:679c7dae6cf6973880743009ebd29c3ba3fde937e042fe87bff56da8bc22af07",
+        "tests/commit-cancellation.test.mjs": "file:644:83c3a4b3f294938628e06bfa2ca8a324f255384ccb24d354d652b54c77847b33",
+        "tests/contracts-integration.test.mjs": "file:644:8eb3c09725dfbe514b5ecfd5ed8520d425d80dcd5d1a3bf0a4e4e78803574fe3",
+        "tests/current-lifecycle.test.mjs": "file:644:54299b6cdfd5238972f09a10184b640b283d27055eb6c41badb35e6b6744b050",
+        "tests/current-roundtrip.test.mjs": "file:644:d8af9e29e3d3639b8c7dcad14436accb8c76da1e5792d26d1ace2e6af50ca56a",
+        "tests/fixtures/upstream-v0.22.0/NOTICE.md": "file:644:f43d5a7ad780077f17700936b7f7bc348567edac78d4c3be0e8de790ececace5",
+        "tests/fixtures/upstream-v0.22.0/hooks/lib.mjs": "file:644:1f9a8ff3a3f4eb300851fcbac7569509050f738a4dd56d22be2e6459f8242339",
+        "tests/fixtures/upstream-v0.22.0/hooks/session-context.mjs": "file:644:820c41410e07ef11f65ad3888971d8c862a7946a9133a2a49479c1b4b1d47c6d",
+        "tests/fixtures/upstream-v0.22.0/templates/actor-state.json.template": "file:644:ae6ae65ca6d3edb00228726b78884e920416dc854f5d0a77a723e8f30ea46d64",
+        "tests/fixtures/upstream-v0.22.0/templates/pm-state.json.template": "file:644:9bdf7ee6b341cf31b94c73ed9cbdade42293db737d6e600d17de791a086d8aa3",
+        "tests/fixtures/upstream-v0.25.1/NOTICE.md": "file:644:5ed9deec2942fd7ca5b3d0da184dd06aa0a57b734f3dc7e43bc83617d6e86458",
+        "tests/fixtures/upstream-v0.25.1/hooks/lib.mjs": "file:644:157bc7afe458d9ce4e05dd9bd3a8bb3326e791d3f5578737bfc17ad7e6dcfaea",
+        "tests/fixtures/upstream-v0.25.1/provenance.json": "file:644:8f1d82ab397d3c5e77e97bda2d2b7896172c8349ea6bebcaaf93d1fcbcab6032",
+        "tests/fixtures/upstream-v0.25.1/templates/AGENTS.md.template": "file:644:e188fbe70d50050a1ea2b5225eff41155366cfb9bcfbd9ac44336e40fa127823",
+        "tests/fixtures/upstream-v0.25.1/templates/CLAUDE.md.template": "file:644:e8d5dd46d7bdc6f6cc5e4b9b845611660d6db84fc647d8519e2fd59f59575ccc",
+        "tests/fixtures/upstream-v0.25.1/templates/HANDOFF.md.template": "file:644:ec44977ce51a36fa54aa30e9a6f9489a5ed235eeb9b9ca43901db35cd7bebc1f",
+        "tests/fixtures/upstream-v0.25.1/templates/approval.json.template": "file:644:91465c46c86cf5ea709a772cc2ae4c8aee72e187dfce994adbab5fc3c030dbca",
+        "tests/fixtures/upstream-v0.25.1/templates/checklist-plan-quality.md.template": "file:644:2cf69e59c44b12f7b22b2b5035b1bcb19a8d25647521ff35206279bf5af9ef25",
+        "tests/fixtures/upstream-v0.25.1/templates/checklist-spec-quality.md.template": "file:644:193518525bdca5760a80b91b7519f7e894cd339a3daed9bb824077a157e1f2fd",
+        "tests/fixtures/upstream-v0.25.1/templates/checklist-story-readiness.md.template": "file:644:f5f365e215233a00629b8c098b0d3f767fd8185c4d5b7089328e93138595d765",
+        "tests/fixtures/upstream-v0.25.1/templates/checklist-verification-quality.md.template": "file:644:f05149e21bfa28f300cab1b1470598c01f0624ce43d0f4a14926a6366dacf68a",
+        "tests/fixtures/upstream-v0.25.1/templates/claude-settings-hardening.json.template": "file:644:730f3279d940a1644f9b0815ade5266757d2e8b93f1e708ee2fb98622f78ebb9",
+        "tests/fixtures/upstream-v0.25.1/templates/completion-report.md.template": "file:644:8b5bee3b93a16a127c3d2c46ae286eff2c18d267d5ffc25f9bc9a3c314d8ec30",
+        "tests/fixtures/upstream-v0.25.1/templates/constitution.md.template": "file:644:0a7dac3ac9c1fb0a0162ef048cf570a5cf9140ba01080d263910edca844ff513",
+        "tests/fixtures/upstream-v0.25.1/templates/plan.md.template": "file:644:95455a8d9e0a86df7484f027ead29d847ecc8964e704c5bbb75d444137a8083f",
+        "tests/fixtures/upstream-v0.25.1/templates/retro.md.template": "file:644:79e642d07644f58c73274ed92d689a27dd13bd610fa717117177d313a6f4ac6d",
+        "tests/fixtures/upstream-v0.25.1/templates/sdd-module.template": "file:644:f8324f4ff59c184bc1ee865847a6a72a4e8cc4feac888f3c6f815c64790a4d88",
+        "tests/fixtures/upstream-v0.25.1/templates/sdd-root.template": "file:644:8169f1e6a0fdb17e4f89b73deaeee1e4b3a5930ad2f65ddc3bf387a65dc991ba",
+        "tests/fixtures/upstream-v0.25.1/templates/spec.md.template": "file:644:29e4c5630f18b5d7458b54b00138826d72d220a3863429a7fc2b0260f415b4d4",
+        "tests/fixtures/upstream-v0.25.1/templates/specdd-bootstrap.md.template": "file:644:2bc3c3175dc0eb5f9ad669517857a0ee324d18d47725552143e0e63dff59ea0a",
+        "tests/fixtures/upstream-v0.25.1/templates/story.md.template": "file:644:2bfa9c32cc339f4b7b8764ff73e4e59e6562ab42dc720192ec8235342bf8c383",
+        "tests/fixtures/upstream-v0.25.1/templates/verification-report.md.template": "file:644:9f82e7857ce5e633918156712b56a2ff6e4c38325c3e8c16006e09c07a6a7006",
+        "tests/fixtures/upstream-v0.25.1/templates/wiki-index.md.template": "file:644:a0f8c0fbb36296a24a1be6567e28eaf0cd9808f8e0696084808c72adeefa037d",
+        "tests/fixtures/upstream-v0.25.1/templates/wiki-page.md.template": "file:644:fda4f3d0e37bab47d79774b865752360d5b0bb3acf8cf7e8249d93b0900daeed",
+        "tests/fixtures/upstream-v0.25.1/templates/wiki-schema.md.template": "file:644:f2b5981a07b942d2b87d108c9d90b19cb4738cd632f3e908a75cc14a5c89b0e7",
+        "tests/hooks-and-environment.test.mjs": "file:644:e86d20b3c8eceeefa9608b7bf33f10c9459b1258ff4405a8d778fbcf794b06fb",
+        "tests/integration.test.mjs": "file:644:62511b6815f00834e0c3b782aaa41b24dd34b7932f8a477ab7ba281d61627915",
+        "tests/launcher-integration.test.mjs": "file:644:faa8fc096ae55c3c57b03b3ccbd1c575f6683c7dafe426f5ec0e117963f8ba98",
+        "tests/operations.test.mjs": "file:644:3c6bc110c2983eef8c931c4369a123ae9ef4cb858258784f693bc276c42e5eb9",
+        "tests/pm-compatibility.test.mjs": "file:644:9cf761f4a5cbc21c9d023630e671a0d135ee10d947a92d88753c4e81b6a90e61",
+        "tests/project-state.test.mjs": "file:644:f37ac20382b22e9368fdabbdc8a43748f2b0d346dc853736bc5db70b97b24b3d",
+        "tests/remote.test.mjs": "file:644:fe2d7b94c898913338475d48ca38af49c894c6c4473b16d259d1377d2bdb536c",
+        "tests/reporting.test.mjs": "file:644:0dc0f794c406068ad8e973819e1fcc64f9b3188369892c455b333177a631c088",
+        "tests/review-panel.test.mjs": "file:644:d8cce607363bc9de4a65facc57291ad6b1684298321057cda27886e4087d6b54",
+        "tests/role-policy.test.mjs": "file:644:ece1cddfc9c290330e328e2db5154f93c96192670c6bab813730a9c635d242c0",
+        "tests/runtime.test.mjs": "file:644:98c143640801b2de4f31edf2ea09aa414cf8a51f582e14075c5869a9465aa236",
+        "tests/scope-regressions.test.mjs": "file:644:c9feabbbbb45bb00bcbd195adae1660b2c7c1315d863487615553bcf5e707d95",
+        "tests/setup.test.mjs": "file:644:6ce8238f45e9ecc6b33eb060794054b746e1d0bd9364e35d14f6bd4472c62096",
+        "tests/specdd.test.mjs": "file:644:5893857063ae810717d0d118d4bc728fecfe49350b62e81d76135eeda5c0b88b",
+        "tests/story.test.mjs": "file:644:ab849d6f6d854f5a51e964ecccd8761782a76000d8d57d5c6ab5e19c39eb67ee",
+        "tests/template-compatibility.test.mjs": "file:644:3e70d479879392cf1686afe149f95a0eb8ea0786ba1d7495a1ad7f85c8dcb625",
+        "tests/transitions.test.mjs": "file:644:863dfa1caa253a11c85f49fd0aa3069cce4a411cae3c044f4fe103d8c9892f34",
+        "tests/upstream-contract.test.mjs": "file:644:443c98e946e9719ce528ff1bf248f7d89f76fb7c2507479017e5943b5e7b0542"
+      },
+      "git_meta": "d801c0ae66cb829be6f51ed92887adc0db3986343f32eb8974451344753cd00b",
+      "ignored_advisory": {},
+      "hash": "ff9d69069c2f635c49085fa00f7c4c30c4b2bb33e6ba6840f107b6297c4c9cf1"
+    },
+    "dirty_paths": []
+  },
+  "gates": [
+    {
+      "provenance": "deliver-runtime-executed-v1",
+      "name": "test",
+      "command": "npm test",
+      "cwd": ".",
+      "environment_keys": [],
+      "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "environment_hash": "8e25184df06998149fc0f7488083329d165f7b595a6f272f52294d3df7a17bcb",
+      "snapshot_hash": "b8c66ec574464337ae65d7b4e810d742a34b381e758f4b21f9e53964ac481d97",
+      "status": "PASS",
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "log_path": ".deliver/logs/d7c72357-2f28-4ac9-b364-09c3b1b0628a/test-dc7d5105-a9f5-4a15-afb9-a9c6de2d8a2b.log",
+      "output": {
+        "stdout_bytes": 25092,
+        "stderr_bytes": 0,
+        "truncated": false
+      },
+      "scope": {
+        "ok": true,
+        "changed": [
+          "plugins/deliver/skills/deliver/references/shipping.md",
+          "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+          "plugins/deliver/skills/deliver/scripts/pm.mjs",
+          "tests/current-lifecycle.test.mjs",
+          "tests/integration-correction.test.mjs"
+        ],
+        "added": [
+          "tests/integration-correction.test.mjs"
+        ],
+        "deleted": [],
+        "renames": [],
+        "out_of_scope": [],
+        "preexisting_dirty_changed": [],
+        "symlink_escapes": [],
+        "git_metadata_changed": false,
+        "ignored_advisory_changed": [],
+        "coordinator_execution_changed": null,
+        "git_metadata_compatibility": null,
+        "contracts_changed": []
+      },
+      "started_at": "2026-09-13T09:28:41.995Z",
+      "finished_at": "2026-09-13T09:37:16.272Z"
+    },
+    {
+      "provenance": "deliver-runtime-executed-v1",
+      "name": "validate",
+      "command": "npm run validate",
+      "cwd": ".",
+      "environment_keys": [],
+      "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "environment_hash": "8e25184df06998149fc0f7488083329d165f7b595a6f272f52294d3df7a17bcb",
+      "snapshot_hash": "b8c66ec574464337ae65d7b4e810d742a34b381e758f4b21f9e53964ac481d97",
+      "status": "PASS",
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "log_path": ".deliver/logs/d7c72357-2f28-4ac9-b364-09c3b1b0628a/validate-5b4ba9cd-0e46-4eb9-a49e-ce23e56e565c.log",
+      "output": {
+        "stdout_bytes": 150,
+        "stderr_bytes": 0,
+        "truncated": false
+      },
+      "scope": {
+        "ok": true,
+        "changed": [
+          "plugins/deliver/skills/deliver/references/shipping.md",
+          "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+          "plugins/deliver/skills/deliver/scripts/pm.mjs",
+          "tests/current-lifecycle.test.mjs",
+          "tests/integration-correction.test.mjs"
+        ],
+        "added": [
+          "tests/integration-correction.test.mjs"
+        ],
+        "deleted": [],
+        "renames": [],
+        "out_of_scope": [],
+        "preexisting_dirty_changed": [],
+        "symlink_escapes": [],
+        "git_metadata_changed": false,
+        "ignored_advisory_changed": [],
+        "coordinator_execution_changed": null,
+        "git_metadata_compatibility": null,
+        "contracts_changed": []
+      },
+      "started_at": "2026-09-13T09:37:16.511Z",
+      "finished_at": "2026-09-13T09:37:17.926Z"
+    }
+  ],
+  "review": null,
+  "verification": null,
+  "evidence_history": [
+    {
+      "at": "2026-09-13T07:56:29.403Z",
+      "reason": "correct_course",
+      "details": {
+        "kind": "fix",
+        "reason": "Independent T05C review: revalidate live correction authority during journal recovery, bind exact token story target, and reject generic Git failures as conflict bases. All three defects independently reproduced before repair.",
+        "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+      },
+      "gates": [],
+      "review": {
+        "status": "FAIL",
+        "findings": [
+          {
+            "severity": "major",
+            "message": "recoverIntegrationCorrectionStart validates the journal and integration-record hashes but never re-runs assertStartTokenCurrent or assertUniqueCorrectionCheckout before applying the recorded writes. A clean correction ref advanced beyond the token's start commit is therefore accepted during recovery and the stale run/story publication proceeds instead of refusing unchanged. The fresh regression at tests/integration-correction.test.mjs:1072 reaches Missing expected exception.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": false
+          },
+          {
+            "severity": "major",
+            "message": "validateIntegrationCorrectionJournal accepts any second write whose path starts with docs/stories/ and validates the parsed story bytes, but it never requires descriptor.writes[1].path to equal token.story_path. An attacker or corrupted journal can rewrite the descriptor, reconstruction and hashes consistently and redirect publication to a shadow story while the generated run remains bound to the original story. The fresh regression at tests/integration-correction.test.mjs:1097 reaches Missing expected exception.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+            "resolved": false
+          },
+          {
+            "severity": "major",
+            "message": "currentFailureBasis treats any repeatable nonzero merge-tree result with the same Git version as a composition-conflict-no-m basis. It does not distinguish content conflicts from fatal errors, so exit 128 for unrelated histories mints a correction token even though no composition conflict was proved. The fresh regression at tests/integration-correction.test.mjs:1126 reaches Missing expected exception.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": false
+          }
+        ],
+        "summary": "T05C fails independent review at successor snapshot 879fbda9c0437f6aa6350310e0fd5e0e8a307237cf3d8fe8a37de32357116a96. The recovered production bytes remain exact and the independently corrected fixture changes only the expected status for the intentional typed journal. The focused successor red run fails all three intended rejection assertions. Full npm test and npm run validate were intentionally not run at this failed-code stage, and no historical PASS is reused.",
+        "builder": "recover_t05c",
+        "reviewer": "recovery_contract",
+        "snapshot_hash": "879fbda9c0437f6aa6350310e0fd5e0e8a307237cf3d8fe8a37de32357116a96",
+        "recorded_at": "2026-09-13T07:56:28.779Z"
+      },
+      "verification": {
+        "verifier": "recovery_contract",
+        "criteria": [
+          {
+            "id": "T05C-AC1",
+            "status": "FAIL",
+            "evidence": "At snapshot 879fbda9c0437f6aa6350310e0fd5e0e8a307237cf3d8fe8a37de32357116a96, the unrelated-histories regression at tests/integration-correction.test.mjs:1126 reaches Missing expected exception. currentFailureBasis accepts repeatable exit 128 as composition-conflict-no-m without proving an actual content conflict, so correction preparation still accepts an invalid failure basis."
+          },
+          {
+            "id": "T05C-AC2",
+            "status": "FAIL",
+            "evidence": "At the same snapshot, the advanced-ref and rehashed-shadow-path regressions at tests/integration-correction.test.mjs:1072 and :1097 both reach Missing expected exception. Recovery neither revalidates the live start ref nor binds the typed story write path to token.story_path before mutation."
+          },
+          {
+            "id": "T05C-AC3",
+            "status": "FAIL",
+            "evidence": "Focused command node --test --test-name-pattern='correction recovery revalidates|unrelated Git histories' tests/integration-correction.test.mjs exited 1 with 0 passing and 4 reported failures including the parent test; log SHA-256 d7cbfdde022b3e9b9f39eb2ed96113cc7c811ed6ec0dd8b79dbeace9da1c2111. All three inherited defects remain unresolved, and full npm test plus npm run validate have not yet run, so fresh whole-task acceptance is not satisfied."
+          }
+        ],
+        "snapshot_hash": "879fbda9c0437f6aa6350310e0fd5e0e8a307237cf3d8fe8a37de32357116a96",
+        "recorded_at": "2026-09-13T07:56:29.173Z"
+      }
+    },
+    {
+      "at": "2026-09-13T08:21:09.513Z",
+      "reason": "correct_course",
+      "details": {
+        "kind": "fix",
+        "reason": "Fix2: reject basis-relative protected metadata drift at correction start and frozen baseline/anchor drift during journal recovery; preserve all prior resolved findings and optimize repeated negative test fixture setup without dropping assertions so full npm test completes within the unchanged runtime limit.",
+        "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+      },
+      "gates": [
+        {
+          "provenance": "deliver-runtime-executed-v1",
+          "name": "test",
+          "command": "npm test",
+          "cwd": ".",
+          "environment_keys": [],
+          "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "environment_hash": "8e25184df06998149fc0f7488083329d165f7b595a6f272f52294d3df7a17bcb",
+          "snapshot_hash": "405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334",
+          "status": "FAIL",
+          "exit_code": 1,
+          "signal": null,
+          "error": "spawnSync /bin/sh ETIMEDOUT",
+          "log_path": ".deliver/logs/d7c72357-2f28-4ac9-b364-09c3b1b0628a/test-2a8b964d-ff9a-4adf-a638-51903b03f173.log",
+          "output": {
+            "stdout_bytes": 4132,
+            "stderr_bytes": 0,
+            "truncated": false
+          },
+          "scope": {
+            "ok": true,
+            "changed": [
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+              "plugins/deliver/skills/deliver/scripts/pm.mjs",
+              "tests/integration-correction.test.mjs"
+            ],
+            "added": [
+              "tests/integration-correction.test.mjs"
+            ],
+            "deleted": [],
+            "renames": [],
+            "out_of_scope": [],
+            "preexisting_dirty_changed": [],
+            "symlink_escapes": [],
+            "git_metadata_changed": false,
+            "ignored_advisory_changed": [],
+            "coordinator_execution_changed": null,
+            "git_metadata_compatibility": null,
+            "contracts_changed": []
+          },
+          "started_at": "2026-09-13T08:04:08.222Z",
+          "finished_at": "2026-09-13T08:14:08.416Z"
+        },
+        {
+          "provenance": "deliver-runtime-executed-v1",
+          "name": "validate",
+          "command": "npm run validate",
+          "cwd": ".",
+          "environment_keys": [],
+          "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "environment_hash": "8e25184df06998149fc0f7488083329d165f7b595a6f272f52294d3df7a17bcb",
+          "snapshot_hash": "405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334",
+          "status": "PASS",
+          "exit_code": 0,
+          "signal": null,
+          "error": null,
+          "log_path": ".deliver/logs/d7c72357-2f28-4ac9-b364-09c3b1b0628a/validate-aff01422-06da-4c49-ab63-bbb6e6800680.log",
+          "output": {
+            "stdout_bytes": 150,
+            "stderr_bytes": 0,
+            "truncated": false
+          },
+          "scope": {
+            "ok": true,
+            "changed": [
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+              "plugins/deliver/skills/deliver/scripts/pm.mjs",
+              "tests/integration-correction.test.mjs"
+            ],
+            "added": [
+              "tests/integration-correction.test.mjs"
+            ],
+            "deleted": [],
+            "renames": [],
+            "out_of_scope": [],
+            "preexisting_dirty_changed": [],
+            "symlink_escapes": [],
+            "git_metadata_changed": false,
+            "ignored_advisory_changed": [],
+            "coordinator_execution_changed": null,
+            "git_metadata_compatibility": null,
+            "contracts_changed": []
+          },
+          "started_at": "2026-09-13T08:16:30.621Z",
+          "finished_at": "2026-09-13T08:16:32.075Z"
+        }
+      ],
+      "review": {
+        "status": "FAIL",
+        "findings": [
+          {
+            "severity": "major",
+            "message": "recoverIntegrationCorrectionStart validates the journal and integration-record hashes but never re-runs assertStartTokenCurrent or assertUniqueCorrectionCheckout before applying the recorded writes. A clean correction ref advanced beyond the token's start commit is therefore accepted during recovery and the stale run/story publication proceeds instead of refusing unchanged. The fresh regression at tests/integration-correction.test.mjs:1072 reaches Missing expected exception.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "validateIntegrationCorrectionJournal accepts any second write whose path starts with docs/stories/ and validates the parsed story bytes, but it never requires descriptor.writes[1].path to equal token.story_path. An attacker or corrupted journal can rewrite the descriptor, reconstruction and hashes consistently and redirect publication to a shadow story while the generated run remains bound to the original story. The fresh regression at tests/integration-correction.test.mjs:1097 reaches Missing expected exception.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "currentFailureBasis treats any repeatable nonzero merge-tree result with the same Git version as a composition-conflict-no-m basis. It does not distinguish content conflicts from fatal errors, so exit 128 for unrelated histories mints a correction token even though no composition conflict was proved. The fresh regression at tests/integration-correction.test.mjs:1126 reaches Missing expected exception.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "assertUniqueCorrectionCheckout captures the correction worktree Git anchor but validates only anchor.head. Initial start does not compare protected ignored entries or protected Git metadata with the recorded I/M checkout proof, and journal recovery does not compare the live protected checkout with the generated run's frozen baseline and full Git anchor. The independent real-Git probe at t05c-protected-probe.test.mjs (SHA-256 3fc1f2a707a3827fdc02901c9aa6329f7d049bfe3c309a97175cf8a2aae607c0) reproduced Missing expected exception for first-start .codex drift, journal .codex drift, started surviving-journal .codex drift, and journal config.worktree drift; all four paths accepted and mutated state. This violates the exact protected I/M checkout and unchanged recovery requirements.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": false
+          },
+          {
+            "severity": "major",
+            "message": "The declared npm test gate at snapshot 405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334 ended FAIL after the runtime's 600-second limit with spawnSync /bin/sh ETIMEDOUT and no complete TAP result. Fresh complete test-gate evidence required by T05C-AC3 is therefore absent. This is separate from the protected-checkout defect; npm run validate passed at the same snapshot.",
+            "resolved": false
+          }
+        ],
+        "summary": "Whole-task T05C review at snapshot 405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334 fails. Fix1 resolves all three independently reproduced round-one findings, but protected checkout drift remains accepted at initial start and journal recovery, and the full npm test gate timed out. Scope remains limited to the seven authorized changed paths; npm run validate passed.",
+        "builder": "recover_t05c",
+        "reviewer": "recovery_contract",
+        "snapshot_hash": "405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334",
+        "recorded_at": "2026-09-13T08:21:08.865Z"
+      },
+      "verification": {
+        "verifier": "correction_verifier",
+        "criteria": [
+          {
+            "id": "T05C-AC1",
+            "status": "PASS",
+            "evidence": "At snapshot 405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334, integration.mjs:994-1058 accepts only a reproducible status-1 merge-tree conflict with a tree OID or current M-bound failing gate/review/verification evidence; integration.mjs:1104-1174 revalidates source, approval, contract, ownership, counter limit and branch uniqueness before publishing an immutable token. The focused current-snapshot command `node --test '--test-name-pattern=correction recovery revalidates|unrelated Git histories' tests/integration-correction.test.mjs` exited 0 with 4/4 passing in 35765.802083ms, including rejection of unrelated histories."
+          },
+          {
+            "id": "T05C-AC2",
+            "status": "FAIL",
+            "evidence": "The correction contract requires unchanged protected metadata and rejected recovery drift before mutation. current-pm.mjs:513-523 captures the full protected Git anchor and integration.mjs:1308-1318 stores its hash. Recovery calls assertStartTokenCurrent at integration.mjs:1419-1420, but assertUniqueCorrectionCheckout at integration.mjs:1201-1202 compares only the fresh anchor's HEAD to start_commit. Journal validation at current-pm.mjs:625 likewise checks only runState.git_anchor.head. No path compares the live protected_hash, index flags or nested submodule anchors with the saved anchor or anchor_hash. Ignored hook/config/exclude metadata can therefore drift after journal creation while recovery still applies the run/story writes."
+          },
+          {
+            "id": "T05C-AC3",
+            "status": "FAIL",
+            "evidence": "At the exact snapshot, independent scope inspection reports the declared seven changed paths, no out-of-scope change, no current worktree Git-metadata drift and no contract drift, but run d7c72357-2f28-4ac9-b364-09c3b1b0628a still has gates:[], review:null and verification:null. The newly confirmed protected-anchor recovery defect is unresolved and lacks a regression. Fresh full npm test, npm run validate, whole-task review and final distinct verification have not been recorded, so C2 integration is not authorized."
+          }
+        ],
+        "snapshot_hash": "405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334",
+        "recorded_at": "2026-09-13T08:21:09.276Z"
+      }
+    },
+    {
+      "at": "2026-09-13T08:55:02.157Z",
+      "reason": "correct_course",
+      "details": {
+        "kind": "fix",
+        "reason": "Fix3: implement relocation-safe complete initialized-submodule proof, retain story executable mode before recovery normalization, and confine strict source cleanliness to correction operations so ordinary baseline-dirty source integration retains freshM evidence. Preserve all prior findings, attempts and baseline; add actual independent regressions and keep full test execution within existing600s gate without reducing coverage.",
+        "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+      },
+      "gates": [
+        {
+          "provenance": "deliver-runtime-executed-v1",
+          "name": "test",
+          "command": "npm test",
+          "cwd": ".",
+          "environment_keys": [],
+          "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "environment_hash": "8e25184df06998149fc0f7488083329d165f7b595a6f272f52294d3df7a17bcb",
+          "snapshot_hash": "de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47",
+          "status": "FAIL",
+          "exit_code": 1,
+          "signal": null,
+          "error": null,
+          "log_path": ".deliver/logs/d7c72357-2f28-4ac9-b364-09c3b1b0628a/test-d873e978-5347-4218-b287-a1586e0db7be.log",
+          "output": {
+            "stdout_bytes": 25232,
+            "stderr_bytes": 0,
+            "truncated": false
+          },
+          "scope": {
+            "ok": true,
+            "changed": [
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+              "plugins/deliver/skills/deliver/scripts/pm.mjs",
+              "tests/integration-correction.test.mjs"
+            ],
+            "added": [
+              "tests/integration-correction.test.mjs"
+            ],
+            "deleted": [],
+            "renames": [],
+            "out_of_scope": [],
+            "preexisting_dirty_changed": [],
+            "symlink_escapes": [],
+            "git_metadata_changed": false,
+            "ignored_advisory_changed": [],
+            "coordinator_execution_changed": null,
+            "git_metadata_compatibility": null,
+            "contracts_changed": []
+          },
+          "started_at": "2026-09-13T08:36:27.979Z",
+          "finished_at": "2026-09-13T08:46:08.197Z"
+        },
+        {
+          "provenance": "deliver-runtime-executed-v1",
+          "name": "validate",
+          "command": "npm run validate",
+          "cwd": ".",
+          "environment_keys": [],
+          "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "environment_hash": "8e25184df06998149fc0f7488083329d165f7b595a6f272f52294d3df7a17bcb",
+          "snapshot_hash": "de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47",
+          "status": "PASS",
+          "exit_code": 0,
+          "signal": null,
+          "error": null,
+          "log_path": ".deliver/logs/d7c72357-2f28-4ac9-b364-09c3b1b0628a/validate-9ee37786-5507-48de-978e-08d565ca8312.log",
+          "output": {
+            "stdout_bytes": 150,
+            "stderr_bytes": 0,
+            "truncated": false
+          },
+          "scope": {
+            "ok": true,
+            "changed": [
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+              "plugins/deliver/skills/deliver/scripts/pm.mjs",
+              "tests/integration-correction.test.mjs"
+            ],
+            "added": [
+              "tests/integration-correction.test.mjs"
+            ],
+            "deleted": [],
+            "renames": [],
+            "out_of_scope": [],
+            "preexisting_dirty_changed": [],
+            "symlink_escapes": [],
+            "git_metadata_changed": false,
+            "ignored_advisory_changed": [],
+            "coordinator_execution_changed": null,
+            "git_metadata_compatibility": null,
+            "contracts_changed": []
+          },
+          "started_at": "2026-09-13T08:48:42.255Z",
+          "finished_at": "2026-09-13T08:48:43.733Z"
+        }
+      ],
+      "review": {
+        "status": "FAIL",
+        "findings": [
+          {
+            "severity": "major",
+            "message": "recoverIntegrationCorrectionStart validates the journal and integration-record hashes but never re-runs assertStartTokenCurrent or assertUniqueCorrectionCheckout before applying the recorded writes. A clean correction ref advanced beyond the token's start commit is therefore accepted during recovery and the stale run/story publication proceeds instead of refusing unchanged. The fresh regression at tests/integration-correction.test.mjs:1072 reaches Missing expected exception.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "validateIntegrationCorrectionJournal accepts any second write whose path starts with docs/stories/ and validates the parsed story bytes, but it never requires descriptor.writes[1].path to equal token.story_path. An attacker or corrupted journal can rewrite the descriptor, reconstruction and hashes consistently and redirect publication to a shadow story while the generated run remains bound to the original story. The fresh regression at tests/integration-correction.test.mjs:1097 reaches Missing expected exception.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "currentFailureBasis treats any repeatable nonzero merge-tree result with the same Git version as a composition-conflict-no-m basis. It does not distinguish content conflicts from fatal errors, so exit 128 for unrelated histories mints a correction token even though no composition conflict was proved. The fresh regression at tests/integration-correction.test.mjs:1126 reaches Missing expected exception.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "assertUniqueCorrectionCheckout captures the correction worktree Git anchor but validates only anchor.head. Initial start does not compare protected ignored entries or protected Git metadata with the recorded I/M checkout proof, and journal recovery does not compare the live protected checkout with the generated run's frozen baseline and full Git anchor. The independent real-Git probe at t05c-protected-probe.test.mjs (SHA-256 3fc1f2a707a3827fdc02901c9aa6329f7d049bfe3c309a97175cf8a2aae607c0) reproduced Missing expected exception for first-start .codex drift, journal .codex drift, started surviving-journal .codex drift, and journal config.worktree drift; all four paths accepted and mutated state. This violates the exact protected I/M checkout and unchanged recovery requirements.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "The declared npm test gate at snapshot 405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334 ended FAIL after the runtime's 600-second limit with spawnSync /bin/sh ETIMEDOUT and no complete TAP result. Fresh complete test-gate evidence required by T05C-AC3 is therefore absent. This is separate from the protected-checkout defect; npm run validate passed at the same snapshot.",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "assertCorrectionProtectedProof is neither a relocation-safe protected-state comparison nor a complete recursive checkout proof. It rejects a clean standard initialized submodule at the exact recorded gitlink and an identical repository-relative .githooks configuration because raw protected hashes contain worktree-specific paths, while a shared-common-dir control accepts moved nested HEAD, changed nested tracked bytes, and a nested skip-worktree flag because recursion compares only protected hashes, protected ignored entries, and initialized-set membership. The independent real-Git probe t05c-nested-mode-probe.test.mjs (SHA-256 02b37f9b1c6977f18596ba16b5fc8b424e2972d747ff2667db9f76d6f35818c7) reproduced both false refusals and all three false acceptances. Correction start therefore cannot enforce the frozen exact-I/M submodule contract without rejecting legitimate worktree relocation.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": false
+          },
+          {
+            "severity": "major",
+            "message": "Recovery replaces the complete live story fingerprint with the retained baseline fingerprint whenever the story text equals the legal after-image, so it also erases evidence that the file mode changed. Real-Git probes at both story and started-record boundaries changed the published story from mode 0600 to 0755 with core.filemode=true; recoverIntegrationCorrectionStart returned recovered:true and preserved mode 0755. The typed journal therefore accepts a state outside its frozen operational snapshot instead of refusing unchanged.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": false
+          },
+          {
+            "severity": "major",
+            "message": "assertRecordSource now applies correction-only source cleanliness and full-anchor checks to every integration-record mutation. This rejects a valid finished source run whose preexisting dirty task input remains unchanged and should instead require fresh M evidence. The fresh full npm test gate completed with 276 tests, 275 PASS and this one FAIL at tests/integration.test.mjs:351; integrate-adopt refuses src/preexisting.txt before mutation. The accepted base supported this workflow, so strict correction-source validation must not replace the ordinary immutable source snapshot rules.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": false
+          }
+        ],
+        "summary": "Whole-task review at snapshot de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47 fails. Fix2 resolves the earlier defects and timeout. Three current majors remain; npm test completed 275/276 and npm run validate passed.",
+        "builder": "recover_t05c",
+        "reviewer": "recovery_contract",
+        "snapshot_hash": "de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47",
+        "recorded_at": "2026-09-13T08:55:01.526Z"
+      },
+      "verification": {
+        "verifier": "correction_verifier",
+        "criteria": [
+          {
+            "id": "T05C-AC1",
+            "status": "PASS",
+            "evidence": "At snapshot de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47, inspected integration.mjs:994-1058 still requires an exact current failed-M receipt or a reproducible status-1 merge-tree conflict with a tree OID, no process error and no signal. integration.mjs:1104-1174 binds the unchanged source run, approved contract, ownership, counter sources and unique correction branch into the immutable token. The fix2 diff does not weaken these checks, and the frozen test file SHA-256 f2e2d4e81c50de815f92d1a4e10ec5fba8ce19563383aca01cff713d29bc376c retains the actual-M, no-M, stale identity, changed contract, duplicate and unrelated-history cases."
+          },
+          {
+            "id": "T05C-AC2",
+            "status": "FAIL",
+            "evidence": "The design at integration-correction-design.md:43-45 requires the correction start checkout to be clean recursively, including index flags and initialized submodules. integration.mjs:1221-1223 checks cleanliness and index flags only at the correction root. validateCheckoutProofObjects at :219-228 validates stored commit objects, not live nested checkout state. assertCorrectionProtectedProof at :1192-1206 recursively compares protected_hash, protected ignored entries and initialized-submodule membership, but never compares nested HEAD, tree, index_tree, index_flags or live tracked bytes with the basis proof. A nested checkout drift hidden by `submodule.<name>.ignore=all`, or a nested assume-unchanged flag, can therefore survive first-start validation. The existing recursive verifyCheckoutProof at :232-255 performs the omitted HEAD, clean-tree, index-flag and live-byte checks, confirming this is a distinct missing validation path."
+          },
+          {
+            "id": "T05C-AC3",
+            "status": "FAIL",
+            "evidence": "The contract regression list at integration-correction-design.md:92-95 explicitly requires dirty, flagged and submodule-state coverage. The frozen tests contain no `submodule`, `assume-unchanged` or `skip-worktree` correction-start case, so the AC2 defect is untested. Independent scope inspection binds this verdict to snapshot de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47 and reports seven declared changed paths, no out-of-scope changes, no contract drift and no current coordinator Git-metadata drift. Run d7c72357-2f28-4ac9-b364-09c3b1b0628a remains active at revision 11 with the original baseline hash ff9d69069c2f635c49085fa00f7c4c30c4b2bb33e6ba6840f107b6297c4c9cf1 and counters retries 0, fixes 2, corrections 0, but current gates, review and verification are still empty. Fresh full-gate PASS and whole-task review are not yet recorded, and the unresolved nested-checkout defect blocks C2 integration."
+          }
+        ],
+        "snapshot_hash": "de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47",
+        "recorded_at": "2026-09-13T08:55:01.927Z"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "label": "T05C successor provenance .deliver/T05C-successor-provenance.json sha256:f83ac2769b60f378e8475e0f007cfb8f2cdb0baa80c33ddaa362b06e7f5a45e8",
+      "snapshot_hash": "ff9d69069c2f635c49085fa00f7c4c30c4b2bb33e6ba6840f107b6297c4c9cf1",
+      "at": "2026-09-13T07:51:04.461Z"
+    }
+  ],
+  "counters": {
+    "retries": 0,
+    "fixes": 3,
+    "corrections": 0
+  },
+  "events": [
+    {
+      "at": "2026-09-13T07:50:24.185Z",
+      "type": "initialized",
+      "mode": "managed",
+      "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+    },
+    {
+      "at": "2026-09-13T07:50:24.272Z",
+      "type": "approved",
+      "approver": "Ben",
+      "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+    },
+    {
+      "at": "2026-09-13T07:50:24.612Z",
+      "type": "baseline_captured",
+      "snapshot_hash": "ff9d69069c2f635c49085fa00f7c4c30c4b2bb33e6ba6840f107b6297c4c9cf1",
+      "dirty_paths": []
+    },
+    {
+      "at": "2026-09-13T07:51:04.461Z",
+      "type": "checkpoint",
+      "label": "T05C successor provenance .deliver/T05C-successor-provenance.json sha256:f83ac2769b60f378e8475e0f007cfb8f2cdb0baa80c33ddaa362b06e7f5a45e8",
+      "snapshot_hash": "ff9d69069c2f635c49085fa00f7c4c30c4b2bb33e6ba6840f107b6297c4c9cf1"
+    },
+    {
+      "at": "2026-09-13T07:56:28.779Z",
+      "type": "review_recorded",
+      "reviewer": "recovery_contract",
+      "status": "FAIL",
+      "snapshot_hash": "879fbda9c0437f6aa6350310e0fd5e0e8a307237cf3d8fe8a37de32357116a96"
+    },
+    {
+      "at": "2026-09-13T07:56:29.173Z",
+      "type": "verification_recorded",
+      "verifier": "recovery_contract",
+      "snapshot_hash": "879fbda9c0437f6aa6350310e0fd5e0e8a307237cf3d8fe8a37de32357116a96"
+    },
+    {
+      "at": "2026-09-13T07:56:29.403Z",
+      "type": "correct_course",
+      "kind": "fix",
+      "reason": "Independent T05C review: revalidate live correction authority during journal recovery, bind exact token story target, and reject generic Git failures as conflict bases. All three defects independently reproduced before repair.",
+      "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+    },
+    {
+      "at": "2026-09-13T08:14:08.416Z",
+      "type": "gate_executed",
+      "name": "test",
+      "status": "FAIL",
+      "snapshot_hash": "405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334"
+    },
+    {
+      "at": "2026-09-13T08:16:32.075Z",
+      "type": "gate_executed",
+      "name": "validate",
+      "status": "PASS",
+      "snapshot_hash": "405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334"
+    },
+    {
+      "at": "2026-09-13T08:21:08.865Z",
+      "type": "review_recorded",
+      "reviewer": "recovery_contract",
+      "status": "FAIL",
+      "snapshot_hash": "405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334"
+    },
+    {
+      "at": "2026-09-13T08:21:09.276Z",
+      "type": "verification_recorded",
+      "verifier": "correction_verifier",
+      "snapshot_hash": "405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334"
+    },
+    {
+      "at": "2026-09-13T08:21:09.513Z",
+      "type": "correct_course",
+      "kind": "fix",
+      "reason": "Fix2: reject basis-relative protected metadata drift at correction start and frozen baseline/anchor drift during journal recovery; preserve all prior resolved findings and optimize repeated negative test fixture setup without dropping assertions so full npm test completes within the unchanged runtime limit.",
+      "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+    },
+    {
+      "at": "2026-09-13T08:46:08.197Z",
+      "type": "gate_executed",
+      "name": "test",
+      "status": "FAIL",
+      "snapshot_hash": "de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47"
+    },
+    {
+      "at": "2026-09-13T08:48:43.733Z",
+      "type": "gate_executed",
+      "name": "validate",
+      "status": "PASS",
+      "snapshot_hash": "de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47"
+    },
+    {
+      "at": "2026-09-13T08:55:01.526Z",
+      "type": "review_recorded",
+      "reviewer": "recovery_contract",
+      "status": "FAIL",
+      "snapshot_hash": "de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47"
+    },
+    {
+      "at": "2026-09-13T08:55:01.927Z",
+      "type": "verification_recorded",
+      "verifier": "correction_verifier",
+      "snapshot_hash": "de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47"
+    },
+    {
+      "at": "2026-09-13T08:55:02.157Z",
+      "type": "correct_course",
+      "kind": "fix",
+      "reason": "Fix3: implement relocation-safe complete initialized-submodule proof, retain story executable mode before recovery normalization, and confine strict source cleanliness to correction operations so ordinary baseline-dirty source integration retains freshM evidence. Preserve all prior findings, attempts and baseline; add actual independent regressions and keep full test execution within existing600s gate without reducing coverage.",
+      "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+    },
+    {
+      "at": "2026-09-13T09:37:16.272Z",
+      "type": "gate_executed",
+      "name": "test",
+      "status": "PASS",
+      "snapshot_hash": "b8c66ec574464337ae65d7b4e810d742a34b381e758f4b21f9e53964ac481d97"
+    },
+    {
+      "at": "2026-09-13T09:37:17.926Z",
+      "type": "gate_executed",
+      "name": "validate",
+      "status": "PASS",
+      "snapshot_hash": "b8c66ec574464337ae65d7b4e810d742a34b381e758f4b21f9e53964ac481d97"
+    }
+  ],
+  "pm_binding": null,
+  "contracts": null
+}

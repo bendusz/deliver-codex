@@ -1,0 +1,37 @@
+{
+  "id": "T07",
+  "objective": "Implement read-only artifact analysis, claim readiness contract and evidence-based quality checklist assets",
+  "read_paths": [
+    "AGENTS.md",
+    "docs/plans/2026-09-09-upstream-parity.md"
+  ],
+  "touches": [
+    "plugins/deliver/skills/deliver/references/governance.md",
+    "plugins/deliver/skills/deliver/assets/templates/checklist-spec-quality.md.template",
+    "plugins/deliver/skills/deliver/assets/templates/checklist-plan-quality.md.template",
+    "plugins/deliver/skills/deliver/assets/templates/checklist-story-readiness.md.template",
+    "plugins/deliver/skills/deliver/assets/templates/checklist-verification-quality.md.template",
+    "plugins/deliver/skills/deliver/scripts/analyze.mjs",
+    "plugins/deliver/skills/deliver/scripts/lib/analyze.mjs",
+    "tests/analysis.test.mjs"
+  ],
+  "acceptance": [
+    {
+      "id": "T07-AC1",
+      "text": "Read-only deterministic analysis reports located clarification, requirement coverage, dependency, scope, command and declared lens defects against production artifact templates; input errors never become PASS."
+    },
+    {
+      "id": "T07-AC2",
+      "text": "Analysis separates factual findings from semantic review still needed, exports claim readiness for applicable scales, and preserves files and project state even on malformed, unsafe or nonregular inputs."
+    },
+    {
+      "id": "T07-AC3",
+      "text": "Four packaged quality checklist templates and native governance instructions preserve evidence-only checkoffs, read-only analysis, scale requirements, and explicit remediation without silently changing artifacts."
+    }
+  ],
+  "commands": {
+    "test": "npm test",
+    "validate": "npm run validate"
+  },
+  "specs": []
+}

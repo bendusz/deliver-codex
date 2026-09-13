@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T03-AC1",
+      "status": "FAIL",
+      "evidence": "current-pm.mjs returns an existing same-owner claim before requireCleanIntegrationCheckout, allowing stale story-branch Execution state to be treated as the claim authority. Other reviewed paths bind the contract, specs, actor, builder, branch and digests, but this integration-tip precondition is missing."
+    },
+    {
+      "id": "T03-AC2",
+      "status": "FAIL",
+      "evidence": "pm.mjs assertPmBinding returns for a null binding even when detectProjectFormat would identify the run's project as current. scope.mjs uses that function for check and for gate/review/verify/finish scope inspection, so shared approval can be present while story ownership is absent."
+    },
+    {
+      "id": "T03-AC3",
+      "status": "PASS",
+      "evidence": "Independent inspection and the exact-snapshot test gate confirm duplicate current story runs are rejected, counters resume with their maximum persisted values, expert-builder fails without fallback, new pm init defaults to current format, sequential same-actor independent work returns PARALLEL_BATCH_REQUIRED, and explicit legacy initialization plus original compatibility regressions remain supported."
+    }
+  ]
+}

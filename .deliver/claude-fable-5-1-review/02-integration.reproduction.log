@@ -1,0 +1,32 @@
+{
+  "post_p_gate": {
+    "status": 0,
+    "finalized_after": false,
+    "finalization_history": 1
+  },
+  "close_after_rerun": {
+    "status": 66,
+    "error": "integration evidence finalization identity is missing or stale"
+  },
+  "gate_after_rerun": {
+    "status": 66,
+    "error": "integration evidence finalization identity is missing or stale"
+  },
+  "close_changed_env": {
+    "status": 66,
+    "error": "fresh integration gate is missing or failed: test"
+  },
+  "gate_changed_env": {
+    "status": 66,
+    "error": "fresh integration gate is missing or failed: test"
+  }
+}
+✔ triage reproduces post-P evidence and environment deadlocks (35595.268833ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 35630.557625

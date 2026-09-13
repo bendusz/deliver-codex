@@ -1,0 +1,12 @@
+{
+  "status": "full gates and independent review in progress; not accepted",
+  "run": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
+  "snapshot": "405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334",
+  "patch_sha256": "c2c3d317d59f912f5c46319c9f197dc95657c0d648dac8153e4819746c99a9fa",
+  "test_sha256": "2cfe112fddc9cdf3e8deb915dbedb2b8f39649f79d5eef85326d5979cde0e683",
+  "builder_reported_focused_tests": {
+    "total": 11,
+    "passed": 11,
+    "qualification": "builder report; coordinator full gates pending"
+  }
+}

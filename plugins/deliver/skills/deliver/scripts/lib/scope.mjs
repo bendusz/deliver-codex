@@ -34,16 +34,211 @@ function fingerprint(root, rel) {
   throw new DeliverError(`unsupported repository path type: ${rel}`, 74);
 }
 
-function gitMetadata(root) {
+function gitDirectories(root) {
   const safe = (args) => { try { return git(root, args); } catch { return ''; } };
   const gitDirRaw = safe(['rev-parse', '--git-dir']).replace(/(\r?\n)+$/, '');
   const gitDir = gitDirRaw ? path.resolve(root, gitDirRaw) : '';
   const commonDirRaw = safe(['rev-parse', '--git-common-dir']).replace(/(\r?\n)+$/, '');
   const commonDir = commonDirRaw ? path.resolve(root, commonDirRaw) : gitDir;
+  return { safe, gitDir, commonDir };
+}
+
+function legacyProtectedGitMetadata(root) {
+  const { gitDir, commonDir } = gitDirectories(root);
   const fileHash = (base, rel) => { try { return sha256(fs.readFileSync(path.join(base, rel))); } catch { return sha256(''); } };
   const hooks = [];
   try {
     for (const name of fs.readdirSync(path.join(commonDir, 'hooks')).sort()) hooks.push(`${name}:${fileHash(commonDir, path.join('hooks', name))}`);
+  } catch {}
+  return sha256(canonical({
+    worktree_config: fileHash(gitDir, 'config.worktree'),
+    common_config: fileHash(commonDir, 'config'),
+    exclude: fileHash(commonDir, path.join('info', 'exclude')),
+    hooks,
+  }));
+}
+
+function effectiveHooks(root) {
+  const { gitDir, commonDir } = gitDirectories(root);
+  let configured = '';
+  try { configured = git(root, ['config', '--path', '--get', 'core.hooksPath']).trim(); } catch {}
+  const location = configured ? path.resolve(root, configured) : path.join(commonDir, 'hooks');
+  const limit = 8 * 1024 * 1024;
+  const result = { configured: configured || null, path: location, kind: 'missing', entries: [] };
+  let locationStat;
+  try { locationStat = fs.lstatSync(location); } catch (error) {
+    if (error.code === 'ENOENT') return { result, active: false, upgrade_safe: true };
+    throw new DeliverError(`cannot inspect effective Git hooks path: ${error.message}`, 66);
+  }
+  let directory = location;
+  if (locationStat.isSymbolicLink()) {
+    result.kind = 'symlink';
+    result.target = fs.readlinkSync(location);
+    try { directory = fs.realpathSync(location); } catch { throw new DeliverError('effective Git hooks path is a broken symlink', 66); }
+    const resolved = fs.statSync(directory);
+    if (!resolved.isDirectory()) throw new DeliverError('effective Git hooks path symlink must resolve to a directory', 66);
+  } else if (locationStat.isDirectory()) {
+    result.kind = 'directory';
+  } else {
+    throw new DeliverError('effective Git hooks path must be a directory or directory symlink', 66);
+  }
+  const names = fs.readdirSync(directory).sort();
+  if (names.length > 1024) throw new DeliverError('effective Git hooks path has too many entries', 66);
+  let total = 0;
+  let active = false;
+  for (const name of names) {
+    if (hasControl(name)) throw new DeliverError('effective Git hooks path contains an unsafe entry name', 66);
+    const file = path.join(directory, name);
+    const stat = fs.lstatSync(file);
+    const mode = stat.mode & 0o777;
+    if (stat.isFile()) {
+      if (stat.size > limit || total + stat.size > 32 * 1024 * 1024) throw new DeliverError('effective Git hooks exceed the protected metadata limit', 66);
+      total += stat.size;
+      result.entries.push({ name, kind: 'file', mode, hash: sha256(fs.readFileSync(file)) });
+      if (!name.endsWith('.sample') && (mode & 0o111) !== 0) active = true;
+      continue;
+    }
+    if (stat.isSymbolicLink()) {
+      const target = fs.readlinkSync(file);
+      const entry = { name, kind: 'symlink', mode, target };
+      let resolved;
+      try { resolved = fs.statSync(file); } catch { throw new DeliverError(`effective Git hook is a broken symlink: ${name}`, 66); }
+      if (!resolved.isFile() || resolved.size > limit || total + resolved.size > 32 * 1024 * 1024) {
+        throw new DeliverError(`effective Git hook symlink has an unsafe target: ${name}`, 66);
+      }
+      total += resolved.size;
+      entry.target_mode = resolved.mode & 0o777;
+      entry.target_hash = sha256(fs.readFileSync(file));
+      result.entries.push(entry);
+      if (!name.endsWith('.sample') && (entry.target_mode & 0o111) !== 0) active = true;
+      continue;
+    }
+    throw new DeliverError(`effective Git hooks path contains a nonregular entry: ${name}`, 66);
+  }
+  return { result, active, upgrade_safe: !active };
+}
+
+export function protectedGitMetadata(root) {
+  const { gitDir, commonDir } = gitDirectories(root);
+  const fileHash = (base, rel) => { try { return sha256(fs.readFileSync(path.join(base, rel))); } catch { return sha256(''); } };
+  return sha256(canonical({
+    worktree_config: fileHash(gitDir, 'config.worktree'),
+    common_config: fileHash(commonDir, 'config'),
+    exclude: fileHash(commonDir, path.join('info', 'exclude')),
+    hooks: effectiveHooks(root).result,
+  }));
+}
+
+function initializedSubmodules(root) {
+  const modules = [];
+  for (const record of listZ(root, ['ls-files', '--stage', '-z'])) {
+    const match = /^160000 [0-9a-f]+ [0-3]\t(.+)$/.exec(record);
+    if (!match) continue;
+    const rel = match[1];
+    const candidate = path.join(root, rel);
+    let stat;
+    try { stat = fs.lstatSync(candidate); } catch { continue; }
+    if (!stat.isDirectory() || stat.isSymbolicLink()) continue;
+    const moduleRoot = fs.realpathSync(candidate);
+    try {
+      if (gitRoot(moduleRoot) === moduleRoot) modules.push({ rel, root: moduleRoot });
+    } catch {}
+  }
+  return modules.sort((left, right) => left.rel.localeCompare(right.rel));
+}
+
+function captureNestedGitAnchor(root) {
+  const anchor = {
+    metadata_version: 'protected-v2',
+    head: git(root, ['rev-parse', '--verify', 'HEAD']).trim(),
+    tree: git(root, ['rev-parse', 'HEAD^{tree}']).trim(),
+    index_tree: git(root, ['write-tree']).trim(),
+    index_flags: sha256(git(root, ['ls-files', '-v', '-z'])),
+    protected_hash: protectedGitMetadata(root),
+  };
+  if (!anchor.head || !anchor.tree || !anchor.index_tree) throw new Error('unborn nested repository');
+  const submodules = Object.fromEntries(initializedSubmodules(root)
+    .map((module) => [module.rel, captureNestedGitAnchor(module.root)]));
+  if (Object.keys(submodules).length) anchor.submodules = submodules;
+  return anchor;
+}
+
+export function captureGitAnchor(root) {
+  try {
+    const head = git(root, ['rev-parse', '--verify', 'HEAD']).trim();
+    const ref = git(root, ['symbolic-ref', '-q', 'HEAD']).trim();
+    const tree = git(root, ['rev-parse', 'HEAD^{tree}']).trim();
+    const indexTree = git(root, ['write-tree']).trim();
+    if (!head || !ref.startsWith('refs/heads/') || !tree || !indexTree) throw new Error('unborn or detached HEAD');
+    const anchor = {
+      metadata_version: 'protected-v2',
+      head,
+      ref,
+      tree,
+      index_tree: indexTree,
+      index_flags: sha256(git(root, ['ls-files', '-v', '-z'])),
+      protected_hash: protectedGitMetadata(root),
+    };
+    const submodules = Object.fromEntries(initializedSubmodules(root)
+      .map((module) => [module.rel, captureNestedGitAnchor(module.root)]));
+    if (Object.keys(submodules).length) anchor.submodules = submodules;
+    return anchor;
+  } catch (error) {
+    if (error instanceof DeliverError) throw error;
+    throw new DeliverError(`cannot capture protected Git anchor: ${error.message}`, 66);
+  }
+}
+
+export function legacyAnchorUpgradeSafe(root) {
+  if (!effectiveHooks(root).upgrade_safe) return false;
+  return initializedSubmodules(root).every((module) => legacyAnchorUpgradeSafe(module.root));
+}
+
+function rootAnchor(anchor) {
+  const { submodules: _submodules, ...root } = anchor;
+  return root;
+}
+
+function protectedV1Compatible(root, stored, current) {
+  if (stored.metadata_version !== undefined) return false;
+  const { metadata_version: _version, ...currentV1Shape } = current;
+  if (canonical(stored) === canonical(currentV1Shape)) return true;
+  if (!legacyAnchorUpgradeSafe(root) || stored.protected_hash !== legacyProtectedGitMetadata(root)) return false;
+  return canonical({ ...stored, protected_hash: current.protected_hash }) === canonical(currentV1Shape);
+}
+
+function nestedMetadata(entries) {
+  const result = Object.create(null);
+  for (const [rel, value] of Object.entries(entries)) {
+    const match = /^gitlink:[0-9a-f]+:([0-9a-f]{64})$/.exec(value);
+    if (match) result[rel] = match[1];
+  }
+  return result;
+}
+
+function gitMetadata(root) {
+  const { safe } = gitDirectories(root);
+  return sha256(canonical({
+    head: safe(['rev-parse', '--verify', 'HEAD']).trim() || 'UNBORN',
+    ref: safe(['symbolic-ref', '-q', 'HEAD']).trim() || 'DETACHED',
+    tree: safe(['rev-parse', 'HEAD^{tree}']).trim(),
+    index_tree: safe(['write-tree']).trim(),
+    index_flags: sha256(safe(['ls-files', '-v', '-z'])),
+    protected_hash: protectedGitMetadata(root),
+    index: sha256(safe(['diff', '--cached', '--binary', '--no-ext-diff', '--no-textconv'])),
+    // Other branches and worktrees can advance independently. Protect this
+    // checkout's HEAD/index and shared configuration, not unrelated refs.
+  }));
+}
+
+function legacyGitMetadataV1(root) {
+  const { safe, gitDir, commonDir } = gitDirectories(root);
+  const fileHash = (base, rel) => { try { return sha256(fs.readFileSync(path.join(base, rel))); } catch { return sha256(''); } };
+  const hooks = [];
+  try {
+    for (const name of fs.readdirSync(path.join(commonDir, 'hooks')).sort()) {
+      hooks.push(`${name}:${fileHash(commonDir, path.join('hooks', name))}`);
+    }
   } catch {}
   return sha256(canonical({
     head: safe(['rev-parse', '--verify', 'HEAD']).trim() || 'UNBORN',
@@ -54,8 +249,6 @@ function gitMetadata(root) {
     common_config: fileHash(commonDir, 'config'),
     exclude: fileHash(commonDir, path.join('info', 'exclude')),
     hooks,
-    // Other branches and worktrees can advance independently. Protect this
-    // checkout's HEAD/index and shared configuration, not unrelated refs.
   }));
 }
 
@@ -94,7 +287,7 @@ function resolvedInputs(root, paths) {
   return [...result];
 }
 
-export function snapshot(root, relevantPaths = []) {
+function snapshotVersion(root, relevantPaths, metadataVersion) {
   root = fs.realpathSync(root);
   relevantPaths = resolvedInputs(root, relevantPaths);
   const gitlinks = new Map(listZ(root, ['ls-files', '--stage', '-z']).flatMap((record) => {
@@ -122,7 +315,7 @@ export function snapshot(root, relevantPaths = []) {
         continue;
       }
       const moduleInputs = relevantPaths.flatMap((scope) => covers(scope, rel) ? ['.'] : covers(rel, scope) ? [scope.slice(rel.length + 1)] : []);
-      const nested = snapshot(moduleRoot, moduleInputs);
+      const nested = snapshotVersion(moduleRoot, moduleInputs, metadataVersion);
       submoduleMetadata[rel] = nested.git_meta;
       entries[rel] = `gitlink:${gitlinks.get(rel)}:${nested.git_meta}`;
       for (const [file, value] of Object.entries(nested.entries)) entries[`${rel}/${file}`] = value;
@@ -139,9 +332,17 @@ export function snapshot(root, relevantPaths = []) {
       ignoredAdvisory[rel] = { size: stat.size, mtime_ms: Math.trunc(stat.mtimeMs), kind: stat.isSymbolicLink() ? 'symlink' : 'file' };
     } catch {}
   }
-  const localMetadata = gitMetadata(root);
+  const localMetadata = metadataVersion === 'legacy-v1' ? legacyGitMetadataV1(root) : gitMetadata(root);
   const gitMeta = gitlinks.size ? sha256(canonical({ local: localMetadata, submodules: submoduleMetadata })) : localMetadata;
   return { entries, git_meta: gitMeta, ignored_advisory: ignoredAdvisory, hash: sha256(canonical({ entries, git_meta: gitMeta })) };
+}
+
+export function snapshot(root, relevantPaths = []) {
+  return snapshotVersion(root, relevantPaths, 'current');
+}
+
+function legacySnapshotV1(root, relevantPaths = []) {
+  return snapshotVersion(root, relevantPaths, 'legacy-v1');
 }
 
 export function baselineDirtyPaths(root) {
@@ -213,7 +414,7 @@ function symlinkEscapes(root, rel) {
   return !isInside(root, target);
 }
 
-export function compareSnapshots(root, baseline, current, touches, dirtyAtStart = []) {
+export function compareSnapshots(root, baseline, current, touches, dirtyAtStart = [], { ignoreGitMetadata = false } = {}) {
   const before = baseline.entries;
   const after = current.entries;
   const changed = [...new Set([...Object.keys(before), ...Object.keys(after)])]
@@ -229,7 +430,7 @@ export function compareSnapshots(root, baseline, current, touches, dirtyAtStart 
   const outOfScope = changed.filter((rel) => !allowed(rel, touches));
   const preexistingDirtyChanged = changed.filter((rel) => dirtyAtStart.some((dirty) => covers(dirty, rel)));
   const symlinkEscapesFound = changed.filter((rel) => symlinkEscapes(root, rel));
-  const gitChanged = baseline.git_meta !== current.git_meta;
+  const gitChanged = !ignoreGitMetadata && baseline.git_meta !== current.git_meta;
   const ignoredAdvisoryChanged = [...new Set([
     ...Object.keys(baseline.ignored_advisory || {}),
     ...Object.keys(current.ignored_advisory || {}),
@@ -248,12 +449,60 @@ export function compareSnapshots(root, baseline, current, touches, dirtyAtStart 
   };
 }
 
-export function inspectScope(state) {
+export function inspectScope(state, { allowPendingAdoption = false, ignoreGitAnchor = false } = {}) {
   assertPmBinding(state);
   if (!state.baseline || !state.task) throw new DeliverError('task has no baseline; run start first', 66);
+  if (state.commit_adoption?.pending && !allowPendingAdoption) throw new DeliverError('commit adoption is pending; commit or reconcile it before continuing', 66);
   validateTaskPaths(state.project_root, state.task.packet);
-  const current = snapshot(state.project_root, [...state.task.packet.touches, ...state.task.packet.read_paths, ...state.task.packet.specs]);
-  const report = compareSnapshots(state.project_root, state.baseline.snapshot, current, state.task.packet.touches, state.baseline.dirty_paths);
+  const relevantPaths = [...state.task.packet.touches, ...state.task.packet.read_paths, ...state.task.packet.specs];
+  const current = snapshot(state.project_root, relevantPaths);
+  const baselineForComparison = state.baseline.snapshot;
+  let currentForComparison = current;
+  let metadataCompatibility = null;
+  if (state.baseline_metadata_version === 'legacy-v1') {
+    currentForComparison = legacySnapshotV1(state.project_root, relevantPaths);
+    metadataCompatibility = 'legacy-v1';
+  } else if (!state.git_anchor && baselineForComparison.git_meta !== current.git_meta) {
+    const legacyCurrent = legacySnapshotV1(state.project_root, relevantPaths);
+    if (baselineForComparison.git_meta === legacyCurrent.git_meta) {
+      currentForComparison = legacyCurrent;
+      metadataCompatibility = 'legacy-v1';
+    }
+  }
+  let coordinatorExecutionChanged = null;
+  if (state.execution_audit) {
+    const audit = state.execution_audit;
+    if (baselineForComparison.entries[audit.story_path] !== audit.original_entry
+      || current.entries[audit.story_path] !== audit.current_entry) {
+      throw new DeliverError('audited Execution entry does not match the original baseline or current story', 66);
+    }
+    const entries = { ...currentForComparison.entries };
+    if (audit.original_entry === null) delete entries[audit.story_path];
+    else entries[audit.story_path] = audit.original_entry;
+    currentForComparison = { ...currentForComparison, entries };
+    coordinatorExecutionChanged = audit.story_path;
+  }
+  const report = compareSnapshots(state.project_root, baselineForComparison, currentForComparison,
+    state.task.packet.touches, state.baseline.dirty_paths, { ignoreGitMetadata: Boolean(state.git_anchor) });
+  if (state.git_anchor && !ignoreGitAnchor) {
+    const anchor = captureGitAnchor(state.project_root);
+    const exact = canonical(anchor) === canonical(state.git_anchor);
+    const protectedCompatible = !exact && protectedV1Compatible(state.project_root, state.git_anchor, anchor);
+    const flatRoot = rootAnchor(anchor);
+    const flatRootCompatible = canonical(flatRoot) === canonical(state.git_anchor)
+      || protectedV1Compatible(state.project_root, state.git_anchor, flatRoot);
+    const flatCompatible = !exact && !protectedCompatible && state.git_anchor.submodules === undefined
+      && anchor.submodules !== undefined
+      && flatRootCompatible
+      && canonical(nestedMetadata(baselineForComparison.entries)) === canonical(nestedMetadata(currentForComparison.entries))
+      && legacyAnchorUpgradeSafe(state.project_root);
+    report.git_metadata_changed = !exact && !protectedCompatible && !flatCompatible;
+    if (protectedCompatible) report.git_anchor_compatibility = 'protected-v1';
+    if (flatCompatible) report.git_anchor_compatibility = 'flat-v1';
+    if (report.git_metadata_changed) report.ok = false;
+  }
+  report.coordinator_execution_changed = coordinatorExecutionChanged;
+  report.git_metadata_compatibility = metadataCompatibility;
   report.contracts_changed = [...new Set([...changedContracts(state), ...(state.contracts
     ? report.changed.filter((rel) => rel.endsWith('.sdd') || /(^|\/)\.specdd(?:\/|$)/.test(rel)) : [])])].sort();
   if (report.contracts_changed.length) report.ok = false;

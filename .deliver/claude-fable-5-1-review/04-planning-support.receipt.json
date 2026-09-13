@@ -1,0 +1,54 @@
+{
+  "status": "PASS",
+  "findings": [
+    {
+      "severity": "minor",
+      "message": "Revising an already-approved plan creates circular guidance: post-plan analysis runs the Git digest probe whenever the marker is 'approved' and emits CRITICAL APPROVAL_DIGEST_MISMATCH (remediation: approve the current plan), while planning.md says every blocking analysis finding must be resolved before asking for sign-off and governance.md says a pending marker is expected at post-plan. The only escape (set the marker back to pending during revision) is never stated; T08 correct-course revocation is pending. Recommendation: either state explicitly in planning.md that a plan revision resets the marker to pending, or report digest drift at post-plan as non-blocking DRIFT/CONCERNS.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/analyze.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "Contradictory SpecDD policy: specdd.md says 'Do not enable SpecDD merely because a project is large', but scale-profiles.md lists SpecDD contracts as required at large/regulated and the analyzer blocks large/regulated post-decomposition and pre-claim with SPECDD_SKELETON_REQUIRED, SPECDD_BOOTSTRAP_REQUIRED and STORY_CONTRACTS_REQUIRED for every story (story.specs.length === 0). The implemented behavior follows the approved plan; the reference text is misleading. Also consider whether requiring a governing .sdd on every large-scale story (e.g. docs-only or test-only stories) is stricter than needed.",
+      "path": "plugins/deliver/skills/deliver/references/specdd.md",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "The packaged illustrative module.sdd declares Owns './scripts/specdd.mjs', './assets/specdd', './tests/specdd.test.mjs' and Can modify './fixtures'. Under the dialect rule the same directory documents ('./ resolves from the spec directory'), these resolve to plugins/deliver/skills/deliver/assets/specdd/scripts/... etc., which do not exist. As a dialect example it demonstrates the wrong resolution; use '/'-rooted or correctly relative paths, or label it explicitly as non-resolving sample text.",
+      "path": "plugins/deliver/skills/deliver/assets/specdd/module.sdd",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "renderAnalysisMarkdown prints Factual status and Semantic review status but omits the headline `status` (BLOCKED/UNKNOWN/REVIEW_REQUIRED/FACTS_CLEAR) that drives the CLI exit code. In addition, REVIEW_REQUIRED exits 0, which a shell caller can misread as pass; the JSON/markdown does say REVIEW_REQUIRED, so this is a usability recommendation, not a false PASS.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/analyze.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "Benchmark speed factor: if any completed run reports elapsed_seconds === 0 (allowed by the validator), `fastest` becomes 0 and every completed run receives the full 5-point speed credit regardless of its actual time. Edge case only; consider requiring elapsed_seconds > 0 for completed runs or computing speed from the smallest positive time.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/benchmark.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "secretScan rejects any tracked-record text matching `(secret|token|password|credential)\\s*[:=]\\s*[A-Za-z0-9_/+=.-]{8,}`, including the user-supplied `next` action, log lines and handoffs. Ordinary text such as 'Next: fix password: validation flow' or 'Rotate token: quarterly' fails the write with 'secret-shaped content'. Legacy path only, but a false-positive trap for autonomous completion; consider narrowing to quoted/high-entropy values.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/pm.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "Known-pending contradictions carried in this tree, not new defects: pm.mjs header comment and AGENTS.md state `pm/` is the source of project progress and recovery.md says to read `pm/` first, contradicting design decision 1 (new projects must not recreate pm/; T14 owns this); knowledge.md says no wiki is required by Quick or Managed while scale-profiles.md requires a wiki at `standard` scale (T11 owns knowledge references). Listed so they are not mistaken for release-ready guidance.",
+      "path": "plugins/deliver/skills/deliver/references/recovery.md",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "Unverifiable boundary: analysis reads every contract path declared by a parsed story (story.specs) through safeArtifactPath, which rejects symlinks but does not itself reject '..' components. Whether traversal is impossible depends on parseStory (story.mjs), which is not in this packet. If parseStory does not normalize/reject traversal, analysis could read and digest files outside the project root (read-only). Recommendation: add an explicit repository-relative check in safeArtifactPath.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/analyze.mjs",
+      "resolved": false
+    }
+  ],
+  "summary": "Design assessment: the supplied analysis, benchmark, SpecDD, legacy PM, role and template material serves the approved plan well. The analyzer is read-only, bounded (size/time/story limits, symlink and non-regular rejection, UTF-8 validation), binds findings to a content identity that includes missing artifacts and the Git approval probe, and keeps factual findings separate from labelled semantic-review prompts; UNKNOWN never becomes PASS and readiness is only READY for tiny/small after a clean deterministic pass. Scale and execution mode are separated as required; checkpoint policy explicitly avoids per-action permission prompts; planning/parallel/workflow references grant standing PM Git/PR authority and keep builders out of integration. The benchmark validator/scorer enforces distinct effective configurations, null-able measurements, eligibility before winner selection, and never changes routes. Roles remain read-only where required. Findings above are recommendations and documentation contradictions, not correctness failures in the supplied code. Limitations: SKILL.md, operations.json, story.mjs, project-state.mjs, current-pm.mjs, scope.mjs and the overlay integration/reporting/review modules are not in this packet, so T06-AC1/T06-AC3 (operation map, context budget, path resolution, slash-registration assumptions) and parseStory-dependent checks cannot be assessed here; no tests were executed and the 153/153 claim is not verified. Pending items (T05C/T05B/T08–T12/T13B/T14) are treated as unfinished work."
+}

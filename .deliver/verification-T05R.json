@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T05R-AC1",
+      "status": "PASS",
+      "evidence": "The adapter validates a real root, safe remote/branches and full local HEAD, requires one parseable push URL and active host authentication, filters exact repository owner/head/base locally, rejects full-page and multiple PR results, bounds command output, and returns closed stage/state results with fixed diagnostics. runCommand uses spawnSync with shell:false and prompt suppression; tests use only an injected fake runner and distinguish unavailable, Git, remote, auth, head and lookup failures."
+    },
+    {
+      "id": "T05R-AC2",
+      "status": "PASS",
+      "evidence": "Publish uses the exact non-force refspec EXPECTED:refs/heads/STORY, never adds tracking/config/bypass flags, re-reads the exact PR after create/edit/ready, and preserves an existing draft unless markReady is explicit. withBodyFile now resolves os.tmpdir through path.resolve and realpath, requires an absolute real directory, creates a private mode0700 directory, fchmods the open body file to mode0600, syncs exact bounded bytes and removes the directory in finally. The publish regression changes cwd, supplies relative TMPDIR and umask0777, then proves the fake gh call sees the absolute path, exact bytes/modes and cleanup on success and rejection."
+    },
+    {
+      "id": "T05R-AC3",
+      "status": "PASS",
+      "evidence": "Inspect and merge require exact PR identity/head, classify exit0 check JSON buckets, treat nonzero structured JSON as CHECKS_UNKNOWN, and accept either exact no-check exit1 message only after a fresh OPEN/non-draft MERGEABLE+CLEAN view. Merge rechecks the exact clean head, invokes gh without admin/auto using --match-head-commit and an explicit method, treats an accepted but still-open PR as MERGE_PENDING, and reports MERGED only after a full mergeCommit OID equals the single remote integration ref. Tests cover failed/pending/unknown checks, exact no-check messages, blocked state, head race, refusal, queueing, remote-base mismatch, and absolute protected merge-body cleanup under relative TMPDIR and umask0777. Coordinator npm test passed 144 tests and npm run validate passed at snapshot 7f2fb09ebbdf1f8818e5a114b14d42384b76047aac2a2a0d3979336475fd2a9d. Already-merged reconciliation remains a later T05B capability rather than evidence claimed by this criterion."
+    }
+  ]
+}

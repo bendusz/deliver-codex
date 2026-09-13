@@ -1,0 +1,38 @@
+{
+  "actor": "/root/recovery_contract",
+  "kind": "Native read-only design review, not final candidate acceptance",
+  "initial_report": {
+    "status": "FAIL",
+    "findings": [
+      {
+        "severity": "major",
+        "path": ".deliver/T05B-fix3-design-proposal-native.json",
+        "message": "The terminal receipt repair is not listed as an implementation repair; it appears only as a later reviewer requirement. Builder scope must explicitly include validation that remote verification covers every source.packet.acceptance ID exactly once with PASS, reviewer/verifier identities satisfy the actor grammar and differ from the builder and each other, every panel reviewer differs from the builder and verifier, panel lenses are unique, and the required lenses derived from the independently read frozen-M story are covered. Finalization should retain the required-lens set or its identified derivation so checkout-free terminal validation can cross-bind it."
+      }
+    ]
+  },
+  "coordinator_resolution": "Receipt validation promoted to explicit production repair. Existing mandatory panel policy applies to required/requested reporting only, preserving skipped-reporting behavior. Required-lens derivation must be retained and independently bound to frozen-M story/source identities.",
+  "final_report": {
+    "status": "PASS",
+    "findings": [],
+    "summary": "READY. No existing contract requires a mandatory panel when remote reporting is skipped. Exact required-lens coverage applies when reporting is required or requested and P is produced. Skipped reporting may retain a valid no-panel review; if a panel is supplied, its member grammar, unique lenses, aggregate verdict/findings and actor separation must still validate. Exact acceptance-ID coverage and reviewer/verifier independence remain mandatory for every finalization."
+  },
+  "representation_followup": {
+    "status": "FAIL",
+    "findings": [
+      {
+        "severity": "major",
+        "message": "Bind review_requirements.story_hash to the frozen evidence manifest entry for story_path, including its retained regular-file mode, rather than only hashing story_before inside the identified object. Otherwise checkout-free validation cannot establish that the supplied story bytes are the story at M; the object and required_lenses can be coherently reidentified together. Then parse the manifest-bound bytes and derive required_lenses. Implement derivation in integration/current-pm or another cycle-safe caller; state.mjs must not import story.mjs or review.mjs because both already depend on state.mjs.",
+        "path": ".deliver/T05B-fix3-dispatch.json"
+      }
+    ],
+    "summary": "With the manifest-entry cross-link, the representation is compatible. Required/requested reporting derives panel lenses from the exact M story; skipped reporting retains an empty required set while validating any supplied panel."
+  },
+  "representation_resolution": "Coordinator adds story_mode, exact manifest story fingerprint and manifest hash recomputation. Semantic derivation remains in cycle-safe public callers; builder must identify all enforcement entrypoints before release.",
+  "builder_entrypoint_map": {
+    "actor": "/root/recover_t05c",
+    "kind": "Native read-only proposal; implementation not yet released",
+    "message": "Cycle-safe entrypoint map is complete. Producer: finalizeRemoteIntegrationEvidence reads the exact story from remoteEvidenceRoot at evidence.commit M, parses it, verifies source contract/Execution, derives sorted requiredReviewLenses when reporting is required/requested (empty for skipped), cross-links the manifest fingerprint/mode, and stores the pinned identified finalization.review_requirements. Integration enforcement: the private validateRecord path should call a local semantic validator after state.mjs structural validation; readIntegrationRecord and both pre/post mutation phases of withRecord already route through validateRecord. This covers the exported read plus every public remote source/evidence/closure/P/E/H/H2/completion entrypoint. prepareRemoteClosureCheckout therefore cannot bypass the derivation check. PM enforcement: validateAdmissionRecord calls its own cycle-safe semantic validator after validateRemotePublicationRecord; remoteAdmissionStatus routes every discovered record through it, and pm status, claimCurrentPm's two admission checks, and prepareCurrentBinding all route through remoteAdmissionStatus/assertRemoteAdmissionClear. integration.mjs already imports story/review modules without a new cycle; current-pm.mjs can import requiredReviewLenses from review.mjs alongside its existing story import. state.mjs remains limited to identity, complete manifest shape/hash/story fingerprint, exact receipt IDs/actors/panel aggregate/coverage and finalization crosslinks. No exported API or schema beyond the pinned private review_requirements object is needed; the small semantic derivation helper must exist in both cycle-safe callers because current-pm cannot import integration.mjs."
+  },
+  "coordinator_status": "Design pins and concrete cycle-safe entrypoints accepted for implementation after independent test freeze; not candidate acceptance."
+}

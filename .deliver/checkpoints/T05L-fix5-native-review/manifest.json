@@ -1,0 +1,40 @@
+{
+  "status": "NOT_ACCEPTED",
+  "task": "T05L",
+  "run_id": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
+  "base_commit": "a18e851375c37ac4c99e62a55fe0e9ff1f1e937d",
+  "snapshot": "f74deb232127a910f84a997b17fee8e250bca37d9be7b321f761d144900280ab",
+  "revision": 34,
+  "counters": {
+    "retries": 1,
+    "fixes": 5,
+    "corrections": 0
+  },
+  "native_tests": {
+    "total": 158,
+    "passed": 158,
+    "validate": "PASS",
+    "evidence_directory": ".deliver/checkpoints/review-repair-gates/T05L-fix5/"
+  },
+  "native_review": "FAIL",
+  "failed_criteria": [
+    "T05L-AC1",
+    "T05L-AC3",
+    "T05L-AC4"
+  ],
+  "finding": "Legacy reconciliation can select an older PASS while ignoring contradictory current active failing evidence.",
+  "probe_method": "Reviewer modified a disposable copy of the shipped legacy regression to use a synthetic valid-identity FAIL gate receipt with exit_code 1 and later finished_at; reconciliation and closure still succeeded. This probe did not execute a failing gate command.",
+  "patch_validation": "PASS: git apply --cached --check at original base using disposable index",
+  "next_decision": "One additional bounded fix6 round requires explicit authorization. No source integration or counter reset.",
+  "files_sha256": {
+    "approval.json": "8d1ef909fa598aceab81189fb25c927c7fd2b195a46816623f514e817ed19007",
+    "check.json": "2ee4c26d0c82f90c698de0d9bd0ba78a1d67386ffaf077f89e83c736c0cda96f",
+    "contradictory-evidence-probe.log": "5d6cc18ac8ce4409bc481f76b8c7f1c35bb94386078fbec4ade79bc986450c5c",
+    "contradictory-evidence-probe.patch": "9fbcdfcaf066b85a067ff3169d4b9ce643bee4539ed1b2e3302d23dbf9a5d74c",
+    "native-review.json": "8ab3cee5a999ad68f1249ce184272b8658722c108d01e9126ea0398f0a1717a8",
+    "native-verification.json": "353e093376654b172231a538fa3a69b6589079a21503557eaacd753cf077ea71",
+    "run.json": "95083655d7482b52d8bd9336f2185e9615399298ce5ff56c70e1c0e090bdb43c",
+    "source.patch": "3b195e24a7fc461234091550bbf472960cb4dfdf0c6f2d32c33dfd6e0c7c0d88",
+    "task.json": "ef5ca47b913e4f4778073fbec61e4a84c96698abf8376b48acb02ec87ee0b901"
+  }
+}

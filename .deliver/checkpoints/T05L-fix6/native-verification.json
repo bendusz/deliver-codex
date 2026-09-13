@@ -1,0 +1,29 @@
+{
+  "criteria": [
+    {
+      "id": "T05L-AC1",
+      "status": "PASS",
+      "evidence": "Normal completion and frozen/historical finalization validation retain the distinct-verifier checks against the source builder and all reviewers, validate real M and preserve identity, criteria and counters. The confirmed fix6 defect concerns missing builder separation for the active review used as a legacy-reconciliation veto, while the selected finalization in the reproduction retained its original independent reviewer and verifier."
+    },
+    {
+      "id": "T05L-AC2",
+      "status": "PASS",
+      "evidence": "Fresh-process P/E/H continuation is independent of the later terminal environment, current/upstream story roundtrips and handoff BASE_COMMIT topology remain covered, and legacy reconciliation is explicit and hash-bound. Advanced-I reprepare and failed-no-M correction remain the documented T05B/T05C boundary rather than T05L failures."
+    },
+    {
+      "id": "T05L-AC3",
+      "status": "PASS",
+      "evidence": "Large/regulated P and subsequent E/H preparations and adopted proofs remain bound to the immutable finalization over M/tree, manifest, exact receipts/logs and reporting policy. Current contradictory active gate/review/verification outcomes now veto legacy recovery before writes, while missing, ambiguous and oversized recovery remains fail-closed."
+    },
+    {
+      "id": "T05L-AC4",
+      "status": "FAIL",
+      "evidence": "Actual declared gates, live M identity, logs, source/C/M manifest rules and active FAIL/UNKNOWN/incomplete evidence vetoes are enforced. A disposable-repository probe nevertheless showed that an identity-valid active PASS review with reviewer equal to source.builder passes reconciliation, so the promised independent active M evidence validation is incomplete."
+    },
+    {
+      "id": "T05L-AC5",
+      "status": "PASS",
+      "evidence": "Structured panel receipts continue to retain exact member identities, verdicts, findings and required lens coverage, and the exact aggregate multiset plus legacy no-panel compatibility regressions pass. The reproduced fix6 defect used a no-panel top-level review wrapper; panel-member builder separation is included in the shared predicate recommendation but was not separately reproduced."
+    }
+  ]
+}

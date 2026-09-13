@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T00B-AC1",
+      "status": "PASS",
+      "evidence": "All 13 bundled role TOMLs have no top-level sandbox_mode before developer_instructions; the bounded diff removes only that field from the seven affected role headers. bin/deliver.mjs remains unchanged with danger-full-access/never as its default and workspace-write or read-only as explicit validated opt-ins using on-request approval."
+    },
+    {
+      "id": "T00B-AC2",
+      "status": "PASS",
+      "evidence": "tests/role-policy.test.mjs pins hashes of the seven affected developer_instructions blocks, proving the read-only reviewer, researcher, explorer, architecture, security, debugger and verifier duties were preserved while only runtime sandbox overrides changed. Its real setup fixture retains the existing .codex/config.toml bytes and custom-reviewer.toml bytes while installing Deliver roles to both .agents/skills/deliver/assets/codex-agents and .codex/agents."
+    },
+    {
+      "id": "T00B-AC3",
+      "status": "PASS",
+      "evidence": "The installed-copy regression compares every installed role byte-for-byte with its bundled source in both destinations and rejects a top-level sandbox_mode; scripts/validate.mjs applies the same invariant to all bundled roles. Tests use temporary local directories and setupProject directly, with no model service or user-global mutation. Coordinator npm test and npm run validate both passed at frozen snapshot d97ae2d5090b3cf645ded54b109a960c978d9f25f1ca3ad2615fac86ed51fef6 with no scope drift."
+    }
+  ]
+}

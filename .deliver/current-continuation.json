@@ -1,0 +1,40 @@
+{
+  "task": "T05B",
+  "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05b-delivery",
+  "branch": "feat/parity-t05b",
+  "revision": 17,
+  "counters": {
+    "retries": 0,
+    "fixes": 3,
+    "corrections": 0
+  },
+  "phase": "Independent test freeze reopened for narrow fixture corrections; production held",
+  "test_author": "/root/correction_regressions",
+  "builder": "/root/recover_t05c",
+  "reviewer": "/root/recovery_contract",
+  "verifier": "/root/correction_verifier",
+  "dispatch": ".deliver/T05B-fix3-dispatch.json",
+  "design": ".deliver/T05B-fix3-design-preflight-native.json",
+  "mode_fixture": ".deliver/T05B-fix3-mode-fixture-ruling.json",
+  "failed_candidate": ".deliver/checkpoints/T05B-fix2-candidate/",
+  "next_action": "Test author removes whitespace normalization and isolates finalized receipt semantics before artifact generation, then refreezes. Root archives new tests against unchanged production and releases builder. Original run fix count remains 3; final gates, review and distinct verification follow.",
+  "stop_rule": "Do not dispatch fix4 if third repair fails without explicit user decision. Preserve original task/baseline/history.",
+  "project_plan": "docs/plans/2026-09-09-upstream-parity.md",
+  "project_status": "Approved parity work remains incomplete. PR2 is draft/open; final fresh claude-fable-5-1 high-effort review and main merge remain pending.",
+  "future_preparation": [
+    ".deliver/T02F-boundary-dispatch.json",
+    ".deliver/T08-journal-testability-dispatch.md",
+    ".deliver/T14-example-scope-preflight.json",
+    ".deliver/retained-review-dispatch-index.json",
+    ".deliver/story-mode-follow-up-proposal-native.json"
+  ],
+  "held_source_candidate_snapshot": "009feeee3ea2fee4433de2815ca869f6a54f74b186103a95ec0c902ca29a8c9f",
+  "held_source_manifest": ".deliver/checkpoints/T05B-fix2-candidate/manifest.json",
+  "snapshot_note": "The held snapshot contains the old test bytes. Current tests are changing; no current candidate snapshot or PASS is asserted.",
+  "historical_test_freeze": {
+    "checkpoint": ".deliver/checkpoints/T05B-fix3-tests/",
+    "snapshot": "8dd1caa3402fa5abd0e89bb8a33c161abf7ac23301325de5dba720335e6c75ed",
+    "lifecycle_sha256": "b5e0a0c6ce4ef9914d6b52b3dcd53bc9bddcf6c6e9b97f474d5be35582a17c44"
+  }
+}

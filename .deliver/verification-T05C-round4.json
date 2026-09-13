@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T05C-AC1",
+      "status": "PASS",
+      "evidence": "At snapshot b8c66ec574464337ae65d7b4e810d742a34b381e758f4b21f9e53964ac481d97, integration.mjs:1136-1200 requires an exact current failed-M receipt or a reproducible status-1 merge-tree conflict with a tree OID, no process error and no signal. prepareIntegrationCorrection at :1246 preserves the approved source, contract, ownership, counter sources and unique token identity. The fresh declared `npm test` gate passed 287/287 with 0 failures in 513994.161041ms; runtime log SHA-256 e001a85fb6d95666a7782c764526bb4da11da7411014133587e6c18f59d40da7. `npm run validate` also passed; log SHA-256 a6171d7f66bde2074c906af25ca12b22544832654e63b0b9d2acd06c386a89da."
+    },
+    {
+      "id": "T05C-AC2",
+      "status": "FAIL",
+      "evidence": "The frozen interface at integration-correction-interface.md:28 and :38 requires `started` recovery with a surviving journal to delete that journal only when both after-images and their retained hashes match. recoverIntegrationCorrectionStart at integration.mjs:1635-1640 checks only starting_record_hash and descriptor_identity, then calls generic applyIntegrationCorrectionJournal. That function at current-pm.mjs:650-656 accepts either before- or after-images and writes missing after-images. Recovery also never binds envelope.started.run_hash and story_hash to the descriptor after-images. The exact-snapshot real-Git probe, source SHA-256 fae33daa9a81cd86de3a63f88741d48f91c1d713a22bf69402b8032a7fbb5104, confirmed all four defects: it recreated a missing published run, republished a story restored to its exact before-image, and accepted unrelated run_hash and story_hash values while returning recovered:true and deleting the journal. Its exact-after control passed. The probe exited 1 with 1 passing and four leaf failures, plus two parent failures, in 61091.361583ms; log SHA-256 4c036764d92f01d1a28faa18e476c7c5e1781a3d59ef0f145e5d79ca53b760a4."
+    },
+    {
+      "id": "T05C-AC3",
+      "status": "FAIL",
+      "evidence": "Fresh full gates are valid at the exact snapshot: 287/287 tests passed and packaging validation passed. Scope evidence lists only eight authorized changed paths, with no out-of-scope, contract, baseline-metadata or coordinator changes. The successor baseline remains ff9d69069c2f635c49085fa00f7c4c30c4b2bb33e6ba6840f107b6297c4c9cf1 and counters remain retries 0, fixes 3, corrections 0, so no baseline or budget reset occurred. However, the declared tests omit the started-state missing-after-image and retained-hash cases that the independent probe disproved, and the run has no current PASS review or verification receipt. A separate corrected configuration probe passed 4/4 and does not add a finding; its log SHA-256 is aeb8482d19f3d9d12be475c542a3bae232fd0f46f92fa8cda4265be6d5d92e9c. The unresolved started-publication defect blocks whole-task acceptance and C2 integration despite the passing declared gates."
+    }
+  ]
+}

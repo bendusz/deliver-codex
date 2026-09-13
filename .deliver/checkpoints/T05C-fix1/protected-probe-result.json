@@ -1,0 +1,14 @@
+{
+  "actor": "correction_regressions",
+  "snapshot": "405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334",
+  "test_sha256": "3fc1f2a707a3827fdc02901c9aa6329f7d049bfe3c309a97175cf8a2aae607c0",
+  "command": "node --test --test-name-pattern='protected checkout drift|worktree config drift' t05c-protected-probe.test.mjs",
+  "exit_code": 1,
+  "total": 6,
+  "pass": 1,
+  "reported_fail": 5,
+  "actual_defect_failures": 4,
+  "duration_ms": 57860.178458,
+  "qualification": "Independent test-author result; verbatim combined output forwarded by author and preserved in protected-probe.log. Canonical test unchanged.",
+  "log_sha256": "805cdeb68199764f7934c19489274a8b7c5a0b5a63a8ec7fa60291371d39ad7f"
+}

@@ -1,0 +1,22 @@
+{
+  "task": "T14",
+  "status": "Unstarted task scope reconciled before baseline; no implementation dispatched",
+  "coordinator": "/root",
+  "paths_added": [
+    "plugins/deliver/skills/deliver/assets/specdd/module.sdd",
+    "tests/specdd.test.mjs"
+  ],
+  "reason": "T14-AC1 already requires all packaged references to resolve. The retained interim review found module.sdd Owns and Can modify paths resolve relative to the wrong directory. Add the example itself and its existing parser regression file to the future packaging task so the example can be repaired and verified. No new behavior, plan acceptance change or active task change.",
+  "constraints": [
+    "Preserve the approved SpecDD relative-path semantics.",
+    "Use an explicitly coherent packaged example context; do not add references to test files absent from installed packages.",
+    "Do not modify pinned upstream fixtures.",
+    "Run T14 only after its declared dependencies are accepted."
+  ],
+  "evidence": {
+    "example_sha256": "88f343d6e95ed72e1989863ea72340f7683bf50162a6d72e53fc1a33134c9ce1",
+    "prior_blueprints_sha256": "4d54e51ff7ff84fcc477880cffc2637035c6a4140551c1a83bbe0513df0505fc",
+    "updated_blueprints_sha256": "6442314c52911f04e16997bd30d2d432383bc861f62466d35308411d9f141061",
+    "approved_plan_sha256": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+  }
+}

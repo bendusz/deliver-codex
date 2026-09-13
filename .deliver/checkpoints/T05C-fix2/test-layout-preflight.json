@@ -1,0 +1,18 @@
+{
+  "reviewer": "recovery_contract",
+  "status": "PASS with conditions",
+  "scope": "Original authorized tests/integration-correction.test.mjs and tests/current-lifecycle.test.mjs",
+  "conditions": [
+    "Canonical direct-entry guard forcore correction registration",
+    "Synchronous exported protectedtestregistration withduplicate guard",
+    "Noimport-time fixtures/Git/writes/test registration",
+    "Preserve testcase names/bodies/assertions",
+    "Lifecycleentry callsprotectionregistration once",
+    "Focuseddiscovery andfinal fullsuite demonstrate casesonce within600s; validatePASS"
+  ],
+  "measured_file_duration_seconds": {
+    "integration-correction.test.mjs": 579.82,
+    "integration.test.mjs": 353.14,
+    "current-lifecycle.test.mjs": 13.16
+  }
+}

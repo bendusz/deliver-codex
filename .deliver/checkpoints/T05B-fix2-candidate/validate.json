@@ -1,0 +1,54 @@
+{
+  "gate": {
+    "provenance": "deliver-runtime-executed-v1",
+    "name": "validate",
+    "command": "npm run validate",
+    "cwd": ".",
+    "environment_keys": [],
+    "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "environment_hash": "65752030d98310aae0f111b47c58cf97fb6851ca2a85bd5848bf303270f2b81d",
+    "snapshot_hash": "009feeee3ea2fee4433de2815ca869f6a54f74b186103a95ec0c902ca29a8c9f",
+    "status": "PASS",
+    "exit_code": 0,
+    "signal": null,
+    "error": null,
+    "log_path": ".deliver/logs/4fcd23c4-4b06-4a55-89ae-f2686bb3516f/validate-08703a65-3be3-436e-ba54-2c6c88e09822.log",
+    "output": {
+      "stdout_bytes": 150,
+      "stderr_bytes": 0,
+      "truncated": false
+    },
+    "scope": {
+      "ok": true,
+      "changed": [
+        "plugins/deliver/skills/deliver/references/compatibility.md",
+        "plugins/deliver/skills/deliver/references/shipping.md",
+        "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/remote.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+        "plugins/deliver/skills/deliver/scripts/pm.mjs",
+        "tests/current-roundtrip.test.mjs",
+        "tests/operations.test.mjs",
+        "tests/remote-lifecycle.test.mjs",
+        "tests/remote.test.mjs"
+      ],
+      "added": [
+        "tests/remote-lifecycle.test.mjs"
+      ],
+      "deleted": [],
+      "renames": [],
+      "out_of_scope": [],
+      "preexisting_dirty_changed": [],
+      "symlink_escapes": [],
+      "git_metadata_changed": false,
+      "ignored_advisory_changed": [],
+      "coordinator_execution_changed": null,
+      "git_metadata_compatibility": null,
+      "contracts_changed": []
+    },
+    "started_at": "2026-09-13T14:44:47.889Z",
+    "finished_at": "2026-09-13T14:44:49.300Z"
+  },
+  "log_sha256": "8b146bfab36098ddfe081ce34555566bdef41fef310ead7321bad3fa329549f0"
+}

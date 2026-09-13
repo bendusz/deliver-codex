@@ -1,0 +1,12 @@
+--- expanded-initial
++++ pm-created-worktree-fixture
+@@ -312,7 +312,8 @@
+ function addCorrectionWorktree(t, fixture, prepared) {
+   const correctionRoot = `${fixture.root}-correction-${prepared.result.run_id}`;
+   t.after(() => fs.rmSync(correctionRoot, { recursive: true, force: true }));
+-  git(fixture.integration, 'worktree', 'add', '-q', correctionRoot, prepared.result.branch);
++  git(fixture.integration, 'worktree', 'add', '-q', '-b', prepared.result.branch,
++    correctionRoot, prepared.result.start_commit);
+   assert.equal(git(correctionRoot, 'rev-parse', 'HEAD'), prepared.result.start_commit);
+   assert.equal(git(correctionRoot, 'symbolic-ref', '--short', 'HEAD'), prepared.result.branch);
+   return correctionRoot;

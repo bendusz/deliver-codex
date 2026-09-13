@@ -1,0 +1,97 @@
+▶ correction recovery rejects incomplete started publications unchanged
+  ✔ exact started after-images control (12168.825125ms)
+  ✖ missing published run (12258.895833ms)
+  ✖ story restored to exact before-image (12207.727583ms)
+✖ correction recovery rejects incomplete started publications unchanged (36669.090791ms)
+▶ correction recovery binds started publication hashes to the journal after-images unchanged
+  ✖ run_hash (12156.476583ms)
+  ✖ story_hash (12199.098292ms)
+✖ correction recovery binds started publication hashes to the journal after-images unchanged (24379.975041ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 1
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 61091.361583
+
+✖ failing tests:
+
+test at ../pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs:1682:13
+✖ missing published run (12258.895833ms)
+  AssertionError [ERR_ASSERTION]: recovery accepted incomplete started publication missing published run: {"recovered":true,"journal_exists":false,"run_exists":true,"story_is_after":true}
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs:1703:16)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs:1682:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'fail',
+    diff: 'simple'
+  }
+
+test at ../pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs:1682:13
+✖ story restored to exact before-image (12207.727583ms)
+  AssertionError [ERR_ASSERTION]: recovery accepted incomplete started publication story restored to exact before-image: {"recovered":true,"journal_exists":false,"run_exists":true,"story_is_after":true}
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs:1703:16)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs:1682:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'fail',
+    diff: 'simple'
+  }
+
+test at ../pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs:1724:13
+✖ run_hash (12156.476583ms)
+  AssertionError [ERR_ASSERTION]: recovery accepted run_hash unrelated to its after-image: {"recovered":true,"journal_exists":false}
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs:1746:16)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs:1724:13)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'fail',
+    diff: 'simple'
+  }
+
+test at ../pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs:1724:13
+✖ story_hash (12199.098292ms)
+  AssertionError [ERR_ASSERTION]: recovery accepted story_hash unrelated to its after-image: {"recovered":true,"journal_exists":false}
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs:1746:16)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs:1724:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'fail',
+    diff: 'simple'
+  }

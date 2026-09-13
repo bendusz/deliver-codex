@@ -1,0 +1,448 @@
+{
+  "status": "ACCEPTED_COMBINED",
+  "integration_parent": "721179236ce1961e8833cb2e8bd96f4ff2ef2210",
+  "T04F_commit": "0a6623936a000afad6bbb0f4d2c51b5b8d6ca419",
+  "T05L_commit": "3f0d3b283dc628a629395878f065ea999d8c44ac",
+  "combined_commit": "b84a045433f77644d541875ad5630915bf7f0c2d",
+  "combined_tree": "5f79ed030f9591529d2e0e038e8af5af9bdbf515",
+  "overlapping_paths": [
+    "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+    "plugins/deliver/skills/deliver/scripts/lib/state.mjs"
+  ],
+  "files": [
+    {
+      "path": "plugins/deliver/skills/deliver/SKILL.md",
+      "sources": [
+        "3f0d3b283dc628a629395878f065ea999d8c44ac"
+      ],
+      "T04F": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "32d6a5a638087e9e9665d724ce9546e48237b27b"
+      },
+      "T05L": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4cbd01c63b57dda18cf1006870c3ad923f59d529"
+      },
+      "combined": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4cbd01c63b57dda18cf1006870c3ad923f59d529"
+      }
+    },
+    {
+      "path": "plugins/deliver/skills/deliver/assets/operations.json",
+      "sources": [
+        "3f0d3b283dc628a629395878f065ea999d8c44ac"
+      ],
+      "T04F": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "fff578c09bf0e2d71a39aed943dde0cedc8cf947"
+      },
+      "T05L": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "9960d8bff3ca158007128e328df31882f59e6466"
+      },
+      "combined": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "9960d8bff3ca158007128e328df31882f59e6466"
+      }
+    },
+    {
+      "path": "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
+      "sources": [
+        "3f0d3b283dc628a629395878f065ea999d8c44ac"
+      ],
+      "T04F": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "be00655368b6c25f898d148bb12eca75a3aa3b9c"
+      },
+      "T05L": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6af538df53599759002dbefaa55f1b0ea869a641"
+      },
+      "combined": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6af538df53599759002dbefaa55f1b0ea869a641"
+      }
+    },
+    {
+      "path": "plugins/deliver/skills/deliver/references/compatibility.md",
+      "sources": [
+        "3f0d3b283dc628a629395878f065ea999d8c44ac"
+      ],
+      "T04F": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "8fb188c9e3191c9fca293fad545c2b28d2f08f0e"
+      },
+      "T05L": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0320134df0b5add75bc348829fa6a98572d437de"
+      },
+      "combined": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0320134df0b5add75bc348829fa6a98572d437de"
+      }
+    },
+    {
+      "path": "plugins/deliver/skills/deliver/references/recovery.md",
+      "sources": [
+        "0a6623936a000afad6bbb0f4d2c51b5b8d6ca419"
+      ],
+      "T04F": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "20d9eaab850c5562bfe8ff5922f66fd9c15f2853"
+      },
+      "T05L": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "52edf0e691ac0663764aa332ac31600f2852d6c5"
+      },
+      "combined": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "20d9eaab850c5562bfe8ff5922f66fd9c15f2853"
+      }
+    },
+    {
+      "path": "plugins/deliver/skills/deliver/references/runtime.md",
+      "sources": [
+        "0a6623936a000afad6bbb0f4d2c51b5b8d6ca419"
+      ],
+      "T04F": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cedc9094003bd5e28a87069aac6cc02583400dda"
+      },
+      "T05L": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "61ce526177a3005207db102a6e4b55f8a02d34ea"
+      },
+      "combined": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cedc9094003bd5e28a87069aac6cc02583400dda"
+      }
+    },
+    {
+      "path": "plugins/deliver/skills/deliver/references/shipping.md",
+      "sources": [
+        "3f0d3b283dc628a629395878f065ea999d8c44ac"
+      ],
+      "T04F": null,
+      "T05L": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6b6f018a203add01214466e7c91edf49a50cdf8e"
+      },
+      "combined": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6b6f018a203add01214466e7c91edf49a50cdf8e"
+      }
+    },
+    {
+      "path": "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+      "sources": [
+        "0a6623936a000afad6bbb0f4d2c51b5b8d6ca419",
+        "3f0d3b283dc628a629395878f065ea999d8c44ac"
+      ],
+      "T04F": {
+        "mode": "100755",
+        "type": "blob",
+        "blob": "559e141ce2fe35e6067dae9b83193c031ec23d40"
+      },
+      "T05L": {
+        "mode": "100755",
+        "type": "blob",
+        "blob": "15bbb12c1545d56ddfb4ab96e86cb0c42a2f7ddc"
+      },
+      "combined": {
+        "mode": "100755",
+        "type": "blob",
+        "blob": "97a9856e1e24e6d70919c2cdf1454b24f4260184"
+      }
+    },
+    {
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "sources": [
+        "3f0d3b283dc628a629395878f065ea999d8c44ac"
+      ],
+      "T04F": null,
+      "T05L": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5f423bf4ec4040773576e11aa171dd1ef68ac286"
+      },
+      "combined": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5f423bf4ec4040773576e11aa171dd1ef68ac286"
+      }
+    },
+    {
+      "path": "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+      "sources": [
+        "3f0d3b283dc628a629395878f065ea999d8c44ac"
+      ],
+      "T04F": null,
+      "T05L": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "8812a3c28eb847a1bd2fc303f556e005fc871a32"
+      },
+      "combined": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "8812a3c28eb847a1bd2fc303f556e005fc871a32"
+      }
+    },
+    {
+      "path": "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+      "sources": [
+        "3f0d3b283dc628a629395878f065ea999d8c44ac"
+      ],
+      "T04F": null,
+      "T05L": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5c7cc244a53cfa76ccc4f285d1dddfb33c5114e9"
+      },
+      "combined": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5c7cc244a53cfa76ccc4f285d1dddfb33c5114e9"
+      }
+    },
+    {
+      "path": "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+      "sources": [
+        "0a6623936a000afad6bbb0f4d2c51b5b8d6ca419",
+        "3f0d3b283dc628a629395878f065ea999d8c44ac"
+      ],
+      "T04F": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5a7b6f067b26d6a7f7a5956ee8b9736d61770d22"
+      },
+      "T05L": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0feb6c8c82b8d73713efa3545b6f786128fde598"
+      },
+      "combined": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "61e2583b5e3ff6b51ed7c372a006109d4f9cd5b6"
+      }
+    },
+    {
+      "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+      "sources": [
+        "0a6623936a000afad6bbb0f4d2c51b5b8d6ca419"
+      ],
+      "T04F": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ad0572be4fb3ae784860b06c638da93bfa66bfe3"
+      },
+      "T05L": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e92bb784473e9c3b4e06e772bd8bfe88c487cd2d"
+      },
+      "combined": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ad0572be4fb3ae784860b06c638da93bfa66bfe3"
+      }
+    },
+    {
+      "path": "plugins/deliver/skills/deliver/scripts/pm.mjs",
+      "sources": [
+        "3f0d3b283dc628a629395878f065ea999d8c44ac"
+      ],
+      "T04F": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "197a3fa3077f73f89d4c99a6e8120f4429264bfa"
+      },
+      "T05L": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ab2ebbaa1ea4b2fad7b909dce969c85d2ddd4a16"
+      },
+      "combined": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ab2ebbaa1ea4b2fad7b909dce969c85d2ddd4a16"
+      }
+    },
+    {
+      "path": "tests/commit-cancellation.test.mjs",
+      "sources": [
+        "0a6623936a000afad6bbb0f4d2c51b5b8d6ca419"
+      ],
+      "T04F": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cb16b87c988bd0beaa04dd6cbb2f9835a47410c0"
+      },
+      "T05L": null,
+      "combined": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "cb16b87c988bd0beaa04dd6cbb2f9835a47410c0"
+      }
+    },
+    {
+      "path": "tests/current-roundtrip.test.mjs",
+      "sources": [
+        "3f0d3b283dc628a629395878f065ea999d8c44ac"
+      ],
+      "T04F": null,
+      "T05L": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "05fcbec7043398ef8b08305d4ba9985d736c7a27"
+      },
+      "combined": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "05fcbec7043398ef8b08305d4ba9985d736c7a27"
+      }
+    },
+    {
+      "path": "tests/integration.test.mjs",
+      "sources": [
+        "3f0d3b283dc628a629395878f065ea999d8c44ac"
+      ],
+      "T04F": null,
+      "T05L": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "211e4cf5b040379f541d963f16d9f734aae46614"
+      },
+      "combined": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "211e4cf5b040379f541d963f16d9f734aae46614"
+      }
+    },
+    {
+      "path": "tests/operations.test.mjs",
+      "sources": [
+        "3f0d3b283dc628a629395878f065ea999d8c44ac"
+      ],
+      "T04F": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "69dff862b46dc113180ba6080743e916f698f26f"
+      },
+      "T05L": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "371df3c0bf4d4011dacedb7b069a78bd582d77c9"
+      },
+      "combined": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "371df3c0bf4d4011dacedb7b069a78bd582d77c9"
+      }
+    },
+    {
+      "path": "tests/reporting.test.mjs",
+      "sources": [
+        "3f0d3b283dc628a629395878f065ea999d8c44ac"
+      ],
+      "T04F": null,
+      "T05L": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "52c1085aa1a983df79b1af897c4f0a60e429e1a9"
+      },
+      "combined": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "52c1085aa1a983df79b1af897c4f0a60e429e1a9"
+      }
+    },
+    {
+      "path": "tests/review-panel.test.mjs",
+      "sources": [
+        "3f0d3b283dc628a629395878f065ea999d8c44ac"
+      ],
+      "T04F": null,
+      "T05L": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "174aac6b8c62fb468f28f93cf85338b75574cb99"
+      },
+      "combined": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "174aac6b8c62fb468f28f93cf85338b75574cb99"
+      }
+    }
+  ],
+  "diffs_sha256": {
+    "plugins__deliver__skills__deliver__scripts__deliver.mjs.vs-T04F.diff": "5ad61dc2dec167432d2bcf04bff5d030bd063e65bee51acc11f5dc6cdb188680",
+    "plugins__deliver__skills__deliver__scripts__deliver.mjs.vs-T05L.diff": "47ce3bdd49ce9628f17eabdbd4d1dda76991a4f4ef53cb4ca419fa60a934ee5c",
+    "plugins__deliver__skills__deliver__scripts__lib__state.mjs.vs-T04F.diff": "a6e82452becdabdbf003bcc033ecec5b6ed897ed649e7c560ebf3e29fa7d485e",
+    "plugins__deliver__skills__deliver__scripts__lib__state.mjs.vs-T05L.diff": "b0363c9436431620b64177bb6545e124f8bed9b439c332520d840e3713c7c3c3"
+  },
+  "contributors": {
+    "composition_coordinator": "/root",
+    "conflict_resolution_author": "/root/t04_repair_builder",
+    "T05L_production_builder": "/root/benchmark_builder",
+    "T05L_fix7_test_author": "/root/identity_tests"
+  },
+  "accepted_evidence": {
+    "T04F": {
+      "snapshot": "a0f9aafd948b2b2a1ce6d9432b01d70c3f0941f4aea102da7b8d2799e490c866",
+      "review_sha256": "2b9b5d36e238687145fe649cb72ad59b725ce5319dbd460a6704722c8f757125",
+      "verification_sha256": "761ac53340577bfe4da5cd78b2e9dc32b8f56d5e2f411299e88e6b99b22f9a57"
+    },
+    "T05L": {
+      "snapshot": "bfa2a3254597c6eeadb5f8acdf5903a80b233ea6496f334efbe1ede849a1b8b2",
+      "review_sha256": "a6ef246a2ec2b8180642fe453b9731f8e713a8493752da8d657ccaa168f0cc0b",
+      "verification_sha256": "8e3ae96b462d6c66984c4f1e08d650db0cc4917f3f618063fd30d27c04881bda"
+    }
+  },
+  "conflict_resolution": {
+    "path": "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+    "artifact": ".deliver/composition/T04F-T05L/deliver.resolved.mjs",
+    "provenance": ".deliver/composition/T04F-T05L/resolution.json",
+    "actual_stage_blobs_match_prepared_resolution": true,
+    "syntax_check": "PASS",
+    "note": "The only textual conflict was the import block; root applied the exact prepared native-builder artifact. state.mjs merged automatically. Both overlaps retain diffs against each accepted parent."
+  },
+  "acceptance": {
+    "run": "4056ee0f-712a-45dc-97f1-059a07a9c02e",
+    "snapshot": "a91dc0c3024b7e109aafc9b0556f2d88def20ec326d4cc0718da26672ad54cc2",
+    "tests": 211,
+    "validate": "PASS",
+    "reviewer": "state_architecture",
+    "review_sha256": "038359fb36a643d8b6dfc9af5988663001c7dc3c42da033461a38118eb0bc4b1",
+    "verifier": "combined_verifier",
+    "verification_sha256": "7a84ab1c18b19c961dadcd194fff404f94aee5d8b05247668f9e5f9b6befc155",
+    "all_criteria": "PASS",
+    "production_and_contracts_unchanged": true,
+    "report": {
+      "path": "docs/reviews/2026-09-11-combined-repairs.md",
+      "sha256": "61d737ce1a0a65292665e525c2986aa0ba60e8f90a0e1e8c58f6f98dbcadc487"
+    }
+  }
+}

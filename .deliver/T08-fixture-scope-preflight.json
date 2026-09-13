@@ -1,0 +1,28 @@
+{
+  "task": "T08",
+  "status": "Unstarted task fixture scope reconciled before baseline; no implementation dispatched",
+  "coordinator": "/root",
+  "path_added": "tests/commit-cancellation.test.mjs",
+  "reason": "The accepted commit-cancellation regression fixture initializes a current-format standard project and calls pm claim at line69 without real pre-claim analysis/semantic artifacts. T08 enforcement will correctly reject that fixture unless it is updated alongside the other already authorized current lifecycle fixtures. This is necessary fixture maintenance for the approved T08 behavior, not a policy, acceptance or production-scope expansion.",
+  "constraints": [
+    "Preserve all cancellation/commit/counter/metadata assertions.",
+    "Provide genuine required standard project artifacts and explicit synthetic semantic receipt fixtures; no scale downgrade or hidden bypass.",
+    "Do not modify active T05B source, task, baseline or counters.",
+    "T08 may start only after accepted T05B."
+  ],
+  "evidence": {
+    "fixture_sha256": "83c3a4b3f294938628e06bfa2ca8a324f255384ccb24d354d652b54c77847b33",
+    "prior_blueprints_sha256": "2d94cb4324d043b9a55182a806af1d85e9a96c762480cce18bb3ed74db5741fd",
+    "updated_blueprints_sha256": "4d54e51ff7ff84fcc477880cffc2637035c6a4140551c1a83bbe0513df0505fc",
+    "approved_plan_sha256": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+  },
+  "other_claim_matches": {
+    "tests/pm-compatibility.test.mjs": "Legacy layout; current readiness fixture change not required.",
+    "tests/operations.test.mjs": "Operation-name assertion, not a current claim fixture.",
+    "tests/integration.test.mjs": "Already in T08 touches.",
+    "tests/current-lifecycle.test.mjs": "Already in T08 touches.",
+    "tests/transitions.test.mjs": "Already in T08 touches.",
+    "tests/integration-correction.test.mjs": "Already in T08 touches.",
+    "tests/current-roundtrip.test.mjs and tests/remote-lifecycle.test.mjs": "T05B additions already listed in T08 touches."
+  }
+}

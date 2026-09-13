@@ -1,0 +1,13 @@
+command: npm run validate
+cwd: /Users/ben/code/pm-skill-codex-worktrees/t05c-delivery
+started: 2026-09-13T08:48:42.255Z
+exit: 0
+
+[stdout]
+
+> deliver-codex@0.1.0 validate
+> node scripts/validate.mjs
+
+Deliver validation passed: manifest, skill routes, 13 roles, JSON and JavaScript syntax.
+
+[stderr]

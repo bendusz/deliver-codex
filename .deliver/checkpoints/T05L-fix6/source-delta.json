@@ -1,0 +1,20 @@
+{
+  "status": "FROZEN_PENDING_FULL_GATES_AND_REVIEW",
+  "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
+  "runtime_snapshot": "d9f901fa13b3900566fb62663ac9a4874b41a0fdbb21e0d0737d530a63cebca4",
+  "prior_snapshot": "f74deb232127a910f84a997b17fee8e250bca37d9be7b321f761d144900280ab",
+  "fix5_source_tree": "a331683f26608cc9963bdf53ce8b9e5421c82fe2",
+  "fix6_source_tree": "9914083ea4734130af51e7b39d4bd53117bd73db",
+  "changed": [
+    "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+    "tests/integration.test.mjs"
+  ],
+  "patch_sha256": "0aa0ad7fa212f6b98779dbc8d9b068293e9719bd2ea7615b1822c4ef347e234e",
+  "builder_focused_tests": {
+    "status": "PASS",
+    "tests": 3,
+    "duration_seconds": 49.1,
+    "provenance": "native builder report; root full gates pending"
+  },
+  "approval": ".deliver/T05L-fix6-approval.json"
+}

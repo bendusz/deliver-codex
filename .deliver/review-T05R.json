@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "findings": [
+    {
+      "severity": "major",
+      "message": "Resolved from round 1: withBodyFile resolves the configured temporary base to a real absolute directory, creates its private directory there, and fchmods the open body descriptor to exact mode0600 before writing and syncing. Publish and merge regressions run under a relative TMPDIR, a coordinator cwd different from target.root, and umask0777; they inspect the absolute argv path and exact body/directory modes during the fake command, then prove cleanup after both success and provider rejection.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/remote.mjs",
+      "resolved": true
+    }
+  ],
+  "summary": "T05R passes at frozen snapshot 7f2fb09ebbdf1f8818e5a114b14d42384b76047aac2a2a0d3979336475fd2a9d. The corrected adapter satisfies the absolute mode0600 temporary-body contract and retains exact remote/PR identity, bounded shell-free command execution, conservative checks classification, protected merge invocation, and post-merge remote-base proof. Coordinator npm test passed 144 tests and npm run validate passed at this exact snapshot. Recovery of a PR found already merged remains explicitly allocated to T05B and is not claimed here."
+}

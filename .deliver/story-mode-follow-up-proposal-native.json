@@ -1,0 +1,55 @@
+{
+  "actor": "/root/recovery_contract",
+  "kind": "Native read-only follow-up proposal; not a formal task receipt or implementation dispatch",
+  "coordinator_clarification": "T08 is unstarted. The report ordering means after future T08 journal acceptance; no active task or completed T05C baseline is reopened. Upstream mode-preservation behavior is not established.",
+  "report": {
+    "status": "FAIL",
+    "findings": [
+      {
+        "severity": "major",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+        "resolved": false,
+        "message": "The current-PM publisher does not preserve an existing story's Git executable class. atomic() always creates the replacement at 0600 (lines 95-100), and claimCurrentPm publishes the claimed story through that writer (lines 370-384). Its journal records and compares only text (lines 172-192, 208-231). This explains the observed 100755\u2192100644 claim result and means normal publication and recovery have different, incomplete authority over file mode."
+      },
+      {
+        "severity": "major",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+        "resolved": false,
+        "message": "Transition publication preserves the live filesystem mode accidentally rather than proving the audited mode. atomic() copies the current target permissions (lines 88-105), but storyMode() constructs its comparison with the expected mode instead of reading the live mode (lines 208-215). The v1 journal and recovery bind only before/after text (lines 141-171, 381-393). A transition therefore inherits claim's normalized 0644 mode and can also accept and retain a later mode-only drift while recording the expected mode in execution_audit."
+      }
+    ],
+    "summary": {
+      "scope": "Preparation for a separate bounded correction after the active T08 journal work; no T05B, T02F or T08 scope change.",
+      "observed_evidence": [
+        "The retained fixture ruling records a real executable story becoming Git 100644 during claim/transition and commit preparation refusing a later manual restoration to 100755.",
+        "The transition baseline already represents story entries as file:644|755:sha256, so mode preservation is part of the existing audited boundary rather than a new story-contract hash."
+      ],
+      "upstream_evidence": "The unchanged upstream project has no equivalent deterministic claim/transition writer. Its implementation-loop reference instructs the PM to append or update Execution and commit it. That supports preserving the story as a document, but it does not specify atomic replacement, journal recovery, or file-mode behavior. Any claim that upstream tooling preserves mode is therefore an inference, not verified parity.",
+      "minimal_future_correction": {
+        "ordering": "Start after T08 freezes its operation-specific current-PM journal format.",
+        "touches": [
+          "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+          "tests/current-lifecycle.test.mjs",
+          "tests/transitions.test.mjs",
+          "tests/integration-correction.test.mjs only to cover the existing current-pm story-write call site"
+        ],
+        "rules": [
+          "Bind each existing story image as one text-plus-Git-mode pair; before and after use the same 644 or 755 class.",
+          "Before publication or recovery, require the live story to equal the exact before pair or exact after pair. Text from one image combined with another mode is a conflict and remains untouched.",
+          "Write the after image through an atomic replacement that retains the proven story mode. Keep journals, run records and newly created internal files at their existing 0600 policy.",
+          "Apply the same rule to ordinary claim, Execution transition, and their recovery paths. Audit the integration-correction story call site because it uses current-pm atomic(), without reopening T05C.",
+          "For transition-v1 recovery, derive the expected mode from the retained baseline/execution_audit. For legacy current-PM claim journals, use only mode evidence that T08 can uniquely derive from the tracked pre-claim story; otherwise refuse rather than reconstruct or normalize history.",
+          "Do not rewrite completed journals, runs, baselines or stories. Story contract/execution hashes remain byte-based, and counters retain their existing maxima."
+        ]
+      },
+      "acceptance": [
+        "Claim and every legal transition preserve both 100644 and 100755 story modes while changing only the intended Execution bytes.",
+        "Fresh-process recovery at before-write, one-write and already-applied boundaries preserves the same mode and exact counters.",
+        "Mode-only drift and mixed text/mode states refuse without changing story, run, journal, hashes or counters.",
+        "A valid 100755 claim and transition reaches commit preparation without manual chmod; a real post-publication mode change remains detectable drift.",
+        "Legacy recovery makes no retrospective mode-proof claim where the old journal lacks sufficient evidence."
+      ]
+    }
+  }
+}

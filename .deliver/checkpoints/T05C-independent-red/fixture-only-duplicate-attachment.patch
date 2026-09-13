@@ -1,0 +1,30 @@
+--- anchor-corrected-test
++++ duplicate-corrected-test
+@@ -328,7 +328,7 @@
+       assert.deepEqual(token.basis.probe.argv.slice(-4), ['merge-tree', '--write-tree', fixture.startCommit, fixture.candidate]);
+       assert.notEqual(token.basis.probe.exit, 0);
+       assert.match(token.basis.probe.output_hash, /^[0-9a-f]{64}$/);
+-      assert.equal(token.actual_start_execution, beforeKind === 'unclaimed' ? null : readStory(fixture.integration, storyRel).execution);
++      assert.deepEqual(token.actual_start_execution, beforeKind === 'unclaimed' ? null : readStory(fixture.integration, storyRel).execution);
+       assert.equal(token.counter_maxima.fixes, beforeKind === 'older' ? 2 : 1);
+       assert.equal(token.counter_maxima.retries, beforeKind === 'older' ? 2 : 1);
+       assert.equal(token.counter_maxima.corrections, 2);
+@@ -490,13 +490,17 @@
+     assert.equal(fs.readFileSync(fixture.recordFile, 'utf8'), recordBefore);
+   });
+ 
+-  await t.test('second attached checkout', () => {
++  await t.test('second checkout attached to the same correction ref', () => {
+     const fixture = makeActualNoM(t);
+     const prepared = correctionPrepare(fixture);
+     const correctionRoot = addCorrectionWorktree(t, fixture, prepared);
+     const duplicate = `${correctionRoot}-duplicate`;
+     t.after(() => fs.rmSync(duplicate, { recursive: true, force: true }));
+     git(fixture.integration, 'worktree', 'add', '--detach', '-q', duplicate, prepared.result.start_commit);
++    git(duplicate, 'symbolic-ref', 'HEAD', `refs/heads/${prepared.result.branch}`);
++    const attached = git(fixture.integration, 'worktree', 'list', '--porcelain')
++      .split(/\r?\n/).filter((line) => line === `branch refs/heads/${prepared.result.branch}`);
++    assert.equal(attached.length, 2, 'fixture attaches the exact unique correction ref twice');
+     const recordBefore = fs.readFileSync(fixture.recordFile, 'utf8');
+     assert.throws(() => correctionStart(fixture, prepared, correctionRoot), /sole|worktree|duplicate|attached/i);
+     assert.equal(fs.readFileSync(fixture.recordFile, 'utf8'), recordBefore);

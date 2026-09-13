@@ -1,0 +1,22 @@
+{
+  "task": "T05B",
+  "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "status": "Narrowly corrected independent tests frozen; final bounded coverage recheck pending",
+  "test_author": "/root/correction_regressions",
+  "files": {
+    "tests/remote.test.mjs": "8b3f797e85fdbaeadad3a457232050d156d0bbaadbd02cbba3173d394af40d82",
+    "tests/remote-lifecycle.test.mjs": "07f22550b83fb5c82ec02347f0a0c9775b8406677b66f4cc53b879e1fdec7c98",
+    "tests/current-roundtrip.test.mjs": "453327ad0a522e122ae3a39ab91564aababf3cd5425d007e2475ecc47175b0d6",
+    "tests/operations.test.mjs": "dde1af29f017b8816b77eb8e9211aff873bcde984b469f6aabaf3d273e6dc3f8"
+  },
+  "snapshot": "bf8380731235eaceae735bb905ac4350893f0ae7d54b43cba1d9405e95817e1e",
+  "counters": {
+    "retries": 0,
+    "fixes": 1,
+    "corrections": 0
+  },
+  "production_matches_pause": true,
+  "prior_checkpoint": ".deliver/checkpoints/T05B-fix1-tests-expanded",
+  "coverage_preflight": ".deliver/T05B-fix1-test-preflight-native.json",
+  "identity_clarification": ".deliver/T05B-fix1-identity-clarification.json"
+}

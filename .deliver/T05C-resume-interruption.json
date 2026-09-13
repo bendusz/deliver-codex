@@ -1,0 +1,29 @@
+{
+  "observed_on": "2026-09-13",
+  "task": "T05C",
+  "run": "5050e142-81ad-42a9-b60e-e21dce156bd5",
+  "last_observed_revision": 2,
+  "last_observed_counters": {
+    "fixes": 0,
+    "retries": 0,
+    "corrections": 0
+  },
+  "reviewer_error": "You've hit your usage limit. Visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at Sep 15th, 2026 8:50 AM.",
+  "quota_type_and_timezone": "Not supplied by error; account balance not inspected",
+  "review_status": "Three independent reproduced majors reported; reviewer removed obsolete raw receipts before usage error. No current formal review receipt recorded. Fix1 not spent or implemented.",
+  "findings": [
+    "Recovery accepts advanced correction HEAD without live revalidation",
+    "Rehashed journal can redirect story writes away from token story_path",
+    "Repeatable unrelated-history merge-tree exit128 wrongly qualifies as no-M composition conflict"
+  ],
+  "filesystem_observation": "All /private/tmp/deliver-parity-* worktrees absent; Git lists retained metadata as prunable. Root checkout and committed history remain. No evidence establishes why temporary directories disappeared. Do not prune worktree metadata.",
+  "durable_evidence": [
+    ".deliver/checkpoints/T05C-independent-red",
+    ".deliver/checkpoints/T05C-expanded-independent",
+    ".deliver/T05C-initial-test-triage.json",
+    ".deliver/T05C-preimplementation-clarifications.json"
+  ],
+  "latest_known_test_result": "26/26 targeted refinement PASS at snapshot85356883cd3be99769fd0374a78577a5429c7a62866e4ed9a6eb02296ea3b489; full gates not run",
+  "recovery_limits": "Saved first-expanded-production.patch represents the earlier 45/53 candidate. Later refinement file hashes/logs survive, but latest production bytes and original active run file are not yet recovered. Do not claim saved earlier patch matches later PASS, recreate original baseline silently, reset attempts or relabel stale receipts.",
+  "next": "Recover available work and raw run/evidence from durable artifacts or session history in a persistent checkout; explicitly record any unrecoverable state before continuing. Reproduce three findings, capture red regressions, obtain current independent FAIL, spend bounded fix1, repair, full gates and independent review/verification. No new model/provider call started after user usage question."
+}

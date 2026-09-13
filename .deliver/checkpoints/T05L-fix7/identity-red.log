@@ -1,0 +1,568 @@
+▶ explicit reconciliation recovers retained post-P legacy provenance and rejects missing evidence unchanged
+  ✖ active builder self-review (1002.763125ms)
+  ✖ active missing reviewer identity (978.532792ms)
+  ✖ active empty reviewer identity (980.383417ms)
+  ✖ active malformed reviewer identity (slash) (973.284083ms)
+  ✖ active malformed reviewer identity (array) (975.925084ms)
+  ✖ active malformed reviewer identity (object) (984.428959ms)
+  ✖ active malformed reviewer identity (number) (1016.392625ms)
+  ✖ active malformed reviewer identity (null) (980.074125ms)
+  ✖ active malformed reviewer identity (overlong) (969.789833ms)
+  ✖ active malformed reviewer identity (trailing newline) (979.572417ms)
+  ✖ active builder panel member (979.146792ms)
+  ✖ active missing verifier identity (982.854291ms)
+  ✖ active empty verifier identity (967.858375ms)
+  ✖ active malformed verifier identity (slash) (898.539708ms)
+  ✖ active malformed verifier identity (array) (896.474417ms)
+  ✖ active malformed verifier identity (object) (900.294541ms)
+  ✖ active malformed verifier identity (number) (982.458833ms)
+  ✖ active malformed verifier identity (null) (990.724666ms)
+  ✖ active malformed verifier identity (overlong) (974.974333ms)
+  ✖ active malformed verifier identity (trailing newline) (983.922375ms)
+  ✔ active verifier equals builder (388.194583ms)
+  ✔ active verifier equals top reviewer (394.900916ms)
+  ✔ active verifier equals panel reviewer (389.688834ms)
+✖ explicit reconciliation recovers retained post-P legacy provenance and rejects missing evidence unchanged (45435.718208ms)
+▶ explicit reconciliation validates selected historical receipt identities and keeps valid current replacements
+  ✖ selected historical builder self-review (744.714334ms)
+  ✖ selected historical missing reviewer (740.590625ms)
+  ✖ selected historical malformed reviewer (736.9525ms)
+  ✖ selected historical builder panel member (737.908958ms)
+  ✖ selected historical missing verifier (744.87425ms)
+  ✖ selected historical malformed verifier (721.641667ms)
+  ✔ selected historical verifier equals builder (383.215583ms)
+  ✔ selected historical verifier equals top reviewer (361.704334ms)
+  ✔ selected historical verifier equals panel reviewer (358.237167ms)
+✖ explicit reconciliation validates selected historical receipt identities and keeps valid current replacements (22976.095042ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 6
+ℹ fail 28
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 68454.02725
+
+✖ failing tests:
+
+test at tests/integration.test.mjs:783:13
+✖ active builder self-review (1002.763125ms)
+  AssertionError [ERR_ASSERTION]: active builder self-review: command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:13)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:783:13
+✖ active missing reviewer identity (978.532792ms)
+  AssertionError [ERR_ASSERTION]: active missing reviewer identity: command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:783:13
+✖ active empty reviewer identity (980.383417ms)
+  AssertionError [ERR_ASSERTION]: active empty reviewer identity: command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:783:13
+✖ active malformed reviewer identity (slash) (973.284083ms)
+  AssertionError [ERR_ASSERTION]: active malformed reviewer identity (slash): command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:783:13
+✖ active malformed reviewer identity (array) (975.925084ms)
+  AssertionError [ERR_ASSERTION]: active malformed reviewer identity (array): command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:783:13
+✖ active malformed reviewer identity (object) (984.428959ms)
+  AssertionError [ERR_ASSERTION]: active malformed reviewer identity (object): command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:783:13
+✖ active malformed reviewer identity (number) (1016.392625ms)
+  AssertionError [ERR_ASSERTION]: active malformed reviewer identity (number): command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:783:13
+✖ active malformed reviewer identity (null) (980.074125ms)
+  AssertionError [ERR_ASSERTION]: active malformed reviewer identity (null): command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:783:13
+✖ active malformed reviewer identity (overlong) (969.789833ms)
+  AssertionError [ERR_ASSERTION]: active malformed reviewer identity (overlong): command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:783:13
+✖ active malformed reviewer identity (trailing newline) (979.572417ms)
+  AssertionError [ERR_ASSERTION]: active malformed reviewer identity (trailing newline): command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:783:13
+✖ active builder panel member (979.146792ms)
+  AssertionError [ERR_ASSERTION]: active builder panel member: command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:783:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:796:13
+✖ active missing verifier identity (982.854291ms)
+  AssertionError [ERR_ASSERTION]: active missing verifier identity: command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:796:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:796:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:796:13
+✖ active empty verifier identity (967.858375ms)
+  AssertionError [ERR_ASSERTION]: active empty verifier identity: command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:796:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:796:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:796:13
+✖ active malformed verifier identity (slash) (898.539708ms)
+  AssertionError [ERR_ASSERTION]: active malformed verifier identity (slash): command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:796:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:796:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:796:13
+✖ active malformed verifier identity (array) (896.474417ms)
+  AssertionError [ERR_ASSERTION]: active malformed verifier identity (array): command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:796:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:796:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:796:13
+✖ active malformed verifier identity (object) (900.294541ms)
+  AssertionError [ERR_ASSERTION]: active malformed verifier identity (object): command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:796:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:796:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:796:13
+✖ active malformed verifier identity (number) (982.458833ms)
+  AssertionError [ERR_ASSERTION]: active malformed verifier identity (number): command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:796:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:796:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:796:13
+✖ active malformed verifier identity (null) (990.724666ms)
+  AssertionError [ERR_ASSERTION]: active malformed verifier identity (null): command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:796:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:796:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:796:13
+✖ active malformed verifier identity (overlong) (974.974333ms)
+  AssertionError [ERR_ASSERTION]: active malformed verifier identity (overlong): command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:796:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:796:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:796:13
+✖ active malformed verifier identity (trailing newline) (983.922375ms)
+  AssertionError [ERR_ASSERTION]: active malformed verifier identity (trailing newline): command unexpectedly succeeded
+      at assertVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:726:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:796:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:796:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:969:13
+✖ selected historical builder self-review (744.714334ms)
+  AssertionError [ERR_ASSERTION]: selected historical builder self-review: command unexpectedly succeeded
+      at assertHistoricalVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:932:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:969:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:969:13)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:969:13
+✖ selected historical missing reviewer (740.590625ms)
+  AssertionError [ERR_ASSERTION]: selected historical missing reviewer: command unexpectedly succeeded
+      at assertHistoricalVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:932:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:969:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:969:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:969:13
+✖ selected historical malformed reviewer (736.9525ms)
+  AssertionError [ERR_ASSERTION]: selected historical malformed reviewer: command unexpectedly succeeded
+      at assertHistoricalVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:932:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:969:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:969:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:969:13
+✖ selected historical builder panel member (737.908958ms)
+  AssertionError [ERR_ASSERTION]: selected historical builder panel member: command unexpectedly succeeded
+      at assertHistoricalVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:932:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:969:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:969:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:969:13
+✖ selected historical missing verifier (744.87425ms)
+  AssertionError [ERR_ASSERTION]: selected historical missing verifier: command unexpectedly succeeded
+      at assertHistoricalVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:932:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:969:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:969:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration.test.mjs:969:13
+✖ selected historical malformed verifier (721.641667ms)
+  AssertionError [ERR_ASSERTION]: selected historical malformed verifier: command unexpectedly succeeded
+      at assertHistoricalVeto (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:932:12)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:969:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05l/tests/integration.test.mjs:969:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }

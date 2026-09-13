@@ -1,0 +1,8 @@
+{
+  "sha256": "526a578466a8e9f005ff96bf5589c2758692bdbc7d22d76c482ab6e74e8170cd",
+  "path": "tests/integration-correction.test.mjs",
+  "source_head": "e57e54fb4996b27d94d171daf7dc82f1333afa5e",
+  "test_author": "/root/correction_tests",
+  "production_not_started": true,
+  "observed_red": "Author reports real failed-M and unclaimed/older no-M fixtures reach missing prepareIntegrationCorrection export; full fixture run pending."
+}

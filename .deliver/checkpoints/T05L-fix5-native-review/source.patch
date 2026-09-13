@@ -1,0 +1,3308 @@
+diff --git a/plugins/deliver/skills/deliver/SKILL.md b/plugins/deliver/skills/deliver/SKILL.md
+index 32d6a5a..4cbd01c 100644
+--- a/plugins/deliver/skills/deliver/SKILL.md
++++ b/plugins/deliver/skills/deliver/SKILL.md
+@@ -47,7 +47,8 @@ Do not silently substitute models or require Claude.
+ | Constitution, plan or approval | `references/planning.md` |
+ | Project scale or checkpoint policy | `references/scale-profiles.md` |
+ | Decompose an approved plan or check story readiness | `references/decomposition.md` |
+-| Build, gate, review, verify, integrate or complete | `references/workflow.md` |
++| Build, gate, review or verify | `references/workflow.md` |
++| Integrate, produce verification reports, close stories or write final handoffs | `references/shipping.md` |
+ | Execute state, scope, gate or receipt commands | `references/runtime.md` |
+ | Resume, handoff, doctor or correct-course | `references/recovery.md` |
+ | SpecDD skeleton, contracts or contract-aware change | `references/specdd.md` |
+diff --git a/plugins/deliver/skills/deliver/assets/operations.json b/plugins/deliver/skills/deliver/assets/operations.json
+index fff578c..9960d8b 100644
+--- a/plugins/deliver/skills/deliver/assets/operations.json
++++ b/plugins/deliver/skills/deliver/assets/operations.json
+@@ -131,9 +131,9 @@
+       "name": "complete",
+       "aliases": ["ship", "integrate"],
+       "arguments": [{ "name": "story-or-project", "required": false, "description": "The verified story or completed project, inferred only when unambiguous." }],
+-      "output": { "kind": "completion", "paths": ["docs/verification/<story-id>.md", "docs/completion-report.md"], "description": "Verified integration status and completion evidence." },
+-      "mutation": { "mode": "delivery-write", "paths": ["docs/stories/", "docs/verification/", "docs/completion-report.md", "docs/handoff/", ".deliver/"], "external": ["git-commit", "git-push", "pull-request-create-or-update", "verified-merge"] },
+-      "reference": "references/workflow.md"
++      "output": { "kind": "completion", "paths": ["docs/stories/<story-id>-<slug>.md", "docs/verification/<story-id>.md", "docs/checklists/verification-<story-id>.md", "docs/handoff/<actor-id>.md"], "description": "A verified C/M/P/E/H story boundary and current handoff." },
++      "mutation": { "mode": "delivery-write", "paths": ["docs/stories/", "docs/verification/", "docs/checklists/", "docs/handoff/", ".deliver/"], "external": ["git-commit", "git-push", "pull-request-create-or-update", "verified-merge"] },
++      "reference": "references/shipping.md"
+     },
+     {
+       "name": "status",
+diff --git a/plugins/deliver/skills/deliver/assets/templates/verification-report.md.template b/plugins/deliver/skills/deliver/assets/templates/verification-report.md.template
+index be00655..6af538d 100644
+--- a/plugins/deliver/skills/deliver/assets/templates/verification-report.md.template
++++ b/plugins/deliver/skills/deliver/assets/templates/verification-report.md.template
+@@ -1,36 +1,39 @@
+-<!-- Write to docs/verification/<story-id>.md when the scale requires a durable report. -->
+-# Verification: <story-id> "<Title>"
++<!-- Generated deterministically at P as docs/verification/<story-id>.md. -->
++# Verification: <story-id>
+ 
+-- Date: <YYYY-MM-DD>
+ - Story: docs/stories/<story-file>.md
+-- Covers: <FR-..., AC-...>
+-- Branch: <story branch> into <integration branch>
+-- Code identity: <verified commit or snapshot>
+-
+-## Changed files
+-
+-- <Path.>
++- Candidate C: <full source candidate commit>
++- Source snapshot: <source snapshot SHA-256>
++- Integrated M: <full integration commit>
++- Manifest: <bound C/M manifest SHA-256>
++- Gate receipts: <immutable receipt identities or none declared>
++- Review receipt: <immutable receipt identity>
++- Verification receipt: <immutable receipt identity>
+ 
+ ## Gates
+ 
+ | Gate | Command | Result |
+ | --- | --- | --- |
+-| test | `<command or N/A>` | PASS / FAIL / N/A |
+-| lint | `<command or N/A>` | PASS / FAIL / N/A |
+-| build | `<command or N/A>` | PASS / FAIL / N/A |
++| <declared name> | `<exact declared command>` | PASS |
+ 
+-## Independent review
++## Review panel
+ 
+-| Lens | Verdict | Open findings |
++| Lens | Reviewer | Verdict |
+ | --- | --- | --- |
+-| code-integrity-reviewer | PASS / CONCERNS / FAIL | <none or finding IDs> |
++| code-integrity-reviewer | <identity> | PASS |
++
++## Retained findings
++
++| Evidence | Lens | Reviewer | Status | Finding |
++| --- | --- | --- | --- | --- |
++| Source C or effective M | <lens> | <identity> | minor / open | <escaped single-line finding> |
+ 
+ ## Acceptance verification
+ 
+-- Status: PASS / FAIL / UNKNOWN
+-- AC-001: PASS / FAIL / UNKNOWN. Evidence: <command or inspected behavior and result>.
+-- Action for FAIL or UNKNOWN: <required fix or missing evidence>.
++| Criterion | Result | Evidence |
++| --- | --- | --- |
++| <criterion-id> | PASS | <escaped single-line current evidence> |
+ 
+ ## Integration status
+ 
+-<SHIPPED on YYYY-MM-DD through commit or pull request, or BLOCKED with reason.>
++Integrated at M <full integration commit>. This report does not identify its own commit P.
+diff --git a/plugins/deliver/skills/deliver/references/compatibility.md b/plugins/deliver/skills/deliver/references/compatibility.md
+index 8fb188c..0320134 100644
+--- a/plugins/deliver/skills/deliver/references/compatibility.md
++++ b/plugins/deliver/skills/deliver/references/compatibility.md
+@@ -89,20 +89,15 @@ or live concurrent editing of PM coordination records is supported by this bridg
+ 
+ Runtime `finish` records reviewed and verified code only. It does not release the shared claim,
+ mark the actor merged, or perform Git integration. Under the approved delivery authority, the PM
+-commits the scoped result, pushes its story branch, creates or updates its pull request, and merges
+-only after required checks pass. After verifying the real integration result, check out the clean
+-integration branch and run:
+-
+-```text
+-node <pm> complete --run <run-id> --commit <full-integration-HEAD-sha> --next "Continue with the next ready story"
+-```
+-
+-The integrated file contents must match the retained verified snapshot. Different integration
+-content needs fresh verification; never relabel an old PASS. The helper then records `merged` and
+-`PASS`, exports counters, clears `resolved_builder`, releases only this story's claim, appends the
+-log and writes a current handoff. Story documents and other actors stay unchanged. Commit these
+-PM records under the approved delivery authority so they travel with a clone. Do not advance the sprint
+-without checking all its stories. The original framework reads the resulting files directly.
++commits candidate C and follows `references/shipping.md`. Current-format projects use the audited
++local C/M/P/E/H protocol or the separately installed remote path. Every declared gate runs again
++at actual M. Different bound content needs fresh M evidence or an explicit source correction; an
++old PASS is never relabeled. Only story-only closure E records `merged` and releases the claim.
++H writes `docs/handoff/<actor-id>.md` with `BASE_COMMIT: E`, so the unchanged upstream reader
++accepts its own handoff-only commit.
++
++The older `pm complete` command remains for tagged legacy 0.22 bindings. It updates legacy actor
++and PM files after exact verified integration. It cannot close a current story.
+ 
+ ## Recovery and limits
+ 
+diff --git a/plugins/deliver/skills/deliver/references/shipping.md b/plugins/deliver/skills/deliver/references/shipping.md
+new file mode 100644
+index 0000000..6b6f018
+--- /dev/null
++++ b/plugins/deliver/skills/deliver/references/shipping.md
+@@ -0,0 +1,131 @@
++# Shipping a verified current story
++
++Use this operation after the source runtime has adopted candidate C in `in-review`, collected
++current gates, review and a verifier distinct from both builder and reviewer, then finished.
++`finish` keeps the shared claim active. Only the integration sequence below records `merged`.
++
++The PM has standing authority for the scoped Git commands in an approved delivery. Run them
++without another user checkpoint. Builders and reviewers do not merge or create closure commits.
++The local protocol never changes the finished source run or commits `.deliver` receipts.
++
++Let `<pm>` be this skill's `scripts/pm.mjs`. Run the following from a clean checkout of the
++approved integration branch. Preserve the `file`, `hash`, and stage `token` returned as JSON.
++Every later mutation takes the latest returned hash through `--expected-record`.
++
++```text
++node <pm> integrate-prepare --run <source-run-file> [--verification-report]
++git merge --no-ff --no-edit <record.source.candidate>
++node <pm> integrate-adopt --integration <file> --expected-record <hash> --token <record.integration.token> --commit "$(git rev-parse HEAD)"
++
++node <pm> integrate-gate --integration <file> --expected-record <hash> --name <each-declared-gate>
++node <pm> integrate-review --integration <file> --expected-record <hash> --reviewer <id> --receipt <json>
++node <pm> integrate-verify --integration <file> --expected-record <hash> --verifier <id> --results <json>
++node <pm> integrate-finalize --integration <file> --expected-record <hash>
++```
++
++Inspect `record.integration.status` before running Git. `prepared` supplies the merge token and
++expected tree. `failed` records the real I/C merge-tree attempt, Git version, exact arguments,
++exit and bounded log hashes without inventing M; do not run the merge. That record is the input
++to the separate source-correction operation.
++
++The runtime always executes every declared gate again at actual integration M. A clean no-ff
++composition with an identical bound C/M manifest may reuse C review and verification. Use the
++integration review and verification commands when evidence needs refreshing. They bind only M
++and do not call or rewrite the finished source run. A FAIL or unresolved block or major finding
++stays in the integration record and needs the explicit source-correction workflow when it concerns
++code. If committed C, its certified source snapshot and M differ only in bound implementation
++inputs, both fresh M review and fresh distinct verification are mandatory. Plan, approval, story
++contract or task-scope drift requires replanning. Missing or stale evidence is never treated as PASS.
++Initialized submodules inside the bound scope must be checked out at M's recorded gitlink. Their
++committed bytes, index flags and protected Git metadata are checked recursively before adoption
++and every integration evidence step.
++
++Finalization freezes a versioned identity over M and its tree, the bound snapshot and manifest,
++the exact gate receipts and durable logs, effective review and verification, and the reporting
++policy. A gate's stored environment hash records the environment that actually ran it; a later
++terminal does not replace that provenance. Once any P, E or H preparation or commit exists,
++gate, review and verification refreshes are refused. Repeating the identical finalization is a
++read-only resume.
++
++Records produced before the frozen identity existed are never upgraded during inspection. When
++the CLI reports `LEGACY_FINALIZATION_RECONCILE_REQUIRED`, inspect the retained receipts and
++artifact proof, then run the explicit hash-bound repair:
++
++```text
++node <pm> integrate-reconcile --integration <file> --expected-record <hash>
++```
++
++The repair succeeds only when retained receipts, logs and Git artifact proofs establish one exact
++finalization. It archives the complete prior record. Missing, contradictory or multiple credible
++finalizations leave the record unchanged and require manual evidence recovery.
++
++Structured review receipts may include:
++
++```json
++{
++  "status": "PASS",
++  "findings": [],
++  "panel": {
++    "snapshot_hash": "<integration snapshot SHA-256>",
++    "members": [
++      {
++        "lens": "code-integrity-reviewer",
++        "reviewer": "<identity>",
++        "verdict": "PASS",
++        "snapshot_hash": "<same SHA-256>",
++        "findings": []
++      }
++    ]
++  }
++}
++```
++
++The parser derives aggregate findings from member receipts and retains `CONCERNS` plus minor
++findings. Large reports require the story's declared lenses and `code-integrity-reviewer`.
++Regulated reports also require `security-auditor`.
++
++Large and regulated projects require reporting commit P. Standard projects include P only when
++`--verification-report` was selected during integration preparation. The choice stays fixed for
++that integration. Tiny and small projects skip P.
++
++```text
++node <pm> report-prepare --integration <file> --expected-record <hash>
++git add -- <each returned report path>
++git commit -m "Verify <story-id> integration"
++node <pm> report-adopt --integration <file> --expected-record <hash> --token <token> --commit "$(git rev-parse HEAD)"
++```
++
++P contains only `docs/verification/<story-id>.md` and
++`docs/checklists/verification-<story-id>.md`. It identifies C, M, the bound manifest and immutable
++receipt identities. It cannot name its own commit. The renderer keeps source and effective panel
++findings, flattens multiline evidence and escapes Markdown control characters before producing
++tables or checked evidence rows.
++
++Next create story-only closure E, then handoff-only H:
++
++```text
++node <pm> close-prepare --integration <file> --expected-record <hash>
++git add -- <returned story path>
++git commit -m "Close <story-id>"
++node <pm> close-adopt --integration <file> --expected-record <hash> --token <token> --commit "$(git rev-parse HEAD)"
++
++node <pm> handoff-prepare --integration <file> --expected-record <hash> --next "<next action>"
++git add -- <returned handoff path>
++git commit -m "Handoff after <story-id>"
++node <pm> handoff-adopt --integration <file> --expected-record <hash> --token <token> --commit "$(git rev-parse HEAD)"
++```
++
++E changes only the story's final Execution section to `merged`, preserves ownership and counters,
++and records M. H writes `docs/handoff/<actor-id>.md` with `BASE_COMMIT: E`; its own commit is H.
++H lists unresolved findings retained from source C and the effective integration review,
++including minor concerns. A fresh M review cannot silently erase an unresolved source concern.
++The upstream reader therefore treats the handoff as current when every commit after E changes
++only that handoff file.
++
++Each preparation persists exact parents, paths and bytes before a PM Git command. Repeating a
++prepare after interruption completes only its recorded before or after images. Adoption accepts
++one direct child with the exact prepared diff and retains its parent, tree, mode, blob and
++before/after proof. Later stages revalidate the entire adopted M/P/E/H chain. Any third-state file,
++extra path, changed branch, tree, manifest, log or record hash blocks without consuming the
++preparation. Integration records live only at the canonical per-run path under
++`.deliver/integrations`.
+diff --git a/plugins/deliver/skills/deliver/scripts/deliver.mjs b/plugins/deliver/skills/deliver/scripts/deliver.mjs
+index 495ab81..15bbb12 100755
+--- a/plugins/deliver/skills/deliver/scripts/deliver.mjs
++++ b/plugins/deliver/skills/deliver/scripts/deliver.mjs
+@@ -20,6 +20,7 @@ import { captureContracts } from './lib/contracts.mjs';
+ import { preparePmBinding } from './lib/pm.mjs';
+ import { detectProjectFormat, inspectProjectState } from './lib/project-state.mjs';
+ import { adoptPreparedCommit, assertFinalCandidate, prepareCommitAdoption, transitionCurrentExecution } from './lib/transitions.mjs';
++import { parseReviewReceipt } from './lib/review.mjs';
+ 
+ const HELP = `Deliver deterministic runtime
+ 
+@@ -117,26 +118,6 @@ function requireCurrentApproval(state) {
+   return null;
+ }
+ 
+-function parseReceipt(file) {
+-  const receipt = readJsonFile(file, 'review receipt');
+-  if (!receipt || typeof receipt !== 'object' || Array.isArray(receipt) || !['PASS', 'FAIL'].includes(receipt.status) || !Array.isArray(receipt.findings)) {
+-    throw new DeliverError('review receipt must contain status PASS|FAIL and a findings array', 66);
+-  }
+-  const findings = receipt.findings.map((finding, index) => {
+-    if (!finding || typeof finding !== 'object' || Array.isArray(finding) || !['block', 'major', 'minor'].includes(finding.severity) || typeof finding.message !== 'string' || finding.message.trim() === '') {
+-      throw new DeliverError(`invalid review finding at index ${index}`, 66);
+-    }
+-    if (finding.path !== undefined && typeof finding.path !== 'string') throw new DeliverError(`review finding ${index} path must be a string`, 66);
+-    if (finding.resolved !== undefined && typeof finding.resolved !== 'boolean') throw new DeliverError(`review finding ${index} resolved must be boolean`, 66);
+-    return { severity: finding.severity, message: finding.message, ...(finding.path === undefined ? {} : { path: finding.path }), resolved: finding.resolved === true };
+-  });
+-  if (receipt.summary !== undefined && typeof receipt.summary !== 'string') throw new DeliverError('review summary must be a string', 66);
+-  if (receipt.status === 'PASS' && findings.some((finding) => !finding.resolved && finding.severity !== 'minor')) {
+-    throw new DeliverError('a PASS review may not contain unresolved block or major findings', 66);
+-  }
+-  return { status: receipt.status, findings, ...(receipt.summary === undefined ? {} : { summary: receipt.summary }) };
+-}
+-
+ function parseVerification(file, acceptance) {
+   const document = readJsonFile(file, 'verification results');
+   if (!document || typeof document !== 'object' || Array.isArray(document) || !Array.isArray(document.criteria)) {
+@@ -299,7 +280,7 @@ function main() {
+   if (command === 'review') {
+     const reviewer = actor(required(o, '--reviewer'), '--reviewer');
+     const reviewedSnapshot = snapshotArgument(o);
+-    const receipt = parseReceipt(required(o, '--receipt'));
++    const receipt = parseReviewReceipt(required(o, '--receipt'), { expectedSnapshot: reviewedSnapshot });
+     const updated = updateRun(run, o.expectedRevision, (state) => {
+       active(state);
+       syncPlan(state);
+@@ -322,6 +303,10 @@ function main() {
+       syncPlan(state);
+       requireCurrentApproval(state);
+       if (verifier === state.task.builder) throw new DeliverError('verifier must differ from builder', 66);
++      if (state.pm_binding?.format === 'current' && state.review?.reviewer === verifier) throw new DeliverError('current shared-project verifier must differ from reviewer', 66);
++      if (state.pm_binding?.format === 'current' && state.review?.panel?.members.some((member) => member.reviewer === verifier)) {
++        throw new DeliverError('current shared-project verifier must differ from every panel reviewer', 66);
++      }
+       if (state.mode === 'governed' && state.review?.reviewer === verifier) throw new DeliverError('governed verifier must differ from reviewer', 66);
+       const criteria = parseVerification(required(o, '--results'), state.task.packet.acceptance);
+       const checked = inspectScope(state);
+@@ -412,6 +397,7 @@ function main() {
+         throw new DeliverError('acceptance verification is missing, non-PASS, or stale', 66);
+       }
+       if (state.verification.verifier === state.task.builder) throw new DeliverError('verifier must differ from builder', 66);
++      if (state.pm_binding?.format === 'current' && state.verification.verifier === state.review.reviewer) throw new DeliverError('current shared-project verifier must differ from reviewer', 66);
+       if (state.mode === 'governed' && state.verification.verifier === state.review.reviewer) throw new DeliverError('governed verifier must differ from reviewer', 66);
+       state.phase = 'finished';
+       state.completion_snapshot = checked.current;
+diff --git a/plugins/deliver/skills/deliver/scripts/lib/integration.mjs b/plugins/deliver/skills/deliver/scripts/lib/integration.mjs
+new file mode 100644
+index 0000000..32b7952
+--- /dev/null
++++ b/plugins/deliver/skills/deliver/scripts/lib/integration.mjs
+@@ -0,0 +1,1573 @@
++import fs from 'node:fs';
++import path from 'node:path';
++import { execFileSync, spawnSync } from 'node:child_process';
++import { randomUUID } from 'node:crypto';
++import { canonical, DeliverError, internalDirectory, readRun, sha256, validateTaskPacket } from './state.mjs';
++import { assertCurrentBinding } from './current-pm.mjs';
++import { readPlanPolicy } from './project-state.mjs';
++import { parseReviewReceipt } from './review.mjs';
++import { parseVerificationResults, renderVerificationArtifacts } from './reporting.mjs';
++import { parseStory, readStory, replaceStoryExecution } from './story.mjs';
++import { environmentHandle } from './gates.mjs';
++import { captureGitAnchor, snapshot } from './scope.mjs';
++
++const OID = /^[0-9a-f]{40}(?:[0-9a-f]{24})?$/;
++const HASH = /^[0-9a-f]{64}$/;
++const RUN_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
++const MAX_RECORD_BYTES = 8 * 1024 * 1024;
++const NO_MUTATION = Symbol('no-mutation');
++const fail = (message, code = 66) => { throw new DeliverError(message, code); };
++const json = (value) => `${JSON.stringify(value, null, 2)}\n`;
++const now = () => new Date().toISOString();
++const stamp = () => now().replace('T', ' ').replace('Z', '').slice(0, 16);
++const covers = (scope, rel) => scope === rel || rel.startsWith(`${scope}/`);
++
++function git(root, args, { buffer = false, env = undefined } = {}) {
++  try {
++    return execFileSync('git', ['-C', root, ...args], {
++      encoding: buffer ? undefined : 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 30000,
++      windowsHide: true, ...(env ? { env: { ...process.env, ...env } } : {}),
++    });
++  } catch (error) {
++    fail(`Git cannot complete local integration: ${String(error.stderr || error.message).trim()}`);
++  }
++}
++
++function rootPath(root) {
++  try {
++    const real = fs.realpathSync.native(root);
++    const stat = fs.lstatSync(real);
++    if (!stat.isDirectory() || stat.isSymbolicLink()) fail('integration root must be a real directory');
++    return real;
++  } catch (error) {
++    if (error instanceof DeliverError) throw error;
++    fail(`cannot access integration root: ${error.message}`);
++  }
++}
++
++function commonRepository(root) {
++  const value = String(git(root, ['rev-parse', '--git-common-dir'])).trim();
++  return fs.realpathSync.native(path.resolve(root, value));
++}
++
++function branch(root) {
++  const value = String(git(root, ['symbolic-ref', '--short', 'HEAD'])).trim();
++  if (!value) fail('integration checkout must use a named branch');
++  return value;
++}
++
++function head(root) { return String(git(root, ['rev-parse', '--verify', 'HEAD'])).trim(); }
++function tree(root, commit = 'HEAD') { return String(git(root, ['rev-parse', `${commit}^{tree}`])).trim(); }
++
++function statusPaths(root) {
++  const records = String(git(root, ['status', '--porcelain=v1', '-z', '--untracked-files=all'])).split('\0').filter(Boolean);
++  const paths = [];
++  for (let index = 0; index < records.length; index++) {
++    const item = records[index];
++    if (item.length < 4) continue;
++    const status = item.slice(0, 2);
++    paths.push(item.slice(3));
++    if ((status[0] === 'R' || status[0] === 'C') && records[index + 1]) paths.push(records[++index]);
++  }
++  return paths.filter((rel) => rel !== '.deliver' && !rel.startsWith('.deliver/'));
++}
++
++function assertClean(root) {
++  const dirty = statusPaths(root);
++  if (dirty.length) fail(`integration checkout has uncommitted project paths: ${dirty.sort().join(', ')}`);
++  const indexTree = String(git(root, ['write-tree'])).trim();
++  if (indexTree !== tree(root)) fail('integration checkout index differs from HEAD');
++}
++
++function assertOrdinaryIndex(root) {
++  const rows = git(root, ['ls-files', '-v', '-z'], { buffer: true }).toString('utf8').split('\0').filter(Boolean);
++  const hidden = rows.filter((row) => row[0] !== 'H').map((row) => row.slice(2));
++  if (hidden.length) fail(`integration checkout has unsupported index flags: ${hidden.sort().join(', ')}`);
++}
++
++function protectedShape(anchor, root = true) {
++  return {
++    metadata_version: anchor.metadata_version,
++    ...(root ? { ref: anchor.ref } : {}),
++    protected_hash: anchor.protected_hash,
++    submodules: Object.fromEntries(Object.entries(anchor.submodules || {})
++      .map(([rel, nested]) => [rel, protectedShape(nested, false)])),
++  };
++}
++
++const protectedIgnored = (rel) => /(^|\/)(?:AGENTS|CLAUDE)\.md$/.test(rel)
++  || /(^|\/)\.(?:agents|codex)(?:\/|$)/.test(rel)
++  || rel.endsWith('.sdd') || /(^|\/)\.specdd(?:\/|$)/.test(rel)
++  || /(^|\/)(?:config|configs|contract|contracts)(?:[./]|$)/.test(rel);
++
++function liveFingerprint(root, rel) {
++  const file = path.join(root, rel);
++  let stat;
++  try { stat = fs.lstatSync(file); } catch (error) {
++    if (error.code === 'ENOENT') return null;
++    throw error;
++  }
++  if (stat.isSymbolicLink()) return `symlink:${sha256(fs.readlinkSync(file))}`;
++  if (stat.isFile()) return `file:${stat.mode & 0o100 ? '755' : '644'}:${sha256(fs.readFileSync(file))}`;
++  fail(`unsupported executable checkout path type: ${rel}`);
++}
++
++function protectedIgnoredEntries(root) {
++  const output = git(root, ['ls-files', '--others', '--ignored', '--exclude-standard', '-z'], { buffer: true });
++  const entries = Object.create(null);
++  for (const rel of output.toString('utf8').split('\0').filter(Boolean)
++    .filter((item) => item !== '.deliver' && !item.startsWith('.deliver/')).filter(protectedIgnored).sort()) {
++    entries[rel] = liveFingerprint(root, rel);
++  }
++  return entries;
++}
++
++function parseTreeRows(root, commit, scopes, recursive = true) {
++  const args = ['ls-tree', ...(recursive ? ['-r'] : []), '-z', commit, '--', ...scopes];
++  const output = git(root, args, { buffer: true });
++  return output.toString('utf8').split('\0').filter(Boolean).map((raw) => {
++    const match = /^(\d{6}) (\w+) ([0-9a-f]+)\t(.+)$/.exec(raw);
++    if (!match) fail('cannot parse committed integration manifest');
++    return { mode: match[1], type: match[2], oid: match[3], rel: match[4] };
++  });
++}
++
++function treeObjects(root, commit, scopes = ['.']) {
++  return Object.fromEntries(parseTreeRows(root, commit, scopes).map((entry) => [entry.rel, entry]));
++}
++
++function exactTreeObject(root, commit, rel) {
++  return parseTreeRows(root, commit, [rel], false).find((entry) => entry.rel === rel) || null;
++}
++
++function moduleRoot(root, rel, { required = false } = {}) {
++  const candidate = path.join(root, rel);
++  let stat;
++  try { stat = fs.lstatSync(candidate); } catch (error) {
++    if (error.code === 'ENOENT' && !required) return null;
++    fail(`cannot access initialized submodule ${rel}: ${error.message}`);
++  }
++  if (!stat.isDirectory() || stat.isSymbolicLink()) {
++    if (!required && stat.isDirectory()) return null;
++    fail(`initialized submodule path is not a real directory: ${rel}`);
++  }
++  const real = fs.realpathSync.native(candidate);
++  const relative = path.relative(root, real);
++  if (relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative) || real !== path.resolve(candidate)) {
++    fail(`initialized submodule escapes its checkout: ${rel}`);
++  }
++  if (fs.readdirSync(real).length === 0) {
++    if (!required) return null;
++    fail(`required submodule checkout is uninitialized: ${rel}`);
++  }
++  let top;
++  try { top = String(git(real, ['rev-parse', '--show-toplevel'])).trim(); } catch {
++    fail(`submodule checkout is not initialized safely: ${rel}`);
++  }
++  if (fs.realpathSync.native(top) !== real) fail(`submodule checkout has an unexpected Git root: ${rel}`);
++  return real;
++}
++
++function initializedForLinks(root, links) {
++  const result = Object.create(null);
++  for (const rel of Object.keys(links).sort()) {
++    const nested = moduleRoot(root, rel);
++    if (nested) result[rel] = nested;
++  }
++  return result;
++}
++
++function checkoutObjectEntries(root, commit) {
++  const entries = Object.create(null);
++  for (const item of Object.values(treeObjects(root, commit))) entries[item.rel] = fingerprintBlob(root, item.mode, item.oid);
++  return entries;
++}
++
++function buildCheckoutProof(root, commit, anchor = captureGitAnchor(root)) {
++  const entries = checkoutObjectEntries(root, commit);
++  const expectedLinks = Object.fromEntries(Object.entries(entries).filter(([, value]) => /^gitlink:[0-9a-f]+$/.test(value)));
++  const currentEntries = checkoutObjectEntries(root, 'HEAD');
++  const currentLinks = Object.fromEntries(Object.entries(currentEntries).filter(([, value]) => /^gitlink:[0-9a-f]+$/.test(value)));
++  const initialized = initializedForLinks(root, { ...expectedLinks, ...currentLinks });
++  const children = Object.create(null);
++  for (const [rel, nestedRoot] of Object.entries(initialized)) {
++    const match = /^gitlink:([0-9a-f]+)$/.exec(expectedLinks[rel] || '');
++    if (!match) fail(`initialized submodule is absent from expected M: ${rel}`);
++    if (!anchor.submodules?.[rel]) fail(`initialized submodule is absent from protected anchor: ${rel}`);
++    children[rel] = buildCheckoutProof(nestedRoot, match[1], anchor.submodules[rel]);
++  }
++  return {
++    version: 'whole-checkout-v1',
++    tree: tree(root, commit),
++    entries,
++    protected_hash: anchor.protected_hash,
++    protected_ignored: protectedIgnoredEntries(root),
++    initialized: children,
++  };
++}
++
++function validateCheckoutProofObjects(root, commit, proof) {
++  if (!proof || proof.version !== 'whole-checkout-v1' || proof.tree !== tree(root, commit)
++    || canonical(proof.entries) !== canonical(checkoutObjectEntries(root, commit))
++    || !HASH.test(proof.protected_hash || '') || !proof.protected_ignored || Array.isArray(proof.protected_ignored)
++    || !proof.initialized || Array.isArray(proof.initialized)) fail('invalid expected M checkout proof');
++  for (const [rel, nestedProof] of Object.entries(proof.initialized)) {
++    const match = /^gitlink:([0-9a-f]+)$/.exec(proof.entries[rel] || '');
++    if (!match) fail(`expected initialized submodule is not an M gitlink: ${rel}`);
++    validateCheckoutProofObjects(moduleRoot(root, rel, { required: true }), match[1], nestedProof);
++  }
++  return proof;
++}
++
++function verifyCheckoutProof(root, commit, proof, anchor = captureGitAnchor(root)) {
++  validateCheckoutProofObjects(root, commit, proof);
++  if (head(root) !== commit || tree(root) !== proof.tree) fail('executable checkout is not at its expected commit');
++  assertClean(root);
++  assertOrdinaryIndex(root);
++  for (const [rel, identity] of Object.entries(proof.entries)) {
++    if (!String(identity).startsWith('gitlink:') && liveFingerprint(root, rel) !== identity) {
++      fail(`executable tracked bytes differ from M: ${rel}`);
++    }
++  }
++  const links = Object.fromEntries(Object.entries(proof.entries).filter(([, value]) => /^gitlink:[0-9a-f]+$/.test(value)));
++  const initialized = initializedForLinks(root, links);
++  if (canonical(Object.keys(initialized).sort()) !== canonical(Object.keys(proof.initialized).sort())) {
++    fail('initialized submodule set differs from prepared M checkout');
++  }
++  if (anchor.protected_hash !== proof.protected_hash
++    || canonical(protectedIgnoredEntries(root)) !== canonical(proof.protected_ignored)) {
++    fail('protected Git metadata changed in executable checkout');
++  }
++  for (const [rel, nestedProof] of Object.entries(proof.initialized)) {
++    const match = /^gitlink:([0-9a-f]+)$/.exec(proof.entries[rel]);
++    if (!anchor.submodules?.[rel]) fail(`initialized submodule is absent from executable protected anchor: ${rel}`);
++    verifyCheckoutProof(initialized[rel], match[1], nestedProof, anchor.submodules[rel]);
++  }
++  return proof;
++}
++
++function executableProof(root, manifest, commit, checkoutProof) {
++  if (head(root) !== commit || tree(root) !== tree(root, commit)) fail('integration executable checkout is not at the recorded commit');
++  verifyCheckoutProof(root, commit, checkoutProof);
++  const anchor = captureGitAnchor(root);
++  const live = snapshot(root, manifest.scopes);
++  const normalized = normalizeSnapshotGitlinks(root, manifest, live.entries, { strict: true, observedEntries: live.entries });
++  const liveManifest = snapshotManifest(manifest, normalized);
++  if (canonical(liveManifest) !== canonical(manifest)) fail('integration executable bytes differ from the recorded M manifest');
++  return { anchor, snapshot_hash: live.hash };
++}
++
++function fingerprintBlob(root, mode, oid) {
++  if (mode === '160000') return `gitlink:${oid}`;
++  const bytes = git(root, ['cat-file', 'blob', oid], { buffer: true });
++  if (mode === '120000') return `symlink:${sha256(bytes)}`;
++  if (!['100644', '100755'].includes(mode)) fail(`unsupported committed mode in integration manifest: ${mode}`);
++  return `file:${mode === '100755' ? '755' : '644'}:${sha256(bytes)}`;
++}
++
++function treeEntries(root, commit, scopes) {
++  const result = Object.create(null);
++  for (const item of parseTreeRows(root, commit, scopes)) result[item.rel] = fingerprintBlob(root, item.mode, item.oid);
++  return result;
++}
++
++function sourceBindings(state) {
++  return {
++    packet: sha256(canonical(state.task.packet)),
++    actor: state.pm_binding.actor,
++    route: { story: state.pm_binding.story, story_path: state.pm_binding.story_path, branch: state.pm_binding.branch },
++    contract_hash: state.pm_binding.contract_hash,
++    execution_hash: state.pm_binding.execution_hash,
++    receipts: {
++      review: receiptIdentity(state.review),
++      verification: receiptIdentity(state.verification),
++      gates: state.gates.map((item) => receiptIdentity(item)),
++    },
++  };
++}
++
++function manifestFromEntries(entries, scopes, bindings) {
++  return { entries, bindings: structuredClone(bindings), hash: sha256(canonical({ entries, bindings })), scopes };
++}
++
++function boundManifest(root, commit, packet, storyPath, bindings = {}) {
++  const scopes = [...new Set([...packet.touches, ...packet.read_paths, ...packet.specs, storyPath, 'docs/plan.md', 'docs/approval.json'])].sort();
++  return manifestFromEntries(committedEntries(root, commit, scopes), scopes, bindings);
++}
++
++function committedEntries(root, commit, scopes) {
++  const committed = treeEntries(root, commit, scopes);
++  for (const scope of scopes) {
++    if (scope === '.' || Object.keys(committed).some((rel) => covers(scope, rel))) continue;
++    const segments = scope.split('/');
++    for (let index = 1; index < segments.length; index++) {
++      const rel = segments.slice(0, index).join('/');
++      const entry = exactTreeObject(root, commit, rel);
++      if (!entry) break;
++      if (entry.mode !== '160000') continue;
++      committed[rel] = fingerprintBlob(root, entry.mode, entry.oid);
++      const nestedRoot = moduleRoot(root, rel, { required: true });
++      const childScope = segments.slice(index).join('/');
++      for (const [name, identity] of Object.entries(committedEntries(nestedRoot, entry.oid, [childScope]))) {
++        committed[`${rel}/${name}`] = identity;
++      }
++      break;
++    }
++  }
++  const candidates = new Set(Object.keys(committed));
++  const entries = Object.create(null);
++  for (const rel of [...candidates].sort()) entries[rel] = committed[rel] ?? null;
++  for (const scope of scopes) {
++    if (![...candidates].some((rel) => covers(scope, rel))) entries[scope] = null;
++  }
++  return entries;
++}
++
++function snapshotManifest(committed, snapshotEntries) {
++  const candidates = new Set(Object.keys(committed.entries));
++  for (const rel of Object.keys(snapshotEntries)) if (committed.scopes.some((scope) => covers(scope, rel))) candidates.add(rel);
++  const entries = Object.create(null);
++  for (const rel of [...candidates].sort()) entries[rel] = snapshotEntries[rel] ?? null;
++  return manifestFromEntries(entries, committed.scopes, committed.bindings);
++}
++
++function manifestMismatches(left, right) {
++  const paths = new Set([...Object.keys(left.entries), ...Object.keys(right.entries)]);
++  return [...paths].filter((rel) => (left.entries[rel] ?? null) !== (right.entries[rel] ?? null)).sort();
++}
++
++function childScopes(scopes, rel) {
++  return scopes.flatMap((scope) => covers(scope, rel) ? ['.'] : covers(rel, scope) ? [scope.slice(rel.length + 1)] : []);
++}
++
++function subtree(entries, rel) {
++  return Object.fromEntries(Object.entries(entries).filter(([name]) => name === rel || name.startsWith(`${rel}/`)));
++}
++
++function normalizeSnapshotGitlinks(root, manifest, suppliedEntries, { strict, observedEntries } = {}) {
++  const normalized = { ...suppliedEntries };
++  const observed = observedEntries || snapshot(root, manifest.scopes).entries;
++  const links = Object.entries(manifest.entries).filter(([rel, identity], index, all) => /^gitlink:[0-9a-f]+$/.test(identity || '')
++    && !all.some(([parent, parentIdentity]) => parent !== rel && rel.startsWith(`${parent}/`) && /^gitlink:[0-9a-f]+$/.test(parentIdentity || '')));
++  for (const [rel, identity] of links) {
++    const match = /^gitlink:([0-9a-f]+)$/.exec(identity || '');
++    try {
++      if (canonical(subtree(suppliedEntries, rel)) !== canonical(subtree(observed, rel))
++        || !String(observed[rel] || '').startsWith(`${identity}:`)) fail(`initialized submodule snapshot changed: ${rel}`);
++      const moduleRoot = fs.realpathSync.native(path.join(root, rel));
++      if (String(git(moduleRoot, ['rev-parse', '--show-toplevel'])).trim() !== moduleRoot || head(moduleRoot) !== match[1]) {
++        fail(`initialized submodule is not at M's gitlink: ${rel}`);
++      }
++      assertClean(moduleRoot);
++      assertOrdinaryIndex(moduleRoot);
++      const scopes = childScopes(manifest.scopes, rel);
++      const nestedManifest = manifestFromEntries(committedEntries(moduleRoot, match[1], scopes), scopes, {});
++      const nestedLive = snapshot(moduleRoot, scopes);
++      const nestedNormalized = normalizeSnapshotGitlinks(moduleRoot, nestedManifest, nestedLive.entries, {
++        strict: true, observedEntries: nestedLive.entries,
++      });
++      if (canonical(snapshotManifest(nestedManifest, nestedNormalized)) !== canonical(nestedManifest)) {
++        fail(`initialized submodule bytes differ from M's gitlink: ${rel}`);
++      }
++      for (const name of Object.keys(normalized)) if (name.startsWith(`${rel}/`)) delete normalized[name];
++      for (const [name, value] of Object.entries(nestedNormalized)) {
++        const namespaced = `${rel}/${name}`;
++        if (Object.hasOwn(manifest.entries, namespaced)) normalized[namespaced] = value;
++      }
++      normalized[rel] = identity;
++    } catch (error) {
++      if (strict) throw error;
++    }
++  }
++  return normalized;
++}
++
++function probeMergeTree(root, integration, candidate) {
++  const args = ['merge-tree', '--write-tree', integration, candidate];
++  const started = now();
++  const result = spawnSync('git', ['-C', root, ...args], {
++    encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 30000, windowsHide: true, maxBuffer: 1024 * 1024,
++  });
++  const stdout = String(result.stdout || '');
++  const stderr = String(result.stderr || '');
++  const expected = stdout.trim().split(/\s+/)[0];
++  return {
++    ok: result.status === 0 && !result.error && OID.test(expected),
++    tree: result.status === 0 && !result.error && OID.test(expected) ? expected : null,
++    log: `command: git ${args.join(' ')}\nstarted: ${started}\nexit: ${result.status ?? 'null'}\n\n[stdout]\n${stdout}\n[stderr]\n${stderr}`,
++    attempt: {
++      provenance: 'deliver-merge-tree-probe-v1', argv: ['git', '-C', root, ...args], git_version: String(git(root, ['--version'])).trim(),
++      integration, candidate, status: result.status,
++      signal: result.signal || null, error: result.error?.message || null, started_at: started, finished_at: now(),
++      stdout_hash: sha256(stdout), stderr_hash: sha256(stderr),
++    },
++  };
++}
++
++function expectedMergeTree(root, integration, candidate) {
++  const probe = probeMergeTree(root, integration, candidate);
++  if (!probe.ok) fail('candidate does not form a clean merge');
++  return probe.tree;
++}
++
++function integrationIdentity(record) {
++  return sha256(canonical({
++    commit: record.integration.commit,
++    tree: record.integration.tree,
++    manifest: record.manifest.hash,
++  }));
++}
++
++function recordPath(root, id, { create = false } = {}) {
++  if (!RUN_ID.test(id || '')) fail('integration record id must be a canonical run id');
++  const directory = create ? internalDirectory(root, ['integrations']) : path.join(root, '.deliver', 'integrations');
++  let stat;
++  let real;
++  try { stat = fs.lstatSync(directory); real = fs.realpathSync.native(directory); }
++  catch (error) { fail(`integration records directory is unavailable: ${error.message}`); }
++  const expected = path.join(root, '.deliver', 'integrations');
++  if (!stat.isDirectory() || stat.isSymbolicLink() || real !== expected) fail('integration records directory is not canonical');
++  return path.join(real, `${id}.json`);
++}
++
++function atomic(file, content) {
++  fs.mkdirSync(path.dirname(file), { recursive: true });
++  const temp = `${file}.${process.pid}.${randomUUID()}.tmp`;
++  const fd = fs.openSync(temp, 'wx', 0o600);
++  try { fs.writeFileSync(fd, content); fs.fsyncSync(fd); } finally { fs.closeSync(fd); }
++  try { fs.renameSync(temp, file); } finally { try { fs.unlinkSync(temp); } catch {} }
++}
++
++function recordHash(record) { return sha256(canonical(record)); }
++
++function expectedReporting(scale, requested) {
++  if (['large', 'regulated'].includes(scale)) return 'required';
++  if (scale === 'standard' && requested) return 'requested';
++  return 'skipped';
++}
++
++function preparationIdentity(record) {
++  return sha256(canonical({
++    source_run_id: record.source.run_id,
++    candidate: record.source.candidate,
++    base: record.integration.base,
++    destination_branch: record.destination.branch,
++    reporting_requested: record.reporting_requested,
++    reporting: record.reporting,
++    merge_token: record.integration.token,
++    base_anchor: sha256(canonical(record.integration.base_anchor)),
++    base_checkout_proof: sha256(canonical(record.integration.base_checkout_proof)),
++    expected_tree: record.integration.expected_tree,
++    manifest: record.integration.manifest?.hash || null,
++    checkout_proof: record.integration.checkout_proof ? sha256(canonical(record.integration.checkout_proof)) : null,
++    failed_probe: record.integration.failure?.identity || null,
++  }));
++}
++
++function validateRecord(record) {
++  if (!record || typeof record !== 'object' || Array.isArray(record) || !RUN_ID.test(record.id || '')) {
++    fail('integration record id must be a canonical run id');
++  }
++  if (!record || typeof record !== 'object' || Array.isArray(record) || record.schema_version !== 1
++    || record.kind !== 'local-integration-v1'
++    || !record.source || record.source.run_id !== record.id || !record.destination || !record.integration || !record.evidence
++    || !record.source.manifest || !record.source.snapshot_manifest
++    || !record.report || !record.closure || !record.handoff
++    || typeof record.source.root !== 'string' || !path.isAbsolute(record.source.root)
++    || typeof record.source.run_path !== 'string' || !path.isAbsolute(record.source.run_path)
++    || path.basename(record.source.run_path) !== `${record.id}.json`
++    || !HASH.test(record.source.snapshot_hash || '') || !HASH.test(record.source.contract_hash || '') || !HASH.test(record.source.execution_hash || '')
++    || !OID.test(record.source.candidate) || !OID.test(record.integration.base)
++    || !record.integration.base_anchor || typeof record.integration.base_anchor !== 'object' || Array.isArray(record.integration.base_anchor)
++    || !record.integration.base_checkout_proof || typeof record.integration.base_checkout_proof !== 'object'
++    || Array.isArray(record.integration.base_checkout_proof)
++    || (record.integration.commit !== null && !OID.test(record.integration.commit))
++    || !['prepared', 'failed', 'adopted'].includes(record.integration.status)
++    || !Array.isArray(record.evidence.gates) || !['required', 'requested', 'skipped'].includes(record.reporting)
++    || typeof record.reporting_requested !== 'boolean'
++    || !Number.isSafeInteger(record.revision) || record.revision < 0
++    || !record.plan || !['tiny', 'small', 'standard', 'large', 'regulated'].includes(record.plan.scale)
++    || record.reporting !== expectedReporting(record.plan.scale, record.reporting_requested)
++    || !record.preparation || record.preparation.identity !== preparationIdentity(record)
++    || typeof record.destination.root !== 'string' || !path.isAbsolute(record.destination.root)
++    || typeof record.destination.common_repository !== 'string' || !path.isAbsolute(record.destination.common_repository)) {
++    fail('invalid local integration record');
++  }
++  if (typeof record.evidence.source_reusable !== 'boolean' || !Array.isArray(record.evidence.reuse_mismatches)
++    || !Array.isArray(record.evidence.gate_history) || !Array.isArray(record.evidence.review_history)
++    || !Array.isArray(record.evidence.verification_history) || !Array.isArray(record.evidence.finalization_history)
++    || (record.evidence.reconciliation_history !== undefined && !Array.isArray(record.evidence.reconciliation_history))) {
++    fail('invalid integration evidence history');
++  }
++  if (Object.hasOwn(record.evidence, 'finalization')) {
++    const finalization = record.evidence.finalization;
++    if (finalization !== null && (!finalization || finalization.version !== 'integration-finalization-v1'
++      || !OID.test(finalization.integration_commit || '') || !OID.test(finalization.integration_tree || '')
++      || !HASH.test(finalization.snapshot_hash || '') || !HASH.test(finalization.manifest_hash || '')
++      || !Array.isArray(finalization.gates) || !finalization.gates.every((gate) => gate && typeof gate === 'object'
++        && typeof gate.name === 'string' && typeof gate.command === 'string' && HASH.test(gate.identity || '')
++        && typeof gate.log_path === 'string' && HASH.test(gate.log_hash || '') && HASH.test(gate.environment_hash || ''))
++      || !HASH.test(finalization.review_identity || '') || !HASH.test(finalization.verification_identity || '')
++      || !['required', 'requested', 'skipped'].includes(finalization.reporting)
++      || typeof finalization.reporting_requested !== 'boolean'
++      || !HASH.test(finalization.identity || '') || finalization.identity !== finalizationIdentity(finalization))) {
++      fail('invalid integration evidence finalization identity');
++    }
++    if (Boolean(finalization) !== record.evidence.finalized
++      || (finalization && (record.evidence.effective_review_identity !== finalization.review_identity
++        || record.evidence.effective_verification_identity !== finalization.verification_identity))) {
++      fail('integration evidence finalization fields disagree');
++    }
++  }
++  for (const entry of record.evidence.reconciliation_history || []) {
++    if (!entry || !HASH.test(entry.before_hash || '') || !entry.before || typeof entry.before !== 'object'
++      || entry.before_hash !== recordHash(entry.before) || typeof entry.at !== 'string') {
++      fail('invalid integration evidence reconciliation history');
++    }
++  }
++  for (const manifest of [record.source.manifest, record.source.snapshot_manifest, record.integration.manifest].filter(Boolean)) {
++    if (!manifest.entries || typeof manifest.entries !== 'object' || Array.isArray(manifest.entries)
++      || !manifest.bindings || typeof manifest.bindings !== 'object' || Array.isArray(manifest.bindings)
++      || !Array.isArray(manifest.scopes) || !manifest.scopes.every((item) => typeof item === 'string') || !HASH.test(manifest.hash || '')
++      || manifest.hash !== sha256(canonical({ entries: manifest.entries, bindings: manifest.bindings }))) fail('invalid integration manifest');
++  }
++  if (record.integration.status === 'adopted' && (!record.integration.manifest || !record.integration.anchor
++    || !record.integration.checkout_proof || record.manifest?.hash !== record.integration.manifest.hash
++    || !HASH.test(record.integration.executable_snapshot_hash || ''))) {
++    fail('adopted integration lacks durable M proof');
++  }
++  if (record.integration.status === 'prepared' && (!RUN_ID.test(record.integration.token || '')
++    || !OID.test(record.integration.expected_tree || '') || !record.integration.manifest
++    || !record.integration.checkout_proof || record.integration.failure !== null)) {
++    fail('prepared integration record is incomplete');
++  }
++  if (record.integration.status === 'failed' && (!record.integration.failure || record.integration.commit !== null
++    || record.integration.token !== null || record.integration.expected_tree !== null || record.integration.manifest !== null
++    || record.integration.checkout_proof !== null || !hasReceiptIdentity(record.integration.failure))) fail('failed integration probe claims an M');
++  validateTaskPacket(record.source.packet);
++  return record;
++}
++
++export function readIntegrationRecord(recordArg, cwd = process.cwd()) {
++  const lexical = path.resolve(cwd, recordArg);
++  let stat;
++  try { stat = fs.lstatSync(lexical); } catch (error) { fail(`cannot read integration record: ${error.message}`); }
++  if (!stat.isFile() || stat.isSymbolicLink() || stat.size > MAX_RECORD_BYTES) fail('integration record must be a bounded regular file');
++  let value;
++  try { value = JSON.parse(fs.readFileSync(lexical, 'utf8')); } catch { fail('invalid JSON in integration record'); }
++  const record = validateRecord(value);
++  const file = fs.realpathSync.native(lexical);
++  if (file !== lexical || record.id !== record.source.run_id
++    || recordPath(rootPath(record.destination.root), record.id) !== file) fail('integration record path does not match its source run and destination checkout');
++  return { file, record, hash: recordHash(record) };
++}
++
++function withRecord(recordArg, expectedHash, mutate, cwd = process.cwd()) {
++  const loaded = readIntegrationRecord(recordArg, cwd);
++  if (!HASH.test(expectedHash || '') || loaded.hash !== expectedHash) fail('integration record hash is missing or stale');
++  const lock = `${loaded.file}.lock`;
++  let fd;
++  try { fd = fs.openSync(lock, 'wx', 0o600); } catch (error) {
++    if (error.code === 'EEXIST') fail('integration record is locked');
++    throw error;
++  }
++  try {
++    const current = readIntegrationRecord(loaded.file);
++    if (current.hash !== expectedHash) fail('integration record changed concurrently');
++    if (needsFinalizationReconcile(current.record)) {
++      fail('LEGACY_FINALIZATION_RECONCILE_REQUIRED: run pm.mjs integrate-reconcile with this exact record hash');
++    }
++    assertRecordSource(current.record);
++    validateIntegrationProofs(current.record);
++    const result = mutate(current.record, current.file);
++    if (result?.[NO_MUTATION] === true) {
++      return { file: current.file, record: current.record, hash: current.hash, result: result.value, unchanged: true };
++    }
++    current.record.revision += 1;
++    current.record.updated_at = now();
++    validateRecord(current.record);
++    atomic(current.file, json(current.record));
++    return { file: current.file, record: current.record, hash: recordHash(current.record), result };
++  } finally {
++    fs.closeSync(fd);
++    try { fs.unlinkSync(lock); } catch {}
++  }
++}
++
++function receiptIdentity(value) { return sha256(canonical(value)); }
++
++function hasReceiptIdentity(value) {
++  if (!value || !HASH.test(value.identity || '')) return false;
++  const { identity, ...body } = value;
++  return identity === receiptIdentity(body);
++}
++
++function artifactStarted(record) {
++  return ['report', 'closure', 'handoff'].some((field) => record[field].pending !== null || record[field].commit !== null);
++}
++
++function needsFinalizationReconcile(record) {
++  if (Object.hasOwn(record.evidence, 'finalization')) {
++    return artifactStarted(record) && (!record.evidence.finalization
++      || ['report', 'closure', 'handoff'].some((field) => {
++        const stage = record[field];
++        return (stage.pending && !HASH.test(stage.pending.finalization_identity || ''))
++          || (stage.proof && !HASH.test(stage.proof.finalization_identity || ''));
++      }));
++  }
++  return record.evidence.finalized || artifactStarted(record);
++}
++
++function finalizationIdentity(value) {
++  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
++  const { identity, ...body } = value;
++  return sha256(canonical(body));
++}
++
++function receiptByIdentity(values, identity, label) {
++  if (!HASH.test(identity || '')) fail(`legacy finalization ${label} identity is missing`);
++  const matches = values.filter(Boolean).filter((item) => item.identity === identity && hasReceiptIdentity(item));
++  const unique = [...new Map(matches.map((item) => [canonical(item), item])).values()];
++  if (unique.length !== 1) fail(`legacy finalization ${label} receipt is ${unique.length ? 'ambiguous' : 'missing'}`);
++  return unique[0];
++}
++
++function gateReceiptPool(record) {
++  return [...record.evidence.gates, ...record.evidence.gate_history];
++}
++
++function reviewReceiptPool(record) {
++  return [record.evidence.review, ...record.evidence.review_history, record.source.review];
++}
++
++function verificationReceiptPool(record) {
++  return [record.evidence.verification, ...record.evidence.verification_history, record.source.verification];
++}
++
++function validateFinalizationReceipts(record, gateIdentities, reviewIdentity, verificationIdentity) {
++  const declared = Object.entries(record.source.packet.commands).sort(([left], [right]) => left.localeCompare(right));
++  if (!Array.isArray(gateIdentities) || gateIdentities.length !== declared.length) {
++    fail('legacy finalization gate identities do not cover the declared gates exactly');
++  }
++  const gates = declared.map(([name, command], index) => {
++    const gate = receiptByIdentity(gateReceiptPool(record), gateIdentities[index], `gate ${name}`);
++    if (gate.name !== name || gate.command !== command || gate.status !== 'PASS'
++      || gate.snapshot_hash !== record.evidence.snapshot_hash || gate.integration_commit !== record.integration.commit
++      || gate.cwd !== '.' || gate.environment_additions_hash !== sha256(canonical({}))
++      || !HASH.test(gate.environment_hash || '')) fail(`frozen integration gate is missing or failed: ${name}`);
++    validateInternalLog(record, gate);
++    return gate;
++  });
++  const review = receiptByIdentity(reviewReceiptPool(record), reviewIdentity, 'review');
++  const verification = receiptByIdentity(verificationReceiptPool(record), verificationIdentity, 'verification');
++  const reviewSnapshot = review.identity === record.source.review.identity ? record.source.snapshot_hash : record.evidence.snapshot_hash;
++  const verificationSnapshot = verification.identity === record.source.verification.identity ? record.source.snapshot_hash : record.evidence.snapshot_hash;
++  if (review.status !== 'PASS' || review.snapshot_hash !== reviewSnapshot
++    || review.findings.some((item) => !item.resolved && item.severity !== 'minor')) {
++    fail('frozen integration review is missing or has unresolved findings');
++  }
++  if (verification.snapshot_hash !== verificationSnapshot || verification.criteria.some((item) => item.status !== 'PASS')) {
++    fail('frozen integration verification is incomplete');
++  }
++  const reviewers = new Set([review.reviewer, ...(review.panel?.members || []).map((item) => item.reviewer)]);
++  if (verification.verifier === record.source.builder || reviewers.has(verification.verifier)) {
++    fail('frozen integration verifier is not distinct from builder and reviewers');
++  }
++  return { gates, review, verification };
++}
++
++function buildFinalization(record, gates, review, verification) {
++  const body = {
++    version: 'integration-finalization-v1',
++    integration_commit: record.integration.commit,
++    integration_tree: record.integration.tree,
++    snapshot_hash: record.evidence.snapshot_hash,
++    manifest_hash: record.manifest.hash,
++    gates: gates.map((gate) => ({
++      name: gate.name,
++      command: gate.command,
++      identity: gate.identity,
++      log_path: gate.log_path,
++      log_hash: gate.log_hash,
++      environment_hash: gate.environment_hash,
++    })),
++    review_identity: review.identity,
++    verification_identity: verification.identity,
++    reporting: record.reporting,
++    reporting_requested: record.reporting_requested,
++  };
++  return { ...body, identity: sha256(canonical(body)) };
++}
++
++function resolveFinalization(record, finalization = record.evidence.finalization) {
++  if (!finalization || finalization.version !== 'integration-finalization-v1'
++    || finalization.identity !== finalizationIdentity(finalization)
++    || finalization.integration_commit !== record.integration.commit
++    || finalization.integration_tree !== record.integration.tree
++    || finalization.snapshot_hash !== record.evidence.snapshot_hash
++    || finalization.manifest_hash !== record.manifest.hash
++    || finalization.reporting !== record.reporting
++    || finalization.reporting_requested !== record.reporting_requested) {
++    fail('integration evidence finalization identity is missing or stale');
++  }
++  const resolved = validateFinalizationReceipts(record, finalization.gates.map((item) => item.identity),
++    finalization.review_identity, finalization.verification_identity);
++  const rebuilt = buildFinalization(record, resolved.gates, resolved.review, resolved.verification);
++  if (canonical(rebuilt) !== canonical(finalization)) fail('integration evidence finalization provenance is inconsistent');
++  return { ...resolved, finalization };
++}
++
++function finalizedRecordView(record, resolved) {
++  const view = structuredClone(record);
++  view.evidence.gates = structuredClone(resolved.gates);
++  view.evidence.review = resolved.review.identity === record.source.review.identity ? null : structuredClone(resolved.review);
++  view.evidence.verification = resolved.verification.identity === record.source.verification.identity ? null : structuredClone(resolved.verification);
++  view.evidence.finalized = true;
++  view.evidence.effective_review_identity = resolved.review.identity;
++  view.evidence.effective_verification_identity = resolved.verification.identity;
++  return view;
++}
++
++function assertEvidenceMutable(record) {
++  if (artifactStarted(record)) fail('integration evidence is frozen by an artifact preparation or commit');
++}
++
++function legacyFinalizationCandidates(record) {
++  const descriptors = [];
++  if (record.evidence.finalized) {
++    descriptors.push({
++      at: record.evidence.finalized_at,
++      gateIdentities: Object.entries(record.source.packet.commands).sort(([left], [right]) => left.localeCompare(right))
++        .map(([name, command]) => record.evidence.gates.find((item) => item.name === name && item.command === command)?.identity),
++      reviewIdentity: record.evidence.effective_review_identity,
++      verificationIdentity: record.evidence.effective_verification_identity,
++    });
++  }
++  for (const entry of record.evidence.finalization_history) {
++    descriptors.push(entry.finalization
++      ? { at: entry.finalized_at || entry.at, finalization: entry.finalization }
++      : { at: entry.finalized_at || entry.at, gateIdentities: entry.gates,
++        reviewIdentity: entry.review_identity, verificationIdentity: entry.verification_identity });
++  }
++  const candidates = new Map();
++  const errors = [];
++  for (const descriptor of descriptors) {
++    try {
++      const finalization = descriptor.finalization
++        ? resolveFinalization(record, descriptor.finalization).finalization
++        : (() => {
++          const resolved = validateFinalizationReceipts(record, descriptor.gateIdentities,
++            descriptor.reviewIdentity, descriptor.verificationIdentity);
++          return buildFinalization(record, resolved.gates, resolved.review, resolved.verification);
++        })();
++      validateIntegrationProofs(record, { legacyFinalization: finalization });
++      candidates.set(finalization.identity, { finalization, at: descriptor.at });
++    } catch (error) {
++      errors.push(error.message);
++    }
++  }
++  if (candidates.size === 0) {
++    fail(`LEGACY_FINALIZATION_MISSING: retained evidence does not uniquely prove a valid finalization${errors[0] ? ` (${errors[0]})` : ''}`);
++  }
++  if (candidates.size !== 1) {
++    fail('LEGACY_FINALIZATION_AMBIGUOUS: retained evidence proves more than one artifact-compatible finalization');
++  }
++  return [...candidates.values()][0];
++}
++
++export function reconcileIntegrationEvidence(recordArg, { expectedRecordHash } = {}, cwd = process.cwd()) {
++  const loaded = readIntegrationRecord(recordArg, cwd);
++  if (!HASH.test(expectedRecordHash || '') || loaded.hash !== expectedRecordHash) fail('integration record hash is missing or stale');
++  if (!needsFinalizationReconcile(loaded.record)) fail('integration record does not require legacy finalization reconciliation');
++  const lock = `${loaded.file}.lock`;
++  let fd;
++  try { fd = fs.openSync(lock, 'wx', 0o600); } catch (error) {
++    if (error.code === 'EEXIST') fail('integration record is locked');
++    throw error;
++  }
++  try {
++    const current = readIntegrationRecord(loaded.file);
++    if (current.hash !== expectedRecordHash) fail('integration record changed concurrently');
++    assertRecordSource(current.record);
++    const selected = legacyFinalizationCandidates(current.record);
++    const before = structuredClone(current.record);
++    current.record.evidence.finalization = selected.finalization;
++    current.record.evidence.finalized = true;
++    current.record.evidence.finalized_at = selected.at || now();
++    current.record.evidence.effective_review_identity = selected.finalization.review_identity;
++    current.record.evidence.effective_verification_identity = selected.finalization.verification_identity;
++    current.record.evidence.reconciliation_history ||= [];
++    current.record.evidence.reconciliation_history.push({ at: now(), before_hash: recordHash(before), before });
++    for (const field of ['report', 'closure', 'handoff']) {
++      for (const proof of [current.record[field].pending, current.record[field].proof].filter(Boolean)) {
++        proof.finalization_identity = selected.finalization.identity;
++      }
++    }
++    current.record.revision += 1;
++    current.record.updated_at = now();
++    validateRecord(current.record);
++    validateIntegrationProofs(current.record);
++    const after = json(current.record);
++    if (Buffer.byteLength(after) > MAX_RECORD_BYTES) fail('LEGACY_FINALIZATION_TOO_LARGE: archived before-image would exceed the bounded integration record size');
++    atomic(current.file, after);
++    return { file: current.file, record: current.record, hash: recordHash(current.record),
++      result: { finalization: selected.finalization.identity, before_hash: recordHash(before) } };
++  } finally {
++    fs.closeSync(fd);
++    try { fs.unlinkSync(lock); } catch {}
++  }
++}
++
++function assertSourceRun(state) {
++  if (state.phase !== 'finished' || state.pm_binding?.format !== 'current' || !state.completion_snapshot) {
++    fail('local integration requires a finished current-bound source run');
++  }
++  assertCurrentBinding(state);
++  if (state.review?.status !== 'PASS' || state.review.findings.some((item) => !item.resolved && item.severity !== 'minor')
++    || state.verification?.criteria.some((item) => item.status !== 'PASS')) fail('source C lacks complete independent evidence');
++  if (state.verification.verifier === state.task.builder || state.verification.verifier === state.review.reviewer) {
++    fail('current source verifier must differ from builder and reviewer');
++  }
++  if (state.git_anchor?.head !== state.commit_adoption?.history?.at(-1)?.commit) fail('source C is not the final adopted candidate');
++}
++
++function assertRecordSource(record) {
++  const loaded = readRun(record.source.run_path);
++  const state = loaded.state;
++  assertSourceRun(state);
++  if (state.run_id !== record.source.run_id || state.project_root !== record.source.root
++    || state.pm_binding.story !== record.source.story || state.pm_binding.story_path !== record.source.story_path
++    || state.pm_binding.contract_hash !== record.source.contract_hash || state.pm_binding.execution_hash !== record.source.execution_hash
++    || state.pm_binding.actor !== record.source.actor || state.pm_binding.branch !== record.source.branch
++    || state.git_anchor.head !== record.source.candidate || tree(state.project_root, record.source.candidate) !== record.source.tree
++    || state.completion_snapshot.hash !== record.source.snapshot_hash
++    || canonical(state.task.packet) !== canonical(record.source.packet)
++    || canonical(state.counters) !== canonical(record.source.counters)
++    || record.source.review.identity !== receiptIdentity(state.review)
++    || record.source.verification.identity !== receiptIdentity(state.verification)
++    || canonical(record.source.gates) !== canonical(state.gates.map((item) => ({ ...item, identity: receiptIdentity(item) })))) {
++    fail('integration record no longer matches immutable source C');
++  }
++  const policy = readPlanPolicy(state.project_root);
++  if ((policy?.scale || 'standard') !== record.plan.scale || policy?.integrationBranch !== record.plan.integration_branch
++    || state.pm_binding.plan_digest !== record.plan.approval_digest
++    || record.destination.branch !== record.plan.integration_branch
++    || commonRepository(state.project_root) !== record.destination.common_repository) {
++    fail('integration record no longer matches the approved plan or repository');
++  }
++  if (head(state.project_root) !== record.source.candidate || branch(state.project_root) !== record.source.branch) fail('finished source checkout no longer remains at C');
++  const manifest = boundManifest(state.project_root, record.source.candidate, state.task.packet,
++    state.pm_binding.story_path, sourceBindings(state));
++  const normalizedSource = normalizeSnapshotGitlinks(state.project_root, manifest, state.completion_snapshot.entries, { strict: false });
++  const sourceSnapshotManifest = snapshotManifest(manifest, normalizedSource);
++  if (canonical(manifest) !== canonical(record.source.manifest)
++    || canonical(sourceSnapshotManifest) !== canonical(record.source.snapshot_manifest)) {
++    fail('integration record no longer matches immutable source manifests');
++  }
++  if (record.integration.status === 'failed') {
++    if (!hasReceiptIdentity(record.integration.failure)) fail('failed merge probe identity is invalid');
++    validateInternalLog(record, record.integration.failure);
++  }
++  return state;
++}
++
++export function prepareLocalIntegration(runArg, { integrationRoot = process.cwd(), verificationReport = false } = {}, cwd = process.cwd()) {
++  const loaded = readRun(runArg, cwd);
++  const state = loaded.state;
++  assertSourceRun(state);
++  const sourceRoot = rootPath(state.project_root);
++  integrationRoot = rootPath(integrationRoot);
++  if (commonRepository(sourceRoot) !== commonRepository(integrationRoot)) fail('source and integration checkouts are not in the same repository');
++  const policy = readPlanPolicy(sourceRoot);
++  const scale = policy?.scale || 'standard';
++  const integrationBranch = policy?.integrationBranch;
++  if (!integrationBranch || branch(integrationRoot) !== integrationBranch) fail('check out the approved integration branch before preparing a merge');
++  assertClean(integrationRoot);
++  assertOrdinaryIndex(integrationRoot);
++  const base = head(integrationRoot);
++  const baseAnchor = captureGitAnchor(integrationRoot);
++  const baseCheckoutProof = buildCheckoutProof(integrationRoot, base, baseAnchor);
++  verifyCheckoutProof(integrationRoot, base, baseCheckoutProof, baseAnchor);
++  if (branch(sourceRoot) !== state.pm_binding.branch || head(sourceRoot) !== state.git_anchor.head) fail('source checkout no longer identifies candidate C');
++  const candidate = state.git_anchor.head;
++  try {
++    execFileSync('git', ['-C', integrationRoot, 'merge-base', '--is-ancestor', candidate, base], { stdio: 'ignore' });
++    fail('candidate C is already an ancestor of the integration branch');
++  } catch (error) { if (error instanceof DeliverError) throw error; }
++  const sourceManifest = boundManifest(sourceRoot, candidate, state.task.packet, state.pm_binding.story_path, sourceBindings(state));
++  const normalizedSource = normalizeSnapshotGitlinks(sourceRoot, sourceManifest, state.completion_snapshot.entries, { strict: false });
++  const sourceSnapshotManifest = snapshotManifest(sourceManifest, normalizedSource);
++  const sourceMismatches = manifestMismatches(sourceManifest, sourceSnapshotManifest);
++  const governance = new Set([state.pm_binding.story_path, 'docs/plan.md', 'docs/approval.json']);
++  const governanceDrift = sourceMismatches.filter((rel) => governance.has(rel));
++  if (governanceDrift.length) fail(`approved story or plan bytes differ from candidate C: ${governanceDrift.join(', ')}`);
++  const reportingRequested = scale === 'standard' && verificationReport === true;
++  const reporting = expectedReporting(scale, reportingRequested);
++  const id = state.run_id;
++  const file = recordPath(integrationRoot, id, { create: true });
++  if (fs.existsSync(file)) {
++    const existing = readIntegrationRecord(file);
++    assertRecordSource(existing.record);
++    validateIntegrationProofs(existing.record);
++    if (existing.record.source.run_id !== state.run_id || existing.record.source.candidate !== candidate
++      || existing.record.destination.root !== integrationRoot || existing.record.reporting !== reporting
++      || existing.record.reporting_requested !== reportingRequested) {
++      fail('existing integration preparation does not match this source run or reporting contract');
++    }
++    if (existing.record.integration.status === 'prepared') {
++      if (head(integrationRoot) !== existing.record.integration.base) fail('prepared integration base is no longer current');
++      verifyCheckoutProof(integrationRoot, existing.record.integration.base, existing.record.integration.base_checkout_proof);
++      if (expectedMergeTree(integrationRoot, base, candidate) !== existing.record.integration.expected_tree) fail('prepared clean merge tree changed');
++    }
++    return { file, record: existing.record, hash: existing.hash, resumed: true };
++  }
++  const probe = probeMergeTree(integrationRoot, base, candidate);
++  const mergedManifest = probe.ok
++    ? boundManifest(integrationRoot, probe.tree, state.task.packet, state.pm_binding.story_path, sourceManifest.bindings)
++    : null;
++  const checkoutProof = probe.ok ? buildCheckoutProof(integrationRoot, probe.tree) : null;
++  const mergeGovernanceDrift = mergedManifest ? manifestMismatches(sourceManifest, mergedManifest).filter((rel) => governance.has(rel)) : [];
++  if (mergeGovernanceDrift.length) fail(`clean composition changes approved story or plan bytes: ${mergeGovernanceDrift.join(', ')}`);
++  const review = { ...structuredClone(state.review), identity: receiptIdentity(state.review) };
++  const verification = { ...structuredClone(state.verification), identity: receiptIdentity(state.verification) };
++  let failure = null;
++  if (!probe.ok) {
++    const logDir = internalDirectory(integrationRoot, ['logs', `integration-${id}`]);
++    const logFile = path.join(logDir, `merge-tree-${randomUUID()}.log`);
++    fs.writeFileSync(logFile, probe.log, { flag: 'wx', mode: 0o600 });
++    failure = { ...probe.attempt, log_path: path.relative(integrationRoot, logFile).split(path.sep).join('/'), log_hash: sha256(probe.log) };
++    failure.identity = receiptIdentity(failure);
++  }
++  const sourceReusable = Boolean(mergedManifest) && sourceMismatches.length === 0
++    && manifestMismatches(sourceManifest, mergedManifest).length === 0;
++  const record = {
++    schema_version: 1,
++    kind: 'local-integration-v1',
++    id,
++    revision: 0,
++    created_at: now(),
++    updated_at: now(),
++    source: {
++      run_id: state.run_id, run_path: loaded.file, root: sourceRoot, story: state.pm_binding.story,
++      story_path: state.pm_binding.story_path, contract_hash: state.pm_binding.contract_hash,
++      execution_hash: state.pm_binding.execution_hash, candidate, tree: tree(sourceRoot, candidate),
++      snapshot_hash: state.completion_snapshot.hash, builder: state.task.builder,
++      actor: state.pm_binding.actor, branch: state.pm_binding.branch,
++      packet: structuredClone(state.task.packet), counters: structuredClone(state.counters),
++      review, verification, gates: state.gates.map((item) => ({ ...structuredClone(item), identity: receiptIdentity(item) })),
++      manifest: sourceManifest, snapshot_manifest: sourceSnapshotManifest,
++    },
++    plan: { scale, integration_branch: integrationBranch, approval_digest: state.pm_binding.plan_digest },
++    destination: { root: integrationRoot, common_repository: commonRepository(integrationRoot), branch: integrationBranch },
++    integration: {
++      status: probe.ok ? 'prepared' : 'failed', token: probe.ok ? randomUUID() : null, base, candidate,
++      base_anchor: baseAnchor, base_checkout_proof: baseCheckoutProof, expected_tree: probe.tree,
++      manifest: mergedManifest, checkout_proof: checkoutProof, failure,
++      commit: null, tree: null, anchor: null, executable_snapshot_hash: null, adopted_at: null,
++    },
++    manifest: mergedManifest,
++    reporting,
++    reporting_requested: reportingRequested,
++    preparation: { identity: null },
++    evidence: {
++      source_reusable: sourceReusable,
++      reuse_mismatches: [...new Set([...sourceMismatches, ...(mergedManifest ? manifestMismatches(sourceManifest, mergedManifest) : [])])].sort(),
++      snapshot_hash: null, gates: [], gate_history: [], review: null, review_history: [], verification: null,
++      verification_history: [], finalization_history: [], finalized: false, finalized_at: null,
++      effective_review_identity: null, effective_verification_identity: null,
++      finalization: null, reconciliation_history: [],
++    },
++    report: { pending: null, commit: null, proof: null },
++    closure: { pending: null, commit: null, proof: null, execution_hash: null },
++    handoff: { pending: null, commit: null, proof: null, path: `docs/handoff/${state.pm_binding.actor}.md` },
++  };
++  record.preparation.identity = preparationIdentity(record);
++  atomic(file, json(record));
++  return { file, record, hash: recordHash(record), resumed: false };
++}
++
++function assertIntegrationHead(record, { requireCommit = true } = {}) {
++  const root = rootPath(record.destination.root);
++  if (commonRepository(root) !== record.destination.common_repository || branch(root) !== record.destination.branch) fail('integration checkout identity or branch changed');
++  if (requireCommit && head(root) !== record.integration.commit) fail('integration checkout is not at recorded M');
++  assertClean(root);
++  return root;
++}
++
++function destinationRoot(record) {
++  const root = rootPath(record.destination.root);
++  if (commonRepository(root) !== record.destination.common_repository || branch(root) !== record.destination.branch) {
++    fail('integration checkout identity or branch changed');
++  }
++  return root;
++}
++
++export function adoptLocalIntegration(recordArg, { expectedRecordHash, token, commit } = {}, cwd = process.cwd()) {
++  return withRecord(recordArg, expectedRecordHash, (record) => {
++    if (record.integration.status !== 'prepared' || token !== record.integration.token || !OID.test(commit || '')) fail('merge adoption token or commit is invalid');
++    const root = rootPath(record.destination.root);
++    if (branch(root) !== record.destination.branch || head(root) !== commit) fail('integration checkout is not at the supplied merge commit');
++    const parents = String(git(root, ['rev-list', '--parents', '-n', '1', commit])).trim().split(/\s+/);
++    if (parents.length !== 3 || parents[1] !== record.integration.base || parents[2] !== record.source.candidate) {
++      fail('local integration must be the prepared no-ff merge of I and C');
++    }
++    if (expectedMergeTree(root, record.integration.base, record.source.candidate) !== record.integration.expected_tree) {
++      fail('prepared clean merge proof no longer matches I and C');
++    }
++    if (tree(root, commit) !== record.integration.expected_tree) fail('actual merge tree differs from the prepared clean composition');
++    const manifest = boundManifest(root, commit, record.source.packet, record.source.story_path, record.integration.manifest.bindings);
++    if (canonical(manifest) !== canonical(record.integration.manifest)) fail('actual M manifest differs from its prepared composition');
++    const proof = executableProof(root, manifest, commit, record.integration.checkout_proof);
++    if (canonical(protectedShape(proof.anchor)) !== canonical(protectedShape(record.integration.base_anchor))) {
++      fail('protected Git metadata changed between integration preparation and adoption');
++    }
++    record.integration.status = 'adopted';
++    record.integration.commit = commit;
++    record.integration.tree = tree(root, commit);
++    record.integration.anchor = proof.anchor;
++    record.integration.executable_snapshot_hash = proof.snapshot_hash;
++    record.integration.adopted_at = now();
++    record.manifest = record.integration.manifest;
++    record.evidence.snapshot_hash = integrationIdentity(record);
++    return record.integration;
++  }, cwd);
++}
++
++function recheckM(record) {
++  if (record.integration.status !== 'adopted') fail('actual integration M has not been adopted');
++  const root = assertIntegrationHead(record);
++  if (tree(root) !== record.integration.tree) fail('integration tree changed after adoption');
++  const parents = String(git(root, ['rev-list', '--parents', '-n', '1', record.integration.commit])).trim().split(/\s+/);
++  if (parents.length !== 3 || parents[1] !== record.integration.base || parents[2] !== record.source.candidate
++    || expectedMergeTree(root, record.integration.base, record.source.candidate) !== record.integration.expected_tree
++    || record.integration.tree !== record.integration.expected_tree) fail('recorded M is no longer the exact clean I plus C composition');
++  const manifest = boundManifest(root, record.integration.commit, record.source.packet, record.source.story_path,
++    record.integration.manifest.bindings);
++  if (canonical(manifest) !== canonical(record.integration.manifest)) fail('integration manifest changed after adoption');
++  if (integrationIdentity(record) !== record.evidence.snapshot_hash) fail('integration evidence snapshot identity is invalid');
++  return root;
++}
++
++function assertExecutableM(record) {
++  const root = recheckM(record);
++  const proof = executableProof(root, record.integration.manifest, record.integration.commit, record.integration.checkout_proof);
++  if (canonical(proof.anchor) !== canonical(record.integration.anchor)
++    || proof.snapshot_hash !== record.integration.executable_snapshot_hash) {
++    fail('integration executable checkout or protected metadata differs from adopted M');
++  }
++  return root;
++}
++
++function invalidateFinalization(record, reason) {
++  if (!record.evidence.finalized) return;
++  record.evidence.finalization_history.push({
++    at: now(), reason, finalized_at: record.evidence.finalized_at,
++    snapshot_hash: record.evidence.snapshot_hash,
++    review_identity: record.evidence.effective_review_identity,
++    verification_identity: record.evidence.effective_verification_identity,
++    gates: record.evidence.gates.map((item) => item.identity),
++    ...(record.evidence.finalization ? { finalization: structuredClone(record.evidence.finalization) } : {}),
++  });
++  record.evidence.finalized = false;
++  record.evidence.finalized_at = null;
++  record.evidence.effective_review_identity = null;
++  record.evidence.effective_verification_identity = null;
++  record.evidence.finalization = null;
++}
++
++function validateInternalLog(record, receipt) {
++  const rel = receipt?.log_path;
++  const directory = `.deliver/logs/integration-${record.id}`;
++  if (typeof rel !== 'string' || path.posix.dirname(rel) !== directory
++    || !/^[A-Za-z0-9][A-Za-z0-9._-]{0,200}\.log$/.test(path.posix.basename(rel)) || !HASH.test(receipt.log_hash || '')) {
++    fail('integration evidence log path or hash is invalid');
++  }
++  const root = rootPath(record.destination.root);
++  const file = path.join(root, ...rel.split('/'));
++  let stat;
++  try { stat = fs.lstatSync(file); } catch (error) { fail(`integration evidence log is unreadable: ${error.message}`); }
++  if (!stat.isFile() || stat.isSymbolicLink() || stat.size > 4 * 1024 * 1024
++    || fs.realpathSync.native(file) !== file) fail('integration evidence log must be a bounded canonical regular file');
++  const bytes = fs.readFileSync(file);
++  if (sha256(bytes) !== receipt.log_hash) fail('integration evidence log bytes changed');
++}
++
++export function runIntegrationGate(recordArg, { expectedRecordHash, name } = {}, cwd = process.cwd()) {
++  return withRecord(recordArg, expectedRecordHash, (record) => {
++    assertEvidenceMutable(record);
++    const command = record.source.packet.commands?.[name];
++    if (typeof command !== 'string') fail('integration gate name is not declared by the source task');
++    const root = assertExecutableM(record);
++    const logDir = internalDirectory(root, ['logs', `integration-${record.id}`]);
++    const log = path.join(logDir, `${name}-${randomUUID()}.log`);
++    const started = now();
++    const result = spawnSync(command, { cwd: root, shell: true, encoding: 'utf8', timeout: 10 * 60 * 1000, maxBuffer: 1024 * 1024, windowsHide: true });
++    let stable = true;
++    let proofError = null;
++    try { assertExecutableM(record); } catch (error) { stable = false; proofError = error.message; }
++    const environmentAdditionsHash = sha256(canonical({}));
++    const receipt = {
++      provenance: 'deliver-integration-gate-v1', name, command, integration_commit: record.integration.commit,
++      snapshot_hash: record.evidence.snapshot_hash, status: result.status === 0 && !result.error && stable ? 'PASS' : 'FAIL',
++      cwd: '.', environment_keys: [], environment_additions_hash: environmentAdditionsHash,
++      environment_hash: environmentHandle(root, environmentAdditionsHash),
++      exit_code: result.status, signal: result.signal || null, error: result.error?.message || proofError,
++      started_at: started, finished_at: now(),
++      output: { stdout_bytes: Buffer.byteLength(result.stdout || ''), stderr_bytes: Buffer.byteLength(result.stderr || '') },
++    };
++    const logText = `command: ${command}\nstarted: ${started}\nexit: ${result.status}\n\n[stdout]\n${result.stdout || ''}\n[stderr]\n${result.stderr || ''}`;
++    fs.writeFileSync(log, logText, { flag: 'wx', mode: 0o600 });
++    receipt.log_path = path.relative(root, log).split(path.sep).join('/');
++    receipt.log_hash = sha256(logText);
++    receipt.identity = receiptIdentity(receipt);
++    invalidateFinalization(record, `gate ${name} changed`);
++    const previous = record.evidence.gates.find((item) => item.name === name);
++    if (previous) record.evidence.gate_history.push(previous);
++    record.evidence.gates = record.evidence.gates.filter((item) => item.name !== name);
++    record.evidence.gates.push(receipt);
++    return receipt;
++  }, cwd);
++}
++
++export function recordIntegrationReview(recordArg, { expectedRecordHash, reviewer, receipt } = {}, cwd = process.cwd()) {
++  return withRecord(recordArg, expectedRecordHash, (record) => {
++    assertEvidenceMutable(record);
++    assertExecutableM(record);
++    validateGateReceipts(record);
++    if (!/^[A-Za-z0-9][A-Za-z0-9._@-]{0,127}$/.test(reviewer || '') || reviewer === record.source.builder) fail('integration reviewer must be explicit and differ from the builder');
++    const parsed = parseReviewReceipt(receipt, { expectedSnapshot: record.evidence.snapshot_hash });
++    if (parsed.panel?.members.some((member) => member.reviewer === record.source.builder)) fail('review panel members must differ from the builder');
++    const value = { ...parsed, reviewer, snapshot_hash: record.evidence.snapshot_hash, recorded_at: now() };
++    value.identity = receiptIdentity(value);
++    invalidateFinalization(record, 'integration review changed');
++    if (record.evidence.review) record.evidence.review_history.push(record.evidence.review);
++    record.evidence.review = value;
++    return value;
++  }, cwd);
++}
++
++export function recordIntegrationVerification(recordArg, { expectedRecordHash, verifier, results } = {}, cwd = process.cwd()) {
++  return withRecord(recordArg, expectedRecordHash, (record) => {
++    assertEvidenceMutable(record);
++    assertExecutableM(record);
++    validateGateReceipts(record);
++    const review = record.evidence.review || record.source.review;
++    const reviewers = new Set([review.reviewer, ...(review.panel?.members || []).map((item) => item.reviewer)]);
++    if (!/^[A-Za-z0-9][A-Za-z0-9._@-]{0,127}$/.test(verifier || '') || verifier === record.source.builder || reviewers.has(verifier)) {
++      fail('integration verifier must differ from builder and every reviewer');
++    }
++    const criteria = parseVerificationResults(results, record.source.packet.acceptance);
++    const value = { verifier, criteria, snapshot_hash: record.evidence.snapshot_hash, recorded_at: now() };
++    value.identity = receiptIdentity(value);
++    invalidateFinalization(record, 'integration verification changed');
++    if (record.evidence.verification) record.evidence.verification_history.push(record.evidence.verification);
++    record.evidence.verification = value;
++    return value;
++  }, cwd);
++}
++
++function effectiveEvidence(record) {
++  if (!record.evidence.source_reusable && (!record.evidence.review || !record.evidence.verification)) {
++    fail('changed integration inputs require fresh independent M review and verification');
++  }
++  const review = record.evidence.review || record.source.review;
++  const verification = record.evidence.verification || record.source.verification;
++  return { review, verification };
++}
++
++function validateGateReceipts(record) {
++  for (const gate of [...record.evidence.gates, ...record.evidence.gate_history]) {
++    if (!hasReceiptIdentity(gate)) fail('integration gate receipt identity is invalid');
++    validateInternalLog(record, gate);
++  }
++}
++
++function assertEvidenceReady(record, { finalized = false } = {}) {
++  if (finalized) {
++    const resolved = resolveFinalization(record);
++    return { ...resolved, view: finalizedRecordView(record, resolved) };
++  }
++  validateGateReceipts(record);
++  for (const [name, command] of Object.entries(record.source.packet.commands)) {
++    const gate = record.evidence.gates.find((item) => item.name === name && item.command === command);
++    if (!gate || !hasReceiptIdentity(gate) || gate.status !== 'PASS' || gate.snapshot_hash !== record.evidence.snapshot_hash
++      || gate.integration_commit !== record.integration.commit || gate.cwd !== '.'
++      || gate.environment_additions_hash !== sha256(canonical({}))
++      || !HASH.test(gate.environment_hash || '')) {
++      fail(`fresh integration gate is missing or failed: ${name}`);
++    }
++  }
++  const { review, verification } = effectiveEvidence(record);
++  const reviewSnapshot = record.evidence.review ? record.evidence.snapshot_hash : record.source.snapshot_hash;
++  const verificationSnapshot = record.evidence.verification ? record.evidence.snapshot_hash : record.source.snapshot_hash;
++  if (!review || !hasReceiptIdentity(review) || review.status !== 'PASS'
++    || review.snapshot_hash !== reviewSnapshot
++    || review.findings.some((item) => !item.resolved && item.severity !== 'minor')) {
++    fail('integration has unresolved review findings');
++  }
++  if (!verification || !hasReceiptIdentity(verification) || verification.snapshot_hash !== verificationSnapshot
++    || verification.criteria.some((item) => item.status !== 'PASS')) {
++    fail('integration acceptance verification is incomplete');
++  }
++  const reviewers = new Set([review.reviewer, ...(review.panel?.members || []).map((item) => item.reviewer)]);
++  if (verification.verifier === record.source.builder || reviewers.has(verification.verifier)) {
++    fail('integration verifier is not distinct from builder and reviewers');
++  }
++  return { review, verification };
++}
++
++export function finalizeIntegrationEvidence(recordArg, { expectedRecordHash } = {}, cwd = process.cwd()) {
++  return withRecord(recordArg, expectedRecordHash, (record) => {
++    const { review, verification } = assertEvidenceReady(record);
++    const gates = Object.entries(record.source.packet.commands).sort(([left], [right]) => left.localeCompare(right))
++      .map(([name, command]) => record.evidence.gates.find((item) => item.name === name && item.command === command));
++    const finalization = buildFinalization(record, gates, review, verification);
++    const value = { snapshot_hash: record.evidence.snapshot_hash, review: review.identity,
++      verification: verification.identity, finalization: finalization.identity };
++    if (record.evidence.finalized && canonical(record.evidence.finalization) === canonical(finalization)) {
++      return { [NO_MUTATION]: true, value };
++    }
++    assertEvidenceMutable(record);
++    assertExecutableM(record);
++    record.evidence.finalized = true;
++    record.evidence.finalized_at = now();
++    record.evidence.effective_review_identity = review.identity;
++    record.evidence.effective_verification_identity = verification.identity;
++    record.evidence.finalization = finalization;
++    return value;
++  }, cwd);
++}
++
++function safeTrackedPath(rel) {
++  if (typeof rel !== 'string' || path.isAbsolute(rel) || /[\x00-\x1f\x7f]/.test(rel)
++    || rel.split('/').some((item) => !item || item === '.' || item === '..')
++    || !/^(?:docs\/verification\/S\d+-\d+\.md|docs\/checklists\/verification-S\d+-\d+\.md|docs\/stories\/S\d+-\d+-[^/]+\.md|docs\/handoff\/[a-z0-9-]+\.md)$/.test(rel)) {
++    fail(`unsafe integration artifact path: ${rel}`);
++  }
++  return rel;
++}
++
++function artifactFile(root, rel) {
++  safeTrackedPath(rel);
++  let cursor = root;
++  for (const part of rel.split('/')) {
++    cursor = path.join(cursor, part);
++    try { if (fs.lstatSync(cursor).isSymbolicLink()) fail(`integration artifact path is a symlink: ${rel}`); }
++    catch (error) { if (error.code !== 'ENOENT') throw error; }
++  }
++  return path.join(root, rel);
++}
++
++function readArtifact(root, rel) {
++  const file = artifactFile(root, rel);
++  try {
++    const stat = fs.lstatSync(file);
++    if (!stat.isFile() || stat.isSymbolicLink() || stat.size > 8 * 1024 * 1024) fail(`invalid integration artifact: ${rel}`);
++    return fs.readFileSync(file, 'utf8');
++  } catch (error) { if (error.code === 'ENOENT') return null; throw error; }
++}
++
++function writeArtifact(root, rel, content) {
++  const file = artifactFile(root, rel);
++  fs.mkdirSync(path.dirname(file), { recursive: true });
++  atomic(file, content);
++}
++
++function applyPending(root, pending) {
++  for (const write of pending.writes) {
++    const current = readArtifact(root, write.path);
++    if (current !== write.before && current !== write.after) fail(`integration artifact changed concurrently: ${write.path}`);
++  }
++  for (const write of pending.writes) if (readArtifact(root, write.path) !== write.after) writeArtifact(root, write.path, write.after);
++}
++
++function handoffFinding(value) {
++  return String(value).replace(/[\x00-\x1f\x7f]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 1000);
++}
++
++function openFindingLines(record, review = effectiveEvidence(record).review) {
++  const reviews = [{ label: 'source C', value: record.source.review }];
++  if (review.identity !== record.source.review.identity) reviews.push({ label: 'effective M', value: review });
++  const findings = reviews.flatMap(({ label, value }) => value.findings
++    .filter((item) => !item.resolved).map((item) => ({ ...item, evidence_label: label, evidence_reviewer: value.reviewer })));
++  if (!findings.length) return ['OPEN_FINDINGS: none'];
++  return ['OPEN_FINDINGS:', ...findings.map((item) => `- [${item.severity}] ${item.evidence_label} · ${handoffFinding(item.lens || 'general')} / ${handoffFinding(item.reviewer || item.evidence_reviewer || 'unknown')}: ${handoffFinding(item.message)}`)];
++}
++
++function handoffContent(record, at, next, review) {
++  return [
++    `# HANDOFF ${at}`,
++    '',
++    `OBJECTIVE: ${record.source.story} completed`,
++    `APPROVAL: approved · SCALE: ${record.plan.scale}`,
++    `POSITION: story ${record.source.story} · status merged · rounds ${record.source.counters.fixes}/3 · retries ${record.source.counters.retries}/2 · verification: PASS`,
++    '',
++    `BASE_COMMIT: ${record.closure.commit}`,
++    `BRANCH: ${record.destination.branch} · INTEGRATION: ${record.destination.branch} · UNCOMMITTED: none`,
++    `READ_FIRST: ${record.source.story_path}, docs/plan.md`,
++    'DONE_THIS_RUN:',
++    `- Integrated candidate ${record.source.candidate} at M ${record.integration.commit}; closed at E ${record.closure.commit}.`,
++    ...openFindingLines(record, review),
++    'NEXT (ordered):',
++    `1. ${next}`,
++    '',
++  ].join('\n');
++}
++
++function commitParents(root, commit) {
++  return String(git(root, ['rev-list', '--parents', '-n', '1', commit])).trim().split(/\s+/).slice(1);
++}
++
++function commitEntry(root, commit, rel) {
++  const raw = String(git(root, ['ls-tree', '-z', commit, '--', rel])).split('\0').filter(Boolean);
++  if (raw.length !== 1) fail(`integration artifact is absent from commit: ${rel}`);
++  const match = /^(\d{6}) (\w+) ([0-9a-f]+)\t(.+)$/.exec(raw[0]);
++  if (!match || match[2] !== 'blob' || match[4] !== rel) fail(`integration artifact commit entry is invalid: ${rel}`);
++  return { mode: match[1], oid: match[3] };
++}
++
++function committedText(root, commit, rel) {
++  try { return git(root, ['show', `${commit}:${rel}`], { buffer: true }).toString('utf8'); }
++  catch { return null; }
++}
++
++function validateAdoptedArtifact(record, field, options) {
++  const stage = record[field];
++  if (!OID.test(stage.commit || '') || !stage.proof || stage.pending !== null
++    || stage.proof.commit !== stage.commit || tree(record.destination.root, stage.commit) !== stage.proof.tree
++    || canonical(commitParents(record.destination.root, stage.commit)) !== canonical([stage.proof.parent])) {
++    fail(`${field} adopted commit proof is invalid`);
++  }
++  validateArtifactPending(record, field, stage.proof, options);
++  const changed = String(git(record.destination.root, ['diff-tree', '--no-commit-id', '--name-only', '-r', stage.proof.parent, stage.commit, '--']))
++    .trim().split(/\r?\n/).filter(Boolean).sort();
++  const paths = stage.proof.writes.map((item) => item.path).sort();
++  if (canonical(changed) !== canonical(paths)) fail(`${field} adopted commit changes unprepared paths`);
++  for (const write of stage.proof.writes) {
++    const entry = commitEntry(record.destination.root, stage.commit, write.path);
++    if (entry.mode !== write.mode || entry.oid !== write.oid || committedText(record.destination.root, stage.commit, write.path) !== write.after
++      || committedText(record.destination.root, stage.proof.parent, write.path) !== write.before) {
++      fail(`${field} adopted bytes, mode or parent image changed`);
++    }
++  }
++}
++
++function validateIntegrationProofs(record, { legacyFinalization = null } = {}) {
++  const root = rootPath(record.destination.root);
++  if (commonRepository(root) !== record.destination.common_repository) fail('integration repository identity changed');
++  if (record.integration.base_anchor?.head !== record.integration.base
++    || record.integration.base_anchor?.tree !== tree(root, record.integration.base)
++    || record.integration.base_anchor?.ref !== `refs/heads/${record.destination.branch}`) {
++    fail('integration base I identity is invalid');
++  }
++  validateCheckoutProofObjects(root, record.integration.base, record.integration.base_checkout_proof);
++  const mismatches = [...new Set([
++    ...manifestMismatches(record.source.manifest, record.source.snapshot_manifest),
++    ...(record.integration.manifest ? manifestMismatches(record.source.manifest, record.integration.manifest) : []),
++  ])].sort();
++  const reusable = record.integration.manifest !== null && mismatches.length === 0;
++  if (record.evidence.source_reusable !== reusable || canonical(record.evidence.reuse_mismatches) !== canonical(mismatches)
++    || (record.integration.manifest && canonical(record.manifest) !== canonical(record.integration.manifest))) {
++    fail('integration evidence reusability or manifest binding is invalid');
++  }
++  if (record.integration.status === 'prepared') {
++    if (expectedMergeTree(root, record.integration.base, record.source.candidate) !== record.integration.expected_tree) {
++      fail('prepared integration composition changed');
++    }
++    validateCheckoutProofObjects(root, record.integration.expected_tree, record.integration.checkout_proof);
++  } else if (record.integration.status === 'failed') {
++    if (record.integration.failure.integration !== record.integration.base
++      || record.integration.failure.candidate !== record.source.candidate
++      || canonical(record.integration.failure.argv) !== canonical(['git', '-C', root, 'merge-tree', '--write-tree', record.integration.base, record.source.candidate])
++      || typeof record.integration.failure.git_version !== 'string' || !record.integration.failure.git_version.startsWith('git version ')
++      || (record.integration.failure.status !== null && !Number.isInteger(record.integration.failure.status))
++      || record.integration.failure.status === 0
++      || (record.integration.failure.status === null && typeof record.integration.failure.error !== 'string')
++      || !HASH.test(record.integration.failure.stdout_hash || '') || !HASH.test(record.integration.failure.stderr_hash || '')
++      || Number.isNaN(Date.parse(record.integration.failure.started_at)) || Number.isNaN(Date.parse(record.integration.failure.finished_at))) {
++      fail('failed merge probe is not bound to its actual I/C attempt');
++    }
++  } else if (record.integration.status === 'adopted') {
++    const parents = commitParents(root, record.integration.commit);
++    if (canonical(parents) !== canonical([record.integration.base, record.source.candidate])
++      || tree(root, record.integration.commit) !== record.integration.tree
++      || record.integration.tree !== record.integration.expected_tree
++      || expectedMergeTree(root, record.integration.base, record.source.candidate) !== record.integration.expected_tree) {
++      fail('adopted integration M topology changed');
++    }
++    validateCheckoutProofObjects(root, record.integration.commit, record.integration.checkout_proof);
++    const manifest = boundManifest(root, record.integration.commit, record.source.packet, record.source.story_path,
++      record.integration.manifest.bindings);
++    if (canonical(manifest) !== canonical(record.integration.manifest)
++      || integrationIdentity(record) !== record.evidence.snapshot_hash) fail('adopted integration M manifest changed');
++  }
++  for (const field of ['report', 'closure', 'handoff']) {
++    if (record[field].commit !== null) validateAdoptedArtifact(record, field, { legacyFinalization });
++    else if (record[field].proof !== null) fail(`${field} proof exists without an adopted commit`);
++    if (record[field].pending !== null) validateArtifactPending(record, field, record[field].pending, { legacyFinalization });
++  }
++  if (record.report.commit && record.reporting === 'skipped') fail('report P exists for a skipped reporting contract');
++  if (record.closure.commit && record.reporting !== 'skipped' && !record.report.commit) fail('closure E bypasses required report P');
++  if (record.handoff.commit && !record.closure.commit) fail('handoff H exists without closure E');
++}
++
++function validateArtifactPending(record, field, pending, { legacyFinalization = null } = {}) {
++  if (!pending || !OID.test(pending.parent) || !Array.isArray(pending.writes) || !pending.writes.length
++    || !pending.writes.every((write) => typeof write.path === 'string' && (write.before === null || typeof write.before === 'string')
++      && typeof write.after === 'string' && write.hash === sha256(write.after))) fail(`invalid ${field} preparation`);
++  const resolved = resolveFinalization(record, legacyFinalization || record.evidence.finalization);
++  if (pending.finalization_identity !== resolved.finalization.identity
++    && !(legacyFinalization && pending.finalization_identity === undefined)) {
++    fail(`${field} preparation is not bound to the frozen finalization`);
++  }
++  const view = finalizedRecordView(record, resolved);
++  if (field === 'report') {
++    const { review, verification } = resolved;
++    const story = parseStory(String(git(record.destination.root, ['show', `${pending.parent}:${record.source.story_path}`])), record.source.story_path);
++    const artifacts = renderVerificationArtifacts(view, story, review, verification);
++    const expected = {
++      [`docs/verification/${record.source.story}.md`]: artifacts.report,
++      [`docs/checklists/verification-${record.source.story}.md`]: artifacts.checklist,
++    };
++    if (pending.parent !== record.integration.commit || pending.writes.length !== 2
++      || pending.writes.some((write) => write.before !== null || expected[write.path] !== write.after)) fail('report preparation no longer matches finalized evidence');
++  } else if (field === 'closure') {
++    if (pending.writes.length !== 1 || pending.writes[0].path !== record.source.story_path
++      || typeof pending.writes[0].before !== 'string') fail('closure preparation must contain only the existing bound story');
++    const expectedParent = record.report.commit || record.integration.commit;
++    if (pending.parent !== expectedParent || (record.reporting !== 'skipped' && !record.report.commit)) {
++      fail('closure preparation does not follow the required evidence commit');
++    }
++    const before = parseStory(pending.writes[0].before, record.source.story_path);
++    const after = parseStory(pending.writes[0].after, record.source.story_path);
++    if (before.contractHash !== record.source.contract_hash || before.executionHash !== record.source.execution_hash
++      || after.execution?.status !== 'merged' || typeof after.execution.updated !== 'string') fail('closure preparation changed the story contract or source execution');
++    const generated = replaceStoryExecution(before, { status: 'merged', updated: after.execution.updated }, {
++      note: `${after.execution.updated} integrated at ${record.integration.commit}`,
++    });
++    if (generated.after !== pending.writes[0].after || generated.executionHash !== record.closure.execution_hash) fail('closure preparation is not the exact legal Execution transition');
++  } else if (field === 'handoff') {
++    if (pending.parent !== record.closure.commit || pending.writes.length !== 1 || pending.writes[0].path !== record.handoff.path
++      || pending.writes[0].after !== handoffContent(view, pending.handoff_at, pending.next, resolved.review)) fail('handoff preparation no longer matches closure E');
++  }
++}
++
++function prepareArtifacts(recordArg, expectedRecordHash, field, build, cwd) {
++  const updated = withRecord(recordArg, expectedRecordHash, (record) => {
++    const root = destinationRoot(record);
++    if (record[field].commit) fail(`${field} commit is already adopted`);
++    if (record[field].pending) {
++      if (head(root) !== record[field].pending.parent) fail(`${field} pending parent is no longer current`);
++      validateArtifactPending(record, field, record[field].pending);
++      const allowed = new Set(record[field].pending.writes.map((item) => item.path));
++      const extra = statusPaths(root).filter((rel) => !allowed.has(rel));
++      if (extra.length) fail(`${field} recovery found unrelated worktree changes: ${extra.sort().join(', ')}`);
++      applyPending(root, record[field].pending);
++      return record[field].pending;
++    }
++    assertClean(root);
++    const pending = build(record, root);
++    pending.finalization_identity = resolveFinalization(record).finalization.identity;
++    pending.token = randomUUID();
++    pending.prepared_at = now();
++    for (const write of pending.writes) {
++      write.path = safeTrackedPath(write.path);
++      write.before = readArtifact(root, write.path);
++      if (typeof write.after !== 'string' || Buffer.byteLength(write.after) > 8 * 1024 * 1024) fail('integration artifact bytes are invalid');
++      write.hash = sha256(write.after);
++    }
++    record[field].pending = pending;
++    return pending;
++  }, cwd);
++  applyPending(updated.record.destination.root, updated.result);
++  return updated;
++}
++
++function adoptArtifacts(recordArg, { expectedRecordHash, token, commit } = {}, field, cwd) {
++  return withRecord(recordArg, expectedRecordHash, (record) => {
++    const pending = record[field].pending;
++    if (!pending || pending.token !== token || !OID.test(commit || '')) fail(`${field} adoption token or commit is invalid`);
++    validateArtifactPending(record, field, pending);
++    const root = rootPath(record.destination.root);
++    if (head(root) !== commit || branch(root) !== record.destination.branch) fail(`${field} commit is not current integration HEAD`);
++    assertClean(root);
++    const parents = String(git(root, ['rev-list', '--parents', '-n', '1', commit])).trim().split(/\s+/);
++    if (parents.length !== 2 || parents[1] !== pending.parent) fail(`${field} commit must be a direct child of its prepared parent`);
++    const changed = String(git(root, ['diff-tree', '--no-commit-id', '--name-only', '-r', pending.parent, commit, '--'])).trim().split(/\r?\n/).filter(Boolean).sort();
++    const paths = pending.writes.map((item) => item.path).sort();
++    if (canonical(changed) !== canonical(paths)) fail(`${field} commit changes paths outside its prepared artifact set`);
++    for (const write of pending.writes) {
++      const bytes = git(root, ['show', `${commit}:${write.path}`], { buffer: true });
++      if (sha256(bytes) !== write.hash || fs.readFileSync(artifactFile(root, write.path), 'utf8') !== write.after) fail(`${field} committed bytes differ from preparation`);
++      const entry = commitEntry(root, commit, write.path);
++      write.mode = entry.mode;
++      write.oid = entry.oid;
++    }
++    record[field].commit = commit;
++    record[field].proof = { ...structuredClone(pending), commit, tree: tree(root, commit) };
++    record[field].pending = null;
++    record[field].adopted_at = now();
++    return { commit, paths };
++  }, cwd);
++}
++
++export function prepareVerificationReport(recordArg, { expectedRecordHash } = {}, cwd = process.cwd()) {
++  return prepareArtifacts(recordArg, expectedRecordHash, 'report', (record, root) => {
++    if (record.reporting === 'skipped') fail('this integration does not require or request a verification report');
++    assertExecutableM(record);
++    const { review, verification, view } = assertEvidenceReady(record, { finalized: true });
++    if (head(root) !== record.integration.commit) fail('verification report P must begin at M');
++    const story = readStory(root, record.source.story_path);
++    const artifacts = renderVerificationArtifacts(view, story, review, verification);
++    const reportPath = `docs/verification/${record.source.story}.md`;
++    const checklistPath = `docs/checklists/verification-${record.source.story}.md`;
++    if (readArtifact(root, reportPath) !== null || readArtifact(root, checklistPath) !== null) fail('verification reporting paths must be new at P');
++    return { parent: record.integration.commit, writes: [
++      { path: reportPath, after: artifacts.report },
++      { path: checklistPath, after: artifacts.checklist },
++    ] };
++  }, cwd);
++}
++
++export function adoptVerificationReport(recordArg, options = {}, cwd = process.cwd()) {
++  return adoptArtifacts(recordArg, options, 'report', cwd);
++}
++
++export function prepareStoryClosure(recordArg, { expectedRecordHash } = {}, cwd = process.cwd()) {
++  return prepareArtifacts(recordArg, expectedRecordHash, 'closure', (record, root) => {
++    assertEvidenceReady(record, { finalized: true });
++    if (record.reporting !== 'skipped' && !record.report.commit) fail('required or requested verification report P is missing');
++    const parent = record.report.commit || record.integration.commit;
++    if (head(root) !== parent) fail('story closure E must begin at the final evidence commit');
++    const story = readStory(root, record.source.story_path);
++    if (story.contractHash !== record.source.contract_hash || story.executionHash !== record.source.execution_hash
++      || story.execution?.status !== 'in-review') fail('story at integration does not match finished candidate C');
++    const closedAt = stamp();
++    const closed = replaceStoryExecution(story, { status: 'merged', updated: closedAt }, {
++      note: `${closedAt} integrated at ${record.integration.commit}`,
++    });
++    record.closure.execution_hash = closed.executionHash;
++    return { parent, writes: [{ path: record.source.story_path, after: closed.after }] };
++  }, cwd);
++}
++
++export function adoptStoryClosure(recordArg, options = {}, cwd = process.cwd()) {
++  return adoptArtifacts(recordArg, options, 'closure', cwd);
++}
++
++export function prepareIntegrationHandoff(recordArg, { expectedRecordHash, next = 'Continue with the next ready story.' } = {}, cwd = process.cwd()) {
++  if (typeof next !== 'string' || !next.trim() || next.length > 1000 || /[\x00-\x1f\x7f]/.test(next)) fail('handoff next action is invalid');
++  return prepareArtifacts(recordArg, expectedRecordHash, 'handoff', (record, root) => {
++    const { review, view } = assertEvidenceReady(record, { finalized: true });
++    if (!record.closure.commit || head(root) !== record.closure.commit) fail('handoff H must begin at closure E');
++    const handoffAt = stamp();
++    return {
++      parent: record.closure.commit, handoff_at: handoffAt, next,
++      writes: [{ path: record.handoff.path, after: handoffContent(view, handoffAt, next, review) }],
++    };
++  }, cwd);
++}
++
++export function adoptIntegrationHandoff(recordArg, options = {}, cwd = process.cwd()) {
++  return adoptArtifacts(recordArg, options, 'handoff', cwd);
++}
+diff --git a/plugins/deliver/skills/deliver/scripts/lib/reporting.mjs b/plugins/deliver/skills/deliver/scripts/lib/reporting.mjs
+new file mode 100644
+index 0000000..8812a3c
+--- /dev/null
++++ b/plugins/deliver/skills/deliver/scripts/lib/reporting.mjs
+@@ -0,0 +1,106 @@
++import { canonical, DeliverError, readJsonFile, sha256 } from './state.mjs';
++import { assertPanelCoverage } from './review.mjs';
++
++const fail = (message) => { throw new DeliverError(message, 66); };
++
++export function parseVerificationResults(input, acceptance) {
++  const document = typeof input === 'string' ? readJsonFile(input, 'verification results') : input;
++  if (!document || typeof document !== 'object' || Array.isArray(document) || !Array.isArray(document.criteria)) {
++    fail('verification results must contain a criteria array');
++  }
++  const criteria = document.criteria.map((criterion, index) => {
++    if (!criterion || typeof criterion !== 'object' || Array.isArray(criterion) || typeof criterion.id !== 'string'
++      || !['PASS', 'FAIL', 'UNKNOWN'].includes(criterion.status) || typeof criterion.evidence !== 'string'
++      || !criterion.evidence.trim() || criterion.evidence.length > 8000) fail(`invalid verification criterion at index ${index}`);
++    return { id: criterion.id, status: criterion.status, evidence: criterion.evidence };
++  });
++  const expected = acceptance.map((item) => item.id).sort();
++  const actual = criteria.map((item) => item.id).sort();
++  if (new Set(actual).size !== actual.length || canonical(actual) !== canonical(expected)) {
++    fail('verification criteria must cover each acceptance id exactly once');
++  }
++  return criteria;
++}
++
++function cleanCell(value) {
++  return String(value).replace(/[\x00-\x1f\x7f]+/g, ' ').replace(/&/g, '&amp;').replace(/</g, '&lt;')
++    .replace(/>/g, '&gt;').replace(/\|/g, '&#124;').replace(/`/g, '&#96;').replace(/\[/g, '&#91;').replace(/\]/g, '&#93;');
++}
++
++function findingRows(label, evidence) {
++  const findings = evidence?.findings || [];
++  if (!findings.length) return [`| ${label} | none | none | none | none |`];
++  return findings.map((item) => `| ${label} | ${cleanCell(item.lens || 'general')} | ${cleanCell(item.reviewer || evidence.reviewer || 'unknown')} | ${item.severity} / ${item.resolved ? 'resolved' : 'open'} | ${cleanCell(item.message)} |`);
++}
++
++export function renderVerificationArtifacts(record, story, review, verification) {
++  if (!record?.evidence?.finalized || !record.integration?.commit) fail('integration evidence must be finalized before reporting');
++  if (verification.criteria.some((item) => item.status !== 'PASS')) fail('verification report cannot claim unsupported PASS criteria');
++  const requiredLenses = assertPanelCoverage(review, story, record.plan.scale);
++  const source = record.source;
++  const sourceReview = source.review || review;
++  const lines = [
++    `# Verification: ${source.story}`,
++    '',
++    `- Story: ${source.story_path}`,
++    `- Candidate C: ${source.candidate}`,
++    `- Source snapshot: ${source.snapshot_hash}`,
++    `- Integrated M: ${record.integration.commit}`,
++    `- Manifest: ${record.manifest.hash}`,
++    `- Gate receipts: ${record.evidence.gates.map((item) => item.identity).join(', ') || 'none declared'}`,
++    `- Review receipt: ${review.identity}`,
++    `- Verification receipt: ${verification.identity}`,
++    '',
++    '## Gates',
++    '',
++    '| Gate | Command | Result |',
++    '| --- | --- | --- |',
++    ...record.evidence.gates.map((gate) => `| ${cleanCell(gate.name)} | ${cleanCell(gate.command)} | ${gate.status} |`),
++    ...(record.evidence.gates.length ? [] : ['| none declared | N/A | PASS |']),
++    '',
++    '## Review panel',
++    '',
++    '| Lens | Reviewer | Verdict |',
++    '| --- | --- | --- |',
++    ...review.panel.members.map((member) => `| ${member.lens} | ${cleanCell(member.reviewer)} | ${member.verdict} |`),
++    '',
++    '## Retained findings',
++    '',
++    '| Evidence | Lens | Reviewer | Status | Finding |',
++    '| --- | --- | --- | --- | --- |',
++    ...findingRows('Source C', sourceReview),
++    ...(review.identity === sourceReview.identity ? [] : findingRows('Effective M', review)),
++    '',
++    '## Acceptance verification',
++    '',
++    '| Criterion | Result | Evidence |',
++    '| --- | --- | --- |',
++    ...verification.criteria.map((item) => `| ${cleanCell(item.id)} | ${item.status} | ${cleanCell(item.evidence)} |`),
++    '',
++    '## Integration status',
++    '',
++    `Integrated at M ${record.integration.commit}. This report does not identify its own commit.`,
++    '',
++  ];
++  const checklist = [
++    `# Verification checklist: ${source.story}`,
++    '',
++    `Candidate C: ${source.candidate}`,
++    `Integrated M: ${record.integration.commit}`,
++    '',
++    ...verification.criteria.map((item) => `- [x] ${cleanCell(item.id)}: ${item.status}. Evidence: ${cleanCell(item.evidence)}`),
++    ...requiredLenses.map((lens) => {
++      const member = review.panel.members.find((item) => item.lens === lens);
++      return `- [x] Review lens ${lens}: ${member.verdict}. Evidence: reviewer ${member.reviewer}, snapshot ${member.snapshot_hash}.`;
++    }),
++    '',
++  ];
++  const report = `${lines.join('\n')}\n`;
++  const checklistText = `${checklist.join('\n')}\n`;
++  return {
++    report,
++    checklist: checklistText,
++    report_hash: sha256(report),
++    checklist_hash: sha256(checklistText),
++  };
++}
+diff --git a/plugins/deliver/skills/deliver/scripts/lib/review.mjs b/plugins/deliver/skills/deliver/scripts/lib/review.mjs
+new file mode 100644
+index 0000000..5c7cc24
+--- /dev/null
++++ b/plugins/deliver/skills/deliver/scripts/lib/review.mjs
+@@ -0,0 +1,100 @@
++import { DeliverError, readJsonFile } from './state.mjs';
++
++const record = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
++const identity = (value) => typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9._@-]{0,127}$/.test(value);
++const digest = (value) => typeof value === 'string' && /^[0-9a-f]{64}$/.test(value);
++const fail = (message) => { throw new DeliverError(message, 66); };
++
++function finding(value, label, { attribution = false } = {}) {
++  if (!record(value) || !['block', 'major', 'minor'].includes(value.severity)
++    || typeof value.message !== 'string' || !value.message.trim() || value.message.length > 4000
++    || (value.path !== undefined && (typeof value.path !== 'string' || value.path.length > 1000))
++    || (value.lens !== undefined && (!attribution || typeof value.lens !== 'string' || !/^[a-z][a-z0-9-]{0,63}$/.test(value.lens)))
++    || (value.reviewer !== undefined && (!attribution || !identity(value.reviewer)))
++    || (value.resolved !== undefined && typeof value.resolved !== 'boolean')) fail(`invalid review finding in ${label}`);
++  return {
++    severity: value.severity,
++    message: value.message,
++    ...(value.path === undefined ? {} : { path: value.path }),
++    resolved: value.resolved === true,
++    ...(value.lens === undefined ? {} : { lens: value.lens }),
++    ...(value.reviewer === undefined ? {} : { reviewer: value.reviewer }),
++  };
++}
++
++function sameFinding(supplied, derived) {
++  return supplied.severity === derived.severity && supplied.message === derived.message
++    && supplied.path === derived.path && supplied.resolved === derived.resolved
++    && (supplied.lens === undefined || supplied.lens === derived.lens)
++    && (supplied.reviewer === undefined || supplied.reviewer === derived.reviewer);
++}
++
++function assertPanelAggregate(supplied, derived) {
++  if (!supplied.length) return;
++  if (supplied.length !== derived.length) fail('top-level panel findings must equal the complete member-derived aggregate');
++  const remaining = [...derived];
++  const constrainedFirst = [...supplied].sort((left, right) => Number(right.lens !== undefined) + Number(right.reviewer !== undefined)
++    - Number(left.lens !== undefined) - Number(left.reviewer !== undefined));
++  for (const item of constrainedFirst) {
++    const index = remaining.findIndex((candidate) => sameFinding(item, candidate));
++    if (index === -1) fail('top-level panel findings differ from the member-derived aggregate');
++    remaining.splice(index, 1);
++  }
++  if (remaining.length) fail('top-level panel findings omit member-derived findings');
++}
++
++export function parseReviewReceipt(input, { expectedSnapshot } = {}) {
++  const receipt = typeof input === 'string' ? readJsonFile(input, 'review receipt') : input;
++  if (!record(receipt) || !['PASS', 'FAIL'].includes(receipt.status) || !Array.isArray(receipt.findings)) {
++    fail('review receipt must contain status PASS|FAIL and a findings array');
++  }
++  const topFindings = receipt.findings.map((item, index) => finding(item, `top-level findings[${index}]`, { attribution: true }));
++  if (receipt.summary !== undefined && (typeof receipt.summary !== 'string' || receipt.summary.length > 8000)) fail('review summary must be a bounded string');
++  if (receipt.panel === undefined) {
++    if (receipt.status === 'PASS' && topFindings.some((item) => !item.resolved && item.severity !== 'minor')) {
++      fail('a PASS review may not contain unresolved block or major findings');
++    }
++    return { status: receipt.status, findings: topFindings, ...(receipt.summary === undefined ? {} : { summary: receipt.summary }) };
++  }
++  const panel = receipt.panel;
++  if (!record(panel) || !digest(panel.snapshot_hash) || !Array.isArray(panel.members) || !panel.members.length || panel.members.length > 16) {
++    fail('review panel must bind one to sixteen members to a snapshot');
++  }
++  if (expectedSnapshot !== undefined && panel.snapshot_hash !== expectedSnapshot) fail('review panel snapshot does not match the reviewed snapshot');
++  const members = panel.members.map((member, index) => {
++    if (!record(member) || typeof member.lens !== 'string' || !/^[a-z][a-z0-9-]{0,63}$/.test(member.lens)
++      || !identity(member.reviewer) || !['PASS', 'CONCERNS', 'FAIL'].includes(member.verdict)
++      || member.snapshot_hash !== panel.snapshot_hash || !Array.isArray(member.findings)) fail(`invalid review panel member at index ${index}`);
++    const findings = member.findings.map((item, findingIndex) => finding(item, `panel member ${index} finding ${findingIndex}`));
++    if (member.verdict === 'PASS' && findings.some((item) => !item.resolved && item.severity !== 'minor')) fail('PASS panel member has unresolved blocking findings');
++    if (member.verdict === 'CONCERNS' && !findings.some((item) => !item.resolved)) fail('CONCERNS panel member must retain an unresolved finding');
++    return { lens: member.lens, reviewer: member.reviewer, verdict: member.verdict, snapshot_hash: member.snapshot_hash, findings };
++  });
++  if (new Set(members.map((item) => item.lens)).size !== members.length) fail('review panel lenses must be unique');
++  const findings = members.flatMap((member) => member.findings.map((item) => ({ ...item, lens: member.lens, reviewer: member.reviewer })));
++  assertPanelAggregate(topFindings, findings);
++  const status = members.some((member) => member.verdict === 'FAIL')
++    || findings.some((item) => !item.resolved && item.severity !== 'minor') ? 'FAIL' : 'PASS';
++  if (receipt.status !== status) fail('review status must equal the verdict derived from panel members');
++  return {
++    status,
++    findings,
++    ...(receipt.summary === undefined ? {} : { summary: receipt.summary }),
++    panel: { snapshot_hash: panel.snapshot_hash, members },
++  };
++}
++
++export function requiredReviewLenses(story, scale) {
++  const required = new Set(['code-integrity-reviewer', ...(story.reviewLenses || [])]);
++  if (scale === 'regulated') required.add('security-auditor');
++  return [...required].sort();
++}
++
++export function assertPanelCoverage(review, story, scale) {
++  const required = requiredReviewLenses(story, scale);
++  if (!review?.panel) fail(`durable reporting requires a structured review panel covering: ${required.join(', ')}`);
++  const actual = new Set(review.panel.members.map((item) => item.lens));
++  const missing = required.filter((lens) => !actual.has(lens));
++  if (missing.length) fail(`review panel is missing required lenses: ${missing.join(', ')}`);
++  return required;
++}
+diff --git a/plugins/deliver/skills/deliver/scripts/lib/state.mjs b/plugins/deliver/skills/deliver/scripts/lib/state.mjs
+index 9b2a5b8..0feb6c8 100644
+--- a/plugins/deliver/skills/deliver/scripts/lib/state.mjs
++++ b/plugins/deliver/skills/deliver/scripts/lib/state.mjs
+@@ -242,6 +242,28 @@ export function validateRunState(state) {
+   if (state.review !== null && (!isObject(state.review) || !['PASS', 'FAIL'].includes(state.review.status)
+     || typeof state.review.builder !== 'string' || typeof state.review.reviewer !== 'string'
+     || !Array.isArray(state.review.findings) || typeof state.review.snapshot_hash !== 'string')) fail('bad review');
++  if (state.review?.panel !== undefined) {
++    const panel = state.review.panel;
++    if (!isObject(panel) || panel.snapshot_hash !== state.review.snapshot_hash || !Array.isArray(panel.members)
++      || !panel.members.length || panel.members.length > 16) fail('bad review panel');
++    for (const member of panel.members) {
++      if (!isObject(member) || typeof member.lens !== 'string' || !/^[a-z][a-z0-9-]{0,63}$/.test(member.lens)
++        || typeof member.reviewer !== 'string' || !['PASS', 'CONCERNS', 'FAIL'].includes(member.verdict)
++        || member.snapshot_hash !== panel.snapshot_hash || !Array.isArray(member.findings)) fail('bad review panel member');
++      for (const finding of member.findings) {
++        if (!isObject(finding) || !['block', 'major', 'minor'].includes(finding.severity)
++          || typeof finding.message !== 'string' || !finding.message.trim() || typeof finding.resolved !== 'boolean') fail('bad review panel finding');
++      }
++      if (member.verdict === 'PASS' && member.findings.some((finding) => !finding.resolved && finding.severity !== 'minor')) fail('invalid PASS panel member');
++      if (member.verdict === 'CONCERNS' && !member.findings.some((finding) => !finding.resolved)) fail('invalid CONCERNS panel member');
++    }
++    if (new Set(panel.members.map((member) => member.lens)).size !== panel.members.length) fail('duplicate review panel lens');
++    const derivedFindings = panel.members.flatMap((member) => member.findings
++      .map((finding) => ({ ...finding, lens: member.lens, reviewer: member.reviewer })));
++    const derivedStatus = panel.members.some((member) => member.verdict === 'FAIL')
++      || derivedFindings.some((finding) => !finding.resolved && finding.severity !== 'minor') ? 'FAIL' : 'PASS';
++    if (state.review.status !== derivedStatus || canonical(state.review.findings) !== canonical(derivedFindings)) fail('review panel aggregate is inconsistent');
++  }
+   if (state.verification !== null && (!isObject(state.verification) || typeof state.verification.verifier !== 'string'
+     || !Array.isArray(state.verification.criteria) || typeof state.verification.snapshot_hash !== 'string')) fail('bad verification');
+   if (['active', 'finished'].includes(state.phase) && (!state.task || !state.baseline)) fail('active/finished run needs a task and baseline');
+@@ -261,6 +283,13 @@ export function validateRunState(state) {
+     }).sort();
+     if (canonical(actual) !== canonical(expected)) fail('verification criteria do not match acceptance');
+     if (state.verification.verifier === state.task.builder) fail('verification identity violates separation');
++    if (state.pm_binding?.format === 'current' && state.review?.reviewer === state.verification.verifier) {
++      fail('current shared-project verifier must differ from reviewer');
++    }
++    if (state.pm_binding?.format === 'current'
++      && state.review?.panel?.members.some((member) => member.reviewer === state.verification.verifier)) {
++      fail('current shared-project verifier must differ from every panel reviewer');
++    }
+   }
+   if (state.contracts !== undefined && state.contracts !== null) {
+     if (!isObject(state.contracts) || !isObject(state.contracts.hashes) || !isStringArray(state.contracts.specs)
+diff --git a/plugins/deliver/skills/deliver/scripts/pm.mjs b/plugins/deliver/skills/deliver/scripts/pm.mjs
+index 197a3fa..ab2ebba 100644
+--- a/plugins/deliver/skills/deliver/scripts/pm.mjs
++++ b/plugins/deliver/skills/deliver/scripts/pm.mjs
+@@ -15,6 +15,21 @@ import {
+   revokeCurrentPm,
+ } from './lib/current-pm.mjs';
+ import { recoverExecutionTransition, transitionCurrentExecution } from './lib/transitions.mjs';
++import {
++  adoptIntegrationHandoff,
++  adoptLocalIntegration,
++  adoptStoryClosure,
++  adoptVerificationReport,
++  finalizeIntegrationEvidence,
++  prepareIntegrationHandoff,
++  prepareLocalIntegration,
++  prepareStoryClosure,
++  prepareVerificationReport,
++  reconcileIntegrationEvidence,
++  recordIntegrationReview,
++  recordIntegrationVerification,
++  runIntegrationGate,
++} from './lib/integration.mjs';
+ 
+ const help = `Shared Deliver project state
+   pm.mjs init [--name PROJECT] [--format current|legacy]
+@@ -24,10 +39,22 @@ const help = `Shared Deliver project state
+   pm.mjs revoke [--reason TEXT]
+   pm.mjs claim --story docs/stories/S1-1-example.md [--branch pm/S1-1-example]
+   pm.mjs transition --run RUN --to building|built|in-review|blocked [--attempt fix|retry] [--reason TEXT]
++  pm.mjs integrate-prepare --run RUN [--verification-report]
++  pm.mjs integrate-adopt --integration FILE --expected-record HASH --token TOKEN --commit SHA
++  pm.mjs integrate-gate --integration FILE --expected-record HASH --name GATE
++  pm.mjs integrate-review --integration FILE --expected-record HASH --reviewer ID --receipt JSON
++  pm.mjs integrate-verify --integration FILE --expected-record HASH --verifier ID --results JSON
++  pm.mjs integrate-finalize --integration FILE --expected-record HASH
++  pm.mjs integrate-reconcile --integration FILE --expected-record HASH
++  pm.mjs report-prepare|close-prepare --integration FILE --expected-record HASH
++  pm.mjs report-adopt|close-adopt --integration FILE --expected-record HASH --token TOKEN --commit SHA
++  pm.mjs handoff-prepare --integration FILE --expected-record HASH [--next TEXT]
++  pm.mjs handoff-adopt --integration FILE --expected-record HASH --token TOKEN --commit SHA
+   pm.mjs complete --run UUID --commit FULL_INTEGRATION_SHA --next "Next ready story or decision"
+   pm.mjs recover
+ 
+ Run in the project checkout. These commands never commit, merge, push or execute a model.
++The explicit integrate-gate command executes only a gate declared by the finished source task.
+ Complete records a verified, committed story boundary, not an unmerged implementation.
+ Recover completes an interrupted journal only when every file matches its before/after image.
+ `;
+@@ -49,12 +76,27 @@ try {
+   const [command = 'help', ...rest] = process.argv.slice(2);
+   if (['help', '--help', '-h'].includes(command)) process.stdout.write(help);
+   else {
+-    const allowed = { init: ['--name', '--format'], status: [], 'actor-id': [], approve: ['--approver'], revoke: ['--reason'], claim: ['--story', '--branch'], transition: ['--run', '--to', '--attempt', '--reason', '--expected-revision'], complete: ['--run', '--commit', '--next'], recover: [] };
++    const allowed = {
++      init: ['--name', '--format'], status: [], 'actor-id': [], approve: ['--approver'], revoke: ['--reason'], claim: ['--story', '--branch'],
++      transition: ['--run', '--to', '--attempt', '--reason', '--expected-revision'], complete: ['--run', '--commit', '--next'], recover: [],
++      'integrate-prepare': ['--run', '--verification-report'], 'integrate-adopt': ['--integration', '--expected-record', '--token', '--commit'],
++      'integrate-gate': ['--integration', '--expected-record', '--name'], 'integrate-review': ['--integration', '--expected-record', '--reviewer', '--receipt'],
++      'integrate-verify': ['--integration', '--expected-record', '--verifier', '--results'], 'integrate-finalize': ['--integration', '--expected-record'],
++      'integrate-reconcile': ['--integration', '--expected-record'],
++      'report-prepare': ['--integration', '--expected-record'], 'report-adopt': ['--integration', '--expected-record', '--token', '--commit'],
++      'close-prepare': ['--integration', '--expected-record'], 'close-adopt': ['--integration', '--expected-record', '--token', '--commit'],
++      'handoff-prepare': ['--integration', '--expected-record', '--next'], 'handoff-adopt': ['--integration', '--expected-record', '--token', '--commit'],
++    };
+     if (!Object.hasOwn(allowed, command)) throw new DeliverError('unknown shared PM command', 64);
+     const options = {};
+-    for (let i = 0; i < rest.length; i += 2) {
+-      if (!allowed[command].includes(rest[i]) || !rest[i + 1] || Object.hasOwn(options, rest[i])) throw new DeliverError('unknown, duplicate or missing PM option', 64);
+-      options[rest[i]] = rest[i + 1];
++    for (let i = 0; i < rest.length;) {
++      const flag = rest[i++];
++      if (!allowed[command].includes(flag) || Object.hasOwn(options, flag)) throw new DeliverError('unknown, duplicate or missing PM option', 64);
++      if (flag === '--verification-report') options[flag] = true;
++      else {
++        if (!rest[i]) throw new DeliverError('unknown, duplicate or missing PM option', 64);
++        options[flag] = rest[i++];
++      }
+     }
+     const root = gitRoot(process.cwd());
+     const format = detectProjectFormat(root);
+@@ -110,6 +152,45 @@ try {
+       if (format === 'current') throw new DeliverError('current story completion requires the integration workflow', 66);
+       result = completePm(root, options['--run'], options['--commit'], options['--next'], snapshot);
+     }
++    else if (command === 'integrate-prepare') result = prepareLocalIntegration(options['--run'], {
++      integrationRoot: root, verificationReport: options['--verification-report'] === true,
++    }, root);
++    else if (command === 'integrate-adopt') result = adoptLocalIntegration(options['--integration'], {
++      expectedRecordHash: options['--expected-record'], token: options['--token'], commit: options['--commit'],
++    }, root);
++    else if (command === 'integrate-gate') result = runIntegrationGate(options['--integration'], {
++      expectedRecordHash: options['--expected-record'], name: options['--name'],
++    }, root);
++    else if (command === 'integrate-review') result = recordIntegrationReview(options['--integration'], {
++      expectedRecordHash: options['--expected-record'], reviewer: options['--reviewer'], receipt: options['--receipt'],
++    }, root);
++    else if (command === 'integrate-verify') result = recordIntegrationVerification(options['--integration'], {
++      expectedRecordHash: options['--expected-record'], verifier: options['--verifier'], results: options['--results'],
++    }, root);
++    else if (command === 'integrate-finalize') result = finalizeIntegrationEvidence(options['--integration'], {
++      expectedRecordHash: options['--expected-record'],
++    }, root);
++    else if (command === 'integrate-reconcile') result = reconcileIntegrationEvidence(options['--integration'], {
++      expectedRecordHash: options['--expected-record'],
++    }, root);
++    else if (command === 'report-prepare') result = prepareVerificationReport(options['--integration'], {
++      expectedRecordHash: options['--expected-record'],
++    }, root);
++    else if (command === 'report-adopt') result = adoptVerificationReport(options['--integration'], {
++      expectedRecordHash: options['--expected-record'], token: options['--token'], commit: options['--commit'],
++    }, root);
++    else if (command === 'close-prepare') result = prepareStoryClosure(options['--integration'], {
++      expectedRecordHash: options['--expected-record'],
++    }, root);
++    else if (command === 'close-adopt') result = adoptStoryClosure(options['--integration'], {
++      expectedRecordHash: options['--expected-record'], token: options['--token'], commit: options['--commit'],
++    }, root);
++    else if (command === 'handoff-prepare') result = prepareIntegrationHandoff(options['--integration'], {
++      expectedRecordHash: options['--expected-record'], next: options['--next'],
++    }, root);
++    else if (command === 'handoff-adopt') result = adoptIntegrationHandoff(options['--integration'], {
++      expectedRecordHash: options['--expected-record'], token: options['--token'], commit: options['--commit'],
++    }, root);
+     else {
+       result = recoverExecutionTransition(root);
+       if (!result.recovered) result = recoverCurrentPm(root);
+diff --git a/tests/current-roundtrip.test.mjs b/tests/current-roundtrip.test.mjs
+new file mode 100644
+index 0000000..05fcbec
+--- /dev/null
++++ b/tests/current-roundtrip.test.mjs
+@@ -0,0 +1,42 @@
++import assert from 'node:assert/strict';
++import { test } from 'node:test';
++import { parseExec as upstreamExecution } from './fixtures/upstream-v0.25.1/hooks/lib.mjs';
++import { parseStory, replaceStoryExecution } from '../plugins/deliver/skills/deliver/scripts/lib/story.mjs';
++
++const rel = 'docs/stories/S2-3-roundtrip.md';
++const contract = [
++  '# S2-3: Round trip',
++  '<!-- pm-meta: {"builder":"codex-builder","touches":["src"]} -->',
++  'Sprint: 2 · Priority: high · Covers: AC-023 · Depends on: none · Parallel-safe: yes',
++  'Risk: low · Review lenses: code-integrity-reviewer · Specs: none',
++  '',
++  '## Acceptance criteria (testable)',
++  '- [ ] The same criterion survives both hosts.',
++  '',
++].join('\n');
++
++test('upstream Execution is accepted and Codex closure remains readable upstream', () => {
++  const upstream = `${contract}## Execution\n<!-- pm-exec: {"owner":"casey-abcdef123456","builder":"codex-builder","branch":"pm/S2-3-roundtrip","status":"in-review","rounds":2,"retries":1,"updated":"2026-09-10 12:00","host_note":"keep"} -->\n`;
++  const document = parseStory(upstream, rel);
++  assert.equal(document.acceptance[0].text, 'The same criterion survives both hosts.');
++  const closed = replaceStoryExecution(document, { status: 'merged', updated: '2026-09-10 13:00' }, { note: '2026-09-10 13:00 integrated' });
++  const readBack = upstreamExecution(closed.after);
++  assert.equal(readBack.status, 'merged');
++  assert.equal(readBack.rounds, 2);
++  assert.equal(readBack.retries, 1);
++  assert.equal(readBack.host_note, 'keep');
++  assert.equal(closed.contractHash, document.contractHash);
++});
++
++test('Codex Execution accepts an upstream boundary update without losing identity', () => {
++  const claimed = replaceStoryExecution(parseStory(contract, rel), {
++    owner: 'casey-abcdef123456', builder: 'codex-builder', branch: 'pm/S2-3-roundtrip',
++    status: 'claimed', rounds: 0, retries: 0, updated: '2026-09-10 12:00',
++  });
++  const fromUpstream = claimed.after.replace('"status":"claimed"', '"status":"building"');
++  const document = parseStory(fromUpstream, rel);
++  assert.equal(document.execution.owner, 'casey-abcdef123456');
++  assert.equal(document.execution.branch, 'pm/S2-3-roundtrip');
++  assert.equal(document.execution.status, 'building');
++  assert.equal(document.contractHash, claimed.contractHash);
++});
+diff --git a/tests/integration.test.mjs b/tests/integration.test.mjs
+new file mode 100644
+index 0000000..d4aebe5
+--- /dev/null
++++ b/tests/integration.test.mjs
+@@ -0,0 +1,767 @@
++import assert from 'node:assert/strict';
++import fs from 'node:fs';
++import os from 'node:os';
++import path from 'node:path';
++import { execFileSync, spawnSync } from 'node:child_process';
++import { test } from 'node:test';
++import { fileURLToPath } from 'node:url';
++import { readStory } from '../plugins/deliver/skills/deliver/scripts/lib/story.mjs';
++import { canonical, sha256 } from '../plugins/deliver/skills/deliver/scripts/lib/state.mjs';
++import { inspectState as upstreamInspect, parseExec as upstreamExecution } from './fixtures/upstream-v0.25.1/hooks/lib.mjs';
++
++const runtime = fileURLToPath(new URL('../plugins/deliver/skills/deliver/scripts/deliver.mjs', import.meta.url));
++const pmCli = fileURLToPath(new URL('../plugins/deliver/skills/deliver/scripts/pm.mjs', import.meta.url));
++const storyRel = 'docs/stories/S1-1-value.md';
++const criterion = 'The integrated value is present.';
++
++function git(root, ...args) {
++  return execFileSync('git', ['-C', root, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trimEnd();
++}
++
++function write(root, rel, value) {
++  const file = path.join(root, rel);
++  fs.mkdirSync(path.dirname(file), { recursive: true });
++  fs.writeFileSync(file, typeof value === 'string' ? value : `${JSON.stringify(value, null, 2)}\n`);
++  return file;
++}
++
++function call(root, file, ...args) {
++  const result = spawnSync(process.execPath, [file, ...args], { cwd: root, encoding: 'utf8' });
++  let json;
++  try { json = JSON.parse(result.stdout); } catch { json = null; }
++  return { ...result, json };
++}
++
++function callWithEnv(root, environment, file, ...args) {
++  const result = spawnSync(process.execPath, [file, ...args], {
++    cwd: root, encoding: 'utf8', env: { ...process.env, ...environment },
++  });
++  let json;
++  try { json = JSON.parse(result.stdout); } catch { json = null; }
++  return { ...result, json };
++}
++
++function story(touches = ['src'], specs = []) {
++  return [
++    '# S1-1: Change value',
++    `<!-- pm-meta: ${JSON.stringify({ builder: 'codex-builder', touches })} -->`,
++    'Sprint: 1 · Priority: high · Covers: AC-001 · Depends on: none · Parallel-safe: yes',
++    `Risk: low · Review lenses: code-integrity-reviewer · Specs: ${specs.length ? specs.join(', ') : 'none'}`,
++    '',
++    '## Goal',
++    'Change the value.',
++    '',
++    '## Acceptance criteria (testable)',
++    `- [ ] ${criterion}`,
++    '',
++    '## Verification',
++    '- Run the declared test gate.',
++    '',
++  ].join('\n');
++}
++
++function finishedCandidate(t, {
++  preexistingDirty = false, gateCommand = 'node -e "process.exit(0)"', withSubmodule = false, advanceSubmodule = false,
++  sourceConcern = false, nestedSubmoduleScopes = false, deepSubmodule = false, bindSubmodule = true,
++  ignoreSubmoduleStatus = false, initializeIntegrationSubmodule = true,
++} = {}) {
++  const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'deliver-integration-source-')));
++  const integration = `${root}-integration`;
++  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
++  t.after(() => fs.rmSync(integration, { recursive: true, force: true }));
++  git(root, 'init', '-q', '--initial-branch=main');
++  git(root, 'config', 'user.name', 'Casey Example');
++  git(root, 'config', 'user.email', 'casey@example.invalid');
++  let dependency = null;
++  let leafDependency = null;
++  if (withSubmodule) {
++    dependency = `${root}-dependency`;
++    t.after(() => fs.rmSync(dependency, { recursive: true, force: true }));
++    fs.mkdirSync(dependency);
++    git(dependency, 'init', '-q', '--initial-branch=main');
++    git(dependency, 'config', 'user.name', 'Dependency Author');
++    git(dependency, 'config', 'user.email', 'dependency@example.invalid');
++    write(dependency, 'value.txt', 'dependency v1\n');
++    if (nestedSubmoduleScopes) {
++      write(dependency, 'contract.sdd', 'Spec: Dependency contract\nPurpose:\n  Bind the nested integration fixture.\nOwns:\n  ./value.txt\n  ./nested/leaf/leaf.txt\n  ../../src\nMust:\n  Preserve the committed value.\nDone when:\n  The committed value is verified.\n');
++      fs.symlinkSync('value.txt', path.join(dependency, 'value-link'));
++    }
++    if (deepSubmodule) {
++      leafDependency = `${root}-leaf-dependency`;
++      t.after(() => fs.rmSync(leafDependency, { recursive: true, force: true }));
++      fs.mkdirSync(leafDependency);
++      git(leafDependency, 'init', '-q', '--initial-branch=main');
++      git(leafDependency, 'config', 'user.name', 'Leaf Author');
++      git(leafDependency, 'config', 'user.email', 'leaf@example.invalid');
++      write(leafDependency, 'leaf.txt', 'leaf v1\n');
++      git(leafDependency, 'add', 'leaf.txt');
++      git(leafDependency, 'commit', '-qm', 'Leaf v1');
++      git(dependency, '-c', 'protocol.file.allow=always', 'submodule', 'add', '-q', leafDependency, 'nested/leaf');
++    }
++    git(dependency, 'add', '-A');
++    git(dependency, 'commit', '-qm', 'Dependency v1');
++    git(root, '-c', 'protocol.file.allow=always', 'submodule', 'add', '-q', dependency, 'vendor/dependency');
++    if (deepSubmodule) git(root, '-c', 'protocol.file.allow=always', 'submodule', 'update', '--init', '--recursive', '-q');
++    if (ignoreSubmoduleStatus) {
++      git(root, 'config', '-f', '.gitmodules', 'submodule.vendor/dependency.ignore', 'all');
++      git(root, 'add', '.gitmodules');
++    }
++  }
++  const pm = (...args) => call(root, pmCli, ...args);
++  const run = (...args) => call(root, runtime, ...args);
++  assert.equal(pm('init').status, 0);
++  write(root, 'docs/plan.md', '# Plan\n\n## Delivery mode\n- Scale: standard\n- Checkpoint policy: story-level\n- Integration branch: main\n- Skeleton: none\n');
++  const touches = withSubmodule && bindSubmodule
++    ? ['src', nestedSubmoduleScopes ? (deepSubmodule ? 'vendor/dependency/nested/leaf/leaf.txt' : 'vendor/dependency/value.txt') : 'vendor/dependency']
++    : ['src'];
++  const specs = withSubmodule && nestedSubmoduleScopes ? ['vendor/dependency/contract.sdd'] : [];
++  const readPaths = [storyRel, ...(withSubmodule && nestedSubmoduleScopes
++    ? ['vendor/dependency/value-link', 'vendor/dependency/missing.txt'] : [])];
++  write(root, storyRel, story(touches, specs));
++  write(root, 'src/value.txt', 'before\n');
++  git(root, 'add', 'docs', 'src');
++  git(root, 'commit', '-qm', 'Planned project');
++  assert.equal(pm('approve', '--approver', 'Ben').status, 0);
++  git(root, 'add', 'docs/approval.json');
++  git(root, 'commit', '-qm', 'Approved project');
++  assert.equal(pm('claim', '--story', storyRel).status, 0);
++  git(root, 'add', storyRel);
++  git(root, 'commit', '-qm', 'Claim story');
++  git(root, 'checkout', '-qb', 'pm/S1-1-value');
++  if (advanceSubmodule) {
++    write(dependency, 'value.txt', 'dependency v2\n');
++    git(dependency, 'add', 'value.txt');
++    git(dependency, 'commit', '-qm', 'Dependency v2');
++    const moduleRoot = path.join(root, 'vendor/dependency');
++    git(moduleRoot, 'fetch', '-q', 'origin');
++    git(moduleRoot, 'checkout', '-q', git(dependency, 'rev-parse', 'HEAD'));
++    git(root, 'add', 'vendor/dependency');
++    git(root, 'commit', '-qm', 'Advance story dependency');
++  }
++  if (preexistingDirty) write(root, 'src/preexisting.txt', 'uncommitted user bytes\n');
++  write(root, '.deliver/task.json', {
++    id: 'S1-1', objective: 'Change the value.', acceptance: [{ id: 'AC-1', text: criterion }],
++    read_paths: readPaths, touches, commands: { test: gateCommand }, specs,
++  });
++  const initialized = run('init', '--mode', 'quick');
++  assert.equal(initialized.status, 0, initialized.stdout);
++  const runId = initialized.json.run_id;
++  const started = run('start', '--run', runId, '--task', '.deliver/task.json', '--builder', 'builder', '--story', storyRel);
++  assert.equal(started.status, 0, started.stdout);
++  for (const status of ['building', 'built', 'in-review']) assert.equal(pm('transition', '--run', runId, '--to', status).status, 0);
++  write(root, 'src/value.txt', 'integrated\n');
++  const prepared = run('commit-prepare', '--run', runId);
++  assert.equal(prepared.status, 0, prepared.stdout);
++  git(root, 'add', '-A', '--', ...prepared.json.preparation.paths);
++  git(root, 'commit', '-qm', 'Candidate C');
++  const candidate = git(root, 'rev-parse', 'HEAD');
++  assert.equal(run('commit-adopt', '--run', runId, '--token', prepared.json.preparation.token, '--commit', candidate).status, 0);
++  const checked = run('check', '--run', runId);
++  assert.equal(checked.status, 0, checked.stdout);
++  assert.equal(run('gate', '--run', runId, '--name', 'test', '--command', gateCommand).status, 0);
++  write(root, '.deliver/review.json', {
++    status: 'PASS', findings: [], panel: { snapshot_hash: checked.json.snapshot_hash, members: [
++      { lens: 'code-integrity-reviewer', reviewer: 'reviewer', verdict: sourceConcern ? 'CONCERNS' : 'PASS', snapshot_hash: checked.json.snapshot_hash,
++        findings: sourceConcern ? [{ severity: 'minor', message: 'Keep the source C concern visible.', resolved: false }] : [] },
++    ] },
++  });
++  assert.equal(run('review', '--run', runId, '--snapshot', checked.json.snapshot_hash, '--reviewer', 'reviewer', '--receipt', '.deliver/review.json').status, 0);
++  write(root, '.deliver/verification.json', { criteria: [{ id: 'AC-1', status: 'PASS', evidence: 'The test gate passed at candidate C.' }] });
++  const selfVerified = run('verify', '--run', runId, '--snapshot', checked.json.snapshot_hash, '--verifier', 'reviewer', '--results', '.deliver/verification.json');
++  assert.notEqual(selfVerified.status, 0);
++  assert.match(selfVerified.stdout, /verifier must differ from reviewer/i);
++  assert.equal(run('verify', '--run', runId, '--snapshot', checked.json.snapshot_hash, '--verifier', 'verifier', '--results', '.deliver/verification.json').status, 0);
++  assert.equal(run('finish', '--run', runId).status, 0);
++  git(root, 'worktree', 'add', '-q', integration, 'main');
++  if (withSubmodule && initializeIntegrationSubmodule) {
++    git(integration, '-c', 'protocol.file.allow=always', 'submodule', 'update', '--init', '--recursive', '-q');
++  }
++  return { root, integration, dependency, leafDependency, runId, runFile: path.join(root, '.deliver/runs', `${runId}.json`), candidate };
++}
++
++function integrationCall(f, ...args) { return call(f.integration, pmCli, ...args); }
++
++function mutateRecord(f, state, command, ...args) {
++  const result = integrationCall(f, command, '--integration', state.file, '--expected-record', state.hash, ...args);
++  assert.equal(result.status, 0, result.stdout);
++  state.hash = result.json.hash;
++  state.record = result.json.record;
++  return result.json.result;
++}
++
++function finalizedIntegration(t, { verificationReport = false } = {}) {
++  const f = finishedCandidate(t);
++  const args = ['integrate-prepare', '--run', f.runFile, ...(verificationReport ? ['--verification-report'] : [])];
++  const prepared = integrationCall(f, ...args);
++  assert.equal(prepared.status, 0, prepared.stdout);
++  const state = { file: prepared.json.file, hash: prepared.json.hash, record: prepared.json.record };
++  git(f.integration, 'merge', '--no-ff', '--no-edit', f.candidate);
++  mutateRecord(f, state, 'integrate-adopt', '--token', state.record.integration.token, '--commit', git(f.integration, 'rev-parse', 'HEAD'));
++  mutateRecord(f, state, 'integrate-gate', '--name', 'test');
++  mutateRecord(f, state, 'integrate-finalize');
++  return { f, state };
++}
++
++test('local C/M/P/E/H closure retains current identity, counters and upstream handoff state', (t) => {
++  const f = finishedCandidate(t, { sourceConcern: true });
++  const prepared = integrationCall(f, 'integrate-prepare', '--run', f.runFile, '--verification-report');
++  assert.equal(prepared.status, 0, prepared.stdout);
++  const state = { file: prepared.json.file, hash: prepared.json.hash, record: prepared.json.record };
++  assert.equal(state.record.reporting, 'requested');
++  assert.equal(readStory(f.root, storyRel).execution.status, 'in-review');
++  const resumed = integrationCall(f, 'integrate-prepare', '--run', f.runFile, '--verification-report');
++  assert.equal(resumed.status, 0, resumed.stdout);
++  assert.equal(resumed.json.resumed, true);
++  assert.equal(resumed.json.hash, state.hash);
++  assert.equal(resumed.json.record.integration.token, state.record.integration.token);
++
++  git(f.integration, 'merge', '--no-ff', '--no-edit', f.candidate);
++  const merge = git(f.integration, 'rev-parse', 'HEAD');
++  mutateRecord(f, state, 'integrate-adopt', '--token', state.record.integration.token, '--commit', merge);
++  const gate = mutateRecord(f, state, 'integrate-gate', '--name', 'test');
++  assert.equal(gate.status, 'PASS');
++  write(f.integration, '.deliver/integration-review.json', {
++    status: 'PASS', findings: [], panel: { snapshot_hash: state.record.evidence.snapshot_hash, members: [
++      { lens: 'code-integrity-reviewer', reviewer: 'm-reviewer', verdict: 'CONCERNS', snapshot_hash: state.record.evidence.snapshot_hash,
++        findings: [{ severity: 'minor', message: 'Retain this minor integration concern.', resolved: false }] },
++    ] },
++  });
++  mutateRecord(f, state, 'integrate-review', '--reviewer', 'm-reviewer', '--receipt', '.deliver/integration-review.json');
++  write(f.integration, '.deliver/integration-verification.json', {
++    criteria: [{ id: 'AC-1', status: 'PASS', evidence: 'The declared gate passed against actual M.' }],
++  });
++  mutateRecord(f, state, 'integrate-verify', '--verifier', 'm-verifier', '--results', '.deliver/integration-verification.json');
++  mutateRecord(f, state, 'integrate-finalize');
++
++  const reportingContract = structuredClone(state.record);
++  const droppedReporting = structuredClone(state.record);
++  droppedReporting.reporting = 'skipped';
++  droppedReporting.reporting_requested = false;
++  write(f.integration, path.relative(f.integration, state.file), droppedReporting);
++  const refusedDrop = integrationCall(f, 'close-prepare', '--integration', state.file,
++    '--expected-record', sha256(canonical(droppedReporting)));
++  assert.notEqual(refusedDrop.status, 0);
++  assert.match(refusedDrop.stdout, /invalid local integration record/);
++  write(f.integration, path.relative(f.integration, state.file), reportingContract);
++
++  const report = mutateRecord(f, state, 'report-prepare');
++  const validRecord = structuredClone(state.record);
++  const tampered = structuredClone(state.record);
++  tampered.report.pending.writes[0].after += 'Unproven claim.\n';
++  tampered.report.pending.writes[0].hash = sha256(tampered.report.pending.writes[0].after);
++  write(f.integration, path.relative(f.integration, state.file), tampered);
++  const refusedResume = integrationCall(f, 'report-prepare', '--integration', state.file,
++    '--expected-record', sha256(canonical(tampered)));
++  assert.notEqual(refusedResume.status, 0);
++  assert.match(refusedResume.stdout, /no longer matches finalized evidence/i);
++  write(f.integration, path.relative(f.integration, state.file), validRecord);
++  const checklist = report.writes.find((item) => item.path.includes('checklists')).path;
++  fs.unlinkSync(path.join(f.integration, checklist));
++  const recoveredReport = mutateRecord(f, state, 'report-prepare');
++  assert.equal(recoveredReport.token, report.token);
++  assert.equal(fs.existsSync(path.join(f.integration, checklist)), true);
++  git(f.integration, 'add', '--', ...report.writes.map((item) => item.path));
++  git(f.integration, 'commit', '-qm', 'Verification report P');
++  mutateRecord(f, state, 'report-adopt', '--token', report.token, '--commit', git(f.integration, 'rev-parse', 'HEAD'));
++  const reportText = fs.readFileSync(path.join(f.integration, `docs/verification/S1-1.md`), 'utf8');
++  assert.match(reportText, new RegExp(`Candidate C: ${f.candidate}`));
++  assert.match(reportText, new RegExp(`Integrated M: ${merge}`));
++  assert.match(reportText, /Retain this minor integration concern/);
++  assert.match(reportText, /Keep the source C concern visible/);
++  assert.doesNotMatch(reportText, /Verification report P/);
++
++  const adoptedReport = structuredClone(state.record);
++  const bypassedReport = structuredClone(state.record);
++  bypassedReport.report.commit = bypassedReport.integration.commit;
++  write(f.integration, path.relative(f.integration, state.file), bypassedReport);
++  const refusedBypass = integrationCall(f, 'close-prepare', '--integration', state.file,
++    '--expected-record', sha256(canonical(bypassedReport)));
++  assert.notEqual(refusedBypass.status, 0);
++  assert.match(refusedBypass.stdout, /report adopted commit proof is invalid/i);
++  write(f.integration, path.relative(f.integration, state.file), adoptedReport);
++
++  const closure = mutateRecord(f, state, 'close-prepare');
++  git(f.integration, 'add', '--', storyRel);
++  git(f.integration, 'commit', '-qm', 'Story closure E');
++  const closureCommit = git(f.integration, 'rev-parse', 'HEAD');
++  mutateRecord(f, state, 'close-adopt', '--token', closure.token, '--commit', closureCommit);
++  const mergedStory = readStory(f.integration, storyRel);
++  assert.equal(mergedStory.execution.status, 'merged');
++  assert.equal(mergedStory.execution.owner, readStory(f.root, storyRel).execution.owner);
++  assert.equal(mergedStory.execution.rounds, 0);
++  assert.match(mergedStory.text, new RegExp(merge));
++
++  const adoptedClosure = structuredClone(state.record);
++  const falseClosure = structuredClone(state.record);
++  falseClosure.closure.proof.parent = falseClosure.integration.commit;
++  write(f.integration, path.relative(f.integration, state.file), falseClosure);
++  const refusedHandoff = integrationCall(f, 'handoff-prepare', '--integration', state.file,
++    '--expected-record', sha256(canonical(falseClosure)), '--next', 'Start the next ready story.');
++  assert.notEqual(refusedHandoff.status, 0);
++  assert.match(refusedHandoff.stdout, /closure adopted commit proof is invalid/i);
++  write(f.integration, path.relative(f.integration, state.file), adoptedClosure);
++
++  const handoff = mutateRecord(f, state, 'handoff-prepare', '--next', 'Start the next ready story.');
++  git(f.integration, 'add', '--', handoff.writes[0].path);
++  git(f.integration, 'commit', '-qm', 'Handoff H');
++  const handoffCommit = git(f.integration, 'rev-parse', 'HEAD');
++  mutateRecord(f, state, 'handoff-adopt', '--token', handoff.token, '--commit', handoffCommit);
++  const handoffText = fs.readFileSync(path.join(f.integration, handoff.writes[0].path), 'utf8');
++  assert.match(handoffText, new RegExp(`BASE_COMMIT: ${closureCommit}`));
++  assert.match(handoffText, /OPEN_FINDINGS:[\s\S]*Retain this minor integration concern/);
++  assert.match(handoffText, /OPEN_FINDINGS:[\s\S]*Keep the source C concern visible/);
++  assert.notEqual(handoffCommit, closureCommit);
++  assert.equal(upstreamInspect(f.integration).handoff.current, true);
++  assert.equal(upstreamExecution(fs.readFileSync(path.join(f.integration, storyRel), 'utf8')).status, 'merged');
++});
++
++test('merge adoption refuses altered M and finish alone leaves the claim active', (t) => {
++  const f = finishedCandidate(t);
++  assert.equal(readStory(f.root, storyRel).execution.status, 'in-review');
++  const prepared = integrationCall(f, 'integrate-prepare', '--run', f.runFile);
++  assert.equal(prepared.status, 0, prepared.stdout);
++  write(f.integration, 'src/unreviewed.txt', 'extra\n');
++  git(f.integration, 'add', 'src/unreviewed.txt');
++  git(f.integration, 'commit', '-qm', 'Unexpected integration content');
++  const rejected = integrationCall(f, 'integrate-adopt', '--integration', prepared.json.file,
++    '--expected-record', prepared.json.hash, '--token', prepared.json.record.integration.token,
++    '--commit', git(f.integration, 'rev-parse', 'HEAD'));
++  assert.notEqual(rejected.status, 0);
++  assert.match(rejected.json.error, /no-ff merge/);
++  const record = JSON.parse(fs.readFileSync(prepared.json.file, 'utf8'));
++  assert.equal(record.integration.status, 'prepared');
++  assert.equal(readStory(f.root, storyRel).execution.status, 'in-review');
++});
++
++test('bound source-only dirt requires fresh M evidence without mutating C', (t) => {
++  const f = finishedCandidate(t, { preexistingDirty: true });
++  const prepared = integrationCall(f, 'integrate-prepare', '--run', f.runFile);
++  assert.equal(prepared.status, 0, prepared.stdout);
++  const state = { file: prepared.json.file, hash: prepared.json.hash, record: prepared.json.record };
++  assert.equal(state.record.evidence.source_reusable, false);
++  assert.deepEqual(state.record.evidence.reuse_mismatches, ['src/preexisting.txt']);
++  git(f.integration, 'merge', '--no-ff', '--no-edit', f.candidate);
++  mutateRecord(f, state, 'integrate-adopt', '--token', state.record.integration.token, '--commit', git(f.integration, 'rev-parse', 'HEAD'));
++  mutateRecord(f, state, 'integrate-gate', '--name', 'test');
++  const missingFresh = integrationCall(f, 'integrate-finalize', '--integration', state.file, '--expected-record', state.hash);
++  assert.notEqual(missingFresh.status, 0);
++  assert.match(missingFresh.stdout, /require fresh independent M review and verification/i);
++  write(f.integration, '.deliver/integration-review.json', {
++    status: 'PASS', findings: [], panel: { snapshot_hash: state.record.evidence.snapshot_hash, members: [
++      { lens: 'code-integrity-reviewer', reviewer: 'fresh-reviewer', verdict: 'PASS', snapshot_hash: state.record.evidence.snapshot_hash, findings: [] },
++    ] },
++  });
++  mutateRecord(f, state, 'integrate-review', '--reviewer', 'fresh-reviewer', '--receipt', '.deliver/integration-review.json');
++  write(f.integration, '.deliver/integration-verification.json', {
++    criteria: [{ id: 'AC-1', status: 'PASS', evidence: 'Fresh review and the declared gate verified actual M.' }],
++  });
++  mutateRecord(f, state, 'integrate-verify', '--verifier', 'fresh-verifier', '--results', '.deliver/integration-verification.json');
++  mutateRecord(f, state, 'integrate-finalize');
++  assert.equal(fs.readFileSync(path.join(f.root, 'src/preexisting.txt'), 'utf8'), 'uncommitted user bytes\n');
++  assert.equal(git(f.root, 'rev-parse', 'HEAD'), f.candidate);
++  assert.equal(readStory(f.root, storyRel).execution.status, 'in-review');
++});
++
++test('conflicted I and C persist an honest no-M probe record', (t) => {
++  const f = finishedCandidate(t);
++  write(f.integration, 'src/value.txt', 'integration-side change\n');
++  git(f.integration, 'add', 'src/value.txt');
++  git(f.integration, 'commit', '-qm', 'Conflicting integration change');
++  const base = git(f.integration, 'rev-parse', 'HEAD');
++  const prepared = integrationCall(f, 'integrate-prepare', '--run', f.runFile);
++  assert.equal(prepared.status, 0, prepared.stdout);
++  assert.equal(prepared.json.record.integration.status, 'failed');
++  assert.equal(prepared.json.record.integration.base, base);
++  assert.equal(prepared.json.record.integration.commit, null);
++  assert.equal(prepared.json.record.integration.manifest, null);
++  assert.equal(prepared.json.record.integration.failure.integration, base);
++  assert.equal(prepared.json.record.integration.failure.candidate, f.candidate);
++  assert.deepEqual(prepared.json.record.integration.failure.argv.slice(-4), ['merge-tree', '--write-tree', base, f.candidate]);
++  const log = path.join(f.integration, prepared.json.record.integration.failure.log_path);
++  assert.equal(sha256(fs.readFileSync(log)), prepared.json.record.integration.failure.log_hash);
++  assert.equal(git(f.integration, 'rev-parse', 'HEAD'), base);
++});
++
++test('clean bound I-to-M drift prepares fresh evidence instead of source correction', (t) => {
++  const f = finishedCandidate(t);
++  write(f.integration, 'src/integration-context.txt', 'already accepted on I\n');
++  git(f.integration, 'add', 'src/integration-context.txt');
++  git(f.integration, 'commit', '-qm', 'Add integration-side context');
++  const prepared = integrationCall(f, 'integrate-prepare', '--run', f.runFile);
++  assert.equal(prepared.status, 0, prepared.stdout);
++  assert.equal(prepared.json.record.integration.status, 'prepared');
++  assert.equal(prepared.json.record.evidence.source_reusable, false);
++  assert.deepEqual(prepared.json.record.evidence.reuse_mismatches, ['src/integration-context.txt']);
++  assert.notEqual(prepared.json.record.source.manifest.hash, prepared.json.record.integration.manifest.hash);
++});
++
++test('initialized scoped submodule advances at M while nested dirt, flags and metadata are rejected', (t) => {
++  const f = finishedCandidate(t, { withSubmodule: true, advanceSubmodule: true });
++  assert.equal(git(f.root, 'rev-parse', 'HEAD:vendor/dependency'), git(f.dependency, 'rev-parse', 'HEAD'), 'source C gitlink');
++  const prepared = integrationCall(f, 'integrate-prepare', '--run', f.runFile);
++  assert.equal(prepared.status, 0, prepared.stdout);
++  assert.equal(prepared.json.record.integration.status, 'prepared');
++  const state = { file: prepared.json.file, hash: prepared.json.hash, record: prepared.json.record };
++  git(f.integration, 'merge', '--no-ff', '--no-edit', f.candidate);
++  const merge = git(f.integration, 'rev-parse', 'HEAD');
++  const moduleRoot = path.join(f.integration, 'vendor/dependency');
++  git(moduleRoot, 'fetch', '-q', 'origin');
++  git(moduleRoot, 'checkout', '-q', git(f.integration, 'rev-parse', 'HEAD:vendor/dependency'));
++  assert.equal(git(moduleRoot, 'rev-parse', 'HEAD'), git(f.dependency, 'rev-parse', 'HEAD'));
++
++  write(moduleRoot, 'value.txt', 'nested dirt\n');
++  let refused = integrationCall(f, 'integrate-adopt', '--integration', state.file, '--expected-record', state.hash,
++    '--token', state.record.integration.token, '--commit', merge);
++  assert.notEqual(refused.status, 0);
++  assert.match(refused.stdout, /uncommitted project paths|submodule bytes differ/);
++  git(moduleRoot, 'checkout', '--', 'value.txt');
++
++  git(moduleRoot, 'update-index', '--assume-unchanged', 'value.txt');
++  write(moduleRoot, 'value.txt', 'hidden nested dirt\n');
++  refused = integrationCall(f, 'integrate-adopt', '--integration', state.file, '--expected-record', state.hash,
++    '--token', state.record.integration.token, '--commit', merge);
++  assert.notEqual(refused.status, 0);
++  assert.match(refused.stdout, /unsupported index flags|submodule bytes differ/);
++  git(moduleRoot, 'update-index', '--no-assume-unchanged', 'value.txt');
++  git(moduleRoot, 'checkout', '--', 'value.txt');
++
++  const moduleGitDir = path.resolve(moduleRoot, git(moduleRoot, 'rev-parse', '--git-dir'));
++  const moduleConfig = path.join(moduleGitDir, 'config');
++  const originalConfig = fs.readFileSync(moduleConfig);
++  git(moduleRoot, 'config', 'deliver.changed', 'yes');
++  refused = integrationCall(f, 'integrate-adopt', '--integration', state.file, '--expected-record', state.hash,
++    '--token', state.record.integration.token, '--commit', merge);
++  assert.notEqual(refused.status, 0);
++  assert.match(refused.stdout, /protected Git metadata changed/);
++  fs.writeFileSync(moduleConfig, originalConfig);
++
++  mutateRecord(f, state, 'integrate-adopt', '--token', state.record.integration.token, '--commit', merge);
++  assert.equal(state.record.integration.anchor.submodules['vendor/dependency'].head, git(f.dependency, 'rev-parse', 'HEAD'));
++  mutateRecord(f, state, 'integrate-gate', '--name', 'test');
++});
++
++test('nested submodule touch, read, spec, missing and symlink scopes bind exact M bytes', (t) => {
++  const f = finishedCandidate(t, { withSubmodule: true, advanceSubmodule: true, nestedSubmoduleScopes: true });
++  const prepared = integrationCall(f, 'integrate-prepare', '--run', f.runFile);
++  assert.equal(prepared.status, 0, prepared.stdout);
++  const entries = prepared.json.record.integration.manifest.entries;
++  assert.match(entries['vendor/dependency'], /^gitlink:[0-9a-f]+$/);
++  assert.match(entries['vendor/dependency/value.txt'], /^file:644:[0-9a-f]{64}$/);
++  assert.match(entries['vendor/dependency/contract.sdd'], /^file:644:[0-9a-f]{64}$/);
++  assert.match(entries['vendor/dependency/value-link'], /^symlink:[0-9a-f]{64}$/);
++  assert.equal(entries['vendor/dependency/missing.txt'], null);
++
++  const state = { file: prepared.json.file, hash: prepared.json.hash, record: prepared.json.record };
++  git(f.integration, 'merge', '--no-ff', '--no-edit', f.candidate);
++  const moduleRoot = path.join(f.integration, 'vendor/dependency');
++  git(moduleRoot, 'fetch', '-q', 'origin');
++  git(moduleRoot, 'checkout', '-q', git(f.integration, 'rev-parse', 'HEAD:vendor/dependency'));
++  mutateRecord(f, state, 'integrate-adopt', '--token', state.record.integration.token,
++    '--commit', git(f.integration, 'rev-parse', 'HEAD'));
++  mutateRecord(f, state, 'integrate-gate', '--name', 'test');
++});
++
++test('nested scopes recurse through more than one initialized gitlink', (t) => {
++  const f = finishedCandidate(t, {
++    withSubmodule: true, deepSubmodule: true, nestedSubmoduleScopes: true, advanceSubmodule: true,
++  });
++  const prepared = integrationCall(f, 'integrate-prepare', '--run', f.runFile);
++  assert.equal(prepared.status, 0, prepared.stdout);
++  const entries = prepared.json.record.integration.manifest.entries;
++  assert.match(entries['vendor/dependency'], /^gitlink:[0-9a-f]+$/);
++  assert.match(entries['vendor/dependency/nested/leaf'], /^gitlink:[0-9a-f]+$/);
++  assert.match(entries['vendor/dependency/nested/leaf/leaf.txt'], /^file:644:[0-9a-f]{64}$/);
++
++  const state = { file: prepared.json.file, hash: prepared.json.hash, record: prepared.json.record };
++  git(f.integration, 'merge', '--no-ff', '--no-edit', f.candidate);
++  const moduleRoot = path.join(f.integration, 'vendor/dependency');
++  git(moduleRoot, 'fetch', '-q', 'origin');
++  git(moduleRoot, 'checkout', '-q', git(f.integration, 'rev-parse', 'HEAD:vendor/dependency'));
++  git(moduleRoot, '-c', 'protocol.file.allow=always', 'submodule', 'update', '--init', '--recursive', '-q');
++  mutateRecord(f, state, 'integrate-adopt', '--token', state.record.integration.token,
++    '--commit', git(f.integration, 'rev-parse', 'HEAD'));
++  mutateRecord(f, state, 'integrate-gate', '--name', 'test');
++});
++
++test('unbound initialized submodule cannot hide a wrong clean HEAD from M proof', (t) => {
++  const f = finishedCandidate(t, { withSubmodule: true, bindSubmodule: false, ignoreSubmoduleStatus: true });
++  const prepared = integrationCall(f, 'integrate-prepare', '--run', f.runFile);
++  assert.equal(prepared.status, 0, prepared.stdout);
++  const state = { file: prepared.json.file, hash: prepared.json.hash, record: prepared.json.record };
++  git(f.integration, 'merge', '--no-ff', '--no-edit', f.candidate);
++  const merge = git(f.integration, 'rev-parse', 'HEAD');
++  const expected = git(f.integration, 'rev-parse', 'HEAD:vendor/dependency');
++  write(f.dependency, 'value.txt', 'unbound dependency v2\n');
++  git(f.dependency, 'add', 'value.txt');
++  git(f.dependency, 'commit', '-qm', 'Unbound dependency v2');
++  const moduleRoot = path.join(f.integration, 'vendor/dependency');
++  git(moduleRoot, 'fetch', '-q', 'origin');
++  git(moduleRoot, 'checkout', '-q', git(f.dependency, 'rev-parse', 'HEAD'));
++  assert.equal(git(f.integration, 'status', '--porcelain', '--untracked-files=no'), '', 'superproject status is suppressed');
++
++  const refused = integrationCall(f, 'integrate-adopt', '--integration', state.file, '--expected-record', state.hash,
++    '--token', state.record.integration.token, '--commit', merge);
++  assert.notEqual(refused.status, 0);
++  assert.match(refused.stdout, /expected commit|tracked bytes differ|expected M/i);
++  git(moduleRoot, 'checkout', '-q', expected);
++  mutateRecord(f, state, 'integrate-adopt', '--token', state.record.integration.token, '--commit', merge);
++  git(moduleRoot, 'checkout', '-q', git(f.dependency, 'rev-parse', 'HEAD'));
++  const refusedGate = integrationCall(f, 'integrate-gate', '--integration', state.file,
++    '--expected-record', state.hash, '--name', 'test');
++  assert.notEqual(refusedGate.status, 0);
++  assert.match(refusedGate.stdout, /expected commit|tracked bytes differ|expected M/i);
++  git(moduleRoot, 'checkout', '-q', expected);
++  mutateRecord(f, state, 'integrate-gate', '--name', 'test');
++});
++
++test('unrelated empty uninitialized submodule can prepare, adopt and gate', (t) => {
++  const f = finishedCandidate(t, {
++    withSubmodule: true, bindSubmodule: false, initializeIntegrationSubmodule: false,
++  });
++  const modulePath = path.join(f.integration, 'vendor/dependency');
++  assert.equal(fs.lstatSync(modulePath).isDirectory(), true);
++  assert.deepEqual(fs.readdirSync(modulePath), []);
++  const prepared = integrationCall(f, 'integrate-prepare', '--run', f.runFile);
++  assert.equal(prepared.status, 0, prepared.stdout);
++  assert.deepEqual(prepared.json.record.integration.base_checkout_proof.initialized, {});
++  const state = { file: prepared.json.file, hash: prepared.json.hash, record: prepared.json.record };
++  git(f.integration, 'merge', '--no-ff', '--no-edit', f.candidate);
++  mutateRecord(f, state, 'integrate-adopt', '--token', state.record.integration.token,
++    '--commit', git(f.integration, 'rev-parse', 'HEAD'));
++  mutateRecord(f, state, 'integrate-gate', '--name', 'test');
++});
++
++test('uninitialized submodule rejects nonempty, symlinked and required nested checkout shapes', (t) => {
++  const malformed = finishedCandidate(t, {
++    withSubmodule: true, bindSubmodule: false, ignoreSubmoduleStatus: true, initializeIntegrationSubmodule: false,
++  });
++  const modulePath = path.join(malformed.integration, 'vendor/dependency');
++  write(modulePath, 'unexpected.txt', 'not an initialized checkout\n');
++  let refused = integrationCall(malformed, 'integrate-prepare', '--run', malformed.runFile);
++  assert.notEqual(refused.status, 0);
++  assert.match(refused.stdout, /unexpected Git root|not initialized safely/i);
++  fs.rmSync(modulePath, { recursive: true, force: true });
++  fs.symlinkSync(malformed.root, modulePath);
++  refused = integrationCall(malformed, 'integrate-prepare', '--run', malformed.runFile);
++  assert.notEqual(refused.status, 0);
++  assert.match(refused.stdout, /not a real directory|escapes/i);
++
++  const required = finishedCandidate(t, {
++    withSubmodule: true, nestedSubmoduleScopes: true, initializeIntegrationSubmodule: false,
++  });
++  refused = integrationCall(required, 'integrate-prepare', '--run', required.runFile);
++  assert.notEqual(refused.status, 0);
++  assert.match(refused.stdout, /required submodule checkout is uninitialized/i);
++});
++
++test('gate execution rejects hidden bytes, retains retries and requires exact logs', (t) => {
++  const gateCommand = 'node -e "const fs=require(\'node:fs\'),cp=require(\'node:child_process\');if(fs.existsSync(\'.deliver/mutate-gate\')){cp.execFileSync(\'git\',[\'update-index\',\'--assume-unchanged\',\'src/value.txt\']);fs.writeFileSync(\'src/value.txt\',\'hidden drift\\n\')}"';
++  const f = finishedCandidate(t, { gateCommand });
++  const prepared = integrationCall(f, 'integrate-prepare', '--run', f.runFile);
++  assert.equal(prepared.status, 0, prepared.stdout);
++  const state = { file: prepared.json.file, hash: prepared.json.hash, record: prepared.json.record };
++  git(f.integration, 'merge', '--no-ff', '--no-edit', f.candidate);
++  mutateRecord(f, state, 'integrate-adopt', '--token', state.record.integration.token, '--commit', git(f.integration, 'rev-parse', 'HEAD'));
++
++  git(f.integration, 'update-index', '--assume-unchanged', 'src/value.txt');
++  write(f.integration, 'src/value.txt', 'hidden before gate\n');
++  const hiddenBefore = integrationCall(f, 'integrate-gate', '--integration', state.file, '--expected-record', state.hash, '--name', 'test');
++  assert.notEqual(hiddenBefore.status, 0);
++  assert.match(hiddenBefore.stdout, /unsupported index flags|executable bytes differ/);
++  git(f.integration, 'update-index', '--no-assume-unchanged', 'src/value.txt');
++  git(f.integration, 'checkout', '--', 'src/value.txt');
++
++  write(f.integration, '.deliver/mutate-gate', 'trigger\n');
++  const failed = mutateRecord(f, state, 'integrate-gate', '--name', 'test');
++  assert.equal(failed.status, 'FAIL');
++  git(f.integration, 'update-index', '--no-assume-unchanged', 'src/value.txt');
++  git(f.integration, 'checkout', '--', 'src/value.txt');
++  fs.unlinkSync(path.join(f.integration, '.deliver/mutate-gate'));
++  const passed = mutateRecord(f, state, 'integrate-gate', '--name', 'test');
++  assert.equal(passed.status, 'PASS');
++  assert.equal(state.record.evidence.gate_history.length, 1);
++  assert.equal(state.record.evidence.gate_history[0].status, 'FAIL');
++
++  const log = path.join(f.integration, state.record.evidence.gates[0].log_path);
++  const exactLog = fs.readFileSync(log);
++  fs.appendFileSync(log, 'altered');
++  const altered = integrationCall(f, 'integrate-finalize', '--integration', state.file, '--expected-record', state.hash);
++  assert.notEqual(altered.status, 0);
++  assert.match(altered.stdout, /log bytes changed/);
++  fs.writeFileSync(log, exactLog);
++  mutateRecord(f, state, 'integrate-finalize');
++  const finalizedReview = state.record.evidence.effective_review_identity;
++  mutateRecord(f, state, 'integrate-gate', '--name', 'test');
++  assert.equal(state.record.evidence.finalized, false);
++  assert.equal(state.record.evidence.finalization_history.length, 1);
++  assert.equal(state.record.evidence.finalization_history[0].review_identity, finalizedReview);
++  mutateRecord(f, state, 'integrate-finalize');
++});
++
++test('integration records reject noncanonical paths before creating locks', (t) => {
++  const f = finishedCandidate(t);
++  const prepared = integrationCall(f, 'integrate-prepare', '--run', f.runFile);
++  assert.equal(prepared.status, 0, prepared.stdout);
++  const linked = path.join(f.integration, '.deliver', 'linked-integration.json');
++  fs.symlinkSync(prepared.json.file, linked);
++  const rejected = integrationCall(f, 'integrate-finalize', '--integration', linked, '--expected-record', prepared.json.hash);
++  assert.notEqual(rejected.status, 0);
++  assert.match(rejected.stdout, /regular file/);
++  assert.equal(fs.existsSync(`${linked}.lock`), false);
++  const escaped = structuredClone(prepared.json.record);
++  escaped.id = '../escaped';
++  escaped.source.run_id = '../escaped';
++  const escapedFile = path.join(f.integration, '.deliver', 'integrations', 'escaped.json');
++  write(f.integration, path.relative(f.integration, escapedFile), escaped);
++  const rejectedId = integrationCall(f, 'integrate-finalize', '--integration', escapedFile,
++    '--expected-record', sha256(canonical(escaped)));
++  assert.notEqual(rejectedId.status, 0);
++  assert.match(rejectedId.stdout, /canonical run id/);
++  assert.equal(fs.existsSync(`${escapedFile}.lock`), false);
++});
++
++test('frozen artifact evidence survives a new terminal and refuses every later evidence mutation', (t) => {
++  const { f, state } = finalizedIntegration(t, { verificationReport: true });
++  const finalizedHash = state.hash;
++  const finalizedRevision = state.record.revision;
++  const repeated = mutateRecord(f, state, 'integrate-finalize');
++  assert.equal(repeated.finalization, state.record.evidence.finalization.identity);
++  assert.equal(state.hash, finalizedHash);
++  assert.equal(state.record.revision, finalizedRevision);
++
++  const report = mutateRecord(f, state, 'report-prepare');
++  const beforeBytes = fs.readFileSync(state.file);
++  const logDirectory = path.join(f.integration, '.deliver', 'logs', `integration-${f.runId}`);
++  const beforeLogs = fs.readdirSync(logDirectory).sort();
++  for (const args of [
++    ['integrate-gate', '--name', 'test'],
++    ['integrate-review', '--reviewer', 'later-reviewer', '--receipt', '.deliver/review.json'],
++    ['integrate-verify', '--verifier', 'later-verifier', '--results', '.deliver/verification.json'],
++  ]) {
++    const refused = integrationCall(f, args[0], '--integration', state.file, '--expected-record', state.hash, ...args.slice(1));
++    assert.notEqual(refused.status, 0);
++    assert.match(refused.stdout, /evidence is frozen/i);
++    assert.deepEqual(fs.readFileSync(state.file), beforeBytes);
++    assert.deepEqual(fs.readdirSync(logDirectory).sort(), beforeLogs);
++  }
++
++  git(f.integration, 'add', '--', ...report.writes.map((item) => item.path));
++  git(f.integration, 'commit', '-qm', 'Verification report P');
++  mutateRecord(f, state, 'report-adopt', '--token', report.token, '--commit', git(f.integration, 'rev-parse', 'HEAD'));
++  const resumed = callWithEnv(f.integration, { TERM_SESSION_ID: 'different-terminal' }, pmCli,
++    'close-prepare', '--integration', state.file, '--expected-record', state.hash);
++  assert.equal(resumed.status, 0, resumed.stdout);
++  assert.equal(resumed.json.result.finalization_identity, state.record.evidence.finalization.identity);
++});
++
++test('explicit reconciliation recovers retained post-P legacy provenance and rejects missing evidence unchanged', (t) => {
++  const { f, state } = finalizedIntegration(t, { verificationReport: true });
++  const report = mutateRecord(f, state, 'report-prepare');
++  git(f.integration, 'add', '--', ...report.writes.map((item) => item.path));
++  git(f.integration, 'commit', '-qm', 'Verification report P');
++  mutateRecord(f, state, 'report-adopt', '--token', report.token, '--commit', git(f.integration, 'rev-parse', 'HEAD'));
++
++  const legacy = structuredClone(state.record);
++  const frozen = legacy.evidence.finalization;
++  const oldGate = legacy.evidence.gates[0];
++  const replacement = { ...structuredClone(oldGate), finished_at: new Date(Date.parse(oldGate.finished_at) + 1000).toISOString() };
++  delete replacement.identity;
++  replacement.identity = sha256(canonical(replacement));
++  legacy.evidence.gate_history.push(oldGate);
++  legacy.evidence.gates = [replacement];
++  legacy.evidence.finalization_history.push({
++    at: new Date().toISOString(), reason: 'legacy post-P gate refresh', finalized_at: legacy.evidence.finalized_at,
++    snapshot_hash: legacy.evidence.snapshot_hash, review_identity: frozen.review_identity,
++    verification_identity: frozen.verification_identity, gates: frozen.gates.map((item) => item.identity),
++  });
++  legacy.evidence.finalized = false;
++  legacy.evidence.finalized_at = null;
++  legacy.evidence.effective_review_identity = null;
++  legacy.evidence.effective_verification_identity = null;
++  delete legacy.evidence.finalization;
++  delete legacy.report.proof.finalization_identity;
++  const legacyHash = sha256(canonical(legacy));
++  write(f.integration, path.relative(f.integration, state.file), legacy);
++
++  const blocked = integrationCall(f, 'close-prepare', '--integration', state.file, '--expected-record', legacyHash);
++  assert.notEqual(blocked.status, 0);
++  assert.match(blocked.stdout, /LEGACY_FINALIZATION_RECONCILE_REQUIRED/);
++  const repaired = callWithEnv(f.integration, { TERM_SESSION_ID: 'different-terminal' }, pmCli,
++    'integrate-reconcile', '--integration', state.file, '--expected-record', legacyHash);
++  assert.equal(repaired.status, 0, repaired.stdout);
++  assert.equal(repaired.json.record.evidence.finalization.identity, frozen.identity);
++  assert.equal(repaired.json.record.report.proof.finalization_identity, frozen.identity);
++  assert.equal(repaired.json.record.evidence.reconciliation_history[0].before_hash, legacyHash);
++  assert.deepEqual(repaired.json.record.evidence.reconciliation_history[0].before, legacy);
++
++  state.hash = repaired.json.hash;
++  state.record = repaired.json.record;
++  const continued = callWithEnv(f.integration, { TERM_SESSION_ID: 'another-terminal' }, pmCli,
++    'close-prepare', '--integration', state.file, '--expected-record', state.hash);
++  assert.equal(continued.status, 0, continued.stdout);
++
++  const missing = structuredClone(legacy);
++  missing.evidence.gate_history = [];
++  const missingHash = sha256(canonical(missing));
++  write(f.integration, path.relative(f.integration, state.file), missing);
++  const before = fs.readFileSync(state.file);
++  const refused = integrationCall(f, 'integrate-reconcile', '--integration', state.file, '--expected-record', missingHash);
++  assert.notEqual(refused.status, 0);
++  assert.match(refused.stdout, /LEGACY_FINALIZATION_MISSING/);
++  assert.deepEqual(fs.readFileSync(state.file), before);
++});
++
++test('closure-only preparations freeze evidence and legacy repair fails closed on ambiguity', (t) => {
++  const { f, state } = finalizedIntegration(t);
++  const closure = mutateRecord(f, state, 'close-prepare');
++  assert.equal(closure.finalization_identity, state.record.evidence.finalization.identity);
++  const frozenBytes = fs.readFileSync(state.file);
++  const frozenLogs = fs.readdirSync(path.join(f.integration, '.deliver', 'logs', `integration-${f.runId}`)).sort();
++  const refusedGate = integrationCall(f, 'integrate-gate', '--integration', state.file,
++    '--expected-record', state.hash, '--name', 'test');
++  assert.notEqual(refusedGate.status, 0);
++  assert.match(refusedGate.stdout, /evidence is frozen/i);
++  assert.deepEqual(fs.readFileSync(state.file), frozenBytes);
++  assert.deepEqual(fs.readdirSync(path.join(f.integration, '.deliver', 'logs', `integration-${f.runId}`)).sort(), frozenLogs);
++
++  const legacy = structuredClone(state.record);
++  const frozen = legacy.evidence.finalization;
++  delete legacy.evidence.finalization;
++  delete legacy.closure.pending.finalization_identity;
++  const ambiguous = structuredClone(legacy);
++  const alternativeGate = { ...structuredClone(ambiguous.evidence.gates[0]),
++    finished_at: new Date(Date.parse(ambiguous.evidence.gates[0].finished_at) + 2000).toISOString() };
++  delete alternativeGate.identity;
++  alternativeGate.identity = sha256(canonical(alternativeGate));
++  ambiguous.evidence.gate_history.push(alternativeGate);
++  ambiguous.evidence.finalization_history.push({
++    at: new Date().toISOString(), finalized_at: legacy.evidence.finalized_at,
++    review_identity: frozen.review_identity, verification_identity: frozen.verification_identity,
++    gates: [alternativeGate.identity], reason: 'ambiguous retained candidate',
++  });
++  const ambiguousHash = sha256(canonical(ambiguous));
++  write(f.integration, path.relative(f.integration, state.file), ambiguous);
++  const ambiguousBytes = fs.readFileSync(state.file);
++  const refused = integrationCall(f, 'integrate-reconcile', '--integration', state.file, '--expected-record', ambiguousHash);
++  assert.notEqual(refused.status, 0);
++  assert.match(refused.stdout, /LEGACY_FINALIZATION_AMBIGUOUS/);
++  assert.deepEqual(fs.readFileSync(state.file), ambiguousBytes);
++
++  const oversized = { ...structuredClone(legacy), retained_legacy_padding: 'x'.repeat(4_500_000) };
++  const oversizedHash = sha256(canonical(oversized));
++  write(f.integration, path.relative(f.integration, state.file), oversized);
++  const oversizedBytes = fs.readFileSync(state.file);
++  const refusedOversized = integrationCall(f, 'integrate-reconcile', '--integration', state.file,
++    '--expected-record', oversizedHash);
++  assert.notEqual(refusedOversized.status, 0);
++  assert.match(refusedOversized.stdout, /LEGACY_FINALIZATION_TOO_LARGE/);
++  assert.deepEqual(fs.readFileSync(state.file), oversizedBytes);
++
++  const legacyHash = sha256(canonical(legacy));
++  write(f.integration, path.relative(f.integration, state.file), legacy);
++  const repaired = callWithEnv(f.integration, { TERM_SESSION_ID: 'new-terminal' }, pmCli,
++    'integrate-reconcile', '--integration', state.file, '--expected-record', legacyHash);
++  assert.equal(repaired.status, 0, repaired.stdout);
++  assert.equal(repaired.json.record.evidence.finalization.identity, frozen.identity);
++  assert.equal(repaired.json.record.closure.pending.finalization_identity, frozen.identity);
++});
+diff --git a/tests/operations.test.mjs b/tests/operations.test.mjs
+index 69dff86..371df3c 100644
+--- a/tests/operations.test.mjs
++++ b/tests/operations.test.mjs
+@@ -63,6 +63,13 @@ test('installed operation map resolves every native operation and its one refere
+   assert.deepEqual(byName.analyze.mutation, { mode: 'read-only', paths: [], external: [] });
+   assert.deepEqual(byName.status.mutation, { mode: 'read-only', paths: [], external: [] });
+   assert(byName.complete.mutation.external.includes('verified-merge'));
++  assert.equal(byName.complete.reference, 'references/shipping.md');
++  assert.deepEqual(byName.complete.output.paths, [
++    'docs/stories/<story-id>-<slug>.md',
++    'docs/verification/<story-id>.md',
++    'docs/checklists/verification-<story-id>.md',
++    'docs/handoff/<actor-id>.md',
++  ]);
+ 
+   const operationContract = read(skill, 'references/operations.md');
+   assert.match(operationContract, /Read only its `reference`/);
+@@ -136,4 +143,9 @@ test('installed planning templates preserve identifiers, scale choices and uncla
+   for (const route of ['operations', 'discovery', 'specification', 'planning', 'scale-profiles', 'decomposition']) {
+     assert.match(entry, new RegExp(`references/${route}\\.md`));
+   }
++  assert.match(entry, /references\/shipping\.md/);
++  const shipping = read(skill, 'references/shipping.md');
++  assert.match(shipping, /integrate-prepare[\s\S]*git merge --no-ff --no-edit[\s\S]*integrate-adopt/);
++  assert.match(shipping, /report-prepare[\s\S]*close-prepare[\s\S]*handoff-prepare/);
++  assert.match(shipping, /standing authority/);
+ });
+diff --git a/tests/reporting.test.mjs b/tests/reporting.test.mjs
+new file mode 100644
+index 0000000..52c1085
+--- /dev/null
++++ b/tests/reporting.test.mjs
+@@ -0,0 +1,60 @@
++import assert from 'node:assert/strict';
++import { test } from 'node:test';
++import { renderVerificationArtifacts } from '../plugins/deliver/skills/deliver/scripts/lib/reporting.mjs';
++
++function values() {
++  const snapshot = 'a'.repeat(64);
++  const record = {
++    evidence: { finalized: true, gates: [{ name: 'test', command: 'node --test', status: 'PASS', identity: 'b'.repeat(64) }] },
++    integration: { commit: '1'.repeat(40) },
++    source: { story: 'S1-2', story_path: 'docs/stories/S1-2-report.md', candidate: '2'.repeat(40), snapshot_hash: snapshot },
++    manifest: { hash: 'c'.repeat(64) },
++    plan: { scale: 'large' },
++  };
++  const story = { reviewLenses: ['architecture-reviewer'] };
++  const review = {
++    identity: 'd'.repeat(64), panel: { members: [
++      { lens: 'code-integrity-reviewer', reviewer: 'reviewer-a', verdict: 'PASS', snapshot_hash: snapshot },
++      { lens: 'architecture-reviewer', reviewer: 'reviewer-b', verdict: 'PASS', snapshot_hash: snapshot },
++    ] },
++  };
++  const verification = { identity: 'e'.repeat(64), criteria: [{ id: 'AC-1', status: 'PASS', evidence: 'Observed output matched the fixture.' }] };
++  return { record, story, review, verification };
++}
++
++test('deterministic report binds C, M and receipt identities without naming P', () => {
++  const input = values();
++  const first = renderVerificationArtifacts(input.record, input.story, input.review, input.verification);
++  const second = renderVerificationArtifacts(input.record, input.story, input.review, input.verification);
++  assert.deepEqual(second, first);
++  assert.match(first.report, new RegExp(`Candidate C: ${'2'.repeat(40)}`));
++  assert.match(first.report, new RegExp(`Integrated M: ${'1'.repeat(40)}`));
++  assert.match(first.report, new RegExp(`Review receipt: ${'d'.repeat(64)}`));
++  assert.doesNotMatch(first.report, /commit P|own hash/i);
++  assert.match(first.checklist, /\[x\] AC-1: PASS\. Evidence: Observed output/);
++});
++
++test('large reporting rejects missing lenses and non-PASS criteria', () => {
++  const input = values();
++  input.review.panel.members = input.review.panel.members.filter((item) => item.lens !== 'architecture-reviewer');
++  assert.throws(() => renderVerificationArtifacts(input.record, input.story, input.review, input.verification), /missing required lenses/);
++  input.review = values().review;
++  input.verification.criteria[0].status = 'UNKNOWN';
++  assert.throws(() => renderVerificationArtifacts(input.record, input.story, input.review, input.verification), /unsupported PASS/);
++});
++
++test('reporting retains minor concerns and neutralizes multiline evidence markup', () => {
++  const input = values();
++  input.review.findings = [{
++    severity: 'minor', message: 'Keep the small concern.', resolved: false,
++    lens: 'code-integrity-reviewer', reviewer: 'reviewer-a',
++  }];
++  input.review.panel.members[0].verdict = 'CONCERNS';
++  input.verification.criteria[0].evidence = 'Observed output.\n## Injected heading\n- [ ] Fake unchecked claim';
++  const rendered = renderVerificationArtifacts(input.record, input.story, input.review, input.verification);
++  assert.match(rendered.report, /Keep the small concern/);
++  assert.doesNotMatch(rendered.report, /\n## Injected heading/);
++  assert.doesNotMatch(rendered.report, /\n- \[ \] Fake unchecked claim/);
++  assert.match(rendered.report, /Observed output\. +## Injected heading/);
++  assert.doesNotMatch(rendered.checklist, /\n## Injected heading|\n- \[ \] Fake unchecked claim/);
++});
+diff --git a/tests/review-panel.test.mjs b/tests/review-panel.test.mjs
+new file mode 100644
+index 0000000..174aac6
+--- /dev/null
++++ b/tests/review-panel.test.mjs
+@@ -0,0 +1,83 @@
++import assert from 'node:assert/strict';
++import { test } from 'node:test';
++import { parseReviewReceipt, requiredReviewLenses } from '../plugins/deliver/skills/deliver/scripts/lib/review.mjs';
++
++const snapshot = 'a'.repeat(64);
++
++test('panel parser retains member identities, concerns and derived findings', () => {
++  const receipt = parseReviewReceipt({
++    status: 'PASS',
++    findings: [],
++    panel: {
++      snapshot_hash: snapshot,
++      members: [
++        { lens: 'code-integrity-reviewer', reviewer: 'reviewer-a', verdict: 'PASS', snapshot_hash: snapshot, findings: [] },
++        { lens: 'architecture-reviewer', reviewer: 'reviewer-b', verdict: 'CONCERNS', snapshot_hash: snapshot,
++          findings: [{ severity: 'minor', message: 'Keep the compatibility note.', resolved: false }] },
++      ],
++    },
++  }, { expectedSnapshot: snapshot });
++  assert.equal(receipt.status, 'PASS');
++  assert.equal(receipt.findings.length, 1);
++  assert.equal(receipt.findings[0].lens, 'architecture-reviewer');
++  assert.equal(receipt.panel.members[1].verdict, 'CONCERNS');
++  assert.throws(() => parseReviewReceipt({ ...receipt, status: 'FAIL' }, { expectedSnapshot: snapshot }), /derived/);
++});
++
++test('panel rejects stale member snapshots and reports regulated lens requirements', () => {
++  const value = {
++    status: 'PASS', findings: [], panel: { snapshot_hash: snapshot, members: [
++      { lens: 'code-integrity-reviewer', reviewer: 'reviewer-a', verdict: 'PASS', snapshot_hash: 'b'.repeat(64), findings: [] },
++    ] },
++  };
++  assert.throws(() => parseReviewReceipt(value, { expectedSnapshot: snapshot }), /member/);
++  assert.deepEqual(requiredReviewLenses({ reviewLenses: ['architecture-reviewer'] }, 'regulated'),
++    ['architecture-reviewer', 'code-integrity-reviewer', 'security-auditor']);
++});
++
++test('panel aggregate is an exact order-independent attributed multiset', () => {
++  const shared = { severity: 'minor', message: 'Retain the shared concern.', resolved: false };
++  const input = {
++    status: 'PASS',
++    findings: [
++      { ...shared, lens: 'architecture-reviewer', reviewer: 'reviewer-b' },
++      { ...shared, lens: 'code-integrity-reviewer', reviewer: 'reviewer-a' },
++    ],
++    panel: { snapshot_hash: snapshot, members: [
++      { lens: 'code-integrity-reviewer', reviewer: 'reviewer-a', verdict: 'CONCERNS', snapshot_hash: snapshot, findings: [shared] },
++      { lens: 'architecture-reviewer', reviewer: 'reviewer-b', verdict: 'CONCERNS', snapshot_hash: snapshot, findings: [shared] },
++    ] },
++  };
++  const parsed = parseReviewReceipt(input, { expectedSnapshot: snapshot });
++  assert.deepEqual(parseReviewReceipt(parsed, { expectedSnapshot: snapshot }), parsed);
++  assert.equal(parsed.findings.length, 2, 'duplicate member findings retain multiplicity');
++  const mixedAttribution = structuredClone(input);
++  mixedAttribution.findings.reverse();
++  delete mixedAttribution.findings[0].lens;
++  delete mixedAttribution.findings[0].reviewer;
++  assert.equal(parseReviewReceipt(mixedAttribution, { expectedSnapshot: snapshot }).findings.length, 2,
++    'an unattributed duplicate cannot consume the only match for an attributed duplicate');
++
++  const hidden = structuredClone(input);
++  hidden.findings.push({ severity: 'major', message: 'Hidden blocking defect.', resolved: false });
++  assert.throws(() => parseReviewReceipt(hidden, { expectedSnapshot: snapshot }), /complete member-derived aggregate/);
++
++  for (const change of [
++    (value) => { value.findings.pop(); },
++    (value) => { value.findings[0].severity = 'major'; },
++    (value) => { value.findings[0].resolved = true; },
++    (value) => { value.findings[0].reviewer = 'reviewer-a'; },
++    (value) => { value.findings.push({ ...shared }); },
++  ]) {
++    const invalid = structuredClone(input);
++    change(invalid);
++    assert.throws(() => parseReviewReceipt(invalid, { expectedSnapshot: snapshot }), /aggregate|differ/);
++  }
++});
++
++test('legacy receipts without a panel keep their supplied findings', () => {
++  const receipt = parseReviewReceipt({ status: 'PASS', findings: [
++    { severity: 'minor', message: 'Standalone concern.', resolved: false },
++  ] });
++  assert.deepEqual(receipt.findings, [{ severity: 'minor', message: 'Standalone concern.', resolved: false }]);
++});

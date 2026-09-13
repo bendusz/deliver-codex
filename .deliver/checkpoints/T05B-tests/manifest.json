@@ -1,0 +1,38 @@
+{
+  "version": "frozen-independent-tests-v1",
+  "task": "T05B",
+  "author": "/root/correction_regressions",
+  "hashes": {
+    "tests/remote.test.mjs": "8b3f797e85fdbaeadad3a457232050d156d0bbaadbd02cbba3173d394af40d82",
+    "tests/remote-lifecycle.test.mjs": "ba632cd811d9b678c3824c57e21b833ed75126b1ef1c70d3be006b76b3fcaaa5",
+    "tests/current-roundtrip.test.mjs": "250a9606d526bd156095a264458c296d089eb5dc747f6e6f997789b8666122f3",
+    "tests/operations.test.mjs": "dde1af29f017b8816b77eb8e9211aff873bcde984b469f6aabaf3d273e6dc3f8"
+  },
+  "new_untracked_path": "tests/remote-lifecycle.test.mjs",
+  "syntax": "Agent-reported all4 PASS",
+  "diff_check": "Agent-reported PASS",
+  "broad_suite": "Not run",
+  "remaining_red": {
+    "command": "node --test --test-name-pattern='proved premerge head or base drift' tests/remote-lifecycle.test.mjs",
+    "child_pass": 2,
+    "child_fail": 1,
+    "duration_seconds": 44.14,
+    "failure": "Exact observed remote head D after successful source publication returns PUBLISHED instead of linked read-only PROVIDER_SUPERSEDED.",
+    "location": "tests/remote-lifecycle.test.mjs:949",
+    "controls": "Base-drift supersession and nonqualifying observation cases pass.",
+    "provenance": "Native independent test engineer report; raw log not provided, not coordinator execution."
+  },
+  "focused_pass_groups": [
+    "interruption/concurrency4/4 33.97s",
+    "retry0/1/2/exhaustion41.24s",
+    "two genuine remote completion histories and later S1-3 claim55.10s",
+    "advanced changed-scope M evidence",
+    "normal/advanced rebase and squash exact/hidden predecessor",
+    "normal lifecycle5/5 73.47s",
+    "raced closure and negative wrappers",
+    "completion dirty/non-FF/stale-token/protected drift",
+    "CLI bounds",
+    "admission, adapter and operation routing"
+  ],
+  "policy": "Test edits require explicit coordinator reopening. Production is still in initial implementation; this is not task acceptance."
+}

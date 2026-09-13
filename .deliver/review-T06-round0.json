@@ -1,0 +1,12 @@
+{
+  "status": "FAIL",
+  "findings": [
+    {
+      "severity": "major",
+      "message": "The checkpoint policy reinstates merge-by-merge user pauses: story-level always pauses before each merge, and every high-risk merge escalates regardless of policy. This conflicts with the approved plan's standing authority for scoped verified merges without repeated permission. State that explicit user preferences and existing authorization override checkpoint defaults; reserve escalation for scope or requirement changes unless the user explicitly chooses a merge-review checkpoint.",
+      "path": "plugins/deliver/skills/deliver/references/scale-profiles.md",
+      "resolved": false
+    }
+  ],
+  "summary": "Independent review verified the installed operation map, planning templates, reference routing and exact-snapshot gates. The scale checkpoint contract conflicts with the user's approved standing merge authority, so T06 is not ready to integrate."
+}

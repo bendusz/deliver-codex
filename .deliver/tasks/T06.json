@@ -1,0 +1,41 @@
+{
+  "objective": "Complete native planning operations, scale policies and project artifact templates",
+  "touches": [
+    "plugins/deliver/skills/deliver/SKILL.md",
+    "plugins/deliver/skills/deliver/references/workflow.md",
+    "plugins/deliver/skills/deliver/references/discovery.md",
+    "plugins/deliver/skills/deliver/references/specification.md",
+    "plugins/deliver/skills/deliver/references/planning.md",
+    "plugins/deliver/skills/deliver/references/decomposition.md",
+    "plugins/deliver/skills/deliver/references/scale-profiles.md",
+    "plugins/deliver/skills/deliver/references/operations.md",
+    "plugins/deliver/skills/deliver/assets/templates",
+    "plugins/deliver/skills/deliver/assets/operations.json",
+    "scripts/validate.mjs",
+    "tests/operations.test.mjs"
+  ],
+  "acceptance": [
+    {
+      "id": "T06-AC1",
+      "text": "Installed skill discovers every approved high-level operation with arguments, output and write authority and only loads relevant references."
+    },
+    {
+      "id": "T06-AC2",
+      "text": "Current templates preserve stable requirement IDs, clarify blocking unknowns, produce ready unclaimed stories, and implement independent project scale and execution mode policies."
+    },
+    {
+      "id": "T06-AC3",
+      "text": "Entry remains below context budget, every operation and asset path resolves, no Claude plugin-root or slash-registration assumptions survive, and plan grants standing PM Git/PR authority."
+    }
+  ],
+  "id": "T06",
+  "read_paths": [
+    "AGENTS.md",
+    "docs/plans/2026-09-09-upstream-parity.md"
+  ],
+  "commands": {
+    "test": "npm test",
+    "validate": "npm run validate"
+  },
+  "specs": []
+}

@@ -1,0 +1,32 @@
+{
+  "status": "READY",
+  "findings": [],
+  "resolved": [
+    {
+      "item": "latest_provider_observation",
+      "resolved": true,
+      "evidence": "Both supersession cases now derive the prior identity from the latest retained observed result, including its result_identity. Valid observed fields override prepared values, while an omitted remoteBase preserves the already-proved prepared base."
+    },
+    {
+      "item": "supersession_qualification",
+      "resolved": true,
+      "evidence": "The frozen tests retain immutable C and refusal controls for failed, unknown, absent, pending, ambiguous and metadata-only observations."
+    },
+    {
+      "item": "repaired_terminal_proof",
+      "resolved": true,
+      "evidence": "The source constructor defines handoff_repair.proof.commit as the merged terminal S. The test proves commit equals S and differs from R before rebinding that actual field to R and reidentifying the proof."
+    },
+    {
+      "item": "remote_commit_correction",
+      "resolved": true,
+      "evidence": "I retract my earlier remote_commit claim. No frozen contract defines that field, and the authorized source constructor confirms commit is the correct representation."
+    },
+    {
+      "item": "remaining_preflight_items",
+      "resolved": true,
+      "evidence": "The representation-neutral supersession checks, fresh-process closure and repair reconciliation, verification finalization binding, repaired admission proof chain, and H2 attachment coverage remain intact."
+    }
+  ],
+  "scope": "Frozen fix1 tests only; this is coverage readiness and does not attest to production behavior or runtime passage."
+}

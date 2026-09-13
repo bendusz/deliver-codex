@@ -1,0 +1,29 @@
+{
+  "criteria": [
+    {
+      "id": "T05L-AC1",
+      "status": "PASS",
+      "evidence": "Finish retains the current shared-project claim; current completion requires a verifier distinct from builder and reviewer, and merged Execution is reached only through a verified M with retained identity, acceptance criteria and spent counters. The extra regression now proves preparation, M adoption and a fresh gate also work when an unrelated tracked submodule is left normally uninitialized."
+    },
+    {
+      "id": "T05L-AC2",
+      "status": "PASS",
+      "evidence": "Both current upstream/Codex Execution directions preserve contract and unknown identity fields. Fresh-process pending recovery, exact story-only E, handoff-only H with BASE_COMMIT E, retained findings and unchanged pinned-reader acceptance are covered; adopted artifact topology, paths, modes and bytes are revalidated."
+    },
+    {
+      "id": "T05L-AC3",
+      "status": "PASS",
+      "evidence": "Large/regulated and persisted standard opt-in reporting policy, exact evidence-derived report/checklist paths, C/source-snapshot/M/manifest/current receipt identities, lens and PASS requirements, escaped retained findings, direct-child P and story-only E are enforced with coherent-tamper regressions."
+    },
+    {
+      "id": "T05L-AC4",
+      "status": "PASS",
+      "evidence": "Separate C/source-snapshot/M manifests, fresh M review plus distinct verification for evidence-only drift, honest no-M records, exact gate logs/history and before/after live-M checks are implemented. Recursive committed/live scopes and every initialized submodule are proved against expected M, including valid gitlink advancement and rejection of dirt, hidden indexes, wrong HEAD and protected metadata drift. A canonical empty optional gitlink directory is now recorded as absent, while nonempty, symlinked, escaping, malformed and required-uninitialized paths reject; the actual Git regression reaches the declared gate at M."
+    },
+    {
+      "id": "T05L-AC5",
+      "status": "PASS",
+      "evidence": "Structured panel receipts retain exact members, snapshots, verdicts and findings, derive the aggregate, enforce required reporting lenses and preserve no-panel compatibility; handoff output retains source-C and effective-M concerns. Coordinator gates passed 153/153 tests and packaging validation at snapshot 10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9."
+    }
+  ]
+}

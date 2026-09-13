@@ -1,0 +1,19 @@
+{
+  "source": "Executed by independent test engineer /root/correction_regressions; exact result reported through native agent output",
+  "snapshot": "49bf99c706aba103ad8b907707393304b32705a04426f72683a2a6ecfe713950",
+  "command": "node --test --test-name-pattern='incomplete started publications|binds started publication hashes' tests/current-lifecycle.test.mjs",
+  "exit_code": 1,
+  "tests": 7,
+  "passed": 1,
+  "failed_reported": 6,
+  "actual_leaf_failures": 4,
+  "duration_ms": 59378.458959,
+  "positive_control": "PASS exact started after-images",
+  "failures": [
+    "missing published run recreated and journal deleted",
+    "exact story before-image rewritten and journal deleted",
+    "unrelated valid-format run_hash accepted and journal deleted",
+    "unrelated valid-format story_hash accepted and journal deleted"
+  ],
+  "setup_failures": false
+}

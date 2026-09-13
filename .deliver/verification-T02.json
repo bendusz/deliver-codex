@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T02-AC1",
+      "status": "PASS",
+      "evidence": "Independent inspection and exact-snapshot tests confirm the current inspector matches the unchanged pinned 0.25.1 reader for valid phase, approval fields, claims, branch/story, unmerged IDs, retrospective precedence, worktrees and handoff freshness. The fixture covers a handoff-only commit, multiple sprints and foreign claims; legacy status regression tests also pass."
+    },
+    {
+      "id": "T02-AC2",
+      "status": "PASS",
+      "evidence": "The parser preserves ordered criterion bytes, excludes only the precisely delimited final Execution section from contractHash, retains safe extension fields, and rejects duplicate sections and unsafe touch paths. The corrected shared isValidGitBranchName rejects every previously accepted Git-invalid execution/ref form and focused tests compare valid and invalid examples with git check-ref-format."
+    },
+    {
+      "id": "T02-AC3",
+      "status": "PASS",
+      "evidence": "Symlink, FIFO, malformed story, missing identity and missing-Git cases produce bounded diagnostics without writes or false completion, and pm status preserves legacy output. Corrected completion gating forces planning whenever approval is non-executable; tests cover null digest with missing plan and untracked marker/plan alongside otherwise completed tiny stories. Fresh npm test and npm run validate gates passed at snapshot db49e17fbc318d3a30f2c411c5b233033791e5031c70ee2de50a009e8087395c with no scope drift."
+    }
+  ]
+}

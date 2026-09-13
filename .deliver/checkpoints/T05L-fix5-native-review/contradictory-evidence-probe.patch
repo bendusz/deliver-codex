@@ -1,0 +1,12 @@
+--- frozen/tests/integration.test.mjs
++++ probe/tests/integration.test.mjs
+@@ -664,7 +664,8 @@
+   const legacy = structuredClone(state.record);
+   const frozen = legacy.evidence.finalization;
+   const oldGate = legacy.evidence.gates[0];
+-  const replacement = { ...structuredClone(oldGate), finished_at: new Date(Date.parse(oldGate.finished_at) + 1000).toISOString() };
++  const replacement = { ...structuredClone(oldGate), status: 'FAIL', exit_code: 1,
++    finished_at: new Date(Date.parse(oldGate.finished_at) + 1000).toISOString() };
+   delete replacement.identity;
+   replacement.identity = sha256(canonical(replacement));
+   legacy.evidence.gate_history.push(oldGate);

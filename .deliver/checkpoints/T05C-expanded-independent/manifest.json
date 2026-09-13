@@ -1,0 +1,11 @@
+{
+  "test_author": "/root/correction_tests",
+  "test_sha256": "2915981f25c40090e3c3120175b904b33f1bf68899c8be01106a4857b951b300",
+  "lines": 1066,
+  "top_level_tests": 12,
+  "syntax": "PASS as reported by author",
+  "runtime": "Pending coherent production candidate; no red result claimed",
+  "purpose": "Independent coverage additions from frozen contract and architecture test preflight, with MAX stale-token clarification",
+  "current_test_sha256": "ce6e9db750659173a90de8c7d88cd00601d658e7aa8abb223b90ac877d482b44",
+  "fixture_correction": "Explicit PM git worktree add -b returned branch at returned start_commit; preserves token-only preparation and frozen PM-created checkout contract."
+}
