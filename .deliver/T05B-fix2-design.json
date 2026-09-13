@@ -1,0 +1,16 @@
+{
+  "task": "T05B",
+  "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "revision": 12,
+  "fixes": 2,
+  "builder": "/root/recover_t05c",
+  "status": "Read-only builder proposal accepted for existing scope; production remains paused until independent regression freeze",
+  "proposal": [
+    "Supersession: veto before provider inspection/allocation if source merge has any proven effect or source proof. Qualifying fresh inspection is only READY or exact HEAD_MISMATCH; draft, checks-pending/failed, absent, unknown and provider failures remain read-only. remoteObservation will use Object.hasOwn(remoteBase): omit => bounded ls-remote fallback; present null/malformed => refuse/unproved, never fallback. Desired C remains immutable.",
+    "Provider state machine in shared state.mjs: first transition must be prepared; prepared→executing only; executing→observed only with the same invocation token; executing→prepared only with an identified replay proof bound to that invocation and exact PR_ABSENT result/identity; observed is terminal. active_token must name the sole latest active prepared/executing attempt; proven requires an observed effect binding; superseded requires observed terminal plus reciprocal successor proof; unresolved observed attempts remain active disposition with no active token/effect. This admits legitimate prepared/executing/observed and replay sequences while rejecting transition deletion/rebinding.",
+    "P/E/H and H2 resume: add an identified private pending image with field/token/parent/generation inputs and exact before/after hashes. Recompute P from retained evidence, E from saved closed_at and the retained before-story, H/H2 from saved handoff_at/next and retained evidence. Before applying/resuming, require index still at parent, porcelain status contains only owned pending paths, every owned file equals exact before or after, checkout/branch/protected proof remains exact; otherwise refuse before any write. H2 uses the same owned-status helper and retains its token.",
+    "Terminal crosslinks: normal closure state=proven requires terminal_commit===provider-bound merge_commit. Repair proof gains retained pr_number and validator requires positive equality with the effect-bound merge input PR, plus exact S/H2/parent links. No remote_commit rename.",
+    "Merge/squash/rebase: derive proved premerge N from the effect-bound merge attempt input observation for every method; require N a valid fetched commit descending from approved I. Merge requires ordered [N,C] and tree=merge-tree(N,C). Squash requires direct parent N, exact recomputed N+C tree and bounded net source paths from the unique N/C merge-base. Rebase keeps the full bounded first-parent proof from N. Fetched M and source merge commit remain distinct."
+  ],
+  "coordinator_note": "The existing terminal repair proof already has pr_number. This requires its validation/cross-binding, not a new public field or a remote_commit rename. Preserve all existing approved contracts and original task/acceptance; no new provider authorization or authentication assertion."
+}

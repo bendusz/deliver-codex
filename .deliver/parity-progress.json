@@ -312,7 +312,7 @@
         "duration_ms": 563301.498166,
         "validate": "PASS"
       },
-      "repair_design": ".deliver/T05B-fix1-design.json",
+      "repair_design": ".deliver/T05B-fix2-design.json",
       "development_test_reports": ".deliver/T05B-fix1-test-reports.json",
       "fix1_red_snapshot": "eab097cc2001a7fd1238d9ac605190afb36f6bc9acdf472a8af64f5264b068b3",
       "partial_snapshot": "45feb36bb616c473c2a2443bee48dd3f2bb4ed68d78983960f397a761fb7f8a9",
