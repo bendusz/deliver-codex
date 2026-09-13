@@ -200,13 +200,13 @@
       "checkpoint": ".deliver/checkpoints/T04F-T05L-COMBINED/manifest.json"
     },
     "T05C": {
-      "status": "paused: reviewer usage limit; temporary worktree missing on 2026-09-13 resume",
-      "worktree": "/tmp/deliver-parity-t05c",
-      "run": "5050e142-81ad-42a9-b60e-e21dce156bd5",
-      "builder": "/root/benchmark_builder",
-      "test_author": "/root/correction_tests",
+      "status": "exact files recovered; explicit successor active; red regression fixture correction before fix1",
+      "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05c-delivery",
+      "run": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
+      "builder": "/root/recover_t05c",
+      "test_author": "/root/correction_regressions",
       "base_commit": "e57e54f",
-      "independent_test_sha256": "ce6e9db750659173a90de8c7d88cd00601d658e7aa8abb223b90ac877d482b44",
+      "independent_test_sha256": "efc189c6674fff41a205b02ddf67f41081837ee55983b8f032df5fbf62adf25c",
       "red_tests": {
         "total": 16,
         "pass": 0,
@@ -235,7 +235,11 @@
         "Fully rehashed journal can redirect story write away from immutable token story_path",
         "Unrelated-history merge-tree exit128 qualifies as a composition conflict"
       ],
-      "continuation_note": ".deliver/T05C-resume-interruption.json"
+      "continuation_note": ".deliver/T05C-resume-interruption.json",
+      "predecessor_run": "5050e142-81ad-42a9-b60e-e21dce156bd5",
+      "recovery_worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05c-recovery",
+      "fixes": 0,
+      "recovery_provenance": ".deliver/T05C-successor-provenance.json"
     }
   },
   "next": "T05C: freeze independent red acceptance tests, implement token-bound integration correction, then run full gates and independent review.",

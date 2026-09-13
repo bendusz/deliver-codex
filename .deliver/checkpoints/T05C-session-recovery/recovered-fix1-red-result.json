@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    "--test-name-pattern=correction recovery revalidates|unrelated Git histories",
+    "tests/integration-correction.test.mjs"
+  ],
+  "cwd": "/Users/ben/code/pm-skill-codex-worktrees/t05c-recovery",
+  "exit_code": 1,
+  "elapsed_seconds": 32.85440237500006,
+  "test_sha256": "efc189c6674fff41a205b02ddf67f41081837ee55983b8f032df5fbf62adf25c",
+  "log_sha256": "f13bd234f540466c8771cb93553c1d348b30e865193d3529fb744851a9b0c994",
+  "purpose": "Fresh reproduction of three independently reported defects on exactly recovered source; not an acceptance gate"
+}
