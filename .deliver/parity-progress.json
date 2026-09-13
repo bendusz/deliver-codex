@@ -200,7 +200,7 @@
       "checkpoint": ".deliver/checkpoints/T04F-T05L-COMBINED/manifest.json"
     },
     "T05C": {
-      "status": "fix1 implementation in progress after current independent FAIL and fresh red",
+      "status": "fix1 candidate ready; fresh full gates and independent review in progress",
       "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05c-delivery",
       "run": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
       "builder": "/root/recover_t05c",
@@ -242,10 +242,11 @@
       "recovery_provenance": ".deliver/T05C-successor-provenance.json",
       "reviewer": "/root/recovery_contract",
       "latest_checkpoint": ".deliver/checkpoints/T05C-fix1",
-      "failed_snapshot": "879fbda9c0437f6aa6350310e0fd5e0e8a307237cf3d8fe8a37de32357116a96"
+      "failed_snapshot": "879fbda9c0437f6aa6350310e0fd5e0e8a307237cf3d8fe8a37de32357116a96",
+      "candidate_snapshot": "405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334"
     }
   },
-  "next": "T05C: freeze independent red acceptance tests, implement token-bound integration correction, then run full gates and independent review.",
+  "next": "Finish T05C full gates, independent review and distinct verification; then T05B remote lifecycle wiring.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
