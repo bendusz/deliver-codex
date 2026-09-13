@@ -288,7 +288,7 @@
       "integration_commit": "e8457e0d446d170fcd4ac1222718826a0c7c1a28"
     },
     "T05B": {
-      "status": "initial candidate failed independent review and AC2/AC3; fix1 authorized and recorded; regression preparation pending",
+      "status": "fix1 regression authoring; original failed review and verifier receipts retained; builder read-only repair design ready",
       "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05b-delivery",
       "branch": "feat/parity-t05b",
       "base_commit": "7c1b68e",
@@ -311,7 +311,9 @@
         "fail": 0,
         "duration_ms": 563301.498166,
         "validate": "PASS"
-      }
+      },
+      "repair_design": ".deliver/T05B-fix1-design.json",
+      "development_test_reports": ".deliver/T05B-fix1-test-reports.json"
     }
   },
   "next": "T05B fix1: independently add regressions for eleven retained major findings, then repair, gate, review and verify on the same run.",

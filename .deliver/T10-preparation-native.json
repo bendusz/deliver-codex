@@ -1,0 +1,77 @@
+{
+  "status": "PREPARATION_READY_WITH_DEPENDENCY_PINS",
+  "readiness": {
+    "task": "T10",
+    "implementation_present": false,
+    "inspector_support_present": true,
+    "template_fixture_present": true,
+    "diagnostics_dependency_present": false,
+    "summary": "T10 can be dispatched after T08 lands, provided the native claim-block seam is assigned before implementation. The current inspector already selects the oldest completed sprint without a regular retrospective and treats directories, FIFOs and symlinks as unreadable rather than completed records."
+  },
+  "required_choices": [
+    {
+      "id": "claim_block_ownership",
+      "recommendation": "Pin the next-claim veto in T08's owned current-pm.mjs caller seam, or authorize a separate bounded current-pm correction. T10 cannot satisfy the approved missing-retrospective claim block through its frozen touches. The check should consume inspectProjectState().sprints_without_retro and fail before a new claim; resume of an existing claim should remain distinct."
+    },
+    {
+      "id": "api_and_cli",
+      "recommendation": "Export prepareRetrospective(root,{sprint?,structuralPaths?}) and recordRetrospective(root,{sprint,expectedPreparationHash,review,submission}). Use `retro.mjs prepare [--sprint N] [--structural-paths FILE]` and `retro.mjs record --sprint N --expected-preparation HASH --review FILE --submission FILE`. All input files must be bounded canonical regular files. Prepare is read-only; record recomputes the preparation and writes only docs/retros/sprint-N.md."
+    },
+    {
+      "id": "state_vocabulary",
+      "recommendation": "Return versioned states READY, SKIPPED, ALREADY_RECORDED and UNKNOWN. Incomplete or out-of-order requested sprints fail without mutation. UNKNOWN is an inspectable non-success state and cannot be recorded. An explicit newer sprint must refuse while an older completed sprint is missing its record."
+    },
+    {
+      "id": "preparation_identity",
+      "recommendation": "Use `retrospective-preparation-v1` and hash canonical normalized evidence excluding preparation_hash. Bind sprint, scale, approved integration branch and head, exact range endpoints and bounded first-parent commits, story paths/contracts/Execution hashes and counters, integration/review evidence identities, full changed-path manifest, full-diff hash, changed-line count, selected lens, structural-selection paths/diff hash, AGENTS.md before hash, output path and null before-image."
+    },
+    {
+      "id": "integration_range",
+      "recommendation": "Resolve each merged story's retained full integration OID from its Execution evidence, require every OID on the approved integration branch's bounded first-parent chain, order them by that chain, and use the first integration commit's first parent through the last integration commit. Treat squash/rebase integration OIDs as real integration events even when they are not Git merge commits. Missing, ambiguous, unreachable or non-first-parent evidence makes the preparation UNKNOWN."
+    },
+    {
+      "id": "history_bounds",
+      "recommendation": "Use argv-only Git reads with time and output limits, no fetch, shell, external diff or textconv. Cap stories, commits, changed paths and diff bytes. Define code-integrity as at most 1500 additions plus deletions; larger, binary, gitlink or type-changing ranges require architecture review. Large ranges require a nonempty caller-selected subset of actual changed structural paths plus the complete changed-path manifest. If the narrowed diff cannot fit the bound, return UNKNOWN rather than truncate."
+    },
+    {
+      "id": "question_submission",
+      "recommendation": "Use `retrospective-submission-v1`, bound to preparation_hash, with exactly three IDs: recurrence, missing-context and ineffective-step. Each answer must cite retained evidence IDs, or use availability UNKNOWN only when the preparation records that evidence as unavailable. The ineffective-step decision is keep, drop or undecided; drop may be recorded only as an explicit user decision and never changes gates or policy."
+    },
+    {
+      "id": "review_and_followups",
+      "recommendation": "Bind the cross-story review receipt to preparation_hash, exact lens and structural selection. Preserve every finding and derive the Markdown verdict as PASS, CONCERNS for unresolved minor-only findings, or FAIL for block/major findings. Every unresolved block/major finding and carried-over item must map to at least one explicit regular follow-up story in the next sprint; record the finding identity, severity, message and story IDs. Refuse recording when the mapping is absent."
+    },
+    {
+      "id": "agents_diff",
+      "recommendation": "Submission may contain a bounded unified AGENTS.md proposal against the retained before hash and an explicit accepted-additions subset. Render separate proposed and accepted sections. Never edit AGENTS.md in the retrospective transaction. Update operations.json so retrospective mutation paths contain only docs/retros/, removing its current AGENTS.md write claim."
+    },
+    {
+      "id": "record_compatibility",
+      "recommendation": "Add a one-line versioned native metadata comment while keeping the upstream headings and path. A matching native record may return ALREADY_RECORDED idempotently. Any other existing regular Markdown remains compatible for shared inspection but is reported as imported/unverified and is never overwritten or represented as native authenticated evidence."
+    },
+    {
+      "id": "diagnostics_integration",
+      "recommendation": "After T08 creates diagnostics.mjs, T10 should only change the native retrospective route from recovery.md to retrospective.md and test that upstream next_reference remains unchanged. Do not recreate T08 diagnostics or introduce a diagnostics-to-mutation dependency."
+    },
+    {
+      "id": "scale_behavior",
+      "recommendation": "Tiny returns SKIPPED and cannot create a mandatory record. Small has no claim-block obligation; preserve the existing profile's optional retrospective wording and require an explicit sprint request if optional small-scale recording is supported. Standard, large and regulated select the oldest missing completed sprint."
+    }
+  ],
+  "test_priorities": [
+    "Real Git fixtures with two or more stories, interleaved M/P/E/H commits, merge and squash/rebase integration events, and exact first-parent range endpoints.",
+    "Missing object, ambiguous Execution integration OID, nonancestor commit, side-branch commit, excessive history/diff and structural-selection UNKNOWN cases with byte-for-byte and Git-status nonmutation checks.",
+    "All three question IDs, evidence citation coverage, unavailable-evidence matching, stale preparation hashes and explicit keep/drop/undecided behavior.",
+    "Unresolved block/major and carried-over mappings to existing next-sprint stories; missing, malformed, same-sprint and nonregular follow-up stories must refuse without writing.",
+    "AGENTS.md proposal and accepted-subset validation, changed AGENTS before-image refusal, and proof that record never edits AGENTS.md.",
+    "Existing native record idempotence, conflicting/imported Markdown preservation, missing record, directory, FIFO and symlink handling.",
+    "Tiny/small/standard/large/regulated matrix, incomplete sprint refusal, explicit newer-sprint refusal and oldest-missing precedence.",
+    "Claim admission regression at the separately pinned current-pm seam, including no new claim while a standard-plus retrospective is owed and unaffected existing-claim resume.",
+    "Operation packaging: installed template/reference, standalone CLI help and JSON/exit behavior, operation map advertising only the implemented retrospective route and docs/retros mutation.",
+    "Diagnostics route switches to retrospective.md only after the reference exists and remains read-only."
+  ],
+  "retained_triage": {
+    "t10_specific_fable_mapping": "none",
+    "instruction": "Do not import unrelated T08/T09 or scanner findings into T10. The runtime should carry open findings only when they are actual evidence for the sprint being reviewed."
+  }
+}

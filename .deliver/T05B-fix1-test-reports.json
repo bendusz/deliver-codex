@@ -1,0 +1,10 @@
+{
+  "task": "T05B",
+  "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "test_author": "/root/correction_regressions",
+  "qualification": "Exact agent-reported development results; raw logs are not claimed here. Formal gates will be recorded separately by the coordinator.",
+  "reports": [
+    "Round1 red #7 captured: deterministic same-process fs lock seam writes a malformed canonical integration record immediately after `current-pm.lock` acquisition. Precheck was CLEAR; `claimCurrentPm` still writes/returns instead of transaction-time remote-admission refusal. `node --test --test-name-pattern='claim repeats remote admission' tests/current-roundtrip.test.mjs`: 0 pass/1 fail, 428.61ms, failure line171 (`refused false`). Fixture restores story bytes after detecting acceptance.",
+    "Round1 additional reds: #2 closure fresh-process recovery: normal lifecycle reaches exact P/E/H, publish invocation throws before effect, child process proves PR_ABSENT but receives PROVIDER_EXECUTING instead of read-only PROVIDER_UNKNOWN (`native remote lifecycle`, 3 child PASS/1 FAIL, 65.67s, line923). #3 pure mode-only race: N changes story 100644\u2192100755 with identical blob; R [N,H] selects H's 100644 entry; reconciliation accepts instead of refusing (`raced closure reconciliation rejects`, content/extra negatives pass, mode child FAIL at invalidRace line1828; 70.02s)."
+  ]
+}
