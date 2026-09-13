@@ -266,7 +266,8 @@
       "plugins/deliver/skills/deliver/scripts/lib/analyze.mjs",
       "tests/analysis.test.mjs",
       "tests/integration-correction.test.mjs",
-      "tests/remote-lifecycle.test.mjs"
+      "tests/remote-lifecycle.test.mjs",
+      "tests/commit-cancellation.test.mjs"
     ],
     "acceptance": [
       {
