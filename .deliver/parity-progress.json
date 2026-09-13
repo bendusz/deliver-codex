@@ -288,7 +288,7 @@
       "integration_commit": "e8457e0d446d170fcd4ac1222718826a0c7c1a28"
     },
     "T05B": {
-      "status": "fix1 source repair resumed after two fixture-only corrections; full gates pending",
+      "status": "fix1 candidate frozen; full gates running; independent whole-task review and distinct verification in progress",
       "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05b-delivery",
       "branch": "feat/parity-t05b",
       "base_commit": "7c1b68e",
@@ -304,7 +304,7 @@
       "dispatch": ".deliver/T05B-operation-dispatch.md",
       "dispatch_sha256": "e40357d4280ee8e4741668e57427b655973318744cd7b345b7029ad5f36f97e1",
       "failed_snapshot": "89d174d040b90ceeb474576fc53939086084ecbd1466be08f0653a51c13fac1d",
-      "latest_checkpoint": ".deliver/checkpoints/T05B-fix1-tests-final",
+      "latest_checkpoint": ".deliver/checkpoints/T05B-fix1-candidate",
       "full_round1_gate": {
         "total": 340,
         "pass": 340,
@@ -320,7 +320,8 @@
       "identity_clarification": ".deliver/T05B-fix1-identity-clarification.json",
       "final_test_snapshot": "bf8380731235eaceae735bb905ac4350893f0ae7d54b43cba1d9405e95817e1e",
       "test_coverage": ".deliver/checkpoints/T05B-fix1-tests-final/coverage-ready-native.json",
-      "fixture_corrections": ".deliver/checkpoints/T05B-fix1-fixture-corrections"
+      "fixture_corrections": ".deliver/checkpoints/T05B-fix1-fixture-corrections",
+      "candidate_snapshot": "362dc4fcaff3b952f52cde2e8388fd91359a441cf9df2e895445f6936744722a"
     }
   },
   "next": "T05B fix1: complete source repair against frozen tests, then full gates, independent whole-task review and distinct verification.",
