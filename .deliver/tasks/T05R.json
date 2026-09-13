@@ -1,0 +1,32 @@
+{
+  "id": "T05R",
+  "objective": "Implement standalone GitHub provider port for exact scoped branch publish and verified PR merge",
+  "read_paths": [
+    "AGENTS.md",
+    "docs/plans/2026-09-09-upstream-parity.md",
+    "docs/plans/parity-contracts/remote-design.md"
+  ],
+  "touches": [
+    "plugins/deliver/skills/deliver/scripts/lib/remote.mjs",
+    "tests/remote.test.mjs"
+  ],
+  "acceptance": [
+    {
+      "id": "T05R-AC1",
+      "text": "Injected command runner implements the accepted inspect/publish/merge protocol with exact checkout/head/remote/PR identity, bounded output and precise distinct failure states. No shell or real remote calls occur in tests."
+    },
+    {
+      "id": "T05R-AC2",
+      "text": "Publish pushes only the expected head without force or tracking configuration changes, creates/updates exactly one PR, preserves draft policy and passes exact bounded bodies through temporary mode0600 body files cleaned on every outcome."
+    },
+    {
+      "id": "T05R-AC3",
+      "text": "Merge requires exact head plus passing required checks or the documented positively proven no-required-checks+CLEAN result, uses normal server protections and match-head-commit, and requires actual merged commit and remote integration proof. Races, ambiguity, queueing, failures and malformed output never report completion."
+    }
+  ],
+  "commands": {
+    "test": "npm test",
+    "validate": "npm run validate"
+  },
+  "specs": []
+}

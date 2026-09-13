@@ -1,0 +1,40 @@
+{
+  "author": "correction_regressions",
+  "snapshot": "de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47",
+  "artifact_sha256": "02b37f9b1c6977f18596ba16b5fc8b424e2972d747ff2667db9f76d6f35818c7",
+  "syntax": "PASS",
+  "cwd": "/Users/ben/code/pm-skill-codex-worktrees/coordinator",
+  "runs": [
+    {
+      "command": "node --test --test-name-pattern='correction initialized submodule controls|same relative hook contract' t05c-nested-mode-probe.test.mjs",
+      "exit_code": 1,
+      "total": 4,
+      "pass": 1,
+      "reported_fail": 3,
+      "duration_ms": 39263.389833,
+      "output_excerpt": "nested-mode-controls-output-excerpt.log",
+      "output_excerpt_sha256": "8e800c21d7e27b88a0c5ddde9d5de031d185396d34d2ab3e99e0017ca2c8606e"
+    },
+    {
+      "command": "node --test --test-name-pattern='hidden initialized submodule drift unchanged' t05c-nested-mode-probe.test.mjs",
+      "exit_code": 1,
+      "total": 4,
+      "pass": 0,
+      "reported_fail": 4,
+      "duration_ms": 50433.331709,
+      "output_excerpt": "nested-drift-output-excerpt.log",
+      "output_excerpt_sha256": "54220aaab7d414dc564ea6f5ca29f34248a9ee2d0842f66ef9f5aa6c84ec1e22"
+    },
+    {
+      "command": "node --test --test-name-pattern='executable mode drift on the exact story after-image' t05c-nested-mode-probe.test.mjs",
+      "exit_code": 1,
+      "total": 3,
+      "pass": 0,
+      "reported_fail": 3,
+      "duration_ms": 23069.775708,
+      "output_excerpt": "story-mode-output-excerpt.log",
+      "output_excerpt_sha256": "12fe60222aa5aae89351224b461e604d0d5e70c96d1e52180821b04d611a44ca"
+    }
+  ],
+  "qualification": "Author-forwarded exact command/outcome and output excerpts. Intermediate mode fixture assumed0600 publication was0644; corrected diagnostic verifies normalizedbaseline file644 and meaningful600-to755 drift. Canonical tests unchanged throughout these probes."
+}

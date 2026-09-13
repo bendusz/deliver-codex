@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T07-AC1",
+      "status": "PASS",
+      "evidence": "Independent inspection and tests confirm deterministic located findings for unresolved clarification, FR/AC plan and story coverage, missing/unknown dependencies and cycles, overlapping parallel write scopes, malformed/missing commands and gates, mandatory declared lenses, malformed stories and approval drift. Semantic keyword candidates remain explicitly judgment-required, malformed/nonregular/invalid inputs become UNKNOWN or blocking, and exact-snapshot npm test plus npm run validate passed at 0887ac7021de0a8e34e70cb0272ec07d446a2983339c04a5292cc6d34d82b279."
+    },
+    {
+      "id": "T07-AC2",
+      "status": "FAIL",
+      "evidence": "The analyzer is bounded and read-only, separates factual findings from unassessed semantic prompts, and exports a content-bound readiness shape. However, content identity and blockers omit story-declared .sdd contracts at every scale and omit large/regulated preimplementation requirements: constitution, applicable spec/plan/story checklists and the required SpecDD skeleton/contracts. A clean large fixture without those artifacts therefore reaches factual_status=CLEAR / REVIEW_REQUIRED, so the readiness contract is incomplete even though runtime claim consumption is correctly deferred to T08."
+    },
+    {
+      "id": "T07-AC3",
+      "status": "PASS",
+      "evidence": "All four packaged checklist templates are unchecked evidence contracts with fixed docs/checklists destinations, concrete evidence fields and remediation/UNKNOWN guidance. Native governance declares analysis read-only, explains deterministic versus semantic limits, preserves tiny/small versus standard/large/regulated analysis rules, makes checklists required at large/regulated scale, and does not mutate artifacts. Installed-copy coverage and the exact-snapshot validation gate passed."
+    }
+  ]
+}

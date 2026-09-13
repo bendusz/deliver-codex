@@ -1,0 +1,33 @@
+{
+  "id": "T13A",
+  "objective": "Implement the independent benchmark result schema, validator and deterministic scorer portion of approved T13",
+  "acceptance": [
+    {
+      "id": "T13A-AC1",
+      "text": "Schema and validator require two explicitly identified configurations with the same story/base and consistent measured gate/review/retry metrics; unavailable tokens/cost remain null."
+    },
+    {
+      "id": "T13A-AC2",
+      "text": "Scoring is deterministic, reports meaningful ties/no eligible winner and never recommends failed or gate/review-blocked runs; rendering handles untrusted labels without altering output structure."
+    },
+    {
+      "id": "T13A-AC3",
+      "text": "Import and CLI tests prove no provider calls, Git changes or import-time side effects; fixture tests cover valid, invalid and unavailable measurements."
+    }
+  ],
+  "touches": [
+    "plugins/deliver/skills/deliver/scripts/benchmark.mjs",
+    "plugins/deliver/skills/deliver/scripts/lib/benchmark.mjs",
+    "plugins/deliver/skills/deliver/assets/benchmark-result.schema.json",
+    "tests/benchmark.test.mjs"
+  ],
+  "read_paths": [
+    "AGENTS.md",
+    "docs/plans/2026-09-09-upstream-parity.md"
+  ],
+  "commands": {
+    "test": "npm test",
+    "validate": "npm run validate"
+  },
+  "specs": []
+}

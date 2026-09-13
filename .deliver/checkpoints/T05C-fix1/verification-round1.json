@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T05C-AC1",
+      "status": "FAIL",
+      "evidence": "At snapshot 879fbda9c0437f6aa6350310e0fd5e0e8a307237cf3d8fe8a37de32357116a96, the unrelated-histories regression at tests/integration-correction.test.mjs:1126 reaches Missing expected exception. currentFailureBasis accepts repeatable exit 128 as composition-conflict-no-m without proving an actual content conflict, so correction preparation still accepts an invalid failure basis."
+    },
+    {
+      "id": "T05C-AC2",
+      "status": "FAIL",
+      "evidence": "At the same snapshot, the advanced-ref and rehashed-shadow-path regressions at tests/integration-correction.test.mjs:1072 and :1097 both reach Missing expected exception. Recovery neither revalidates the live start ref nor binds the typed story write path to token.story_path before mutation."
+    },
+    {
+      "id": "T05C-AC3",
+      "status": "FAIL",
+      "evidence": "Focused command node --test --test-name-pattern='correction recovery revalidates|unrelated Git histories' tests/integration-correction.test.mjs exited 1 with 0 passing and 4 reported failures including the parent test; log SHA-256 d7cbfdde022b3e9b9f39eb2ed96113cc7c811ed6ec0dd8b79dbeace9da1c2111. All three inherited defects remain unresolved, and full npm test plus npm run validate have not yet run, so fresh whole-task acceptance is not satisfied."
+    }
+  ]
+}

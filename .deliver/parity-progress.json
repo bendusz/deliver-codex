@@ -1,0 +1,338 @@
+{
+  "plan": "docs/plans/2026-09-09-upstream-parity.md",
+  "approval": "Ben approved in conversation; standing PM commits/PR/merge authority",
+  "integration_branch": "feat/upstream-parity",
+  "tasks": {
+    "T00": {
+      "status": "reviewed, verified, integrated",
+      "worktree": "/tmp/deliver-parity-t00",
+      "run": "298d8b1b-27f7-4241-a61f-9b2f17f588d9",
+      "builder": "/root/t00_builder",
+      "commit": "7063579"
+    },
+    "T01": {
+      "status": "reviewed, verified, integrated",
+      "worktree": "/tmp/deliver-parity-t01",
+      "run": "f157180e-8595-4c07-aadc-0824a4c4120a",
+      "builder": "/root/t01_builder",
+      "commit": "d8b9a9c"
+    },
+    "T06": {
+      "status": "reviewed, verified, integrated after fix round 1",
+      "worktree": "/tmp/deliver-parity-t06",
+      "run": "97421b5f-81ec-4897-9433-6e7b4da67adf",
+      "builder": "/root/t00_builder",
+      "snapshot": "d9bdbf178fb29ceebb6ccba51ca4276e16b67ac16d24968c5c12bfbce2ec1fc3",
+      "correction_builder": "/root/benchmark_builder",
+      "findings": [
+        "Independent reviewer found unconditional checkpoint merge pauses conflicting with explicit standing merge approval."
+      ],
+      "commit": "ad3e0e46d6f325b51900ff26fe1869a241adc2a7"
+    },
+    "T02": {
+      "status": "reviewed, verified, integrated after fix round 1",
+      "worktree": "/tmp/deliver-parity-t02-ready",
+      "run": "f3ab27ff-119d-4ffd-b529-c83e84869d39",
+      "builder": "/root/t01_builder",
+      "snapshot": "db49e17fbc318d3a30f2c411c5b233033791e5031c70ee2de50a009e8087395c",
+      "findings": [
+        "Completion must not report done when shared approval implementation_ready is false, including missing/null plan digest and untracked approval/plan.",
+        "Story Execution and plan branch names must reject Git-invalid references consistently."
+      ],
+      "fixes": 1,
+      "commit": "b25f8f3b94e9921332d9b07f5e512035c5a45d0e"
+    },
+    "T13A": {
+      "status": "reviewed, verified, integrated; full T13 workflow remains pending",
+      "worktree": "/tmp/deliver-parity-t13a",
+      "run": "3c72298f-1bd3-48b4-8ec7-b7fdf541462c",
+      "builder": "/root/benchmark_builder",
+      "snapshot": "f6d71245520f8f1d546ac56657ca24e25fc09278bcfd21e3773443cec122193b",
+      "commit": "2fdde58b35cdea33c1c95190c18d98d91e827881"
+    },
+    "T07": {
+      "status": "reviewed, verified, integrated after fix round1; first-claim enforcement remains T08",
+      "worktree": "/tmp/deliver-parity-t07-ready",
+      "run": "0261fffc-4137-4075-bad3-d3c7e89bb554",
+      "builder": "/root/benchmark_builder",
+      "deferred_run": "a2f04e07-4d9b-435b-8016-2cbdb97881ca",
+      "snapshot": "823d14c5c7a5566376e2fc3ad2adef00bb3b38bce6cb9927372eef261aee9949",
+      "fixes": 1,
+      "findings": [
+        "Large/regulated preimplementation prerequisites missing from factual readiness; story-declared SpecDD files absent from analysis identity at every scale."
+      ],
+      "commit": "64d66f80d249410a6b373d27ce96a9b872540a3c"
+    },
+    "T03": {
+      "status": "reviewed, verified, integrated after fix round 1",
+      "worktree": "/tmp/deliver-parity-t03",
+      "run": "b00463b7-eb08-432c-b428-43009ffb3be0",
+      "builder": "/root/t01_builder",
+      "snapshot": "68bf0a95c015bd9b3bce8ddc523b493621c0fe850a52f8632569b355aab82c26",
+      "fixes": 1,
+      "findings": [
+        "Missing/null binding must block all active shared-project continuation operations.",
+        "Same-owner pm claim resume must validate clean integration checkout before returning."
+      ],
+      "commit": "54ef0fa5c934b35bf3d95d295760e3933a9d572f"
+    },
+    "T06B": {
+      "status": "reviewed, verified, integrated",
+      "worktree": "/tmp/deliver-parity-t06b",
+      "run": "eba21310-ebb6-4e5e-b590-d11afb881af3",
+      "builder": "/root/benchmark_builder",
+      "commit": "4beba2c453335687c3db96b21dadf8fed67e2ace",
+      "snapshot": "ca84692b0e44143e661d1ca03b971a0e1281db9ebe44b72c933d3757c1fd1a69"
+    },
+    "T00B": {
+      "status": "reviewed, verified, integrated; nonblocking test-maintenance finding carried to T11",
+      "worktree": "/tmp/deliver-parity-t00b",
+      "run": "0d50b3f1-52c0-450d-9685-9450e53b7daf",
+      "builder": "/root/benchmark_builder",
+      "snapshot": "d97ae2d5090b3cf645ded54b109a960c978d9f25f1ca3ad2615fac86ed51fef6",
+      "commit": "5bd847292d1c70df822338006db24b68d2cf33eb",
+      "findings": [
+        "Minor: replace opaque developer-instruction hash pins with direct duty-boundary assertions in planned T11 role updates."
+      ]
+    },
+    "T04": {
+      "status": "reviewed, verified, integrated after final fix round3",
+      "worktree": "/tmp/deliver-parity-t04",
+      "run": "9e5faaea-1973-4a63-b57c-6c943bf4c5d0",
+      "builder": "/root/t01_builder",
+      "snapshot": "50471c7d0d9ca1fbe5fb567aefba1966305546e925b6cdeefcaee5b76ec4b1bf",
+      "findings": [
+        "Independent diagnosis: current snapshot Git metadata schema changed; real old metadata exactly matches baseline. Add exact legacy-v1 comparison for pre-anchor runs without loosening actual Git drift checks.",
+        "Review: commit preparation includes unchanged pre-start dirty paths under touches.",
+        "Review: recovery validates path-shaped images but not the full legal story/run before-after transition.",
+        "Fix2 review: prepared/adopted index flags and complete audited changed-entry tree coverage are missing.",
+        "Fix2 review: current anchor suppresses recursive baseline Git metadata but does not protect initialized submodule metadata.",
+        "Minor carried to T14: explain restricted legacy active-hook anchor upgrades and explicit reconciliation without baseline/budget reset."
+      ],
+      "fixes": 3,
+      "commit": "8bdd6f1367141add5af69c9b7bce19da3e1a46ab",
+      "integration_commit": "4c419a7c948642b9a5e35e3cc59a4b03b2b8d806",
+      "post_acceptance_review_finding": "Requested Claude review independently reproduced stale commit-preparation deadlock after legal correction. Additional bounded follow-up requires retained lineage/counters; original finished run remains historical evidence.",
+      "post_acceptance_review_resolution": {
+        "task": "T04F",
+        "commit": "0a6623936a000afad6bbb0f4d2c51b5b8d6ca419",
+        "status": "confirmed stale-preparation defect repaired and independently verified"
+      }
+    },
+    "T05L": {
+      "status": "reviewed, verified and integrated after approved fix7 and distinct combined acceptance",
+      "worktree": "/tmp/deliver-parity-t05l",
+      "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
+      "builder": "/root/benchmark_builder",
+      "retries": 1,
+      "findings": [
+        "Native host returned selected model at capacity; retry1 recorded before resuming same agent/model, preserving in-scope partial source.",
+        "Independent review round1: evidence-only M refresh and no-M failure record missing.",
+        "Independent review round1: actual live M bytes, gate logs and prior failure receipts are not durably bound.",
+        "Independent review round1: integration record ID/path is not canonical or bound to source run.",
+        "Independent review round1: adopted P/E/H/reporting proof and truthful escaped findings are incomplete.",
+        "Independent review round2: clean initialized scoped submodule manifests mismatch and protected I metadata incorrectly freezes legitimate M gitlink changes.",
+        "Independent review round2 minor: fresh M handoff can omit unresolved source C concerns retained in the report.",
+        "Independent review round3: nested submodule scopes lack committed ancestor gitlinks; unbound initialized submodules can hide wrong M content through ignore=all after protectedShape removes nested content. Root-link and source-concern fixes resolved.",
+        "Independent final fix3 review: empty canonical uninitialized gitlink directory is misclassified as unsafe nested root, blocking unrelated integration. All earlier findings resolved.",
+        "Requested Claude review, independently reproduced: adopted P/E/H proof depends on live process environment/finalization, preventing resume or recovery after evidence refresh.",
+        "Requested Claude review, independently reproduced: panel parser silently discards supplied top-level findings.",
+        "Independent fix5 review: legacy reconciliation ignores contradictory current active FAIL evidence when selecting an older PASS finalization.",
+        "Independent fix6 review: active identity-valid PASS review with reviewer equal to source.builder is accepted by legacy reconciliation. Prior active FAIL-veto defect resolved."
+      ],
+      "builder_checkpoint": "Finished original run at revision45, fixes7/retries1. Independent authored red regressions became green unchanged; full191/191 tests and validate plus independent all5AC PASS.",
+      "snapshot": "bfa2a3254597c6eeadb5f8acdf5903a80b233ea6496f334efbe1ede849a1b8b2",
+      "fixes": 7,
+      "candidate_snapshot": "bfa2a3254597c6eeadb5f8acdf5903a80b233ea6496f334efbe1ede849a1b8b2",
+      "checkpoint": ".deliver/checkpoints/T05L-final-fix3/manifest.json",
+      "latest_checkpoint": ".deliver/checkpoints/T05L-fix7/manifest.json",
+      "failed_criteria": [],
+      "next_proposal": "docs/plans/2026-09-10-reconciliation-identity-follow-up.md",
+      "approval": ".deliver/T05L-fix7-approval.json",
+      "test_author": "/root/identity_tests",
+      "commit": "3f0d3b283dc628a629395878f065ea999d8c44ac",
+      "integration_commit": "2a6def04575447fe777737a44aede6d7d8b7540f"
+    },
+    "T05R": {
+      "status": "reviewed, verified, integrated after fix1",
+      "worktree": "/tmp/deliver-parity-t05r",
+      "run": "722c47ba-d20f-410d-a201-e093f9315254",
+      "builder": "/root/benchmark_builder",
+      "snapshot": "7f2fb09ebbdf1f8818e5a114b14d42384b76047aac2a2a0d3979336475fd2a9d",
+      "fixes": 1,
+      "findings": [
+        "Independent review: relative TMPDIR makes body argv relative; restrictive umask prevents exact0600. Actual failed review/verification archived round1 before fix1 dispatch."
+      ],
+      "commit": "9009f71d26ed081cd47a0d0b4fc73a2ebd7418e1",
+      "integration_commit": "10e6c2260c59faad6802988932efcfcd189e088b"
+    },
+    "T04F": {
+      "status": "reviewed, verified, integrated",
+      "worktree": "/tmp/deliver-parity-t04f",
+      "run": "8ba60517-eee5-486d-96db-cf86b1aebf49",
+      "builder": "/root/t04_repair_builder",
+      "fixes": 4,
+      "retries": 0,
+      "source_run": "9e5faaea-1973-4a63-b57c-6c943bf4c5d0",
+      "snapshot": "a0f9aafd948b2b2a1ce6d9432b01d70c3f0941f4aea102da7b8d2799e490c866",
+      "commit": "0a6623936a000afad6bbb0f4d2c51b5b8d6ca419",
+      "integration_commit": "2fff9e6a58c65f92bd7315ea91c0fe10c50fd4b6",
+      "findings": [
+        "Inherited nonblocking legacy active-hook documentation limitation remains assigned T14."
+      ]
+    },
+    "T04F-T05L-COMBINED": {
+      "status": "finished, independently reviewed, distinctly verified and integrated",
+      "worktree": "/tmp/deliver-parity-combined",
+      "branch": "feat/parity-combined",
+      "run": "4056ee0f-712a-45dc-97f1-059a07a9c02e",
+      "snapshot": "a91dc0c3024b7e109aafc9b0556f2d88def20ec326d4cc0718da26672ad54cc2",
+      "source_commit": "b84a045433f77644d541875ad5630915bf7f0c2d",
+      "composition_coordinator": "/root",
+      "reviewer": "/root/state_architecture",
+      "verifier": "/root/combined_verifier",
+      "source_only_snapshot": "5b4cb70bb73ecb9cacf63a13b38fa21daefa96d5718848bf99a11ee73f5a57ab",
+      "report": "docs/reviews/2026-09-11-combined-repairs.md",
+      "source_unchanged": true,
+      "commit": "2a6def04575447fe777737a44aede6d7d8b7540f",
+      "tests": 211,
+      "validate": "PASS",
+      "checkpoint": ".deliver/checkpoints/T04F-T05L-COMBINED/manifest.json"
+    },
+    "T05C": {
+      "status": "finished, independently reviewed, distinctly verified, committed and integrated",
+      "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05c-delivery",
+      "run": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
+      "builder": "/root/recover_t05c",
+      "test_author": "/root/correction_regressions",
+      "base_commit": "e57e54f",
+      "independent_test_sha256": "4dfc6ccdabd2ee0c93225082d56693c5b0d4f43cee449e5258f72092f7ba25fb",
+      "red_tests": {
+        "total": 16,
+        "pass": 0,
+        "fail": 16,
+        "duration_ms": 88619.656666,
+        "qualification": "Real Git fixtures reached absent APIs; full raw output retained in independent-red checkpoint. Fixture-only deltas recorded separately."
+      },
+      "checkpoint": ".deliver/checkpoints/T05C-independent-red",
+      "expanded_tests": {
+        "total": 53,
+        "passed": 45,
+        "failed": 8,
+        "actual_failures": 5,
+        "duration_ms": 486249.299583,
+        "checkpoint": ".deliver/checkpoints/T05C-expanded-independent",
+        "snapshot": "35c7a8ee612e47463d017dd8a14c9b7acb6e380db087729426e8a7181d0d5b6c"
+      },
+      "targeted_refinement": {
+        "passed": 26,
+        "total": 26,
+        "duration_ms": 287330.972292,
+        "snapshot": "85356883cd3be99769fd0374a78577a5429c7a62866e4ed9a6eb02296ea3b489"
+      },
+      "review_findings": [
+        "All nine inherited findings preserved verbatim and resolved in round5 review."
+      ],
+      "continuation_note": ".deliver/T05C-resume-interruption.json",
+      "predecessor_run": "5050e142-81ad-42a9-b60e-e21dce156bd5",
+      "recovery_worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05c-recovery",
+      "fixes": 4,
+      "recovery_provenance": ".deliver/T05C-successor-provenance.json",
+      "reviewer": "/root/recovery_contract",
+      "latest_checkpoint": ".deliver/checkpoints/T05C-fix4",
+      "failed_snapshot": "b8c66ec574464337ae65d7b4e810d742a34b381e758f4b21f9e53964ac481d97",
+      "candidate_snapshot": "6878683c7c9e3511d86a2d59507c28805816398b43ed8737740dea8a875ea0e3",
+      "verifier": "/root/correction_verifier",
+      "fix2_red_snapshot": "73ec06fe10b3211942a7be646ea6737f9b8c8a7bf18b46a573024ba92a99fddd",
+      "full_fix2_gate": {
+        "total": 276,
+        "pass": 275,
+        "fail": 1,
+        "duration_ms": 579908.718167,
+        "validate": "PASS"
+      },
+      "independent_lifecycle_test_sha256": "371de8ed4d0ebe1491b3cd1f57ba5ff7f972af241dd95e59ed5933be5e348baf",
+      "fix3_red_snapshot": "7df5d19fb2283f89c02c074842ed8187d63a129b28819a0386b380f70d324c66",
+      "full_fix3_gate": {
+        "total": 287,
+        "pass": 287,
+        "fail": 0,
+        "duration_ms": 513994.161041,
+        "validate": "PASS",
+        "checkpoint": ".deliver/checkpoints/T05C-fix3"
+      },
+      "proposal": "docs/reviews/2026-09-13-correction-recovery-proposal.md",
+      "extra_fix_approval": ".deliver/T05C-fix4-approval.json",
+      "fix4_focused": {
+        "new_started": {
+          "passed": 7,
+          "total": 7,
+          "duration_ms": 62996.301292
+        },
+        "existing_torn_publication": {
+          "passed": 7,
+          "total": 7,
+          "duration_ms": 71338.478208
+        }
+      },
+      "commit": "3513e0c2146abeb88230dbfacd2c4dc68937da32",
+      "snapshot": "6878683c7c9e3511d86a2d59507c28805816398b43ed8737740dea8a875ea0e3",
+      "full_fix4_gate": {
+        "total": 294,
+        "pass": 294,
+        "fail": 0,
+        "duration_ms": 518039.657375,
+        "validate": "PASS"
+      },
+      "report": "docs/reviews/2026-09-13-correction-recovery-acceptance.md",
+      "integration_commit": "e8457e0d446d170fcd4ac1222718826a0c7c1a28"
+    }
+  },
+  "next": "Start approved T05B remote lifecycle wiring from accepted T05C integrated base.",
+  "interfaces": {
+    "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
+    "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
+    "approval": "shared Git digest plus internal runtime hash, no missing-digest fail-open for execution"
+  },
+  "pull_request": "https://github.com/bendusz/deliver-codex/pull/2",
+  "coordinator_notes": [
+    "Do not use git push -u during active runs: shared tracking-config mutation invalidates their protected Git metadata. Use explicit remote/branch pushes.",
+    "Unused pre-dispatch T02 baseline 1cb0b0fd-76f5-462a-8df2-4a5a8d18f39f was archived under .deliver/aborted after initial sequencing error; no worker ran, no budgets spent, no evidence reused.",
+    "Runtime task read_paths cannot include .deliver. Frozen supplemental design copies live under docs/plans/parity-contracts; coordinator progress/evidence stays under .deliver.",
+    "Run gate and finish through the same coordinator launch environment; subprocess cwd does not itself normalize inherited environment. Combined source-only evidence remains archived; scoped acceptance report made the verification task finishable without runtime or baseline relaxation."
+  ],
+  "latest_integrated_validation": {
+    "commit": "e8457e0d446d170fcd4ac1222718826a0c7c1a28",
+    "source_commit": "3513e0c2146abeb88230dbfacd2c4dc68937da32",
+    "tests": 294,
+    "passed": 294,
+    "validate": "PASS",
+    "snapshot": "6878683c7c9e3511d86a2d59507c28805816398b43ed8737740dea8a875ea0e3",
+    "scope": "Git diff is empty across all production, tests, launcher, scripts, package and exact T05C declared read paths; every changed file byte and executable mode matches the retained completion snapshot.",
+    "report": "docs/reviews/2026-09-13-correction-recovery-acceptance.md"
+  },
+  "requested_external_review": {
+    "model": "claude-fable-5-1",
+    "effort": "high",
+    "authorization": "Explicit user request in current turn",
+    "status": "COMPLETE: FAIL; native triage complete",
+    "sources": [
+      "https://platform.claude.com/docs/en/models/overview",
+      "https://code.claude.com/docs/en/env-vars"
+    ],
+    "report_directory": ".deliver/claude-fable-5-1-review",
+    "results": {
+      "01-runtime": "FAIL",
+      "02-integration": "FAIL",
+      "03-public-remote": "PASS with minor findings",
+      "04-planning-support": "PASS with minor findings"
+    },
+    "report": "docs/reviews/2026-09-10-claude-fable-5-1.md"
+  },
+  "final_release_review": {
+    "model": "claude-fable-5-1",
+    "effort": "high",
+    "authorization": ".deliver/2026-09-13-continuation-authorization.json",
+    "status": "Pending completed release candidate; earlier external review is interim and preserved separately."
+  }
+}

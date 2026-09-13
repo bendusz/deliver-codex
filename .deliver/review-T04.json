@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "findings": [
+    {
+      "severity": "major",
+      "message": "Resolved from round 1: commit preparation derives its intended paths from the complete cumulative baseline delta plus the audited story path. It excludes unchanged pre-start dirt, rejects a pre-start staged index without mutation, and retains the original baseline and dirty-path list across adoption.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+      "resolved": true
+    },
+    {
+      "severity": "major",
+      "message": "Resolved from round 1: recovery validates the complete story/run pair by parsing both before images, regenerating the legal transition with the recorded timestamps and attempt, and comparing both exact after images. Changed criteria, contract identity, binding, counters or concurrent live bytes are rejected before either file is written.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+      "resolved": true
+    },
+    {
+      "severity": "major",
+      "message": "Resolved from round 2: expectedIndex uses an isolated GIT_INDEX_FILE based on the prepared parent, preserves unchanged skip-worktree and assume-unchanged flags, rejects flags on intended paths, and assertTreeCoverage compares every cumulative intended entry to the resulting tree. Pending state binds the expected tree and index-flag digest; adoption checks both before changing run state.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+      "resolved": true
+    },
+    {
+      "severity": "major",
+      "message": "Resolved from round 2: current anchors recursively bind initialized-submodule HEAD, tree, index tree, index flags and protected Git metadata. Effective hooks bind configuration, directory or symlink identity, each hook's kind/mode/content, and for a symlinked hook both target text and resolved referent mode/bytes. Check, preparation and adoption reject nested drift, while legacy/flat upgrades require represented metadata equality and no unproved active hook.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/scope.mjs",
+      "resolved": true
+    },
+    {
+      "severity": "minor",
+      "message": "The runtime reference describes exact legacy metadata compatibility and immutable baseline upgrade, but does not state the operational condition enforced by commit preparation: an old anchorless run with an active hook cannot be upgraded because the legacy digest did not record hook mode or symlink referent identity. Document the fresh-run/removal route with the later reference cleanup.",
+      "path": "plugins/deliver/skills/deliver/references/runtime.md",
+      "resolved": false
+    }
+  ],
+  "summary": "T04 passes at frozen snapshot 50471c7d0d9ca1fbe5fb567aefba1966305546e925b6cdeefcaee5b76ec4b1bf. The complete review confirms legal durable transitions, exact recovery generation, cumulative-scope commit isolation, full prepared-tree/index-flag binding, recursive submodule and effective-hook protection, safe legacy upgrade, and stale-evidence invalidation. Coordinator npm test and npm run validate both passed at that exact snapshot. The remaining finding is documentation-only."
+}

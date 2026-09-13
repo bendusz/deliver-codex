@@ -1,0 +1,101 @@
+test at tests/integration-correction.test.mjs:466:11
+✖ dirty exact branch (6984.844041ms)
+  AssertionError [ERR_ASSERTION]: integration.mjs must export the T05C public function prepareIntegrationCorrection
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at requireFunction (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:43:10)
+      at correctionPrepare (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:234:19)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:468:22)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:466:11)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration-correction.test.mjs:477:11
+✖ moved branch (9890.5395ms)
+  AssertionError [ERR_ASSERTION]: integration.mjs must export the T05C public function prepareIntegrationCorrection
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at requireFunction (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:43:10)
+      at correctionPrepare (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:234:19)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:479:22)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:477:11)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration-correction.test.mjs:489:11
+✖ second attached checkout (7067.000917ms)
+  AssertionError [ERR_ASSERTION]: integration.mjs must export the T05C public function prepareIntegrationCorrection
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at requireFunction (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:43:10)
+      at correctionPrepare (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:234:19)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:491:22)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:489:11)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration-correction.test.mjs:536:1
+✖ dedicated correction journal recovers every torn run/story publication and rejects tampering (0.203334ms)
+  AssertionError [ERR_ASSERTION]: integration.mjs must export the T05C public function recoverIntegrationCorrectionStart
+  + actual - expected
+
+  + 'undefined'
+  - 'function'
+
+      at requireFunction (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:43:10)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:537:19)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'undefined',
+    expected: 'function',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

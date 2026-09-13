@@ -1,0 +1,5 @@
+{
+  "status": "PASS",
+  "findings": [],
+  "summary": "Bounded test-change review only; this is not a whole-task or production PASS. At correction SHA a764d071d5123dc3b1fd9a346139364f656c715fd48a9ff24422cb500bd38137 and lifecycle SHA 371de8ed4d0ebe1491b3cd1f57ba5ff7f972af241dd95e59ed5933be5e348baf, all frozen tests and assertions remain, the seven protected groups register exactly once, import is side-effect free, direct core discovery passes, and the expected pre-fix failures reproduce without setup failures."
+}

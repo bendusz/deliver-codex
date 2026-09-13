@@ -1,0 +1,52 @@
+{
+  "status": "NOT_ACCEPTED",
+  "task": "T05L",
+  "run_id": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
+  "worktree": "/tmp/deliver-parity-t05l",
+  "base_commit": "a18e851375c37ac4c99e62a55fe0e9ff1f1e937d",
+  "snapshot": "260df67738389280469cf5f365537764a040ddcc9f117d32fd3394d9fe46cdff",
+  "tests": {
+    "passed": 151,
+    "total": 151,
+    "validate": "PASS"
+  },
+  "review": "FAIL",
+  "failed_criteria": [
+    "T05L-AC1",
+    "T05L-AC4"
+  ],
+  "counters": {
+    "fixes": 3,
+    "retries": 1,
+    "corrections": 0
+  },
+  "remaining_finding": "Empty canonical uninitialized gitlink directories are misclassified as unsafe initialized roots, blocking unrelated integration preparation.",
+  "next_decision": "One additional bounded fix round requires explicit user approval; no baseline, ID or spent-counter reset.",
+  "files_sha256": {
+    "check-T05L-round2.json": "956be36105cb2a7cf5a9de11e6ae30a16247c994f2544cdb3b51319602d89986",
+    "check-T05L-round3.json": "945b81832b6f1c9dd3e3cea4d391083b2fa1a02e5fbe20755c63098ac19f59b0",
+    "check-T05L-round4.json": "7c5c876fac9a61c2947db118c27c48f69c4d76dcfdbf10845411eb2922692b86",
+    "logs/test-1023d80f-42dc-49d0-b742-816a70bef680.log": "ae6379bb94f99f97c3ec6293fc84b1099fbcef1a0ca3400d4a3ee471a8a6e131",
+    "logs/test-1d5a3023-28d4-4486-8ca9-f0bd3e2a1cb3.log": "88dc58c9566c27ccd48252cfe427d3a12a709a5906f337e19f8ded4d34eacc1f",
+    "logs/test-c3ebcd05-ceb2-4f48-8772-5d6b090896c9.log": "78aa3fdf80e86356ba7d0277fc95d023f040157cad9089fe87f78e182e5d51a4",
+    "logs/test-fbc880a1-e5fa-48ae-897d-d142d7b6d541.log": "c9e37b0a30922102011e23538d39eb76742b9468348902747dd6284a333e66c6",
+    "logs/validate-194627d6-c766-460d-9e46-2a4940d0e5c5.log": "88d05238fac2ef725723191c07d9962f00698a058c4aa7f2e3d71f9552f9a692",
+    "logs/validate-3bd639ce-b269-41a8-a9e5-49072881bd54.log": "546c5d4526a64235983c91f79cb19d9198065ae7975ec449db221125533f127e",
+    "logs/validate-7167ba56-bd63-400e-8675-eac241df8007.log": "771dc04c5a13d5f694b8e0d1a9b0ac81bb61d58512c7938ba9007d49f09ec33f",
+    "logs/validate-8ad66aa4-f1d3-4011-84aa-105997797b9a.log": "803885ea597b1a211374fd118b47120b51034c43d5bb1d63da3d7eb9cbfbfedd",
+    "review-T05L-round1.json": "eb057fb9487b6f2cd69f1fe7b4311840f46710372c09626a57aa2f4dfd76ca3d",
+    "review-T05L-round2.json": "72ea23da24e00186da54439d1cc12c6c333e377f2a0024733be5a85c541acbff",
+    "review-T05L-round3.json": "d718291f4d06bdcd0da0d1d9608230152c9c9e4757528fdd63d7b4044cc1cf42",
+    "review-T05L-round4.json": "a302cec76595abd62d064f944888434eed8e915569e54e4dd73586615908535b",
+    "review-T05L.json": "a302cec76595abd62d064f944888434eed8e915569e54e4dd73586615908535b",
+    "run.json": "c4b2f0e85d8d2470a37f09b66500b6b4e85e848f0a02c6f2e00e93ae14fd436f",
+    "source.patch": "54fb81376e6df4694b5a08736ca4f1469ada051c464a14da32929c8a12ac3b35",
+    "task.json": "ef5ca47b913e4f4778073fbec61e4a84c96698abf8376b48acb02ec87ee0b901",
+    "verification-T05L-round1.json": "fa3c324ff6d453dc78d8640db0ad57bb07a9ffbb41f9189a432f6a06ca4a9977",
+    "verification-T05L-round2.json": "df7e7c69fe8e6bee577a1e619625846e2e526f26af1ad7d0bcfc3a6cd7969922",
+    "verification-T05L-round3.json": "ceebfc9b6d3fa558a2cee3781bf3e6482ffc3aa35acdbb1f3a0d387a9e719bca",
+    "verification-T05L-round4.json": "c28f36b6b8272871a3c443c9a236e8d583b8696e6ac07aae2169827e0bdd66e6",
+    "verification-T05L.json": "c28f36b6b8272871a3c443c9a236e8d583b8696e6ac07aae2169827e0bdd66e6"
+  },
+  "patch_validation": "PASS: git apply --cached --check against recorded base in a disposable index; no source checkout changed."
+}

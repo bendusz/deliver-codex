@@ -1,0 +1,29 @@
+{
+  "criteria": [
+    {
+      "id": "T05L-AC1",
+      "status": "FAIL",
+      "evidence": "Runtime and state validation enforce a verifier distinct from the current story's builder, top reviewer and panel members, and the subprocess lifecycle test proves finish leaves Execution in-review until integration. Normal adoption records M before E. However finalization accepts gate receipts whose log is missing or altered and whose command may have executed hidden assume-unchanged/skip-worktree bytes rather than M, so merged Execution is not always conditioned on fresh verified integration evidence. The integration record also lacks a canonical id/source binding and durable adopted-artifact validation."
+    },
+    {
+      "id": "T05L-AC2",
+      "status": "FAIL",
+      "evidence": "The unchanged pinned reader accepts the generated merged Execution and treats the handoff-only H as current with BASE_COMMIT E; current-roundtrip tests also preserve upstream Execution identity and unknown fields in both parser directions, and pending report recovery runs through fresh CLI processes. After E adoption, however, the record retains only closure.commit and execution_hash, and handoff preparation does not re-prove E's direct parent, story-only diff or merged story bytes. A structurally edited record with a recomputed concurrency hash can therefore produce H from an unproven closure, so the durable interruption/recovery boundary is incomplete."
+    },
+    {
+      "id": "T05L-AC3",
+      "status": "FAIL",
+      "evidence": "The normal standard opt-in path creates exactly the two report paths at direct-child P, references C/M/manifest/gate/review/verification identities without self-hashing, rejects missing lenses and non-PASS criteria, then creates story-only E. But adopted P proof is discarded, reporting is not re-derived from large/regulated scale or bound to the standard opt-in, and close-prepare trusts report.commit; reporting=skipped or report.commit=M can bypass required P. Rendering also omits retained panel findings and emits multiline verification evidence without Markdown neutralization, while H falsely says OPEN_FINDINGS none for permitted minor concerns."
+    },
+    {
+      "id": "T05L-AC4",
+      "status": "FAIL",
+      "evidence": "Every declared command is run by integrate-gate at recorded M in the normal test, with an M snapshot and environment identity, and fresh M review/verification APIs preserve source C. The preparation rejects source-snapshot/C drift and clean C/M manifest drift before a record can select fresh M evidence, and a merge-tree conflict leaves no discriminated failure record for T05C. Gate cleanliness can be bypassed by index flags, log_path/log_hash are not revalidated, and same-name retries erase earlier failed receipts. Thus neither exact actual-M gate identity nor the promised evidence-only refresh/correction handoff is complete."
+    },
+    {
+      "id": "T05L-AC5",
+      "status": "PASS",
+      "evidence": "parseReviewReceipt validates one shared snapshot, bounded safe member identities, unique lenses, PASS/CONCERNS/FAIL verdicts and each member's findings; it derives the aggregate status/findings instead of trusting top-level claims and retains unresolved minor CONCERNS under aggregate PASS. Reporting enforces the story-declared lenses plus code-integrity-reviewer and regulated security-auditor. Receipts without panel retain the legacy status/findings/summary shape, and the complete coordinator test suite passed 142 tests plus packaging validation at snapshot 663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3."
+    }
+  ]
+}

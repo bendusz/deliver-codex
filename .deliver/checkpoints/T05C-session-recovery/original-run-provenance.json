@@ -1,0 +1,13 @@
+{
+  "source_file": "rollout-2026-09-09T23-36-54-01a08851-2470-7db2-9428-986cd9225da0.jsonl",
+  "source_line": 6542,
+  "call_id": "call_mZNMguFSjKIW3HUvNgc57God",
+  "status": "PARTIAL: recorded output ends mid-baseline entries; not valid run JSON; cannot resume as original run",
+  "sha256": "849d845c7e53dd70ebcc4cf4f3973849e05f58e7d1ef29a39525dce18d48a5f4",
+  "last_known_revision": 2,
+  "last_known_counters": {
+    "fixes": 0,
+    "retries": 0,
+    "corrections": 0
+  }
+}

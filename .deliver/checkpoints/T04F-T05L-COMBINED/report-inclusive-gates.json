@@ -1,0 +1,15 @@
+{
+  "run": "4056ee0f-712a-45dc-97f1-059a07a9c02e",
+  "snapshot": "a91dc0c3024b7e109aafc9b0556f2d88def20ec326d4cc0718da26672ad54cc2",
+  "tests": 211,
+  "passed": 211,
+  "validate": "PASS",
+  "changed": [
+    "docs/reviews/2026-09-11-combined-repairs.md"
+  ],
+  "production_changed": false,
+  "logs_sha256": {
+    "test-5a771ac3-fa9d-4e9d-9fe5-9a5ae1746742.log": "570caf31b6eab4af85945b5f0a0cf539a664cb56b4e6fffc69aebeeef7526f40",
+    "validate-cdda9a48-173a-463c-b3f8-cca345bedf43.log": "16015ea9bb29aadcb776f4c95ae9bab2cc3281797fc4970b15a64e3e5371619a"
+  }
+}

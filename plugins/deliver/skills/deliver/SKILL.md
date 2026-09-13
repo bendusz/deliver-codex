@@ -15,9 +15,9 @@ Do not silently substitute models or require Claude.
 
 ## Working contract
 
-- Project progress lives in the original `pm/pm-state.json`, actor files and log. Read
-  `references/compatibility.md` before starting or resuming a project. `.deliver/` holds
-  Codex execution evidence, not a second project backlog. Switch hosts at completed story boundaries.
+- Shared progress lives in `docs/approval.json`, `docs/stories/` Execution blocks and Git history.
+  `.deliver/` holds Codex execution evidence, not another backlog. Read `references/compatibility.md`
+  before starting or switching hosts, and switch at completed story boundaries.
 - Quick may implement directly. Managed and Governed delegate bounded implementation to
   `deliver-builder`. Never edit a scope while another worker owns it.
 - Use native subagents when delegating. Start with a fresh, minimal task packet when the host
@@ -28,8 +28,11 @@ Do not silently substitute models or require Claude.
   in Quick and Managed. Governed uses a separate verifier. Missing evidence is UNKNOWN, not PASS.
 - Approval covers the requested scope only. Managed and Governed record explicit plan approval
   before implementation. A clear implementation request can authorize Quick work directly.
-- Preserve unrelated work. Never expand scope, loosen a contract, install dependencies, send
-  code to another provider, or commit/push merely because a workflow step mentions it.
+- Preserve unrelated work. Approved delivery gives the PM standing authority to commit scoped
+  work, push story branches, create or update pull requests, and merge verified code under the
+  repository's policy. Do not ask again for each of those steps. Builders and reviewers never
+  perform Git integration. Never expand scope, loosen a contract, install dependencies, send
+  code to another provider, deploy, or spend money without specific authorization.
 - Record bounded retry/fix counts and continuation points on disk. Read actual state after
   interruption rather than relying on the transcript. Stop after two builder retries or three
   fix rounds and report what needs a decision.
@@ -38,7 +41,14 @@ Do not silently substitute models or require Claude.
 
 | Request or phase | Read |
 |---|---|
-| Start, discover, specify, clarify, plan or build | `references/workflow.md` |
+| Operation names, arguments, output or authority | `references/operations.md` |
+| Discover or start a new project | `references/discovery.md` |
+| Specify or clarify product intent | `references/specification.md` |
+| Constitution, plan or approval | `references/planning.md` |
+| Project scale or checkpoint policy | `references/scale-profiles.md` |
+| Decompose an approved plan or check story readiness | `references/decomposition.md` |
+| Build, gate, review or verify | `references/workflow.md` |
+| Integrate, produce verification reports, close stories or write final handoffs | `references/shipping.md` |
 | Execute state, scope, gate or receipt commands | `references/runtime.md` |
 | Resume, handoff, doctor or correct-course | `references/recovery.md` |
 | SpecDD skeleton, contracts or contract-aware change | `references/specdd.md` |

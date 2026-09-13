@@ -1,0 +1,29 @@
+{
+  "criteria": [
+    {
+      "id": "T05L-AC1",
+      "status": "FAIL",
+      "evidence": "Current run/state validation and integration reconciliation require a verifier distinct from builder, top reviewer and every panel member; the subprocess lifecycle proves finish leaves the current claim in-review, and normal M/P/E/H adoption gates merged Execution on finalized evidence. Fix1 revalidates live M, logs and artifact topology. However a clean initialized submodule in a bound scope is encoded incompatibly by the committed manifest and live snapshot, so executableProof rejects the real integration before fresh gates or closure even when its gitlink and nested checkout are exact."
+    },
+    {
+      "id": "T05L-AC2",
+      "status": "PASS",
+      "evidence": "current-roundtrip.test.mjs proves both upstream-to-Codex and Codex-to-unchanged-upstream Execution parsing while preserving contract and unknown identity fields. The full integration subprocess test resumes prepared report state through fresh CLI processes, proves E is a story-only legal merged transition, adopts a separate H whose BASE_COMMIT is E, and the pinned upstream inspector treats that handoff as current. Adopted closure and handoff parent/tree/path/mode/blob proofs are revalidated from Git objects before later mutations."
+    },
+    {
+      "id": "T05L-AC3",
+      "status": "PASS",
+      "evidence": "Reporting policy is re-derived as required for large/regulated, requested only from the persisted standard opt-in, and skipped otherwise. Finalized evidence deterministically renders only docs/verification/<story>.md and docs/checklists/verification-<story>.md with C, source snapshot, M, manifest and current gate/review/verification identities; it rejects missing lenses and non-PASS criteria, escapes multiline evidence, retains findings, adopts exact direct-child P proof, then requires P before story-only E. Coherent reporting/proof tampering is rejected in the integration tests."
+    },
+    {
+      "id": "T05L-AC4",
+      "status": "FAIL",
+      "evidence": "Fix1 separately binds committed C, certified live source snapshot and expected M manifests; the tests prove source-only bound dirt and clean I-to-M bound drift select fresh M review plus distinct verification while preserving finished C, and a conflict persists an honest no-M I/C probe/log record. Gate execution proves live bytes, index flags, recursive anchor and exact M before and after each command, rehashes current/history logs, and retains failed reruns/finalization history. For an initialized scoped submodule, though, boundManifest uses `gitlink:<oid>` while snapshot uses `gitlink:<oid>:<nested-meta>` plus nested entries, so exact M is always rejected; protectedShape also freezes nested I HEAD/tree across a legitimate gitlink change. Thus declared gates cannot always run at the actual valid combined M."
+    },
+    {
+      "id": "T05L-AC5",
+      "status": "PASS",
+      "evidence": "parseReviewReceipt validates one shared snapshot, bounded safe identities, unique lenses, PASS/CONCERNS/FAIL member verdicts and exact member findings, then derives aggregate status/findings rather than trusting an underreported top level. Reporting enforces story-declared lenses plus code-integrity-reviewer and regulated security-auditor, while receipts without panel retain the legacy status/findings/summary shape. Coordinator gates passed 147/147 tests and packaging validation at snapshot 477c3fb8d6ae901dc3c6160406acab0834ab7123c3c65a9b7c8cffbf499dab92."
+    }
+  ]
+}

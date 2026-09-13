@@ -1,0 +1,14 @@
+{
+  "task": "T05B",
+  "status": "PASS preimplementation interface review; no T05B run started or attempts spent",
+  "reviewer": "/root/state_architecture",
+  "contract": "docs/plans/parity-contracts/remote-lifecycle-interface.md",
+  "resolved": [
+    "Separate remote.integration_evidence retains original local L identities",
+    "Prepared/executing/observed provider writes, exact read-only reconciliation and constrained replay/supersession",
+    "Raced closure cannot overwrite advanced-base changes on closure paths",
+    "Remote closure proof and local adoption readiness are distinct",
+    "CAS publication envelope, exact source merge versus verified tip, unique closure checkout, read-only merged adapter, terminal tokenized adoption"
+  ],
+  "scope": "Existing approved T05B only; no provider calls"
+}

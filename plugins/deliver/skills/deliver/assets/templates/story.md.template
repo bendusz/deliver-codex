@@ -1,0 +1,34 @@
+# S<sprint>-<n>: <Title>
+
+<!-- pm-meta: {"builder":"<expert-builder|codex-builder|auto>","touches":["<bounded repo-relative path>"]} -->
+
+Sprint: <n> · Priority: <high|med|low> · Covers: <FR-..., AC-...> · Depends on: <IDs|none> · Parallel-safe: <yes|no>
+Risk: <low|med|high> · Review lenses: <code-integrity-reviewer[, architecture-reviewer][, security-auditor]> · Specs: <.sdd paths|none>
+
+## Goal
+
+<One observable outcome.>
+
+## Context
+
+<Facts a cold builder needs. Name exact source paths, symbols, interfaces and conventions.>
+
+## Acceptance criteria
+
+<!-- Criterion text is authoritative here. Keep stable AC IDs and do not repeat the text in the plan. -->
+
+- [ ] AC-001: <Observable criterion.>
+
+## Out of scope
+
+- <Excluded work.>
+
+## Verification
+
+- Prove done with: `<exact command>`
+
+## Verification evidence
+
+<!-- Added after gates and independent verification. -->
+
+<!-- The claim operation adds the Execution section and pm-exec block. Decomposition must add neither. -->

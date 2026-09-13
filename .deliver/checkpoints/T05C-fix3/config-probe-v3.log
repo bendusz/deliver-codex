@@ -1,0 +1,13 @@
+▶ correction common core.worktree handling accepts the exact shared checkout and rejects retargeting unchanged
+  ✔ legitimate shared protected Git worktree (16667.061084ms)
+  ✔ fresh clone common config (14299.286334ms)
+  ✔ shared common config (13414.421375ms)
+✔ correction common core.worktree handling accepts the exact shared checkout and rejects retargeting unchanged (44447.860958ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 44486.69625

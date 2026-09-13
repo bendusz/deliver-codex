@@ -1,0 +1,1 @@
+T07 deferred before source edits because integrated production story template failed strict reader contract. Fix via T06B, then new baseline. Original run retained, counters zero, no PASS reused.

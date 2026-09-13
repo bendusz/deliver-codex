@@ -1,0 +1,18 @@
+{
+  "status": "FAIL",
+  "findings": [
+    {
+      "severity": "major",
+      "message": "Current-format continuation does not fail closed when an active run lacks pm_binding. assertPmBinding returns immediately for null bindings, so check and the scope checks used by gate/review/verify/finish can proceed without proving current story ownership. Require a current-format active run to retain its binding, while preserving null bindings for standalone projects, and cover stale or explicitly nulled current evidence across continuation operations.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/pm.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "Same-owner claim resumption returns before enforcing the clean integration-checkout precondition. Running pm claim from an old story branch or worktree can therefore treat that checkout's retained Execution block as authoritative. Require both new claims and claim resumption to inspect a clean checkout on the plan integration branch; retain the existing exact claim and counters only after that check.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+      "resolved": false
+    }
+  ],
+  "summary": "Independent round-zero review found two current-state authority gaps: missing bindings do not block continuation and existing claims can be resumed from a non-integration checkout. Exact contract/spec binding, routing, counters and legacy compatibility otherwise received supporting coverage, but the two majors require correction and fresh exact-snapshot gates."
+}

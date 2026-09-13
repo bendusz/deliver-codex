@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "approved_by": "Ben",
+  "at": "2026-09-11T07:39:49.518834+00:00",
+  "instruction": "Yes",
+  "proposal": "docs/plans/2026-09-10-reconciliation-identity-follow-up.md",
+  "proposal_sha256": "33d76438a4a98703cfdcf41b75dde458b4a7a05441ae187f860df1a5818e147d",
+  "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
+  "previous_fixes": 6,
+  "authorized_fixes": 7,
+  "retries": 1,
+  "scope": "One bounded seventh T05L identity/separation correction; independent regression tests first, production builder distinct, fresh full gates and independent review. Integrate only after PASS, then combined acceptance with distinct verifier. Preserve baseline, task, history and counters; no paid provider calls."
+}

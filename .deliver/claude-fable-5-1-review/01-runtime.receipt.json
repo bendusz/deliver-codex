@@ -1,0 +1,72 @@
+{
+  "status": "FAIL",
+  "findings": [
+    {
+      "severity": "major",
+      "message": "transitions.mjs prepareCommitAdoption/adoptPreparedCommit: a pending commit preparation can never be cancelled or superseded. prepareCommitAdoption fails with 'a commit adoption is already pending' while state.commit_adoption.pending exists, and adoptPreparedCommit leaves pending intact on any failure. Trigger: PM runs commit-prepare, then the worktree changes before adoption (one more builder edit, a correct-course fix which transitionCurrentExecution allows while pending, a mis-made commit that gets reset). adopt then fails 'worktree content differs from the prepared audited snapshot' and re-prepare is refused; assertFinalCandidate blocks finish. Impact: the standing-authority commit path deadlocks with no runtime recovery except hand-editing run state (which validateRunState accepts unaudited). Recommend: allow re-preparation when HEAD still equals pending.parent and the index is clean (supersede token, record the stale preparation in events), and make transitionCurrentExecution either refuse or explicitly void a pending adoption.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "transitions.mjs transitionRule: the only exit from 'blocked' is building via --attempt fix|retry (the forward table has no blocked -> X edge and to==='building' without attempt is rejected). Blocked is defined for non-defect stops (dependency wait, missing decision), yet every unblock spends a fix round or retry. When retries==2 and rounds==3 a blocked story can never resume: assertCurrentBinding (allowBlocked=false) rejects check/gate/review/verify/finish, transitions demand an attempt that is over budget, and a manual pm-exec edit changes executionHash so the binding fails with no reconcile command. Impact: permanent stall contrary to 'practical autonomy'; budgets are miscounted. Recommend a budget-free blocked -> building (or blocked -> prior status, recorded in the receipt) transition that requires --reason, keeping attempts strictly for fix/retry.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "current-pm.mjs requireExecutable (called from assertCurrentBinding on every runtime step) fails whenever any story in docs/stories is unreadable. The strict parser rejects many plausible upstream hand-written variants (e.g. '<!-- pm-meta : ', Sprint/Risk header spacing, missing '- [ ]' checkboxes, builder names outside auto/codex-builder/expert-builder, criteria in a second '## Acceptance criteria' section). Trigger: another actor commits such a story to the integration branch and it reaches the local checkout. Impact: all local check/gate/review/verify/finish/transition calls on an unrelated bound story stop, and policy forbids mutating the foreign file. This is a design choice rather than a crash, but it conflicts with the stated autonomy goal. Recommend limiting the inventory gate to claim time (where overlap/ownership must be provable) and to stories in the same sprint/scope; for continuation, emit STORY_UNREADABLE diagnostics without blocking.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "story.mjs replaceStoryExecution: when a story has no Execution section and no trailing newline, prefix gets '\\n' appended, so the regenerated contractText differs from the original text and the function throws 'Execution replacement changed the story contract'. Trigger: first claim of a story file saved without a final newline. Impact: claim refused with a misleading message that suggests contract tampering. Fix by hashing a newline-normalized contract or by rejecting with an explicit 'missing trailing newline' error.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/story.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "transitions.mjs storyMode: the first transition derives the story file mode from baseline.snapshot.entries[story_path]. The baseline is built in deliver.mjs start from packet touches+read_paths+specs, and the supplied test packet lists the story in read_paths. scope.mjs snapshot() is not in the packet; if it is scoped to those paths, a packet that omits the story starts successfully but every later transition/correct-course fails with 'run baseline cannot prove the story file mode', stranding retry/fix budgets. Verify snapshot() behaviour; if scoped, have prepareCurrentBinding require or auto-add the story path so the failure surfaces at start.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "current-pm.mjs transact/secretScan scans the entire rewritten story text on claim, not just the Execution block it adds. The loose pattern '(credential|token|secret|...)\\s*[:=]\\s*[A-Za-z0-9_/+=.-]{8,}' matches ordinary contract prose such as 'credential: rotation' or 'token: refreshing', so a legitimate auth-related story cannot be claimed ('secret-shaped content cannot be written to tracked project records'). Recommend scanning only the delta written by the transaction.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "current-pm.mjs approveCurrentPm validates plan policy syntax but not that an Integration branch is present, while requireExecutable later fails every claim/run with 'approved plan needs an Integration branch'. Fixing the plan changes the blob digest and forces a second approval round. Validate executability requirements at approve time.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "deliver.mjs correct-course --kind plan on a current-format project takes the generic branch: no active()/binding check, state.plan is rewritten to an arbitrary --plan path and approval nulled. requireCurrentApproval then permanently rejects the run ('runtime must use the unchanged approved shared docs/plan.md'). It fails closed, but it silently strands the run instead of rejecting; for current projects reject --kind plan and point to pm.mjs revoke/approve.",
+      "path": "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "current-pm.mjs prepareCurrentBinding duplicate-run scan calls readRun on every .deliver/runs/*.json; one malformed or older-schema run file throws and blocks every new start in the project. It also treats a finished run for the same story as a duplicate (acceptable until T05C correction-run creation lands, but note it). Recommend a tolerant scan that reports unreadable run files as diagnostics and only counts active current bindings.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "current-pm.mjs claimCurrentPm resume path (existing own claim) writes nothing yet still calls requireCleanIntegrationCheckout, so resuming from the story branch fails with 'claim preparation requires the plan integration branch main' (test 'wrongCheckout' encodes this). Runtime start already handles resume on the story branch; the restriction on the read-only resume report is unnecessary friction.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "pm.mjs status calls assertCurrentPmReady and exits non-zero when either journal exists, so the read-only status cannot report the interrupted transaction it is blocked by; and transitionCurrentExecution checks only the transition journal, not the current-pm journal. Recommend status returning the inspector result plus an INTERRUPTED_TRANSACTION diagnostic, and both mutators checking both journals.",
+      "path": "plugins/deliver/skills/deliver/scripts/pm.mjs",
+      "resolved": false
+    }
+  ],
+  "summary": "Design assessment: the supplied runtime largely serves the plan. Shared approval is bound by exact Git blob digest plus tracked-file checks (project-state.mjs implementation_ready; DIFF-02 fail-closed preserved while derived phase matches upstream), current-format claims preserve contract hash/actor/route/branch and never mutate foreign work, Quick cannot bypass a recognized shared project (deliver.mjs requireCurrentApproval ignores mode), counters are monotonic max() at binding and transition, the transition journal is validated by exact regeneration of after-images with before-image conflict checks, and commit adoption checks single direct parent, exact tree/index/index flags, protected metadata and full content hash. Actual defects found in implemented behaviour: (1) a stale pending commit preparation deadlocks the run with no supersede path; (2) blocked stories can only resume by spending fix/retry budget and become unrecoverable once budgets are spent; (3) any unreadable foreign story halts every local run, a strict-parser design choice at odds with practical autonomy. Remaining items are minor usability/fail-closed-but-stranding issues. Known pending, not defects: T05C correction runs, T08 doctor/resume, T14 replacing AGENTS.md's stale 'pm/ is the upstream-compatible source' guidance. Limitations: pm.mjs lib (preparePmBinding/assertPmBinding), scope.mjs, gates.mjs, review.mjs, integration.mjs and the T04/T05L lifecycle tests are not in the packet, so T04-AC3 test coverage, index_flags compatibility between captureGitAnchor and expectedIndex, panel receipt parsing and the integrate-* commands were not reviewed; the '153/153 tests' claim is not verified here."
+}

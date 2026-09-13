@@ -1,0 +1,4 @@
+[adapter stdout]
+{"adapter":"claude-review","model":"claude-fable-5-1","dry_run":false,"output":"/Users/ben/code/pm-skill-codex/.deliver/claude-fable-5-1-review/04-planning-support.receipt.json"}
+
+[adapter stderr]

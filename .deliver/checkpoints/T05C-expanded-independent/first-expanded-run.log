@@ -1,0 +1,172 @@
+✔ correction preparation binds only an actual failed M and keeps the immutable approved lineage (11567.265292ms)
+▶ correction preparation binds a real no-M conflict for both nullable and older I before-images
+  ✔ unclaimed (8001.511208ms)
+  ✔ older (8088.909042ms)
+✔ correction preparation binds a real no-M conflict for both nullable and older I before-images (16109.255333ms)
+▶ preparation rejects invented failure, contract drift and exhausted MAX before correction mutation
+  ✔ invented failure (8119.160666ms)
+  ✔ changed story contract (7196.719125ms)
+  ✔ exhausted fixes (11491.399291ms)
+✔ preparation rejects invented failure, contract drift and exhausted MAX before correction mutation (26831.552542ms)
+▶ failed-M qualification accepts current review or verification failure and rejects invalid authority or UNKNOWN alone
+  ✖ current review FAIL qualifies and retains its actor and finding origin (12560.388042ms)
+  ✔ current verification FAIL qualifies (12479.978917ms)
+  ✔ UNKNOWN-only verification does not qualify (12490.973667ms)
+  ✔ invalid reviewer identity (12458.584541ms)
+  ✔ reviewer equals builder (12579.771333ms)
+  ✔ panel reviewer equals builder (12555.996792ms)
+  ✔ verifier equals builder (12552.056666ms)
+  ✔ verifier equals reviewer (12736.169541ms)
+  ✔ verifier equals panel member (12560.79075ms)
+  ✔ invalid verifier identity (12644.75125ms)
+  ✔ malformed FAIL criteria cannot qualify (12673.029416ms)
+  ✔ stale review snapshot cannot qualify (12542.683542ms)
+  ✔ superseded review FAIL does not qualify (13632.734209ms)
+✖ failed-M qualification accepts current review or verification failure and rejects invalid authority or UNKNOWN alone (164556.29325ms)
+▶ correction start publishes the exact legal run/story pair and requires fresh complete evidence
+  ✔ failed-integration (19372.943458ms)
+  ✔ composition-conflict-no-m (15376.304666ms)
+✔ correction start publishes the exact legal run/story pair and requires fresh complete evidence (34772.249083ms)
+✖ fresh correction review must resolve the inherited finding multiset exactly (13527.003208ms)
+✖ a genuine prior correction remains in root lineage and cannot hide MAX attempts behind a new generation (20058.694958ms)
+▶ correction start rejects dirty, moved and duplicate checkouts without consuming its token
+  ✔ dirty exact branch (8773.219834ms)
+  ✔ moved branch (12591.401167ms)
+  ✔ second checkout attached to the same correction ref (8837.381459ms)
+  ✔ unrelated active same-story branch and worktree (8917.320084ms)
+  ✖ same-owner active other-story worktree (10249.447583ms)
+✖ correction start rejects dirty, moved and duplicate checkouts without consuming its token (49419.856833ms)
+▶ correction preparation rejects foreign, merged and conflicting no-M I Execution states
+  ✔ foreign owner (8125.693375ms)
+  ✔ merged state (8188.811334ms)
+  ✔ conflicting unknown metadata (8107.73425ms)
+✔ correction preparation rejects foreign, merged and conflicting no-M I Execution states (24450.715417ms)
+▶ correction start revalidates approval, plan and no-M probe identities before publication
+  ✖ approval drift (9971.346708ms)
+  ✔ plan drift (8226.78525ms)
+  ✔ probe log drift (8506.663208ms)
+✖ correction start revalidates approval, plan and no-M probe identities before publication (26735.532417ms)
+▶ dedicated correction journal recovers every torn run/story publication and rejects tampering
+  ✔ recover after starting-record (10823.0785ms)
+  ✔ recover after journal (9866.959208ms)
+  ✔ recover after run (9937.94075ms)
+  ✔ recover after story (9917.669792ms)
+  ✔ recover after started-record (9774.099708ms)
+  ✔ semantic journal tampering and coexistence refuse unchanged (9685.432042ms)
+✔ dedicated correction journal recovers every torn run/story publication and rejects tampering (60063.993083ms)
+▶ recovery rejects a fully rehashed but semantically illegal correction pair and third-state files unchanged
+  ✔ self-consistent outer hashes cannot legalize a built story after-image (9498.418125ms)
+  ✔ third states after journal preserve every byte (9508.539417ms)
+  ✔ third states after run preserve every byte (9569.095375ms)
+  ✔ third states after story preserve every byte (9501.365833ms)
+✔ recovery rejects a fully rehashed but semantically illegal correction pair and third-state files unchanged (38112.488916ms)
+ℹ tests 53
+ℹ suites 0
+ℹ pass 45
+ℹ fail 8
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 486249.299583
+
+✖ failing tests:
+
+test at tests/integration-correction.test.mjs:446:11
+✖ current review FAIL qualifies and retains its actor and finding origin (12560.388042ms)
+  AssertionError [ERR_ASSERTION]: The "string" argument must be of type string. Received type undefined (undefined)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:454:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:446:11)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /^[0-9a-f]{64}$/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests/integration-correction.test.mjs:698:1
+✖ fresh correction review must resolve the inherited finding multiset exactly (13527.003208ms)
+  AssertionError [ERR_ASSERTION]: extra duplicate
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:716:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration-correction.test.mjs:765:1
+✖ a genuine prior correction remains in root lineage and cannot hide MAX attempts behind a new generation (20058.694958ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:778:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration-correction.test.mjs:857:11
+✖ same-owner active other-story worktree (10249.447583ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:873:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:857:11)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /^PARALLEL_BATCH_REQUIRED:|parallel|other.story|same.owner/i,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests/integration-correction.test.mjs:905:13
+✖ approval drift (9971.346708ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:912:14)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///private/tmp/deliver-parity-t05c/tests/integration-correction.test.mjs:905:13)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /approval|changed|drift|source/i,
+    operator: 'throws',
+    diff: 'simple'
+  }

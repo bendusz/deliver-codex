@@ -1,0 +1,78 @@
+▶ correction recovery revalidates the exact start ref and token story target before any journal write
+  ✖ clean advanced correction ref refuses the old-I journal unchanged (11280.725875ms)
+  ✖ fully rehashed descriptor cannot redirect the typed story write (11529.602084ms)
+✖ correction recovery revalidates the exact start ref and token story target before any journal write (22833.070958ms)
+✖ unrelated Git histories are a generic merge error, not a no-M composition conflict (9941.249125ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 0
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 32824.219875
+
+✖ failing tests:
+
+test at tests/integration-correction.test.mjs:1072:11
+✖ clean advanced correction ref refuses the old-I journal unchanged (11280.725875ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '?? .deliver/integration-correction-transaction.json'
+  - ''
+  
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/t05c-recovery/tests/integration-correction.test.mjs:1079:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/t05c-recovery/tests/integration-correction.test.mjs:1072:11)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '?? .deliver/integration-correction-transaction.json',
+    expected: '',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/integration-correction.test.mjs:1094:11
+✖ fully rehashed descriptor cannot redirect the typed story write (11529.602084ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/t05c-recovery/tests/integration-correction.test.mjs:1114:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/t05c-recovery/tests/integration-correction.test.mjs:1094:11)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /story|path|target|token|descriptor|write/i,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests/integration-correction.test.mjs:1123:1
+✖ unrelated Git histories are a generic merge error, not a no-M composition conflict (9941.249125ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/t05c-recovery/tests/integration-correction.test.mjs:1156:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /composition|conflict|unrelated|generic|merge.tree|probe/i,
+    operator: 'throws',
+    diff: 'simple'
+  }

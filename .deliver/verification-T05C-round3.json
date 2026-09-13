@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T05C-AC1",
+      "status": "PASS",
+      "evidence": "At snapshot de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47, inspected integration.mjs:994-1058 still requires an exact current failed-M receipt or a reproducible status-1 merge-tree conflict with a tree OID, no process error and no signal. integration.mjs:1104-1174 binds the unchanged source run, approved contract, ownership, counter sources and unique correction branch into the immutable token. The fix2 diff does not weaken these checks, and the frozen test file SHA-256 f2e2d4e81c50de815f92d1a4e10ec5fba8ce19563383aca01cff713d29bc376c retains the actual-M, no-M, stale identity, changed contract, duplicate and unrelated-history cases."
+    },
+    {
+      "id": "T05C-AC2",
+      "status": "FAIL",
+      "evidence": "The design at integration-correction-design.md:43-45 requires the correction start checkout to be clean recursively, including index flags and initialized submodules. integration.mjs:1221-1223 checks cleanliness and index flags only at the correction root. validateCheckoutProofObjects at :219-228 validates stored commit objects, not live nested checkout state. assertCorrectionProtectedProof at :1192-1206 recursively compares protected_hash, protected ignored entries and initialized-submodule membership, but never compares nested HEAD, tree, index_tree, index_flags or live tracked bytes with the basis proof. A nested checkout drift hidden by `submodule.<name>.ignore=all`, or a nested assume-unchanged flag, can therefore survive first-start validation. The existing recursive verifyCheckoutProof at :232-255 performs the omitted HEAD, clean-tree, index-flag and live-byte checks, confirming this is a distinct missing validation path."
+    },
+    {
+      "id": "T05C-AC3",
+      "status": "FAIL",
+      "evidence": "The contract regression list at integration-correction-design.md:92-95 explicitly requires dirty, flagged and submodule-state coverage. The frozen tests contain no `submodule`, `assume-unchanged` or `skip-worktree` correction-start case, so the AC2 defect is untested. Independent scope inspection binds this verdict to snapshot de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47 and reports seven declared changed paths, no out-of-scope changes, no contract drift and no current coordinator Git-metadata drift. Run d7c72357-2f28-4ac9-b364-09c3b1b0628a remains active at revision 11 with the original baseline hash ff9d69069c2f635c49085fa00f7c4c30c4b2bb33e6ba6840f107b6297c4c9cf1 and counters retries 0, fixes 2, corrections 0, but current gates, review and verification are still empty. Fresh full-gate PASS and whole-task review are not yet recorded, and the unresolved nested-checkout defect blocks C2 integration."
+    }
+  ]
+}

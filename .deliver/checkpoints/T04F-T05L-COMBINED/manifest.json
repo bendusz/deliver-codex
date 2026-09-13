@@ -1,0 +1,28 @@
+{
+  "status": "ACCEPTED",
+  "run": "4056ee0f-712a-45dc-97f1-059a07a9c02e",
+  "source_merge_commit": "b84a045433f77644d541875ad5630915bf7f0c2d",
+  "source_merge_tree": "5f79ed030f9591529d2e0e038e8af5af9bdbf515",
+  "verified_snapshot": "a91dc0c3024b7e109aafc9b0556f2d88def20ec326d4cc0718da26672ad54cc2",
+  "report": {
+    "path": "docs/reviews/2026-09-11-combined-repairs.md",
+    "sha256": "61d737ce1a0a65292665e525c2986aa0ba60e8f90a0e1e8c58f6f98dbcadc487"
+  },
+  "composition": ".deliver/composition/accepted-T04F-T05L/manifest.json",
+  "files_sha256": {
+    "coordinator-reconciliation.json": "371f9abdefcae849eb95ef8f2ece5a3e843778375f58d1529440059378967b07",
+    "gates.json": "47eeb47484c20c971f66707a0f980d2db816c4f1e9e06e0312c2b93e13b17b13",
+    "logs/test-5a771ac3-fa9d-4e9d-9fe5-9a5ae1746742.log": "570caf31b6eab4af85945b5f0a0cf539a664cb56b4e6fffc69aebeeef7526f40",
+    "logs/test-8ee35c23-d13c-440f-97e2-b3e602236730.log": "af2a996e331017832382c9caa336af3db74eaa43f37cde3533530e25dbc705f7",
+    "logs/validate-cdda9a48-173a-463c-b3f8-cca345bedf43.log": "16015ea9bb29aadcb776f4c95ae9bab2cc3281797fc4970b15a64e3e5371619a",
+    "logs/validate-e785983f-fde5-4fe5-8412-ec0eb2c9b303.log": "2aeb986340c8f279fddc6496fa3e64c1fa502277bffb0c674daa864623dff3d7",
+    "native-review.json": "038359fb36a643d8b6dfc9af5988663001c7dc3c42da033461a38118eb0bc4b1",
+    "native-verification.json": "7a84ab1c18b19c961dadcd194fff404f94aee5d8b05247668f9e5f9b6befc155",
+    "report-inclusive-gates.json": "5c6d941bb0a6fc0e83bb14133e4396409686ad767278464bec25bc9a59b8af3e",
+    "run.json": "7ec9ddedb906c800d73f7ccc3a2b072aa1af195f4c508402a28c0caddc2f593f",
+    "source-only-review.json": "dd576ccea28a9051784a534b3321ce5822acc6c81b73ac6c2709e6f958d3b40c",
+    "source-only-run.json": "b6bf937d6c2b98006f4632d6cbd066f72fbe6a5fe44f2b7ec9555a3e67d908f5",
+    "source-only-verification.json": "eaed91f1a5e24f62bbfdcdc0f7625dbbd141a98f61e61dc19a6733a42878a479",
+    "task.json": "ddc78e0bdba4d0b079bb4ff282e209e72b07cb0dcbeb4fa567a85a3309b518d8"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "id": "T04F-T05L-COMBINED",
+  "objective": "Independently verify the actual integrated T04F and T05L repairs without changing production code",
+  "read_paths": [
+    "AGENTS.md",
+    "package.json",
+    "README.md",
+    "NOTICE.md",
+    "LICENSE",
+    ".gitattributes",
+    ".gitignore",
+    "plugins/deliver",
+    "bin",
+    "scripts",
+    "tests",
+    "docs"
+  ],
+  "touches": [
+    "docs/reviews/2026-09-11-combined-repairs.md"
+  ],
+  "acceptance": [
+    {
+      "id": "COMBINED-AC1",
+      "text": "Actual integration commit includes the accepted T04F and T05L commits with all repaired source and tests retained. Any conflict resolution is explicitly reviewed against both parent diffs and original failure lineage."
+    },
+    {
+      "id": "COMBINED-AC2",
+      "text": "Full repository tests and packaging validation pass at the exact combined snapshot. Commit cancellation and transition refusal coexist with frozen integration evidence, historical record repair, active failing/incomplete evidence refusal, declared actor identity/separation checks and panel aggregate validation. Original review defects and the subsequent legacy-reconciliation regressions remain fixed."
+    },
+    {
+      "id": "COMBINED-AC3",
+      "text": "Independent review and a distinct verifier assess the exact combined tree and original findings. Production and contract bytes remain unchanged throughout this verification run; the sole writable path is an optional review report, which must share the verified snapshot if created. No source/baseline/counter/history weakening, sandbox default change or new PM permission checkpoint is introduced."
+    }
+  ],
+  "commands": {
+    "test": "npm test",
+    "validate": "npm run validate"
+  },
+  "specs": []
+}

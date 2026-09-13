@@ -1,0 +1,47 @@
+▶ correction common core.worktree handling accepts the exact shared checkout and rejects retargeting unchanged
+  ✔ legitimate shared protected Git worktree (17131.005542ms)
+  ✖ fresh clone common config (13027.710291ms)
+  ✖ shared common config (12882.576791ms)
+✖ correction common core.worktree handling accepts the exact shared checkout and rejects retargeting unchanged (43109.96575ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 1
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 43150.414125
+
+✖ failing tests:
+
+test at ../pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs:1594:13
+✖ fresh clone common config (13027.710291ms)
+  Error [DeliverError]: cannot capture protected Git anchor: Command failed: git -C /private/var/folders/g5/60xbzztj24x67d8v1b45sx_00000gn/T/deliver-correction-source-nxU4Bc-integration/vendor/dependency symbolic-ref -q HEAD
+      at captureGitAnchor (file:///Users/ben/code/pm-skill-codex-worktrees/t05c-delivery/plugins/deliver/skills/deliver/scripts/lib/scope.mjs:188:11)
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs:1602:20)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs:1594:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    code: 66,
+    details: undefined
+  }
+
+test at ../pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs:1594:13
+✖ shared common config (12882.576791ms)
+  Error [DeliverError]: cannot capture protected Git anchor: Command failed: git -C /private/var/folders/g5/60xbzztj24x67d8v1b45sx_00000gn/T/deliver-correction-source-sEUZvT-integration/vendor/dependency symbolic-ref -q HEAD
+      at captureGitAnchor (file:///Users/ben/code/pm-skill-codex-worktrees/t05c-delivery/plugins/deliver/skills/deliver/scripts/lib/scope.mjs:188:11)
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs:1602:20)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs:1594:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    code: 66,
+    details: undefined
+  }

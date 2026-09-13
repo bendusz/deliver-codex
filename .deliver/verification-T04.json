@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T04-AC1",
+      "status": "PASS",
+      "evidence": "transitionRule and buildExecutionTransition enforce claimed -> building -> built -> in-review, explicit blocked handling, and bounded fix/retry returns to building. Story and run counters use their maximum persisted values and increment before the two-file journal is published. validateTransitionJournal regenerates the complete legal pair from validated before images, while the temporary-repository tests reject changed criteria, contract, binding and counters and preserve conflicting live bytes."
+    },
+    {
+      "id": "T04-AC2",
+      "status": "PASS",
+      "evidence": "prepareCommitAdoption requires a clean index, passing cumulative scope, unchanged protected anchor and committable Execution state. Its temporary index starts at the direct parent, rejects flags on intended paths, retains flags elsewhere, stages every cumulative changed task entry plus audited Execution, and proves each resulting tree entry. adoptPreparedCommit requires the exact one-parent current HEAD, same ref, expected tree/index/index flags, unchanged recursive protected metadata and exact prepared worktree-content hash before advancing the anchor. Tests prove pre-start unstaged dirt is preserved, pre-start staged dirt is rejected without mutation, hidden flagged source cannot be omitted, post-prepare flag drift is rejected, and recursive submodule config/hooks/index drift cannot be adopted."
+    },
+    {
+      "id": "T04-AC3",
+      "status": "PASS",
+      "evidence": "The real temporary-repository suite covers intermediate and final candidate commits, fresh gates/review/verification, fix counter persistence, process recovery, stale evidence, unauthorized commits, altered trees, hidden ignored source, changed protected metadata, wrong lineage/branch, immutable baseline compatibility, index flags and recursive submodules. Coordinator npm test passed 121 tests and npm run validate passed packaging, role, JSON and JavaScript checks; both runtime receipts have exit_code 0, passing scope and snapshot_hash 50471c7d0d9ca1fbe5fb567aefba1966305546e925b6cdeefcaee5b76ec4b1bf."
+    }
+  ]
+}

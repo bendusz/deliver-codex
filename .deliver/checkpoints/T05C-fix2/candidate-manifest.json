@@ -1,0 +1,15 @@
+{
+  "snapshot": "de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47",
+  "patch_sha256": "3581054fb0995df48a620c3dd47496d733a796231fbff2efb5ae28e8f02e5d91",
+  "files": {
+    "plugins/deliver/skills/deliver/scripts/lib/integration.mjs": "3b4afd9f92c15777af4b99dfe6b73eb48404ca0cf8c8908bd8243546a3f987ba",
+    "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs": "4f2f60e411d5c58414db61be792ee7fd454fee632043e77f7c5e733f4a1e0852",
+    "tests/integration-correction.test.mjs": "f2e2d4e81c50de815f92d1a4e10ec5fba8ce19563383aca01cff713d29bc376c"
+  },
+  "builder_reported_focused": {
+    "passed": 15,
+    "total": 15,
+    "duration_ms": 141326.4485
+  },
+  "status": "full gates and independent whole-task review/distinct verification in progress, not accepted"
+}

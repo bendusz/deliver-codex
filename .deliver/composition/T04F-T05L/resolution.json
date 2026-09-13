@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "kind": "bounded Git composition conflict resolution",
+  "probe": "/Users/ben/code/pm-skill-codex/.deliver/T04F-T05L-composition-probe.json",
+  "source": {
+    "root_commit": "9b3ee4aafb7b7adb899b2078ee5bf4dfbb140446",
+    "candidate_commit": "bdc8de89187e0f6e501ac91f84bda38ec04d96c3",
+    "candidate_tree": "a331683f26608cc9963bdf53ce8b9e5421c82fe2",
+    "merge_result_tree": "6846e41e54d9db340c7adc81fc8d68a34c3610e8",
+    "path": "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+    "base_blob": "495ab818055eb4907c9dfa2716fe75d1f6465034",
+    "t04f_stage_2_blob": "559e141ce2fe35e6067dae9b83193c031ec23d40",
+    "t05l_stage_3_blob": "15bbb12c1545d56ddfb4ab96e86cb0c42a2f7ddc"
+  },
+  "result": {
+    "path": "/tmp/T04F-T05L-deliver.resolved.mjs",
+    "bytes": 22398,
+    "sha256": "4af0184e72c945c373efd35fac37b0286918fd4622a162dd1034fd85613b1071",
+    "git_blob": "97a9856e1e24e6d70919c2cdf1454b24f4260184",
+    "syntax_check": {
+      "command": "node --check /tmp/T04F-T05L-deliver.resolved.mjs",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  "resolution": "Preserved the complete T04F multiline transitions import, added the T05L parseReviewReceipt import, and retained every other byte from Git's automatic three-way merge. The generated merge had one conflict marker block, and replacing only that block produced an exact byte match with this result."
+}

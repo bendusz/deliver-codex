@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T05C-AC1",
+      "status": "PASS",
+      "evidence": "At snapshot 405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334, integration.mjs:994-1058 accepts only a reproducible status-1 merge-tree conflict with a tree OID or current M-bound failing gate/review/verification evidence; integration.mjs:1104-1174 revalidates source, approval, contract, ownership, counter limit and branch uniqueness before publishing an immutable token. The focused current-snapshot command `node --test '--test-name-pattern=correction recovery revalidates|unrelated Git histories' tests/integration-correction.test.mjs` exited 0 with 4/4 passing in 35765.802083ms, including rejection of unrelated histories."
+    },
+    {
+      "id": "T05C-AC2",
+      "status": "FAIL",
+      "evidence": "The correction contract requires unchanged protected metadata and rejected recovery drift before mutation. current-pm.mjs:513-523 captures the full protected Git anchor and integration.mjs:1308-1318 stores its hash. Recovery calls assertStartTokenCurrent at integration.mjs:1419-1420, but assertUniqueCorrectionCheckout at integration.mjs:1201-1202 compares only the fresh anchor's HEAD to start_commit. Journal validation at current-pm.mjs:625 likewise checks only runState.git_anchor.head. No path compares the live protected_hash, index flags or nested submodule anchors with the saved anchor or anchor_hash. Ignored hook/config/exclude metadata can therefore drift after journal creation while recovery still applies the run/story writes."
+    },
+    {
+      "id": "T05C-AC3",
+      "status": "FAIL",
+      "evidence": "At the exact snapshot, independent scope inspection reports the declared seven changed paths, no out-of-scope change, no current worktree Git-metadata drift and no contract drift, but run d7c72357-2f28-4ac9-b364-09c3b1b0628a still has gates:[], review:null and verification:null. The newly confirmed protected-anchor recovery defect is unresolved and lacks a regression. Fresh full npm test, npm run validate, whole-task review and final distinct verification have not been recorded, so C2 integration is not authorized."
+    }
+  ]
+}

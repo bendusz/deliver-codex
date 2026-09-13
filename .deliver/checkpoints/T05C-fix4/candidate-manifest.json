@@ -1,0 +1,16 @@
+{
+  "snapshot": "6878683c7c9e3511d86a2d59507c28805816398b43ed8737740dea8a875ea0e3",
+  "run_id": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
+  "state": "fix4 candidate awaiting full gates and independent acceptance",
+  "files": {
+    "plugins/deliver/skills/deliver/references/shipping.md": "ca1eca99f7e01127bc86f2332c042525d2d77d44ddd196364affe9938b436f5a",
+    "plugins/deliver/skills/deliver/scripts/deliver.mjs": "438c242de87b79d7261eaa7ea9db73f0530dece4bfed3b0df4574ffdd02a2905",
+    "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs": "4f2f60e411d5c58414db61be792ee7fd454fee632043e77f7c5e733f4a1e0852",
+    "plugins/deliver/skills/deliver/scripts/lib/integration.mjs": "f7b0678ed0f75ff3d0b7d66927be9b8ccd763486ff095760031694656460af20",
+    "plugins/deliver/skills/deliver/scripts/lib/state.mjs": "457cb4fa8d4b0170102e2515d2f8a01b22a37fe13aebaf4e1c329ad2b61471a5",
+    "plugins/deliver/skills/deliver/scripts/pm.mjs": "7f3e0f27d7e426b792086552503f47cc34316cce8d77d73eca4283c1bd8dc1ef",
+    "tests/current-lifecycle.test.mjs": "371de8ed4d0ebe1491b3cd1f57ba5ff7f972af241dd95e59ed5933be5e348baf",
+    "tests/integration-correction.test.mjs": "4dfc6ccdabd2ee0c93225082d56693c5b0d4f43cee449e5258f72092f7ba25fb"
+  },
+  "patch_sha256": "51308707b08b00768eb71e750067461f3dbe665927e0cff046bcafae48d23afb"
+}

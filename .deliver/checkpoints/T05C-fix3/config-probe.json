@@ -1,0 +1,11 @@
+{
+  "command": [
+    "node",
+    "--test",
+    "--test-name-pattern=common core\\.worktree handling",
+    "/Users/ben/code/pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs"
+  ],
+  "exit_code": 1,
+  "log_sha256": "211ed32fbd07445cdba398b8fa2a5f8a5d523ccdb90f6a4ca3309a94cc84aaed",
+  "probe_sha256": "fae33daa9a81cd86de3a63f88741d48f91c1d713a22bf69402b8032a7fbb5104"
+}

@@ -1,0 +1,53 @@
+{
+  "snapshot": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9",
+  "stale_pending": {
+    "root": "/private/var/folders/g5/60xbzztj24x67d8v1b45sx_00000gn/T/deliver-recovery-triage-WXAvHW",
+    "prepare_status": 0,
+    "correct_course_status": 0,
+    "pending_after_correction": true,
+    "reprepare": {
+      "status": 66,
+      "error": "a commit adoption is already pending"
+    },
+    "adopt": {
+      "status": 66,
+      "error": "adopted commit tree or index differs from the prepared tree"
+    },
+    "finish": {
+      "status": 66,
+      "error": "commit adoption is pending; commit or reconcile it before continuing"
+    },
+    "counters": {
+      "retries": 0,
+      "fixes": 1,
+      "corrections": 0
+    }
+  },
+  "blocked": {
+    "root": "/private/var/folders/g5/60xbzztj24x67d8v1b45sx_00000gn/T/deliver-recovery-triage-owXHOw",
+    "direct_initial": {
+      "status": 66,
+      "error": "illegal Execution transition blocked -> building"
+    },
+    "retry1": 0,
+    "retry2": 0,
+    "final_execution_status": {},
+    "counters": {
+      "retries": 2,
+      "fixes": 3,
+      "corrections": 0
+    },
+    "direct_final": {
+      "status": 66,
+      "error": "illegal Execution transition blocked -> building"
+    },
+    "retry_final": {
+      "status": 66,
+      "error": "retry limit of 2 has been reached"
+    },
+    "fix_final": {
+      "status": 66,
+      "error": "fix limit of 3 has been reached"
+    }
+  }
+}

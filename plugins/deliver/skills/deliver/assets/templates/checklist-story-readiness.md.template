@@ -1,0 +1,24 @@
+# Story readiness checklist: <story ID>
+<!-- Write to docs/checklists/story-readiness-<story ID>.md only during an authorized checklist
+operation. Check each box from the current story content identity. UNKNOWN remains unchecked. -->
+
+- [ ] Goal and context give a cold builder the exact source paths, symbols, contracts and outcome.
+  Evidence: <story path:lines and reviewer judgment>
+- [ ] `Covers` and every acceptance checkbox use authoritative stable `FR-` or `AC-` IDs.
+  Evidence: <story path:lines and requirement declarations>
+- [ ] Acceptance criteria are observable and out-of-scope work is explicit.
+  Evidence: <story path:lines and reviewer judgment>
+- [ ] Verification contains one usable exact command; any named gate exists in the plan.
+  Evidence: <story path:line and docs/plan.md command line>
+- [ ] Every `Depends on` ID exists, the graph is acyclic and required predecessors are merged before claim.
+  Evidence: <dependency paths, statuses and lines>
+- [ ] First-12-lines `pm-meta` has exactly `builder` and unique bounded `touches` without globs or traversal.
+  Evidence: <story path:pm-meta line>
+- [ ] Parallel-safe stories have no overlapping touch roots.
+  Evidence: <compared story IDs, paths and touch roots>
+- [ ] Risk and Review lenses include code integrity, security for relevant trust boundaries and architecture for structural contracts.
+  Evidence: <story path:Risk line, scope triggers and reviewer judgment>
+- [ ] When SpecDD applies, every declared spec exists and owns the story touch paths.
+  Evidence: <story Specs line and .sdd Owns lines, or N/A>
+- [ ] The story is unclaimed before decomposition completes; claim bookkeeping is not part of its requirements.
+  Evidence: <absence of Execution section before claim>

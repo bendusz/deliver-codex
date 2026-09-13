@@ -36,6 +36,51 @@ export function readJsonFile(file, label = file) {
 
 const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const isStringArray = (value) => Array.isArray(value) && value.every((item) => typeof item === 'string');
+const safeBranch = (value) => typeof value === 'string' && value && value.length <= 512 && value !== '@'
+  && !value.startsWith('-') && !value.startsWith('/') && !value.endsWith('/') && !value.endsWith('.')
+  && !value.includes('..') && !value.includes('//') && !value.includes('@{')
+  && !/[\x00-\x20\x7f~^:?*[\\\]]/.test(value)
+  && value.split('/').every((part) => part && !part.startsWith('.') && !part.endsWith('.lock'));
+const safeRef = (value) => typeof value === 'string' && value.startsWith('refs/heads/') && safeBranch(value.slice('refs/heads/'.length));
+const safeRelativePath = (value) => typeof value === 'string' && value && !path.isAbsolute(value)
+  && !/[\x00-\x1f\x7f]/.test(value) && !value.split(/[\\/]/).some((part) => !part || part === '.' || part === '..')
+  && !/^(?:\.git|\.deliver)(?:[\\/]|$)/.test(value);
+const oid = (value) => typeof value === 'string' && /^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(value);
+const digest = (value) => typeof value === 'string' && /^[0-9a-f]{64}$/.test(value);
+const runId = (value) => typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(value);
+
+function validNestedAnchor(anchor) {
+  if (!isObject(anchor) || !['head', 'tree', 'index_tree', 'index_flags', 'protected_hash']
+    .every((key) => typeof anchor[key] === 'string')
+    || !oid(anchor.head) || !oid(anchor.tree) || !oid(anchor.index_tree)
+    || !digest(anchor.index_flags) || !digest(anchor.protected_hash)
+    || (anchor.metadata_version !== undefined && anchor.metadata_version !== 'protected-v2')) return false;
+  if (anchor.submodules === undefined) return true;
+  return isObject(anchor.submodules) && Object.entries(anchor.submodules)
+    .every(([rel, nested]) => safeRelativePath(rel) && validNestedAnchor(nested));
+}
+
+export function archiveEvidence(state, reason, details = {}, archivedAt = new Date().toISOString()) {
+  if (!isObject(state) || typeof reason !== 'string' || !reason.trim() || !isObject(details)
+    || typeof archivedAt !== 'string' || Number.isNaN(Date.parse(archivedAt))) {
+    throw new DeliverError('cannot archive evidence without a state, reason and detail object', 66);
+  }
+  const hasEvidence = state.gates.length > 0 || state.review !== null || state.verification !== null;
+  if (hasEvidence) {
+    if (state.evidence_history === undefined) state.evidence_history = [];
+    state.evidence_history.push({
+      at: archivedAt,
+      reason,
+      details: structuredClone(details),
+      gates: structuredClone(state.gates),
+      review: structuredClone(state.review),
+      verification: structuredClone(state.verification),
+    });
+  }
+  state.gates = [];
+  state.review = null;
+  state.verification = null;
+}
 
 export function validateTaskPacket(packet) {
   if (!isObject(packet)) throw new DeliverError('task packet must be a JSON object', 66);
@@ -78,7 +123,7 @@ export function validateTaskPacket(packet) {
   };
 }
 
-function validateState(state) {
+export function validateRunState(state) {
   const fail = (message) => { throw new DeliverError(`invalid run state: ${message}`, 66); };
   if (!isObject(state)) fail('root must be an object');
   if (state.schema_version !== STATE_VERSION) fail(`schema_version must be ${STATE_VERSION}`);
@@ -104,9 +149,96 @@ function validateState(state) {
   }
   if (state.pm_binding !== undefined && state.pm_binding !== null) {
     const binding = state.pm_binding;
-    if (!isObject(binding) || !['actor', 'story', 'story_path', 'story_hash', 'integration_branch', 'actor_path'].every((key) => typeof binding[key] === 'string')) fail('bad PM binding');
-    if (!/^[a-z0-9-]+-[a-f0-9]{12}$/.test(binding.actor) || binding.actor_path !== `pm/actors/${binding.actor}.json`
-      || !binding.story_path.startsWith('docs/stories/') || binding.story_path.split(/[\\/]/).includes('..')) fail('unsafe PM binding');
+    const safeActor = (value) => typeof value === 'string' && /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?-[a-f0-9]{12}$/.test(value);
+    const safeStoryPath = (value) => typeof value === 'string' && /^docs\/stories\/S\d+-\d+-[^/\\]+\.md$/.test(value);
+    if (!isObject(binding)) fail('bad PM binding');
+    if (binding.format === 'current') {
+      if (!['actor', 'story', 'story_path', 'contract_hash', 'execution_hash', 'plan_digest', 'branch', 'builder', 'integration_branch']
+        .every((key) => typeof binding[key] === 'string')) fail('bad current PM binding');
+      if (!safeActor(binding.actor) || !/^S\d+-\d+$/.test(binding.story) || !safeStoryPath(binding.story_path)
+        || !/^[0-9a-f]{64}$/.test(binding.contract_hash) || !/^[0-9a-f]{64}$/.test(binding.execution_hash)
+        || !/^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(binding.plan_digest)
+        || !safeBranch(binding.branch) || !safeBranch(binding.integration_branch)
+        || !['codex-builder', 'expert-builder'].includes(binding.builder)) fail('unsafe current PM binding');
+    } else {
+      if (binding.format !== undefined && binding.format !== 'legacy') fail('unsupported PM binding format');
+      if (!['actor', 'story', 'story_path', 'story_hash', 'integration_branch', 'actor_path'].every((key) => typeof binding[key] === 'string')) fail('bad legacy PM binding');
+      if (!safeActor(binding.actor) || binding.actor_path !== `pm/actors/${binding.actor}.json`
+        || !binding.story_path.startsWith('docs/stories/') || binding.story_path.split(/[\\/]/).includes('..')) fail('unsafe legacy PM binding');
+    }
+  }
+  if (state.git_anchor !== undefined && state.git_anchor !== null) {
+    const anchor = state.git_anchor;
+    if (!isObject(anchor) || !['head', 'ref', 'tree', 'index_tree', 'index_flags', 'protected_hash']
+      .every((key) => typeof anchor[key] === 'string')) fail('bad git anchor');
+    if (!oid(anchor.head) || !oid(anchor.tree) || !oid(anchor.index_tree)
+      || !digest(anchor.index_flags) || !digest(anchor.protected_hash)
+      || !safeRef(anchor.ref)
+      || (anchor.metadata_version !== undefined && anchor.metadata_version !== 'protected-v2')
+      || (anchor.submodules !== undefined && (!isObject(anchor.submodules) || !Object.entries(anchor.submodules)
+        .every(([rel, nested]) => safeRelativePath(rel) && validNestedAnchor(nested))))) fail('unsafe git anchor');
+  }
+  if (state.baseline_metadata_version !== undefined
+    && (state.baseline_metadata_version !== 'legacy-v1' || !state.git_anchor)) fail('bad baseline metadata compatibility marker');
+  if (state.execution_audit !== undefined && state.execution_audit !== null) {
+    const audit = state.execution_audit;
+    if (!isObject(audit) || typeof audit.story_path !== 'string' || typeof audit.contract_hash !== 'string'
+      || !(audit.original_entry === null || /^file:(?:644|755):[0-9a-f]{64}$/.test(audit.original_entry))
+      || !/^file:(?:644|755):[0-9a-f]{64}$/.test(audit.current_entry) || !Array.isArray(audit.transitions)
+      || !/^docs\/stories\/S\d+-\d+-[^/\\]+\.md$/.test(audit.story_path)
+      || !/^[0-9a-f]{64}$/.test(audit.contract_hash)) fail('bad Execution audit');
+    for (const item of audit.transitions) {
+      if (!isObject(item) || !['from', 'to', 'before_hash', 'after_hash', 'at'].every((key) => typeof item[key] === 'string')
+        || !['claimed', 'building', 'built', 'in-review', 'blocked'].includes(item.from)
+        || !['claimed', 'building', 'built', 'in-review', 'blocked'].includes(item.to)
+        || !/^[0-9a-f]{64}$/.test(item.before_hash) || !/^[0-9a-f]{64}$/.test(item.after_hash)
+        || !(item.reason === null || typeof item.reason === 'string')
+        || (item.attempt !== null && item.attempt !== undefined && !['fix', 'retry'].includes(item.attempt))) fail('bad Execution transition receipt');
+    }
+  }
+  if (state.commit_adoption !== undefined && state.commit_adoption !== null) {
+    const adoption = state.commit_adoption;
+    if (!isObject(adoption) || !Array.isArray(adoption.history) || !(adoption.pending === null || isObject(adoption.pending))) fail('bad commit adoption state');
+    const validPreparation = (pending) => {
+      if (!['token', 'parent', 'ref', 'expected_tree', 'expected_index_flags', 'content_hash', 'protected_hash', 'prepared_at'].every((key) => typeof pending[key] === 'string')
+        || !Array.isArray(pending.paths) || !isStringArray(pending.paths) || !pending.paths.every(safeRelativePath)
+        || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(pending.token)
+        || ![pending.parent, pending.expected_tree].every((value) => /^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(value))
+        || ![pending.expected_index_flags, pending.content_hash, pending.protected_hash].every(digest)
+        || !safeRef(pending.ref)) return false;
+      return true;
+    };
+    if (adoption.pending && !validPreparation(adoption.pending)) fail('bad pending commit adoption');
+    for (const item of adoption.history) {
+      if (!isObject(item) || typeof item.commit !== 'string' || typeof item.parent !== 'string'
+        || !/^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(item.commit)
+        || !/^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(item.parent)
+        || typeof item.tree !== 'string' || !/^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(item.tree)
+        || !safeRef(item.ref) || !isStringArray(item.paths) || !item.paths.every(safeRelativePath)
+        || !['claimed', 'building', 'built', 'in-review'].includes(item.execution_status)
+        || typeof item.execution_hash !== 'string' || !/^[0-9a-f]{64}$/.test(item.execution_hash)
+        || typeof item.adopted_at !== 'string') fail('bad commit adoption receipt');
+    }
+    if (adoption.cancellations !== undefined) {
+      if (!Array.isArray(adoption.cancellations)) fail('bad commit cancellation history');
+      for (const item of adoption.cancellations) {
+        if (!isObject(item) || !isObject(item.preparation) || !validPreparation(item.preparation)
+          || typeof item.reason !== 'string' || !item.reason.trim() || item.reason.length > 1000
+          || /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(item.reason)
+          || typeof item.cancelled_at !== 'string' || Number.isNaN(Date.parse(item.cancelled_at))) {
+          fail('bad commit cancellation receipt');
+        }
+      }
+    }
+  }
+  if (state.evidence_history !== undefined) {
+    if (!Array.isArray(state.evidence_history)) fail('bad evidence history');
+    for (const item of state.evidence_history) {
+      if (!isObject(item) || typeof item.at !== 'string' || typeof item.reason !== 'string' || !item.reason.trim()
+        || !isObject(item.details)
+        || !Array.isArray(item.gates) || !(item.review === null || isObject(item.review))
+        || !(item.verification === null || isObject(item.verification))) fail('bad evidence history item');
+    }
   }
   if (state.completion_snapshot !== undefined) {
     const snap = state.completion_snapshot;
@@ -123,6 +255,28 @@ function validateState(state) {
   if (state.review !== null && (!isObject(state.review) || !['PASS', 'FAIL'].includes(state.review.status)
     || typeof state.review.builder !== 'string' || typeof state.review.reviewer !== 'string'
     || !Array.isArray(state.review.findings) || typeof state.review.snapshot_hash !== 'string')) fail('bad review');
+  if (state.review?.panel !== undefined) {
+    const panel = state.review.panel;
+    if (!isObject(panel) || panel.snapshot_hash !== state.review.snapshot_hash || !Array.isArray(panel.members)
+      || !panel.members.length || panel.members.length > 16) fail('bad review panel');
+    for (const member of panel.members) {
+      if (!isObject(member) || typeof member.lens !== 'string' || !/^[a-z][a-z0-9-]{0,63}$/.test(member.lens)
+        || typeof member.reviewer !== 'string' || !['PASS', 'CONCERNS', 'FAIL'].includes(member.verdict)
+        || member.snapshot_hash !== panel.snapshot_hash || !Array.isArray(member.findings)) fail('bad review panel member');
+      for (const finding of member.findings) {
+        if (!isObject(finding) || !['block', 'major', 'minor'].includes(finding.severity)
+          || typeof finding.message !== 'string' || !finding.message.trim() || typeof finding.resolved !== 'boolean') fail('bad review panel finding');
+      }
+      if (member.verdict === 'PASS' && member.findings.some((finding) => !finding.resolved && finding.severity !== 'minor')) fail('invalid PASS panel member');
+      if (member.verdict === 'CONCERNS' && !member.findings.some((finding) => !finding.resolved)) fail('invalid CONCERNS panel member');
+    }
+    if (new Set(panel.members.map((member) => member.lens)).size !== panel.members.length) fail('duplicate review panel lens');
+    const derivedFindings = panel.members.flatMap((member) => member.findings
+      .map((finding) => ({ ...finding, lens: member.lens, reviewer: member.reviewer })));
+    const derivedStatus = panel.members.some((member) => member.verdict === 'FAIL')
+      || derivedFindings.some((finding) => !finding.resolved && finding.severity !== 'minor') ? 'FAIL' : 'PASS';
+    if (state.review.status !== derivedStatus || canonical(state.review.findings) !== canonical(derivedFindings)) fail('review panel aggregate is inconsistent');
+  }
   if (state.verification !== null && (!isObject(state.verification) || typeof state.verification.verifier !== 'string'
     || !Array.isArray(state.verification.criteria) || typeof state.verification.snapshot_hash !== 'string')) fail('bad verification');
   if (['active', 'finished'].includes(state.phase) && (!state.task || !state.baseline)) fail('active/finished run needs a task and baseline');
@@ -142,12 +296,40 @@ function validateState(state) {
     }).sort();
     if (canonical(actual) !== canonical(expected)) fail('verification criteria do not match acceptance');
     if (state.verification.verifier === state.task.builder) fail('verification identity violates separation');
+    if (state.pm_binding?.format === 'current' && state.review?.reviewer === state.verification.verifier) {
+      fail('current shared-project verifier must differ from reviewer');
+    }
+    if (state.pm_binding?.format === 'current'
+      && state.review?.panel?.members.some((member) => member.reviewer === state.verification.verifier)) {
+      fail('current shared-project verifier must differ from every panel reviewer');
+    }
   }
   if (state.contracts !== undefined && state.contracts !== null) {
     if (!isObject(state.contracts) || !isObject(state.contracts.hashes) || !isStringArray(state.contracts.specs)
       || !isStringArray(state.contracts.editable_paths)) fail('bad frozen contracts');
     for (const [rel, hash] of Object.entries(state.contracts.hashes)) {
       if (path.isAbsolute(rel) || rel.split(/[\\/]/).includes('..') || !/^[0-9a-f]{64}$/.test(hash)) fail('unsafe contract hash');
+    }
+  }
+  if (state.correction !== undefined && state.correction !== null) {
+    const correction = state.correction;
+    if (!isObject(correction) || correction.version !== 'integration-correction-v1'
+      || !runId(correction.token_id) || !digest(correction.token_identity)
+      || !['failed-integration', 'composition-conflict-no-m'].includes(correction.basis)
+      || typeof correction.integration_record !== 'string' || !path.isAbsolute(correction.integration_record)
+      || !runId(correction.root_run_id) || !runId(correction.source_run_id)
+      || !Number.isSafeInteger(correction.generation) || correction.generation < 1
+      || !isObject(correction.root_review_lineage) || !Array.isArray(correction.required_resolutions)
+      || canonical(correction.required_resolutions) !== canonical(correction.root_review_lineage.required_resolutions)) {
+      fail('bad integration correction binding');
+    }
+    for (const item of correction.required_resolutions) {
+      if (!isObject(item) || !digest(item.receipt_identity) || !Number.isSafeInteger(item.ordinal) || item.ordinal < 0
+        || !['block', 'major', 'minor'].includes(item.severity)
+        || typeof item.message !== 'string' || !item.message.trim() || item.message.length > 4000
+        || (item.path !== undefined && (typeof item.path !== 'string' || item.path.length > 1000))) {
+        fail('bad inherited correction finding');
+      }
     }
   }
   return state;
@@ -168,11 +350,9 @@ export function syncPlan(state) {
   const hash = currentPlanHash(state);
   if (hash === null) throw new DeliverError(`plan is missing or unreadable: ${state.plan.path}`, 66);
   if (hash !== state.plan.hash) {
+    archiveEvidence(state, 'plan_changed', { previous_plan_hash: state.plan.hash, next_plan_hash: hash });
     state.plan.hash = hash;
     state.approval = null;
-    state.gates = [];
-    state.review = null;
-    state.verification = null;
     state.events.push({ at: new Date().toISOString(), type: 'plan_changed', plan_hash: hash });
   }
   return hash;
@@ -227,9 +407,11 @@ function atomicWrite(file, value, exclusive = false) {
   }
 }
 
-export function createRun(projectRoot, mode, planPath = null) {
+export function createRunState(projectRoot, mode, planPath = null, { fixedRunId = randomUUID(), createdAt = new Date().toISOString() } = {}) {
   if (!['quick', 'managed', 'governed'].includes(mode)) throw new DeliverError('mode must be quick, managed, or governed', 64);
   const root = fs.realpathSync(projectRoot);
+  if (!runId(fixedRunId)) throw new DeliverError('fixed run id must be a canonical UUID', 66);
+  if (typeof createdAt !== 'string' || Number.isNaN(Date.parse(createdAt))) throw new DeliverError('created time must be a valid timestamp', 66);
   if (!planPath && mode !== 'quick') throw new DeliverError('--plan is required in managed and governed modes', 64);
   const plan = planPath ? path.resolve(root, planPath) : null;
   let planHash = sha256('quick:no-plan');
@@ -237,16 +419,14 @@ export function createRun(projectRoot, mode, planPath = null) {
     try { planHash = sha256(fs.readFileSync(plan)); }
     catch (error) { throw new DeliverError(`cannot read plan: ${error.message}`, 66); }
   }
-  const runId = randomUUID();
-  const now = new Date().toISOString();
   const state = {
     schema_version: STATE_VERSION,
-    run_id: runId,
+    run_id: fixedRunId,
     mode,
     revision: 0,
     project_root: root,
-    created_at: now,
-    updated_at: now,
+    created_at: createdAt,
+    updated_at: createdAt,
     phase: 'initialized',
     plan: { path: plan, hash: planHash },
     approval: null,
@@ -255,11 +435,18 @@ export function createRun(projectRoot, mode, planPath = null) {
     gates: [],
     review: null,
     verification: null,
+    evidence_history: [],
     checkpoints: [],
     counters: { retries: 0, fixes: 0, corrections: 0 },
-    events: [{ at: now, type: 'initialized', mode, plan_hash: planHash }],
+    events: [{ at: createdAt, type: 'initialized', mode, plan_hash: planHash }],
   };
-  const file = path.join(runsDir(root), `${runId}.json`);
+  validateRunState(state);
+  return state;
+}
+
+export function createRun(projectRoot, mode, planPath = null) {
+  const state = createRunState(projectRoot, mode, planPath);
+  const file = path.join(runsDir(state.project_root), `${state.run_id}.json`);
   atomicWrite(file, state, true);
   return { state, file };
 }
@@ -302,7 +489,7 @@ export function readRun(runArg, cwd = process.cwd()) {
     if (error instanceof DeliverError) throw error;
     throw new DeliverError(`cannot read run state: ${error.message}`, 66);
   }
-  const state = validateState(readJsonFile(file, 'run state'));
+  const state = validateRunState(readJsonFile(file, 'run state'));
   let actualRoot;
   try { actualRoot = fs.realpathSync(state.project_root); } catch { throw new DeliverError('run project root no longer exists', 66); }
   if (actualRoot !== state.project_root || actualRoot !== lexicalRoot) throw new DeliverError('run project root identity changed', 66);
@@ -333,7 +520,7 @@ export function updateRun(runArg, expectedRevision, mutate, cwd = process.cwd())
     const result = mutate(state);
     state.revision += 1;
     state.updated_at = new Date().toISOString();
-    validateState(state);
+    validateRunState(state);
     atomicWrite(file, state);
     return { state, file, result };
   } finally { unlock(); }

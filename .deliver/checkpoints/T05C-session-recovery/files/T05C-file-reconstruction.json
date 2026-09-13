@@ -1,0 +1,110 @@
+{
+  "schema": "t05c-file-reconstruction-v1",
+  "recorded_on": "2026-09-13",
+  "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05c-recovery",
+  "branch": "recovery/t05c-20260913",
+  "base_commit": "e57e54fb4996b27d94d171daf7dc82f1333afa5e",
+  "method": "Replay only successful, scoped file patches from the named durable checkpoint and session transcript calls. No historical command, provider, Git mutation, or test execution was replayed.",
+  "production": {
+    "initial_patch": {
+      "path": "/Users/ben/code/pm-skill-codex/.deliver/checkpoints/T05C-expanded-independent/first-expanded-production.patch",
+      "sha256": "ca74ffa82ca81b86c2f796ef1dd53d7e16cd479b8d57161460bdf6076ba04d4d",
+      "result": "All seven production/read-path hashes matched first-expanded-candidate-files.json before later patches were replayed."
+    },
+    "later_patches": [
+      {
+        "transcript": "/Users/ben/.codex/sessions/2026/09/09/rollout-2026-09-09T23-58-25-01a08864-d890-70e2-a182-e87ba27325e1.jsonl",
+        "source_line": 3908,
+        "success_output_line": 3911,
+        "timestamp": "2026-09-11T09:16:43.302Z",
+        "call_id": "call_YVKug8hb073RXTKPKdphnfka",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/state.mjs"
+      },
+      {
+        "transcript": "/Users/ben/.codex/sessions/2026/09/09/rollout-2026-09-09T23-58-25-01a08864-d890-70e2-a182-e87ba27325e1.jsonl",
+        "source_line": 3913,
+        "success_output_line": 3916,
+        "timestamp": "2026-09-11T09:17:00.287Z",
+        "call_id": "call_AEmyV0I5GGuuMXlE0rT4HKOA",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs"
+      },
+      {
+        "transcript": "/Users/ben/.codex/sessions/2026/09/09/rollout-2026-09-09T23-58-25-01a08864-d890-70e2-a182-e87ba27325e1.jsonl",
+        "source_line": 3920,
+        "success_output_line": 3923,
+        "timestamp": "2026-09-11T09:17:09.316Z",
+        "call_id": "call_4Pw68lvgDAtf8xYd3Rt7AMOR",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs"
+      },
+      {
+        "transcript": "/Users/ben/.codex/sessions/2026/09/09/rollout-2026-09-09T23-58-25-01a08864-d890-70e2-a182-e87ba27325e1.jsonl",
+        "source_line": 3927,
+        "success_output_line": 3930,
+        "timestamp": "2026-09-11T09:17:16.862Z",
+        "call_id": "call_HBRh7nghpJSj6fgA5A3s8KaW",
+        "path": "plugins/deliver/skills/deliver/scripts/deliver.mjs"
+      }
+    ],
+    "target_manifest": {
+      "path": "/Users/ben/code/pm-skill-codex/.deliver/checkpoints/T05C-expanded-independent/targeted-refinement-candidate-files.json",
+      "sha256": "b9907661a1ed60a5dcc09d3f6a3205f967043d42bc52990c0c8508aede5ca5d5"
+    },
+    "verified_hashes": {
+      "plugins/deliver/skills/deliver/scripts/lib/integration.mjs": "6025dcc7860d8f6674b14bdb9c3ad99a82fca48d0fbab0480faeea9ffc45ef04",
+      "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs": "813eb029edf2ebe3f272ebf1cf9e41724b0dcb7c3735cb457a44c867f232e5c1",
+      "plugins/deliver/skills/deliver/scripts/lib/state.mjs": "457cb4fa8d4b0170102e2515d2f8a01b22a37fe13aebaf4e1c329ad2b61471a5",
+      "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs": "2d36874c3ebd03f55cecc937e6e35a39fda544731e96b6f481729230c95fecf4",
+      "plugins/deliver/skills/deliver/scripts/deliver.mjs": "438c242de87b79d7261eaa7ea9db73f0530dece4bfed3b0df4574ffdd02a2905",
+      "plugins/deliver/skills/deliver/scripts/pm.mjs": "7f3e0f27d7e426b792086552503f47cc34316cce8d77d73eca4283c1bd8dc1ef",
+      "plugins/deliver/skills/deliver/references/shipping.md": "ca1eca99f7e01127bc86f2332c042525d2d77d44ddd196364affe9938b436f5a"
+    }
+  },
+  "tests": {
+    "durable_base": {
+      "path": "/Users/ben/code/pm-skill-codex/.deliver/checkpoints/T05C-expanded-independent/integration-correction.test.mjs",
+      "sha256": "2915981f25c40090e3c3120175b904b33f1bf68899c8be01106a4857b951b300"
+    },
+    "states": [
+      {
+        "sha256": "ce6e9db750659173a90de8c7d88cd00601d658e7aa8abb223b90ac877d482b44",
+        "snapshot": ".deliver/recovery/integration-correction.ce6e9db7.test.mjs",
+        "lines": 1067,
+        "top_level_tests": 12,
+        "patch_source_line": 771,
+        "patch_success_output_line": 774,
+        "call_id": "call_XZb5zra5LGs5iyMsLIOfxxLW",
+        "timestamp": "2026-09-11T09:04:19.389Z",
+        "meaning": "Last checkpoint-manifest current test state after the explicit correction worktree branch/start-commit fixture correction."
+      },
+      {
+        "sha256": "d4693408421c439b9402ef62403705f9ba22a43de6d9ca1320dda334b4330371",
+        "snapshot": ".deliver/recovery/integration-correction.d4693408.test.mjs",
+        "lines": 1121,
+        "top_level_tests": 13,
+        "patch_source_line": 989,
+        "patch_success_output_line": 992,
+        "call_id": "call_zviHL35njDVVpIoBGozg96Xe",
+        "timestamp": "2026-09-11T09:25:05.678Z",
+        "meaning": "Adds the advanced-correction-ref and rehashed-story-target recovery regressions."
+      },
+      {
+        "sha256": "efc189c6674fff41a205b02ddf67f41081837ee55983b8f032df5fbf62adf25c",
+        "snapshot": ".deliver/recovery/integration-correction.efc189c6.test.mjs",
+        "lines": 1161,
+        "top_level_tests": 14,
+        "patch_source_line": 1031,
+        "patch_success_output_line": 1034,
+        "call_id": "call_qzCa4IwVEbl4Ni4MbRfqYjxx",
+        "timestamp": "2026-09-11T09:26:10.597Z",
+        "meaning": "Adds the unrelated-history merge-tree exit-128 regression. This is the recovered tests/integration-correction.test.mjs state."
+      }
+    ],
+    "transcript": "/Users/ben/.codex/sessions/2026/09/11/rollout-2026-09-11T09-38-21-01a08f9e-260c-7393-97a8-78057fe21c5c.jsonl"
+  },
+  "limits": {
+    "tests_run_during_recovery": false,
+    "historical_pass_claimed_as_current": false,
+    "original_run_reconstructed": false,
+    "note": "The original active run is incomplete in surviving output. This record covers file reconstruction only."
+  }
+}

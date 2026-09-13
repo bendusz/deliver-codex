@@ -5,6 +5,8 @@ import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { DeliverError, canonical, sha256, internalDirectory, readRun } from './state.mjs';
+import { detectProjectFormat } from './project-state.mjs';
+import { assertCurrentBinding, prepareCurrentBinding } from './current-pm.mjs';
 
 const record = (x) => x !== null && typeof x === 'object' && !Array.isArray(x);
 const fail = (message) => { throw new DeliverError(message, 66); };
@@ -261,7 +263,7 @@ export function claimPm(root, storyPath, plannedBranch) {
     return { actor: id, story: story.id, claim_visibility: 'local until explicitly committed/pushed' };
   });
 }
-export function preparePmBinding(state, packet, storyPath) {
+function prepareLegacyBinding(state, packet, storyPath) {
   const pm = readPm(state.project_root);
   if (!pm) return null;
   if (!storyPath) fail('PM-managed projects require start --story docs/stories/<story>.md');
@@ -281,10 +283,10 @@ export function preparePmBinding(state, packet, storyPath) {
   state.counters.retries = pm.actor.current_story_retries ?? 0;
   state.counters.fixes = pm.actor.current_story_rounds ?? 0;
   if (state.counters.retries > 2 || state.counters.fixes > 3) fail('persisted story retry budget is already exhausted');
-  return { actor: pm.actorId, story: story.id, story_path: story.path, story_hash: story.hash,
+  return { format: 'legacy', actor: pm.actorId, story: story.id, story_path: story.path, story_hash: story.hash,
     integration_branch: pm.core.integration_branch, actor_path: pm.actorPath };
 }
-export function assertPmBinding(state) {
+function assertLegacyBinding(state) {
   if (!state.pm_binding) return;
   const binding = state.pm_binding, pm = readPm(state.project_root);
   if (!pm || pm.actorId !== binding.actor || !pm.core.signed_off || !pm.actor
@@ -293,11 +295,28 @@ export function assertPmBinding(state) {
   if (readStory(state.project_root, binding.story_path).hash !== binding.story_hash) fail('shared story changed; reconcile and reapprove before continuing');
 }
 
+export function preparePmBinding(state, packet, storyPath) {
+  const format = detectProjectFormat(state.project_root);
+  if (format === 'current') return prepareCurrentBinding(state, packet, storyPath);
+  if (format === 'legacy') return prepareLegacyBinding(state, packet, storyPath);
+  return null;
+}
+
+export function assertPmBinding(state, options = {}) {
+  if (!state.pm_binding) {
+    if (detectProjectFormat(state.project_root) === 'current') fail('current project run is missing its shared story binding');
+    return;
+  }
+  if (state.pm_binding.format === 'current') return assertCurrentBinding(state, options);
+  return assertLegacyBinding(state);
+}
+
 export function completePm(root, runArg, commit, next, snapshotReader) {
   safeText(next, 'next action');
   if (!/^[0-9a-f]{40,64}$/.test(commit || '')) fail('completion requires a full integration commit SHA');
   const state = readRun(runArg, root).state;
   if (state.project_root !== root || state.phase !== 'finished' || !state.pm_binding || !state.completion_snapshot) fail('completion needs a finished, PM-bound run with a retained verified snapshot');
+  if (state.pm_binding.format === 'current') fail('current story completion is handled by the current integration workflow');
   const b = state.pm_binding;
   assertPmBinding(state);
   if (state.review?.status !== 'PASS' || !state.verification?.criteria.every((item) => item.status === 'PASS')) fail('independent verification is required');

@@ -1,0 +1,41 @@
+{
+  "packet": "01-runtime",
+  "packet_sha256": "efb3cbf15dfe19fd9594cd4c669035926252352ee404ca0e8bace22568e1c6bb",
+  "requested_model": "claude-fable-5-1",
+  "requested_effort": "high",
+  "environment_additions": {
+    "CLAUDE_CODE_EFFORT_LEVEL": "high"
+  },
+  "command": [
+    "node",
+    "/Users/ben/code/pm-skill-codex/plugins/deliver/skills/deliver/scripts/claude-review.mjs",
+    "--input",
+    "/Users/ben/code/pm-skill-codex/.deliver/claude-fable-5-1-review/01-runtime.packet.json",
+    "--out",
+    "/Users/ben/code/pm-skill-codex/.deliver/claude-fable-5-1-review/01-runtime.receipt.json",
+    "--model",
+    "claude-fable-5-1",
+    "--timeout-seconds",
+    "1800",
+    "--allow-external"
+  ],
+  "cwd": "/Users/ben/code/pm-skill-codex",
+  "state": "COMPLETED",
+  "exit_code": 0,
+  "attempt": 1,
+  "started_at": null,
+  "finished_at": null,
+  "elapsed_seconds": null,
+  "tokens": null,
+  "cost": null,
+  "review_status": "FAIL",
+  "findings": 11,
+  "receipt_sha256": "26a4b7cb6028487fb570f4dab594c59a98962cb4f114946816cd5ae0a67d42f1",
+  "provenance": "Retrospective attestation by native adapter agent /root/claude_spec_review of its actual completed tool invocation. No raw provider log or absolute timestamps retained.",
+  "observed_adapter_stdout": {
+    "adapter": "claude-review",
+    "model": "claude-fable-5-1",
+    "dry_run": false,
+    "output": "/Users/ben/code/pm-skill-codex/.deliver/claude-fable-5-1-review/01-runtime.receipt.json"
+  }
+}
