@@ -331,7 +331,8 @@
         "checkpoint": ".deliver/checkpoints/T05B-fix1-candidate"
       },
       "latest_review": ".deliver/review-T05B-fix1.json",
-      "latest_verification": ".deliver/verification-T05B-fix1.json"
+      "latest_verification": ".deliver/verification-T05B-fix1.json",
+      "design_preflight": ".deliver/T05B-fix2-design-preflight-native.json"
     }
   },
   "next": "T05B fix2: freeze independent regressions for five residual findings, release bounded production repair, then unchanged full gates, independent whole-task review and distinct verification.",
