@@ -47,6 +47,7 @@ const safeRelativePath = (value) => typeof value === 'string' && value && !path.
   && !/^(?:\.git|\.deliver)(?:[\\/]|$)/.test(value);
 const oid = (value) => typeof value === 'string' && /^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(value);
 const digest = (value) => typeof value === 'string' && /^[0-9a-f]{64}$/.test(value);
+const runId = (value) => typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(value);
 
 function validNestedAnchor(anchor) {
   if (!isObject(anchor) || !['head', 'tree', 'index_tree', 'index_flags', 'protected_hash']
@@ -310,6 +311,27 @@ export function validateRunState(state) {
       if (path.isAbsolute(rel) || rel.split(/[\\/]/).includes('..') || !/^[0-9a-f]{64}$/.test(hash)) fail('unsafe contract hash');
     }
   }
+  if (state.correction !== undefined && state.correction !== null) {
+    const correction = state.correction;
+    if (!isObject(correction) || correction.version !== 'integration-correction-v1'
+      || !runId(correction.token_id) || !digest(correction.token_identity)
+      || !['failed-integration', 'composition-conflict-no-m'].includes(correction.basis)
+      || typeof correction.integration_record !== 'string' || !path.isAbsolute(correction.integration_record)
+      || !runId(correction.root_run_id) || !runId(correction.source_run_id)
+      || !Number.isSafeInteger(correction.generation) || correction.generation < 1
+      || !isObject(correction.root_review_lineage) || !Array.isArray(correction.required_resolutions)
+      || canonical(correction.required_resolutions) !== canonical(correction.root_review_lineage.required_resolutions)) {
+      fail('bad integration correction binding');
+    }
+    for (const item of correction.required_resolutions) {
+      if (!isObject(item) || !digest(item.receipt_identity) || !Number.isSafeInteger(item.ordinal) || item.ordinal < 0
+        || !['block', 'major', 'minor'].includes(item.severity)
+        || typeof item.message !== 'string' || !item.message.trim() || item.message.length > 4000
+        || (item.path !== undefined && (typeof item.path !== 'string' || item.path.length > 1000))) {
+        fail('bad inherited correction finding');
+      }
+    }
+  }
   return state;
 }
 
@@ -385,9 +407,11 @@ function atomicWrite(file, value, exclusive = false) {
   }
 }
 
-export function createRun(projectRoot, mode, planPath = null) {
+export function createRunState(projectRoot, mode, planPath = null, { fixedRunId = randomUUID(), createdAt = new Date().toISOString() } = {}) {
   if (!['quick', 'managed', 'governed'].includes(mode)) throw new DeliverError('mode must be quick, managed, or governed', 64);
   const root = fs.realpathSync(projectRoot);
+  if (!runId(fixedRunId)) throw new DeliverError('fixed run id must be a canonical UUID', 66);
+  if (typeof createdAt !== 'string' || Number.isNaN(Date.parse(createdAt))) throw new DeliverError('created time must be a valid timestamp', 66);
   if (!planPath && mode !== 'quick') throw new DeliverError('--plan is required in managed and governed modes', 64);
   const plan = planPath ? path.resolve(root, planPath) : null;
   let planHash = sha256('quick:no-plan');
@@ -395,16 +419,14 @@ export function createRun(projectRoot, mode, planPath = null) {
     try { planHash = sha256(fs.readFileSync(plan)); }
     catch (error) { throw new DeliverError(`cannot read plan: ${error.message}`, 66); }
   }
-  const runId = randomUUID();
-  const now = new Date().toISOString();
   const state = {
     schema_version: STATE_VERSION,
-    run_id: runId,
+    run_id: fixedRunId,
     mode,
     revision: 0,
     project_root: root,
-    created_at: now,
-    updated_at: now,
+    created_at: createdAt,
+    updated_at: createdAt,
     phase: 'initialized',
     plan: { path: plan, hash: planHash },
     approval: null,
@@ -416,9 +438,15 @@ export function createRun(projectRoot, mode, planPath = null) {
     evidence_history: [],
     checkpoints: [],
     counters: { retries: 0, fixes: 0, corrections: 0 },
-    events: [{ at: now, type: 'initialized', mode, plan_hash: planHash }],
+    events: [{ at: createdAt, type: 'initialized', mode, plan_hash: planHash }],
   };
-  const file = path.join(runsDir(root), `${runId}.json`);
+  validateRunState(state);
+  return state;
+}
+
+export function createRun(projectRoot, mode, planPath = null) {
+  const state = createRunState(projectRoot, mode, planPath);
+  const file = path.join(runsDir(state.project_root), `${state.run_id}.json`);
   atomicWrite(file, state, true);
   return { state, file };
 }

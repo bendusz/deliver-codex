@@ -28,6 +28,27 @@ expected tree. `failed` records the real I/C merge-tree attempt, Git version, ex
 exit and bounded log hashes without inventing M; do not run the merge. That record is the input
 to the separate source-correction operation.
 
+When the record contains a current failed M gate/review/verification result, or contains the
+recorded I/C composition conflict without M, prepare a correction from the immutable finished
+source run. Preparation infers the failure basis and preserves the original task, approval,
+lineage and maximum spent attempts.
+
+```text
+node <pm> correction-prepare --run <source-run-file> --integration <file> --expected-record <hash>
+git worktree add -b <returned-branch> <correction-root> <returned-start-commit>
+cd <correction-root>
+node <deliver> correction-start --integration <absolute-record> --expected-record <returned-hash> --token <returned-token> --builder <id>
+```
+
+The PM creates only the exact returned branch at the exact returned I or M commit. Correction
+start requires that branch to have one attached clean worktree and publishes the fixed run plus
+the actual story Execution through a recoverable journal. It retains every inherited open
+finding, including minor findings and duplicates. The correction review must repeat each one
+with the same severity, message and path and mark it resolved. Run the full original gates,
+independent review and distinct verification before finishing correction candidate C2. A stopped
+publication is resumed with `pm.mjs recover`; if it stopped after the starting record but before
+the journal, repeat the identical correction-start command.
+
 The runtime always executes every declared gate again at actual integration M. A clean no-ff
 composition with an identical bound C/M manifest may reuse C review and verification. Use the
 integration review and verification commands when evidence needs refreshing. They bind only M

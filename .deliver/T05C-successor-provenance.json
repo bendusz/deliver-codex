@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "kind": "explicit-T05C-successor-recovery",
+  "predecessor": {
+    "run_id": "5050e142-81ad-42a9-b60e-e21dce156bd5",
+    "root": "/private/tmp/deliver-parity-t05c",
+    "branch": "feat/parity-t05c",
+    "mode": "managed",
+    "last_observed_revision": 2,
+    "last_observed_counters": {
+      "fixes": 0,
+      "retries": 0,
+      "corrections": 0
+    },
+    "status": "active but unrecoverable; historical partial retained outside runs",
+    "partial_sha256": "849d845c7e53dd70ebcc4cf4f3973849e05f58e7d1ef29a39525dce18d48a5f4",
+    "later_state_bytes": "unknown; no original run or baseline fabricated"
+  },
+  "successor": {
+    "run_id": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
+    "root": "/Users/ben/code/pm-skill-codex-worktrees/t05c-delivery",
+    "branch": "feat/parity-t05c-recovered",
+    "mode": "managed",
+    "revision_at_clean_baseline": 2,
+    "baseline_hash": "ff9d69069c2f635c49085fa00f7c4c30c4b2bb33e6ba6840f107b6297c4c9cf1",
+    "counters": {
+      "retries": 0,
+      "fixes": 0,
+      "corrections": 0
+    },
+    "accepted_base_commit": "e57e54fb4996b27d94d171daf7dc82f1333afa5e",
+    "accepted_base_tree": "69aa5f41c5e35da0ae9c1b07362c56439c08e635"
+  },
+  "plan_sha256": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb",
+  "normalized_packet_sha256": "48d482526f96e925bfd5776bc1d619572510b639080513c49f1f37e226dcedf6",
+  "contracts": null,
+  "read_path_hashes": {
+    "AGENTS.md": "880f8a032e9e90eead7c3aef538b7c6d8dabf4b50e607405df4a45c20ad66392",
+    "docs/plans/2026-09-09-upstream-parity.md": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb",
+    "docs/plans/parity-contracts/architecture-state.md": "9983fe04490cb0f854f6b4d713bebd7f3705401b43ec9d2d21966acc29835f8b",
+    "docs/plans/parity-contracts/integration-correction-design.md": "7d20e7253a44012b4ff647904311b80b95b14259eb160a8ee85eb92e42d3976e",
+    "docs/plans/parity-contracts/integration-correction-interface.md": "1f40cf43052e2bda4868e1a980605870055d096f795ff53c5c7a86bca9d03599"
+  },
+  "reconstruction_manifest_sha256": "37eb959b480baa851f6c0e1cf574b7a16b3e368383a3e2085239f4c9727e1f51",
+  "recovered_file_hashes": {
+    "plugins/deliver/skills/deliver/scripts/lib/integration.mjs": "6025dcc7860d8f6674b14bdb9c3ad99a82fca48d0fbab0480faeea9ffc45ef04",
+    "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs": "813eb029edf2ebe3f272ebf1cf9e41724b0dcb7c3735cb457a44c867f232e5c1",
+    "plugins/deliver/skills/deliver/scripts/lib/state.mjs": "457cb4fa8d4b0170102e2515d2f8a01b22a37fe13aebaf4e1c329ad2b61471a5",
+    "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs": "2d36874c3ebd03f55cecc937e6e35a39fda544731e96b6f481729230c95fecf4",
+    "plugins/deliver/skills/deliver/scripts/deliver.mjs": "438c242de87b79d7261eaa7ea9db73f0530dece4bfed3b0df4574ffdd02a2905",
+    "plugins/deliver/skills/deliver/scripts/pm.mjs": "7f3e0f27d7e426b792086552503f47cc34316cce8d77d73eca4283c1bd8dc1ef",
+    "plugins/deliver/skills/deliver/references/shipping.md": "ca1eca99f7e01127bc86f2332c042525d2d77d44ddd196364affe9938b436f5a"
+  },
+  "recovered_test_sha256": "efc189c6674fff41a205b02ddf67f41081837ee55983b8f032df5fbf62adf25c",
+  "diagnostic_result_sha256": "cbb689891f8ae8c8f923e826bf1a0816342addf325ecb83aa8ace1a912727524",
+  "diagnostic_log_sha256": "f13bd234f540466c8771cb93553c1d348b30e865193d3529fb744851a9b0c994",
+  "authorization_sha256": "d54dfc970b1fa0a24deb2f51952a766849258309fabc885fcabce949caf60fe6",
+  "reviewer": "recovery_contract",
+  "reason": "Temporary source checkout disappeared and original runtime JSON is incomplete. Exact candidate code recovered from successful transcript patches; fresh unchanged task execution uses independently captured operational baseline.",
+  "constraints": [
+    "No disappearance cause claimed",
+    "No old PASS reused",
+    "Predecessor partial and history immutable",
+    "Apply recovered candidate only after this clean baseline",
+    "Reproduce three findings with independently corrected fixture, record current FAIL, spend fix1 before repairs",
+    "Fresh full gates, whole-task independent review and distinct verification required"
+  ]
+}

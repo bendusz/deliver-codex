@@ -29,6 +29,7 @@ import {
   transitionCurrentExecution,
 } from './lib/transitions.mjs';
 import { parseReviewReceipt } from './lib/review.mjs';
+import { startIntegrationCorrection } from './lib/integration.mjs';
 
 const HELP = `Deliver deterministic runtime
 
@@ -39,6 +40,7 @@ Usage:
   deliver.mjs status --run <uuid|state.json>
   deliver.mjs approve --run <run> --approver <id>
   deliver.mjs start --run <run> --task <packet.json> --builder <id> [--story docs/stories/<story>.md]
+  deliver.mjs correction-start --integration <absolute-record> --expected-record <hash> --token <uuid> --builder <id>
   deliver.mjs check --run <run>
   deliver.mjs gate --run <run> --name <command-name> --command <exact-shell-command> [--cwd <relative-dir>] [--env <json>]
   deliver.mjs review --run <run> --snapshot <sha256> --reviewer <id> --receipt <json>
@@ -60,6 +62,7 @@ const VALUE_FLAGS = new Set([
   '--name', '--command', '--cwd', '--env', '--reviewer', '--receipt', '--verifier', '--results',
   '--label', '--kind', '--reason', '--snapshot', '--story',
   '--token', '--commit',
+  '--integration', '--expected-record',
 ]);
 
 function args(argv) {
@@ -194,6 +197,25 @@ function summarize(state, file) {
 
 function output(value) { process.stdout.write(`${JSON.stringify(value)}\n`); }
 
+function assertCorrectionResolutions(state, review) {
+  const requiredFindings = state.correction?.required_resolutions || [];
+  if (!requiredFindings.length) return;
+  const key = (item) => JSON.stringify([item.severity, item.message, item.path ?? null]);
+  const requiredKeys = new Set(requiredFindings.map(key));
+  const remaining = review.findings.map((item) => ({
+    severity: item.severity, message: item.message, ...(item.path === undefined ? {} : { path: item.path }), resolved: item.resolved,
+  }));
+  for (const requiredFinding of requiredFindings) {
+    const index = remaining.findIndex((item) => item.resolved === true && item.severity === requiredFinding.severity
+      && item.message === requiredFinding.message && item.path === requiredFinding.path);
+    if (index < 0) throw new DeliverError('correction review omits an exact resolved inherited finding', 66);
+    remaining.splice(index, 1);
+  }
+  if (remaining.some((item) => requiredKeys.has(key(item)))) {
+    throw new DeliverError('correction review changes the required inherited finding multiplicity', 66);
+  }
+}
+
 function main() {
   const [command = 'help', ...rest] = process.argv.slice(2);
   if (command === 'help' || command === '--help' || command === '-h') {
@@ -201,6 +223,14 @@ function main() {
     return;
   }
   const o = args(rest);
+  if (command === 'correction-start') {
+    const summary = startIntegrationCorrection(required(o, '--integration'), {
+      expectedRecordHash: required(o, '--expected-record'), token: required(o, '--token'),
+      builder: actor(required(o, '--builder'), '--builder'), correctionRoot: gitRoot(process.cwd()),
+    }, process.cwd());
+    output(summary);
+    return;
+  }
   if (command === 'init') {
     const root = gitRoot(process.cwd());
     const format = detectProjectFormat(root);
@@ -297,12 +327,13 @@ function main() {
   if (command === 'review') {
     const reviewer = actor(required(o, '--reviewer'), '--reviewer');
     const reviewedSnapshot = snapshotArgument(o);
-    const receipt = parseReviewReceipt(required(o, '--receipt'), { expectedSnapshot: reviewedSnapshot });
+      const receipt = parseReviewReceipt(required(o, '--receipt'), { expectedSnapshot: reviewedSnapshot });
     const updated = updateRun(run, o.expectedRevision, (state) => {
       active(state);
       syncPlan(state);
       requireCurrentApproval(state);
       if (reviewer === state.task.builder) throw new DeliverError('reviewer must differ from builder', 66);
+      assertCorrectionResolutions(state, receipt);
       const checked = inspectScope(state);
       if (!checked.report.ok) throw new DeliverError('cannot review out-of-scope changes', 74, checked.report);
       if (checked.current.hash !== reviewedSnapshot) throw new DeliverError('review snapshot is stale or does not match this run', 66);
@@ -418,6 +449,7 @@ function main() {
         || state.review.findings.some((finding) => !finding.resolved && finding.severity !== 'minor')) {
         throw new DeliverError('independent PASS review is missing, unresolved, or stale', 66);
       }
+      assertCorrectionResolutions(state, state.review);
       if (!state.verification || state.verification.snapshot_hash !== checked.current.hash || state.verification.criteria.some((criterion) => criterion.status !== 'PASS')) {
         throw new DeliverError('acceptance verification is missing, non-PASS, or stale', 66);
       }

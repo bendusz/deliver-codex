@@ -6,6 +6,7 @@ import path from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { readStory } from '../plugins/deliver/skills/deliver/scripts/lib/story.mjs';
+import { registerCorrectionProtectionTests } from './integration-correction.test.mjs';
 
 const pmCli = fileURLToPath(new URL('../plugins/deliver/skills/deliver/scripts/pm.mjs', import.meta.url));
 const runtime = fileURLToPath(new URL('../plugins/deliver/skills/deliver/scripts/deliver.mjs', import.meta.url));
@@ -302,3 +303,5 @@ test('current recovery applies exact before images and refuses concurrent edits'
   assert.equal(fs.readFileSync(approvalPath, 'utf8'), after);
   assert.equal(fs.existsSync(path.join(f.root, '.deliver/current-pm-transaction.json')), false);
 });
+
+registerCorrectionProtectionTests();

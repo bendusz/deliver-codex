@@ -1,0 +1,19 @@
+{
+  "task": "T05C",
+  "run": "5050e142-81ad-42a9-b60e-e21dce156bd5",
+  "kind": "preimplementation interpretation within frozen contract",
+  "decisions": [
+    "Normal correction-start requires the current expected record hash. A retained prepared predecessor hash may be accepted only for the exact idempotent starting-before-journal continuation after all current starting, descriptor, token and provenance validation. No general stale-hash exception.",
+    "The starting record does not contain its own hash S. With journal present validate S against wrapper; without journal fully validate exact deterministic reconstruction and derive S from the current starting record. Only wrapper and later started envelope retain S.",
+    "Inherited findings use existing attested fresh review resolved:true entries matched by normalized severity/message/path and exact multiplicity. Token retains origin receipt and ordinal; no new finding evidence field required.",
+    "Counter re-enumeration does not relax immutable identity checks. No token-bound counter source may legally rise while the same token remains valid; changed/new source identities cause unchanged refusal. Positive higher MAX belongs to a genuine subsequent correction generation with a fresh token after finished C2 and a new failed integration. The earlier review suggestion to accept raised counters on the same token is withdrawn.",
+    "Preparation persists the inferred immutable token and does not create a Git ref. The PM creates the checkout with git worktree add -b <returned-branch> <root> <returned-start-commit>, as frozen design PM-created checkout requires. Prepare rejects existing collisions; start verifies exact unique ref/checkout. Shipping docs expose the actual command under standing PM Git authority. No new ref/token crash protocol is introduced."
+  ],
+  "participants": [
+    "root",
+    "benchmark_builder",
+    "correction_tests",
+    "state_architecture"
+  ],
+  "source_contract": "docs/plans/parity-contracts/integration-correction-interface.md"
+}
