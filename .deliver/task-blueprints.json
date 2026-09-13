@@ -534,7 +534,9 @@
       "tests/operations.test.mjs",
       "tests/packaging.test.mjs",
       "plugins/deliver/skills/deliver/references/specdd.md",
-      "plugins/deliver/skills/deliver/references/runtime.md"
+      "plugins/deliver/skills/deliver/references/runtime.md",
+      "plugins/deliver/skills/deliver/assets/specdd/module.sdd",
+      "tests/specdd.test.mjs"
     ],
     "acceptance": [
       {
