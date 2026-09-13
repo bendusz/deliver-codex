@@ -288,7 +288,7 @@
       "integration_commit": "e8457e0d446d170fcd4ac1222718826a0c7c1a28"
     },
     "T05B": {
-      "status": "fix1 regression authoring; original failed review and verifier receipts retained; builder read-only repair design ready",
+      "status": "fix1 independent regressions frozen with meaningful reds; production implementation released",
       "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05b-delivery",
       "branch": "feat/parity-t05b",
       "base_commit": "7c1b68e",
@@ -304,7 +304,7 @@
       "dispatch": ".deliver/T05B-operation-dispatch.md",
       "dispatch_sha256": "e40357d4280ee8e4741668e57427b655973318744cd7b345b7029ad5f36f97e1",
       "failed_snapshot": "89d174d040b90ceeb474576fc53939086084ecbd1466be08f0653a51c13fac1d",
-      "latest_checkpoint": ".deliver/checkpoints/T05B-round1-failed",
+      "latest_checkpoint": ".deliver/checkpoints/T05B-fix1-tests",
       "full_round1_gate": {
         "total": 340,
         "pass": 340,
@@ -313,10 +313,11 @@
         "validate": "PASS"
       },
       "repair_design": ".deliver/T05B-fix1-design.json",
-      "development_test_reports": ".deliver/T05B-fix1-test-reports.json"
+      "development_test_reports": ".deliver/T05B-fix1-test-reports.json",
+      "fix1_red_snapshot": "eab097cc2001a7fd1238d9ac605190afb36f6bc9acdf472a8af64f5264b068b3"
     }
   },
-  "next": "T05B fix1: independently add regressions for eleven retained major findings, then repair, gate, review and verify on the same run.",
+  "next": "T05B fix1 production repair, then frozen regression checks and full gates, independent whole-task review and distinct verification.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
