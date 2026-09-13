@@ -1,0 +1,6 @@
+{
+  "actor": "/root/recover_t05c",
+  "kind": "Native builder report; focused results are agent-reported, formal raw gates archived separately",
+  "frozen": true,
+  "message": "T05B fix2 production/docs candidate is FROZEN now; no further writes or tests. Focused results: native remote lifecycle 5/5 PASS (84,907.02375ms); advanced-base + provider interruption 9/9 PASS (60,136.84ms); raced R\u2192H2/S 1/1 PASS (38,530.111042ms); idempotence + supersession 5/5 PASS (60,670.533166ms). Final static checks: git diff --check PASS; node --check PASS for remote/integration/current-pm/state/pm. Frozen test hashes remain lifecycle 9d1169ed592e9b80c7a0eb82f716f9ceff7f3953471edde8cb126b452600c708, remote 8b3f797e..., current-roundtrip 453327ad..., operations dde1af29.... Production/docs hashes: remote ba21914d8a131532ec38c66e40948621da9d81452449024d59ba5a837a10ea89; integration 666ae4d9ef42bf399e9450e9821c18d5ef1714a27535940aba5e68e052c55877; current-pm 07ea55559cdbfdc1c5bdcd6f3fa962cac385bf02ffb32e05ce3d7067e1623e7b; state 37803f859278e820d66e31d2e032e07ac41d3fdaa451dd9db1c61c15e4b21699; pm 22bb33abee9deedbe9a8c5fa6fb6825f652b6c2be026f72229d7cde100920a09; shipping d40f652ec585050a98d30683d22d8142fbf2c5add24fbd7eadce2d16b7ab1d99; compatibility 746031f8813b689994d4c6d7abeca6625676fa8ceed240e1b2522bc945636b58. No contract edits or blockers."
+}
