@@ -1,0 +1,25 @@
+{
+  "author": "correction_regressions",
+  "snapshot": "7df5d19fb2283f89c02c074842ed8187d63a129b28819a0386b380f70d324c66",
+  "files": {
+    "tests/integration-correction.test.mjs": "a764d071d5123dc3b1fd9a346139364f656c715fd48a9ff24422cb500bd38137",
+    "tests/current-lifecycle.test.mjs": "371de8ed4d0ebe1491b3cd1f57ba5ff7f972af241dd95e59ed5933be5e348baf"
+  },
+  "command": "node --test --test-name-pattern='protected checkout drift|worktree config drift|initialized submodule controls|same relative hook contract|hidden initialized submodule drift|executable mode drift' tests/current-lifecycle.test.mjs",
+  "exit_code": 1,
+  "total": 19,
+  "pass": 9,
+  "reported_fail": 10,
+  "actual_leaf_failures": 7,
+  "duration_ms": 183965.686792,
+  "syntax": "PASS",
+  "import": "exit0, no output or test registration",
+  "core_discovery": "1/1PASS",
+  "groups": {
+    "core": 14,
+    "protection": 7,
+    "moved_existing_protection": 3,
+    "new_protection": 4
+  },
+  "qualification": "Independent author executed canonical red. Earlier missing helper setup failure was repaired before this final frozen run. Existing integration.test source-dirt regression remains unchanged and separately red in complete gate."
+}

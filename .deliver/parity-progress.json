@@ -200,13 +200,13 @@
       "checkpoint": ".deliver/checkpoints/T04F-T05L-COMBINED/manifest.json"
     },
     "T05C": {
-      "status": "fix3 authorized after actual independent submodule/relocation/mode probes and ordinary source-dirt regression; tests being organized before production",
+      "status": "fix3 implementation underway against frozen independent split tests and bounded testreviewPASS",
       "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05c-delivery",
       "run": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
       "builder": "/root/recover_t05c",
       "test_author": "/root/correction_regressions",
       "base_commit": "e57e54f",
-      "independent_test_sha256": "f2e2d4e81c50de815f92d1a4e10ec5fba8ce19563383aca01cff713d29bc376c",
+      "independent_test_sha256": "a764d071d5123dc3b1fd9a346139364f656c715fd48a9ff24422cb500bd38137",
       "red_tests": {
         "total": 16,
         "pass": 0,
@@ -242,7 +242,7 @@
       "fixes": 3,
       "recovery_provenance": ".deliver/T05C-successor-provenance.json",
       "reviewer": "/root/recovery_contract",
-      "latest_checkpoint": ".deliver/checkpoints/T05C-fix2",
+      "latest_checkpoint": ".deliver/checkpoints/T05C-fix3",
       "failed_snapshot": "de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47",
       "candidate_snapshot": "de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47",
       "verifier": "/root/correction_verifier",
@@ -253,7 +253,9 @@
         "fail": 1,
         "duration_ms": 579908.718167,
         "validate": "PASS"
-      }
+      },
+      "independent_lifecycle_test_sha256": "371de8ed4d0ebe1491b3cd1f57ba5ff7f972af241dd95e59ed5933be5e348baf",
+      "fix3_red_snapshot": "7df5d19fb2283f89c02c074842ed8187d63a129b28819a0386b380f70d324c66"
     }
   },
   "next": "T05C fix3: freeze independent submodule/mode/relocation regressions, restore ordinary source-dirt integration and complete protected checkout proof, then fresh full gates and independent review/distinct verification; T05B remains queued.",
