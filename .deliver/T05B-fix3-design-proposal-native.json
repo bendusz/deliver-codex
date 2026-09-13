@@ -1,0 +1,21 @@
+{
+  "actor": "/root/recover_t05c",
+  "kind": "Coordinator summary of native read-only proposal; not a dispatch or acceptance",
+  "scope": [
+    "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+    "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+    "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs"
+  ],
+  "repairs": [
+    "mergeRemoteSource terminal same-input projection from effect-bound retained observation before new provider inspection; changed intent refuses.",
+    "H2 generation/resume/adoption use each attempt parent as BASE_COMMIT after every proved race.",
+    "P/E generation story_before equals committed parent story and source contract/execution identity and in-review state.",
+    "Retain identified generation in adopted artifact proof, validate source/finalization/view/input/parent cross-links and modes without environment rehash.",
+    "P requires both report paths absent before record mutation.",
+    "Pending status verifies live bytes and modes; writes preserve permitted100644/100755, absent additions default100644.",
+    "Replay absence expectedHead equals exact attempt target.",
+    "Admission projects validated closure terminal_commit."
+  ],
+  "later_reviewer_requirement": "Validate finalization verification exact acceptance ID coverage and existing review/verifier/panel independence rules, not merely nonempty all-PASS criteria.",
+  "status": "Proposed within existing task; formal failed receipts and fix3 counter dispatch still required."
+}

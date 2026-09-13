@@ -1,0 +1,23 @@
+{
+  "criteria": [
+    {
+      "id": "T05B-AC1",
+      "status": "PASS",
+      "evidence": "At frozen snapshot 009feeee3ea2fee4433de2815ca869f6a54f74b186103a95ec0c902ca29a8c9f, I inspected the actual adapter and fake-runner tests. remote.mjs SHA-256 ba21914d8a131532ec38c66e40948621da9d81452449024d59ba5a837a10ea89 validates one fetch/push destination and auth, pushes only EXPECTED_HEAD:refs/heads/STORY_BRANCH at lines 599-617, binds the exact PR head/base, requires structured passing/skipping checks plus a fresh clean mergeable view, invokes gh pr merge with --match-head-commit at lines 672-704, and accepts a full merge OID only after exact remote-base inspection. remote.test.mjs SHA-256 8b3f797e85fdbaeadad3a457232050d156d0bbaadbd02cbba3173d394af40d82 uses an injected command runner and contains explicit missing-auth, pending/failed/unknown-check, head-race, rejected/queued/mismatched-merge, exact/advanced reconciliation and deleted-head recovery cases without real provider/model calls. The declared npm test gate itself did not pass: it timed out at 600 seconds before reaching these adapter tests, so this PASS rests on inspected criterion-specific source and test artifacts, not a claimed full-suite pass. Gate log SHA-256 d0a17b4e7b1e4c7b005f189e6bfa9db29d739d15a17153fb89b1c7bb5137d3c0."
+    },
+    {
+      "id": "T05B-AC2",
+      "status": "FAIL",
+      "evidence": "The fix2 source resolves the five fix1 findings in their reported forms, including provider transition legality, supersession limits, terminal PR/commit cross-links and effect-bound N for merge/squash/rebase. The actual public lifecycle still violates the frozen contract in several reachable paths. Most directly, remote-lifecycle-interface.md:31 requires every replacement H2 to descend latest N and contain BASE_COMMIT N. reconcileRemoteHandoffRepair persists a raced terminal and increments retry at integration.mjs:2964-2977; the next prepare uses it as repairBase and pending.parent at :2806 and :2828-2831, but generates H2 with the original closure.terminal_commit at :2820-2822. handoffContent writes that stale value at :3500-3509. Resume/adopt validate the same stale basis at :2800-2802 and :2860-2862, while adoptRemoteCompletion later requires the latest repair proof.parent at :3027, so authorized retries 1 and 2 cannot complete. Remote artifact materialization also records expected_mode but atomic write replaces files as mode 0600 without restoring it (:2486-2501, :590-596, :3473-3485), making a valid 100755 story/handoff unadoptable and allowing same-text mode drift through pending recovery. prepareRemoteVerificationReport at :2594-2598 can overwrite existing report/checklist paths although architecture-state.md:216-221 requires P to add them and local P rejects existing paths at :3718-3732. remoteAdmissionStatus projects closure.proof.commit at current-pm.mjs:415 even though closure proof stores merge_commit/terminal_commit, so a proved normal closure reports a null remote terminal. The formal npm test gate is also FAIL due to ETIMEDOUT at 600 seconds; npm run validate passed."
+    },
+    {
+      "id": "T05B-AC3",
+      "status": "FAIL",
+      "evidence": "The frozen fake-provider/temporary-Git suite connects public API/CLI operations and covers normal and raced closure, initial H2/S repair, interruption, completion and retry counting, but it does not prove the full implemented user lifecycle. In tests/remote-lifecycle.test.mjs:2685-2737 the replacement-retry loop asserts retry number, parent and exhaustion only; it never asserts replacement H2 BASE_COMMIT or completes adoption after a replacement race. The initial attempt alone asserts BASE_COMMIT at :2407. Tests also lack the executable-mode pending/recovery boundary and remote-P existing-path refusal described in AC2. The only formal current-snapshot test run timed out after 600 seconds before the remote lifecycle and adapter files completed, with status FAIL and log SHA-256 d0a17b4e7b1e4c7b005f189e6bfa9db29d739d15a17153fb89b1c7bb5137d3c0; validation passed with log SHA-256 8b146bfab36098ddfe081ce34555566bdef41fef310ead7321bad3fa329549f0. Snapshot/run state remained unchanged at run revision 14."
+    }
+  ],
+  "snapshot_hash": "009feeee3ea2fee4433de2815ca869f6a54f74b186103a95ec0c902ca29a8c9f",
+  "run_id": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "verifier": "correction_verifier",
+  "recorded_at": "2026-09-13T14:47:30.000Z"
+}
