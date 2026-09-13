@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "approved_by": "Ben",
+  "at": "2026-09-13T10:02:23.235Z",
+  "instruction": "Yes.",
+  "proposal": "docs/reviews/2026-09-13-correction-recovery-proposal.md",
+  "proposal_sha256": "c184804cd736faf228875e1ba3dd5c6ea28d8fd9553797c0974cbd8d9652923b",
+  "run": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
+  "previous_fixes": 3,
+  "authorized_fixes": 4,
+  "retries": 0,
+  "scope": "One additional bounded T05C repair of completed-publication recovery, independent regression tests, full declared gates, whole-task review and distinct verification. Preserve original run, task, baseline, all prior findings and spent attempts. Continue approved delivery after acceptance."
+}

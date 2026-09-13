@@ -200,7 +200,7 @@
       "checkpoint": ".deliver/checkpoints/T04F-T05L-COMBINED/manifest.json"
     },
     "T05C": {
-      "status": "fix3 declared gates PASS; independent review and distinct verification found completed-publication recovery failure; three fixes spent, awaiting bounded extension decision",
+      "status": "user approved fix4; independent regression promotion underway before production repair",
       "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05c-delivery",
       "run": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
       "builder": "/root/recover_t05c",
@@ -237,10 +237,10 @@
       "continuation_note": ".deliver/T05C-resume-interruption.json",
       "predecessor_run": "5050e142-81ad-42a9-b60e-e21dce156bd5",
       "recovery_worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05c-recovery",
-      "fixes": 3,
+      "fixes": 4,
       "recovery_provenance": ".deliver/T05C-successor-provenance.json",
       "reviewer": "/root/recovery_contract",
-      "latest_checkpoint": ".deliver/checkpoints/T05C-fix3",
+      "latest_checkpoint": ".deliver/checkpoints/T05C-fix4",
       "failed_snapshot": "b8c66ec574464337ae65d7b4e810d742a34b381e758f4b21f9e53964ac481d97",
       "candidate_snapshot": "b8c66ec574464337ae65d7b4e810d742a34b381e758f4b21f9e53964ac481d97",
       "verifier": "/root/correction_verifier",
@@ -262,10 +262,11 @@
         "validate": "PASS",
         "checkpoint": ".deliver/checkpoints/T05C-fix3"
       },
-      "proposal": "docs/reviews/2026-09-13-correction-recovery-proposal.md"
+      "proposal": "docs/reviews/2026-09-13-correction-recovery-proposal.md",
+      "extra_fix_approval": ".deliver/T05C-fix4-approval.json"
     }
   },
-  "next": "Decision needed: one additional bounded T05C fix on the same run and baseline for completed-publication recovery. Preserve counters and full review history; no fix4 dispatched. Full parity and T05B onward remain pending.",
+  "next": "T05C fix4: freeze four started-publication regression failures, implement bounded repair, run full gates and whole-task independent review/distinct verification, integrate only after PASS; then T05B.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
