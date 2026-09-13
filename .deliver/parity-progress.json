@@ -288,7 +288,7 @@
       "integration_commit": "e8457e0d446d170fcd4ac1222718826a0c7c1a28"
     },
     "T05B": {
-      "status": "fix2 independent regression authoring and read-only repair design; fix1 gates PASS but five major review findings remain",
+      "status": "fix2 production repair released against independently frozen regressions; full gates pending",
       "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05b-delivery",
       "branch": "feat/parity-t05b",
       "base_commit": "7c1b68e",
@@ -304,7 +304,7 @@
       "dispatch": ".deliver/T05B-operation-dispatch.md",
       "dispatch_sha256": "e40357d4280ee8e4741668e57427b655973318744cd7b345b7029ad5f36f97e1",
       "failed_snapshot": "362dc4fcaff3b952f52cde2e8388fd91359a441cf9df2e895445f6936744722a",
-      "latest_checkpoint": ".deliver/checkpoints/T05B-fix1-candidate",
+      "latest_checkpoint": ".deliver/checkpoints/T05B-fix2-tests-final",
       "full_round1_gate": {
         "total": 340,
         "pass": 340,
@@ -318,7 +318,7 @@
       "partial_snapshot": "45feb36bb616c473c2a2443bee48dd3f2bb4ed68d78983960f397a761fb7f8a9",
       "coverage_preflight": ".deliver/T05B-fix1-test-preflight-native.json",
       "identity_clarification": ".deliver/T05B-fix1-identity-clarification.json",
-      "final_test_snapshot": "bf8380731235eaceae735bb905ac4350893f0ae7d54b43cba1d9405e95817e1e",
+      "final_test_snapshot": "2511cd8c1137abacb93a6421426d0b36165b1584509b2504b9bc291fdd866412",
       "test_coverage": ".deliver/checkpoints/T05B-fix1-tests-final/coverage-ready-native.json",
       "fixture_corrections": ".deliver/checkpoints/T05B-fix1-fixture-corrections",
       "candidate_snapshot": "362dc4fcaff3b952f52cde2e8388fd91359a441cf9df2e895445f6936744722a",
@@ -332,10 +332,11 @@
       },
       "latest_review": ".deliver/review-T05B-fix1.json",
       "latest_verification": ".deliver/verification-T05B-fix1.json",
-      "design_preflight": ".deliver/T05B-fix2-design-preflight-native.json"
+      "design_preflight": ".deliver/T05B-fix2-design-preflight-native.json",
+      "fix2_red_snapshot": "4591c845188c530e6541576b82ce000f0b4419d8a00589e448a2f81e5ffed7e1"
     }
   },
-  "next": "T05B fix2: freeze independent regressions for five residual findings, release bounded production repair, then unchanged full gates, independent whole-task review and distinct verification.",
+  "next": "T05B fix2: complete five-finding source repair, freeze candidate, run unchanged full gates, then independent whole-task review and distinct verification.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
