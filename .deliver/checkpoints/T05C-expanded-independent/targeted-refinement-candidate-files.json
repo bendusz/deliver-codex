@@ -1,0 +1,12 @@
+{
+  "plugins/deliver/skills/deliver/scripts/lib/integration.mjs": "6025dcc7860d8f6674b14bdb9c3ad99a82fca48d0fbab0480faeea9ffc45ef04",
+  "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs": "813eb029edf2ebe3f272ebf1cf9e41724b0dcb7c3735cb457a44c867f232e5c1",
+  "plugins/deliver/skills/deliver/scripts/lib/state.mjs": "457cb4fa8d4b0170102e2515d2f8a01b22a37fe13aebaf4e1c329ad2b61471a5",
+  "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs": "2d36874c3ebd03f55cecc937e6e35a39fda544731e96b6f481729230c95fecf4",
+  "plugins/deliver/skills/deliver/scripts/deliver.mjs": "438c242de87b79d7261eaa7ea9db73f0530dece4bfed3b0df4574ffdd02a2905",
+  "plugins/deliver/skills/deliver/scripts/pm.mjs": "7f3e0f27d7e426b792086552503f47cc34316cce8d77d73eca4283c1bd8dc1ef",
+  "plugins/deliver/skills/deliver/references/shipping.md": "ca1eca99f7e01127bc86f2332c042525d2d77d44ddd196364affe9938b436f5a",
+  "tests/integration-correction.test.mjs": "ce6e9db750659173a90de8c7d88cd00601d658e7aa8abb223b90ac877d482b44",
+  "tests/integration.test.mjs": "62511b6815f00834e0c3b782aaa41b24dd34b7932f8a477ab7ba281d61627915",
+  "tests/current-lifecycle.test.mjs": "54299b6cdfd5238972f09a10184b640b283d27055eb6c41badb35e6b6744b050"
+}

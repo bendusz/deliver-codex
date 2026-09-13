@@ -1,0 +1,39 @@
+{
+  "task": "T05C",
+  "stage": "Initial implementation, independent expanded tests before full gates/review",
+  "test_sha256": "ce6e9db750659173a90de8c7d88cd00601d658e7aa8abb223b90ac877d482b44",
+  "failed_snapshot": "35c7a8ee612e47463d017dd8a14c9b7acb6e380db087729426e8a7181d0d5b6c",
+  "diagnosed_by": [
+    "benchmark_builder",
+    "correction_tests independently"
+  ],
+  "test_changes": false,
+  "findings": [
+    {
+      "id": "T05C-PRE1",
+      "issue": "Required finding receipt identity has inconsistent public key",
+      "change": "Canonical receipt_identity in token/run validation"
+    },
+    {
+      "id": "T05C-PRE2",
+      "issue": "Extra duplicate required-key finding accepted by fresh review",
+      "change": "Reject surplus required normalized severity/message/path multiplicity; allow unrelated fresh findings"
+    },
+    {
+      "id": "T05C-PRE3",
+      "issue": "Counter source identity uses UUID and run-backed entries omit run_id",
+      "change": "Canonical content SHA256 identity and explicit run_id with stable sorting"
+    },
+    {
+      "id": "T05C-PRE4",
+      "issue": "Other attached worktree story Execution without run is omitted from duplicate inventory",
+      "change": "Scan attached worktrees valid story inventories before writes"
+    },
+    {
+      "id": "T05C-PRE5",
+      "issue": "Live retained source approval whitespace drift is accepted",
+      "change": "Verify live finished source clean index/worktree/protected anchor/governance bytes before start"
+    }
+  ],
+  "authorization": "Within already approved original T05C scope; initial implementation remains unaccepted, no baseline or attempt reset"
+}
