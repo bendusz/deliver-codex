@@ -288,7 +288,7 @@
       "integration_commit": "e8457e0d446d170fcd4ac1222718826a0c7c1a28"
     },
     "T05B": {
-      "status": "started; bounded API/test dispatch preparation before implementation",
+      "status": "active implementation; independent provider regression frozen red; remaining acceptance tests in progress",
       "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05b-delivery",
       "branch": "feat/parity-t05b",
       "base_commit": "7c1b68e",
@@ -300,7 +300,9 @@
       "fixes": 0,
       "retries": 0,
       "checkpoint": ".deliver/checkpoints/T05B-initial",
-      "interface_preflight": ".deliver/T05B-interface-preflight.json"
+      "interface_preflight": ".deliver/T05B-interface-preflight.json",
+      "dispatch": ".deliver/T05B-operation-dispatch.md",
+      "dispatch_sha256": "e40357d4280ee8e4741668e57427b655973318744cd7b345b7029ad5f36f97e1"
     }
   },
   "next": "T05B remote lifecycle: align exported API and independent test dispatch within approved frozen contract, then implement and verify.",

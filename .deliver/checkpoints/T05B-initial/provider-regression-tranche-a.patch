@@ -1,0 +1,132 @@
+diff --git a/tests/remote.test.mjs b/tests/remote.test.mjs
+index 3901298..4ba0028 100644
+--- a/tests/remote.test.mjs
++++ b/tests/remote.test.mjs
+@@ -138,6 +138,14 @@ function assertNoUnsafeArgs(calls) {
+   }
+ }
+ 
++function assertReconciliationReadOnly(fixture) {
++  assert.equal(fixture.bodies.length, 0);
++  assert.equal(fixture.calls.some((call) => call.file === 'git' && ['push', 'config'].includes(call.args[0])), false);
++  assert.equal(fixture.calls.some((call) => call.file === 'gh' && call.args[0] === 'pr'
++    && ['create', 'edit', 'ready', 'merge'].includes(call.args[1])), false);
++  assertNoUnsafeArgs(fixture.calls);
++}
++
+ function withRelativeTmpdirAndRestrictiveUmask(callback) {
+   const originalCwd = process.cwd();
+   const originalUmask = process.umask();
+@@ -176,7 +184,8 @@ function assertProtectedBody(body, temporaryBase, call) {
+ 
+ test('exports a closed protocol and rejects invalid caller input with shared DeliverError', (t) => {
+   assert.deepEqual(GITHUB_REMOTE_STAGES, ['preflight', 'lookup', 'publish', 'checks', 'merge', 'postmerge']);
+-  for (const state of ['UNAVAILABLE', 'REMOTE_AMBIGUOUS', 'PR_LOOKUP_FAILED', 'PUBLISHED', 'READY', 'MERGED']) {
++  for (const state of ['UNAVAILABLE', 'REMOTE_AMBIGUOUS', 'PR_LOOKUP_FAILED', 'PUBLISHED', 'READY',
++    'MERGED', 'MERGED_BASE_ADVANCED', 'UNKNOWN']) {
+     assert(GITHUB_REMOTE_STATES.includes(state));
+   }
+   const f = fixture(t);
+@@ -569,3 +578,102 @@ test('merge never reports completion for refusal, queueing, changed head or remo
+     prNumber: 17, method: 'merge', subject: 'Merge', body: '',
+   }).state, 'MERGE_MISMATCH');
+ });
++
++test('reconcileMerged proves exact or advanced merges read-only and keeps pending, unknown and provider failures distinct', async (t) => {
++  const api = fixture(t);
++  assert.equal(typeof api.adapter.reconcileMerged, 'function', 'adapter must expose read-only merged reconciliation');
++
++  await t.test('exact merged result survives a deleted remote head branch', () => {
++    const f = fixture(t);
++    f.state.merged = true;
++    const result = f.adapter.reconcileMerged(f.target, { prNumber: 17 });
++    assert.equal(result.state, 'MERGED');
++    assert.equal(result.expectedHead, HEAD);
++    assert.equal(result.mergeCommit, MERGE);
++    assert.equal(result.remoteBase, MERGE);
++    assert.equal(f.calls.some((call) => call.file === 'git' && call.args[0] === 'ls-remote'
++      && call.args.includes('refs/heads/pm/S1-1-value')), false,
++    'reconciliation must not require the deleted remote source branch');
++    assertReconciliationReadOnly(f);
++  });
++
++  await t.test('advanced remote base retains both proven OIDs', () => {
++    const f = fixture(t, {
++      onRun(request) {
++        if (request.file === 'git' && request.args[0] === 'ls-remote') {
++          return response(0, `${OLD_HEAD}\trefs/heads/main\n`);
++        }
++      },
++    });
++    f.state.merged = true;
++    const result = f.adapter.reconcileMerged(f.target, { prNumber: 17 });
++    assert.equal(result.state, 'MERGED_BASE_ADVANCED');
++    assert.equal(result.expectedHead, HEAD);
++    assert.equal(result.mergeCommit, MERGE);
++    assert.equal(result.remoteBase, OLD_HEAD);
++    assertReconciliationReadOnly(f);
++  });
++
++  for (const [label, onRun] of [
++    ['open pull request', undefined],
++    ['queued pull request', (request, state) => {
++      if (request.file === 'gh' && request.args[0] === 'pr' && request.args[1] === 'view') {
++        return response(0, JSON.stringify(pr(state, { mergeStateStatus: 'QUEUED' })));
++      }
++    }],
++  ]) {
++    await t.test(label, () => {
++      const f = fixture(t, { onRun });
++      const result = f.adapter.reconcileMerged(f.target, { prNumber: 17 });
++      assert.equal(result.state, 'MERGE_PENDING');
++      assert.equal(result.expectedHead, HEAD);
++      assertReconciliationReadOnly(f);
++    });
++  }
++
++  for (const [label, configure] of [
++    ['missing merge commit', (f) => { f.state.merged = true; f.state.mergeOid = null; }],
++    ['malformed merge commit', (f) => { f.state.merged = true; f.state.mergeOid = 'short'; }],
++    ['missing remote base', (f) => { f.state.merged = true; }],
++  ]) {
++    await t.test(label, () => {
++      const options = label === 'missing remote base' ? {
++        onRun(request) {
++          if (request.file === 'git' && request.args[0] === 'ls-remote') return response(0, '');
++        },
++      } : {};
++      const f = fixture(t, options);
++      configure(f);
++      const result = f.adapter.reconcileMerged(f.target, { prNumber: 17 });
++      assert.equal(result.state, 'UNKNOWN');
++      assert.equal(result.expectedHead, HEAD);
++      assertReconciliationReadOnly(f);
++    });
++  }
++
++  await t.test('authentication failure stays distinct', () => {
++    const f = fixture(t, {
++      onRun(request) {
++        if (request.file === 'gh' && request.args[0] === 'auth') return response(1, '', 'secret auth detail');
++      },
++    });
++    const result = f.adapter.reconcileMerged(f.target, { prNumber: 17 });
++    assert.equal(result.state, 'AUTH_REQUIRED');
++    assert.equal(JSON.stringify(result).includes('secret auth detail'), false);
++    assertReconciliationReadOnly(f);
++  });
++
++  await t.test('provider lookup failure stays distinct', () => {
++    const f = fixture(t, {
++      onRun(request) {
++        if (request.file === 'gh' && request.args[0] === 'pr' && request.args[1] === 'view') {
++          return response(1, '', 'secret lookup detail');
++        }
++      },
++    });
++    const result = f.adapter.reconcileMerged(f.target, { prNumber: 17 });
++    assert.equal(result.state, 'PR_LOOKUP_FAILED');
++    assert.equal(JSON.stringify(result).includes('secret lookup detail'), false);
++    assertReconciliationReadOnly(f);
++  });
++});
