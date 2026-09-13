@@ -200,13 +200,13 @@
       "checkpoint": ".deliver/checkpoints/T04F-T05L-COMBINED/manifest.json"
     },
     "T05C": {
-      "status": "exact files recovered; explicit successor active; red regression fixture correction before fix1",
+      "status": "fix1 implementation in progress after current independent FAIL and fresh red",
       "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05c-delivery",
       "run": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
       "builder": "/root/recover_t05c",
       "test_author": "/root/correction_regressions",
       "base_commit": "e57e54f",
-      "independent_test_sha256": "efc189c6674fff41a205b02ddf67f41081837ee55983b8f032df5fbf62adf25c",
+      "independent_test_sha256": "2cfe112fddc9cdf3e8deb915dbedb2b8f39649f79d5eef85326d5979cde0e683",
       "red_tests": {
         "total": 16,
         "pass": 0,
@@ -238,8 +238,11 @@
       "continuation_note": ".deliver/T05C-resume-interruption.json",
       "predecessor_run": "5050e142-81ad-42a9-b60e-e21dce156bd5",
       "recovery_worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05c-recovery",
-      "fixes": 0,
-      "recovery_provenance": ".deliver/T05C-successor-provenance.json"
+      "fixes": 1,
+      "recovery_provenance": ".deliver/T05C-successor-provenance.json",
+      "reviewer": "/root/recovery_contract",
+      "latest_checkpoint": ".deliver/checkpoints/T05C-fix1",
+      "failed_snapshot": "879fbda9c0437f6aa6350310e0fd5e0e8a307237cf3d8fe8a37de32357116a96"
     }
   },
   "next": "T05C: freeze independent red acceptance tests, implement token-bound integration correction, then run full gates and independent review.",

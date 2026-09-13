@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    "--test-name-pattern=correction recovery revalidates|unrelated Git histories",
+    "tests/integration-correction.test.mjs"
+  ],
+  "root": "/Users/ben/code/pm-skill-codex-worktrees/t05c-delivery",
+  "run": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
+  "test_sha256": "2cfe112fddc9cdf3e8deb915dbedb2b8f39649f79d5eef85326d5979cde0e683",
+  "exit_code": 1,
+  "elapsed_seconds": 29.3265177090002,
+  "log_sha256": "d7cbfdde022b3e9b9f39eb2ed96113cc7c811ed6ec0dd8b79dbeace9da1c2111"
+}

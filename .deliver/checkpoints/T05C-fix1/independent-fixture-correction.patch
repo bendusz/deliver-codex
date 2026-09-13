@@ -1,0 +1,14 @@
+--- recovered-original-test
++++ independently-corrected-fixture
+@@ -1076,7 +1076,10 @@
+     git(torn.correctionRoot, 'commit', '-qm', 'Move correction ref after journal');
+     const moved = git(torn.correctionRoot, 'rev-parse', 'HEAD');
+     assert.notEqual(moved, torn.prepared.result.start_commit);
+-    assert.equal(git(torn.correctionRoot, 'status', '--porcelain=v1', '--untracked-files=all'), '');
++    assert.equal(
++      git(torn.correctionRoot, 'status', '--porcelain=v1', '--untracked-files=all'),
++      '?? .deliver/integration-correction-transaction.json',
++    );
+     const before = {
+       record: fs.readFileSync(torn.fixture.recordFile, 'utf8'),
+       journal: fs.readFileSync(torn.journal, 'utf8'),
