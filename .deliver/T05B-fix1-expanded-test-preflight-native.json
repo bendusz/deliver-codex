@@ -1,0 +1,38 @@
+{
+  "status": "NOT_READY",
+  "findings": [
+    {
+      "kind": "test_overconstraint",
+      "finding": 5,
+      "message": "Both supersession cases derive prior_observation_identity from predecessor.input.remote_observation. The frozen dispatch requires the latest observed provider result when one exists. Build the expected prior observation independently by starting from the validated prepared observation, overlaying valid repository, PR, branch, head and base fields supplied by the latest observed result, and always replacing result_identity with that result's retained identity. A missing remoteBase on a PENDING result may retain the already-proved prepared base; an explicitly null, malformed or conflicting field makes that value unproved. Supersession still requires proved prior/current OIDs, stable identities, immutable expected C, and a qualifying current observation."
+    },
+    {
+      "kind": "coverage_omission",
+      "finding": 1,
+      "message": "The repaired-completion case assigns handoff_repair.proof.commit when rebinding the terminal proof to provisional R. The approved repair proof identifies terminal S through remote_commit. Adding an unknown commit field can trigger structural rejection without testing the S-to-R binding. Mutate remote_commit to R, reidentify the proof, and require blocking read-only admission."
+    }
+  ],
+  "resolved": [
+    {
+      "item": "representation_neutral_supersession_identity",
+      "resolved": true,
+      "evidence": "The tests permit stable immutable-header attempt identities and separately validate proof, transition, reciprocal-link and retained-effect relationships."
+    },
+    {
+      "item": "closure_and_repair_fresh_process_reconciliation",
+      "resolved": true,
+      "evidence": "Public closure and repair reconciliation run in fresh subprocesses whose provider write methods throw; each adopts the exact retained executing merge attempt and effect."
+    },
+    {
+      "item": "verification_finalization_binding",
+      "resolved": true,
+      "evidence": "Missing and mismatched verification bindings are independently exercised before closure allocation."
+    },
+    {
+      "item": "handoff_repair_attachment",
+      "resolved": true,
+      "evidence": "A duplicate branch attachment between H2 preparation and adoption must refuse with the record unchanged."
+    }
+  ],
+  "scope": "Frozen expanded tests only; no production acceptance, execution, or state changes."
+}
