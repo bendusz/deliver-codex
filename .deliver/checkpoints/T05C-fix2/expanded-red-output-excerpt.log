@@ -1,0 +1,15 @@
+▶ correction resume rejects protected checkout drift after publication
+  ✔ starting-record (11014.6885ms)
+  ✖ journal (11241.868167ms)
+  ✖ run (11220.817334ms)
+  ✖ story (11268.437625ms)
+  ✖ started-record (11281.445125ms)
+✖ correction resume rejects protected checkout drift after publication (56080.077708ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 1
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 56122.077041

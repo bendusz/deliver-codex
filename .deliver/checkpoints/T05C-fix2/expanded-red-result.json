@@ -1,0 +1,23 @@
+{
+  "author": "correction_regressions",
+  "snapshot": "73ec06fe10b3211942a7be646ea6737f9b8c8a7bf18b46a573024ba92a99fddd",
+  "test_sha256": "f2e2d4e81c50de815f92d1a4e10ec5fba8ce19563383aca01cff713d29bc376c",
+  "expanded_resume": {
+    "command": "node --test --test-name-pattern='correction resume rejects protected checkout drift after publication' tests/integration-correction.test.mjs",
+    "exit_code": 1,
+    "total": 6,
+    "pass": 1,
+    "reported_fail": 5,
+    "actual_leaf_failures": 4,
+    "duration_ms": 56122.077041
+  },
+  "fixture_reuse_checks": {
+    "command": "node --test --test-name-pattern='failed-M qualification|correction start revalidates approval' tests/integration-correction.test.mjs",
+    "exit_code": 0,
+    "total": 18,
+    "pass": 18,
+    "duration_ms": 96936.083375
+  },
+  "reused_builds_removed": 9,
+  "qualification": "Independent author executed exact commands. Focused red preceding productionfix2; original firststart and config.worktree reds remain in intermediate checkpoint."
+}

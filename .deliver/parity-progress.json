@@ -200,13 +200,13 @@
       "checkpoint": ".deliver/checkpoints/T04F-T05L-COMBINED/manifest.json"
     },
     "T05C": {
-      "status": "fix2 authorized after independent protected-checkout drift reproductions and full test timeout; independent tests being expanded and optimized",
+      "status": "fix2 production implementation underway after frozen independent protected-state red and test-delta reviewPASS",
       "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05c-delivery",
       "run": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
       "builder": "/root/recover_t05c",
       "test_author": "/root/correction_regressions",
       "base_commit": "e57e54f",
-      "independent_test_sha256": "2cfe112fddc9cdf3e8deb915dbedb2b8f39649f79d5eef85326d5979cde0e683",
+      "independent_test_sha256": "f2e2d4e81c50de815f92d1a4e10ec5fba8ce19563383aca01cff713d29bc376c",
       "red_tests": {
         "total": 16,
         "pass": 0,
@@ -241,10 +241,11 @@
       "fixes": 2,
       "recovery_provenance": ".deliver/T05C-successor-provenance.json",
       "reviewer": "/root/recovery_contract",
-      "latest_checkpoint": ".deliver/checkpoints/T05C-fix1",
+      "latest_checkpoint": ".deliver/checkpoints/T05C-fix2",
       "failed_snapshot": "405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334",
       "candidate_snapshot": "405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334",
-      "verifier": "/root/correction_verifier"
+      "verifier": "/root/correction_verifier",
+      "fix2_red_snapshot": "73ec06fe10b3211942a7be646ea6737f9b8c8a7bf18b46a573024ba92a99fddd"
     }
   },
   "next": "T05C fix2: independently freeze expanded regression tests, reject protected metadata drift, then full gates and fresh independent review/distinct verification; T05B remains next.",

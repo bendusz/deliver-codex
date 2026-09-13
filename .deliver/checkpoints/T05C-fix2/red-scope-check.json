@@ -1,0 +1,28 @@
+{
+  "ok": true,
+  "run_id": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
+  "revision": 11,
+  "snapshot_hash": "fc953ed501c8122437c6f1b58738e4d641666457193690686e2865b6d8e65642",
+  "changed": [
+    "plugins/deliver/skills/deliver/references/shipping.md",
+    "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+    "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+    "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+    "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+    "plugins/deliver/skills/deliver/scripts/pm.mjs",
+    "tests/integration-correction.test.mjs"
+  ],
+  "added": [
+    "tests/integration-correction.test.mjs"
+  ],
+  "deleted": [],
+  "renames": [],
+  "out_of_scope": [],
+  "preexisting_dirty_changed": [],
+  "symlink_escapes": [],
+  "git_metadata_changed": false,
+  "ignored_advisory_changed": [],
+  "coordinator_execution_changed": null,
+  "git_metadata_compatibility": null,
+  "contracts_changed": []
+}
