@@ -37,5 +37,32 @@
     "review": "/root/recovery_contract",
     "verification": "/root/correction_verifier"
   },
-  "stop_rule": "This is fix3 on the original run. Do not dispatch fix4 without a user decision if final repair fails."
+  "stop_rule": "This is fix3 on the original run. Do not dispatch fix4 without a user decision if final repair fails.",
+  "review_requirements_representation": {
+    "location": "remote.integration_evidence.finalization.review_requirements",
+    "version": "remote-review-requirements-v1",
+    "fields": [
+      "version",
+      "commit",
+      "story_path",
+      "story_before",
+      "story_hash",
+      "story_mode",
+      "contract_hash",
+      "execution_hash",
+      "scale",
+      "reporting",
+      "required_lenses",
+      "identity"
+    ],
+    "rules": [
+      "Existing identified canonical identity convention.",
+      "commit equals frozen evidenceM; story_before is independently committed M story text, story_hash hashes it, parsed contract/Execution match source identities.",
+      "Derive sorted unique required_lenses from parsed retained story and existing reporting policy, not from a self-supplied list.",
+      "For skipped reporting use empty required_lenses; supplied panel still validates its structure, actor independence and aggregate.",
+      "Retain existing byte bounds; no new timestamps, environment rehash or authentication claims.",
+      "story_mode is100644 or100755; manifest.entries[story_path] equals file:644|755:<story_hash>. Validate manifest entries/bindings/scopes and recompute manifest.hash as SHA256(canonical({entries,bindings})).",
+      "Derive required lenses in cycle-safe integration/current-pm callers. state.mjs must not import story.mjs or review.mjs, which already depend on state. All public read/admission/closure paths must enforce semantic derivation."
+    ]
+  }
 }
