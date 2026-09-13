@@ -1,0 +1,59 @@
+{
+  "status": "FAIL",
+  "findings": [
+    {
+      "severity": "major",
+      "message": "recoverIntegrationCorrectionStart validates the journal and integration-record hashes but never re-runs assertStartTokenCurrent or assertUniqueCorrectionCheckout before applying the recorded writes. A clean correction ref advanced beyond the token's start commit is therefore accepted during recovery and the stale run/story publication proceeds instead of refusing unchanged. The fresh regression at tests/integration-correction.test.mjs:1072 reaches Missing expected exception.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true
+    },
+    {
+      "severity": "major",
+      "message": "validateIntegrationCorrectionJournal accepts any second write whose path starts with docs/stories/ and validates the parsed story bytes, but it never requires descriptor.writes[1].path to equal token.story_path. An attacker or corrupted journal can rewrite the descriptor, reconstruction and hashes consistently and redirect publication to a shadow story while the generated run remains bound to the original story. The fresh regression at tests/integration-correction.test.mjs:1097 reaches Missing expected exception.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+      "resolved": true
+    },
+    {
+      "severity": "major",
+      "message": "currentFailureBasis treats any repeatable nonzero merge-tree result with the same Git version as a composition-conflict-no-m basis. It does not distinguish content conflicts from fatal errors, so exit 128 for unrelated histories mints a correction token even though no composition conflict was proved. The fresh regression at tests/integration-correction.test.mjs:1126 reaches Missing expected exception.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true
+    },
+    {
+      "severity": "major",
+      "message": "assertUniqueCorrectionCheckout captures the correction worktree Git anchor but validates only anchor.head. Initial start does not compare protected ignored entries or protected Git metadata with the recorded I/M checkout proof, and journal recovery does not compare the live protected checkout with the generated run's frozen baseline and full Git anchor. The independent real-Git probe at t05c-protected-probe.test.mjs (SHA-256 3fc1f2a707a3827fdc02901c9aa6329f7d049bfe3c309a97175cf8a2aae607c0) reproduced Missing expected exception for first-start .codex drift, journal .codex drift, started surviving-journal .codex drift, and journal config.worktree drift; all four paths accepted and mutated state. This violates the exact protected I/M checkout and unchanged recovery requirements.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true
+    },
+    {
+      "severity": "major",
+      "message": "The declared npm test gate at snapshot 405f77cdd37a269fc02bcbdb34c5953b48cac485cd700185db9e6e5ae70cb334 ended FAIL after the runtime's 600-second limit with spawnSync /bin/sh ETIMEDOUT and no complete TAP result. Fresh complete test-gate evidence required by T05C-AC3 is therefore absent. This is separate from the protected-checkout defect; npm run validate passed at the same snapshot.",
+      "resolved": true
+    },
+    {
+      "severity": "major",
+      "message": "assertCorrectionProtectedProof is neither a relocation-safe protected-state comparison nor a complete recursive checkout proof. It rejects a clean standard initialized submodule at the exact recorded gitlink and an identical repository-relative .githooks configuration because raw protected hashes contain worktree-specific paths, while a shared-common-dir control accepts moved nested HEAD, changed nested tracked bytes, and a nested skip-worktree flag because recursion compares only protected hashes, protected ignored entries, and initialized-set membership. The independent real-Git probe t05c-nested-mode-probe.test.mjs (SHA-256 02b37f9b1c6977f18596ba16b5fc8b424e2972d747ff2667db9f76d6f35818c7) reproduced both false refusals and all three false acceptances. Correction start therefore cannot enforce the frozen exact-I/M submodule contract without rejecting legitimate worktree relocation.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true
+    },
+    {
+      "severity": "major",
+      "message": "Recovery replaces the complete live story fingerprint with the retained baseline fingerprint whenever the story text equals the legal after-image, so it also erases evidence that the file mode changed. Real-Git probes at both story and started-record boundaries changed the published story from mode 0600 to 0755 with core.filemode=true; recoverIntegrationCorrectionStart returned recovered:true and preserved mode 0755. The typed journal therefore accepts a state outside its frozen operational snapshot instead of refusing unchanged.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true
+    },
+    {
+      "severity": "major",
+      "message": "assertRecordSource now applies correction-only source cleanliness and full-anchor checks to every integration-record mutation. This rejects a valid finished source run whose preexisting dirty task input remains unchanged and should instead require fresh M evidence. The fresh full npm test gate completed with 276 tests, 275 PASS and this one FAIL at tests/integration.test.mjs:351; integrate-adopt refuses src/preexisting.txt before mutation. The accepted base supported this workflow, so strict correction-source validation must not replace the ordinary immutable source snapshot rules.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true
+    },
+    {
+      "severity": "major",
+      "message": "recoverIntegrationCorrectionStart does not enforce the started envelope's retained run/story hashes or require both published after-images before deleting a surviving journal. At integration.mjs:1635-1639 it checks only starting_record_hash and descriptor_identity, then calls applyIntegrationCorrectionJournal; that generic starting-phase applier accepts an absent run or the exact story before-image and writes the after-images. The independent real-Git probe core-worktree-started-probe.test.mjs (SHA-256 fae33daa9a81cd86de3a63f88741d48f91c1d713a22bf69402b8032a7fbb5104) confirmed that recovery returned recovered:true, recreated a deleted run, republished a reverted story, and accepted rehashed unrelated started.run_hash and started.story_hash before deleting the journal. This violates the frozen requirement that a surviving started journal may be deleted only when its retained bindings and both after-images match.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": false
+    }
+  ],
+  "summary": "Whole-task review at snapshot b8c66ec574464337ae65d7b4e810d742a34b381e758f4b21f9e53964ac481d97 fails. Fix3 resolves all eight retained findings, npm test passes 287/287 and npm run validate passes, but one current major remains in started correction recovery."
+}

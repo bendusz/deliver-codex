@@ -1,0 +1,12 @@
+{
+  "command": [
+    "node",
+    "--test",
+    "--test-name-pattern=common core\\.worktree handling",
+    "/Users/ben/code/pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe-v3.test.mjs"
+  ],
+  "exit_code": 0,
+  "log_sha256": "aeb8482d19f3d9d12be475c542a3bae232fd0f46f92fa8cda4265be6d5d92e9c",
+  "probe_sha256": "9c2895b8b312543fd7b2285a1d99e098a92026d1ac2202d8c4320ea4451a4efd",
+  "supersedes": "v1 detached-HEAD and v2 untracked sibling fixture setup failures; original evidence preserved"
+}

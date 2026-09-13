@@ -200,7 +200,7 @@
       "checkpoint": ".deliver/checkpoints/T04F-T05L-COMBINED/manifest.json"
     },
     "T05C": {
-      "status": "fix3 implementation underway against frozen independent split tests and bounded testreviewPASS",
+      "status": "fix3 declared gates PASS; independent review and distinct verification found completed-publication recovery failure; three fixes spent, awaiting bounded extension decision",
       "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05c-delivery",
       "run": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
       "builder": "/root/recover_t05c",
@@ -231,10 +231,8 @@
         "snapshot": "85356883cd3be99769fd0374a78577a5429c7a62866e4ed9a6eb02296ea3b489"
       },
       "review_findings": [
-        "Prior5 findings resolved, including fullsuite nowcompletedwithin600s",
-        "Initial submodule proof rejects legitimate relocation yet accepts hidden nested HEAD/bytes/index flags",
-        "Recovery masks executable mode drift on exact story after-image",
-        "Correction-only strict source check regresses ordinary baseline-dirty source integration"
+        "Prior eight findings resolved by fix3; retained verbatim in independent review history.",
+        "Started publication recovery recreates missing run, republishes before-image story and accepts unrelated retained run/story hashes; four real-Git diagnostic leaf failures, exact-after control PASS."
       ],
       "continuation_note": ".deliver/T05C-resume-interruption.json",
       "predecessor_run": "5050e142-81ad-42a9-b60e-e21dce156bd5",
@@ -243,8 +241,8 @@
       "recovery_provenance": ".deliver/T05C-successor-provenance.json",
       "reviewer": "/root/recovery_contract",
       "latest_checkpoint": ".deliver/checkpoints/T05C-fix3",
-      "failed_snapshot": "de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47",
-      "candidate_snapshot": "de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47",
+      "failed_snapshot": "b8c66ec574464337ae65d7b4e810d742a34b381e758f4b21f9e53964ac481d97",
+      "candidate_snapshot": "b8c66ec574464337ae65d7b4e810d742a34b381e758f4b21f9e53964ac481d97",
       "verifier": "/root/correction_verifier",
       "fix2_red_snapshot": "73ec06fe10b3211942a7be646ea6737f9b8c8a7bf18b46a573024ba92a99fddd",
       "full_fix2_gate": {
@@ -255,10 +253,19 @@
         "validate": "PASS"
       },
       "independent_lifecycle_test_sha256": "371de8ed4d0ebe1491b3cd1f57ba5ff7f972af241dd95e59ed5933be5e348baf",
-      "fix3_red_snapshot": "7df5d19fb2283f89c02c074842ed8187d63a129b28819a0386b380f70d324c66"
+      "fix3_red_snapshot": "7df5d19fb2283f89c02c074842ed8187d63a129b28819a0386b380f70d324c66",
+      "full_fix3_gate": {
+        "total": 287,
+        "pass": 287,
+        "fail": 0,
+        "duration_ms": 513994.161041,
+        "validate": "PASS",
+        "checkpoint": ".deliver/checkpoints/T05C-fix3"
+      },
+      "proposal": "docs/reviews/2026-09-13-correction-recovery-proposal.md"
     }
   },
-  "next": "T05C fix3: freeze independent submodule/mode/relocation regressions, restore ordinary source-dirt integration and complete protected checkout proof, then fresh full gates and independent review/distinct verification; T05B remains queued.",
+  "next": "Decision needed: one additional bounded T05C fix on the same run and baseline for completed-publication recovery. Preserve counters and full review history; no fix4 dispatched. Full parity and T05B onward remain pending.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",
@@ -296,5 +303,11 @@
       "04-planning-support": "PASS with minor findings"
     },
     "report": "docs/reviews/2026-09-10-claude-fable-5-1.md"
+  },
+  "final_release_review": {
+    "model": "claude-fable-5-1",
+    "effort": "high",
+    "authorization": ".deliver/2026-09-13-continuation-authorization.json",
+    "status": "Pending completed release candidate; earlier external review is interim and preserved separately."
   }
 }
