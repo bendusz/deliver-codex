@@ -288,7 +288,7 @@
       "integration_commit": "e8457e0d446d170fcd4ac1222718826a0c7c1a28"
     },
     "T05B": {
-      "status": "fix1 independent regressions frozen with meaningful reds; production implementation released",
+      "status": "fix1 partial source repair paused while independent tests close coverage gaps; no full gates yet",
       "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05b-delivery",
       "branch": "feat/parity-t05b",
       "base_commit": "7c1b68e",
@@ -304,7 +304,7 @@
       "dispatch": ".deliver/T05B-operation-dispatch.md",
       "dispatch_sha256": "e40357d4280ee8e4741668e57427b655973318744cd7b345b7029ad5f36f97e1",
       "failed_snapshot": "89d174d040b90ceeb474576fc53939086084ecbd1466be08f0653a51c13fac1d",
-      "latest_checkpoint": ".deliver/checkpoints/T05B-fix1-tests",
+      "latest_checkpoint": ".deliver/checkpoints/T05B-fix1-source-pause",
       "full_round1_gate": {
         "total": 340,
         "pass": 340,
@@ -314,10 +314,13 @@
       },
       "repair_design": ".deliver/T05B-fix1-design.json",
       "development_test_reports": ".deliver/T05B-fix1-test-reports.json",
-      "fix1_red_snapshot": "eab097cc2001a7fd1238d9ac605190afb36f6bc9acdf472a8af64f5264b068b3"
+      "fix1_red_snapshot": "eab097cc2001a7fd1238d9ac605190afb36f6bc9acdf472a8af64f5264b068b3",
+      "partial_snapshot": "45feb36bb616c473c2a2443bee48dd3f2bb4ed68d78983960f397a761fb7f8a9",
+      "coverage_preflight": ".deliver/T05B-fix1-test-preflight-native.json",
+      "identity_clarification": ".deliver/T05B-fix1-identity-clarification.json"
     }
   },
-  "next": "T05B fix1 production repair, then frozen regression checks and full gates, independent whole-task review and distinct verification.",
+  "next": "T05B fix1: freeze expanded independent tests, recheck coverage, resume source repair, then full gates and independent acceptance.",
   "interfaces": {
     "story_module": "parseStory/readStory/storyTaskContract/replaceStoryExecution; exact Execution exclusion only",
     "project_module": "inspectProjectState/readApprovalMarker/readPlanPolicy/detectProjectFormat; no pm/scope dependency",

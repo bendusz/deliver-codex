@@ -1,0 +1,12 @@
+{
+  "status": "CLARIFIED",
+  "correction": "My statement that superseding necessarily changes the predecessor attempt identity was specific to the round-one whole-object identity implementation. It is not a contract requirement. A validated stable identity over an immutable attempt header is compatible with the approved design.",
+  "test_contract": [
+    "Require the identified supersession proof to bind the exact predecessor attempt identity, predecessor effect identity or null, prior observation identity, current observation identity and exact changed_fields.",
+    "Preserve the predecessor's observed result bytes, transition identity and result identity unchanged.",
+    "Require reciprocal predecessor/successor relationships and validate their separately identified link or chain representation.",
+    "Retain the prior effect during successor preparation/execution; after successor success, keep the prior effect recoverable through retained history and the supersession proof.",
+    "Create reidentified records with broken reciprocal links, proof identities, observation bindings or effect-history bindings and require deterministic rejection."
+  ],
+  "representation_rule": "Tests must not prescribe whether attempt.identity covers the whole mutable envelope or a stable immutable header. Stable-header identity is expressly allowed when disposition, reciprocal links, transition chain and effect history have their own validated identities and the complete relationship is checked."
+}
