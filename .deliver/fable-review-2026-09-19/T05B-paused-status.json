@@ -1,0 +1,72 @@
+{
+  "status": "Paused by coordinator following user frustration over elapsed session; no acceptance claimed",
+  "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "revision": 17,
+  "counters": {
+    "retries": 0,
+    "fixes": 3,
+    "corrections": 0
+  },
+  "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05b-delivery",
+  "files": {
+    "plugins/deliver/skills/deliver/SKILL.md": {
+      "sha256": "d2f5aa3004648eac530b9cafae75c4e3a68f4614ab576a6d84d1946aa588fd9e",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/assets/operations.json": {
+      "sha256": "b3a23ed104859f4c56e154e9a459d6180799f901383a545bb42684c498a04623",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/references/compatibility.md": {
+      "sha256": "746031f8813b689994d4c6d7abeca6625676fa8ceed240e1b2522bc945636b58",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/references/shipping.md": {
+      "sha256": "d40f652ec585050a98d30683d22d8142fbf2c5add24fbd7eadce2d16b7ab1d99",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/scripts/deliver.mjs": {
+      "sha256": "438c242de87b79d7261eaa7ea9db73f0530dece4bfed3b0df4574ffdd02a2905",
+      "mode": "0o755"
+    },
+    "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs": {
+      "sha256": "07ea55559cdbfdc1c5bdcd6f3fa962cac385bf02ffb32e05ce3d7067e1623e7b",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/scripts/lib/integration.mjs": {
+      "sha256": "666ae4d9ef42bf399e9450e9821c18d5ef1714a27535940aba5e68e052c55877",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/scripts/lib/remote.mjs": {
+      "sha256": "ba21914d8a131532ec38c66e40948621da9d81452449024d59ba5a837a10ea89",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/scripts/lib/state.mjs": {
+      "sha256": "37803f859278e820d66e31d2e032e07ac41d3fdaa451dd9db1c61c15e4b21699",
+      "mode": "0o644"
+    },
+    "plugins/deliver/skills/deliver/scripts/pm.mjs": {
+      "sha256": "22bb33abee9deedbe9a8c5fa6fb6825f652b6c2be026f72229d7cde100920a09",
+      "mode": "0o644"
+    },
+    "tests/current-roundtrip.test.mjs": {
+      "sha256": "453327ad0a522e122ae3a39ab91564aababf3cd5425d007e2475ecc47175b0d6",
+      "mode": "0o644"
+    },
+    "tests/operations.test.mjs": {
+      "sha256": "dde1af29f017b8816b77eb8e9211aff873bcde984b469f6aabaf3d273e6dc3f8",
+      "mode": "0o644"
+    },
+    "tests/remote-lifecycle.test.mjs": {
+      "sha256": "905a4941fa44b980a4c38548dd72b560ac3b812ca3b0185b056011f63e7857ba",
+      "mode": "0o644"
+    },
+    "tests/remote.test.mjs": {
+      "sha256": "8b3f797e85fdbaeadad3a457232050d156d0bbaadbd02cbba3173d394af40d82",
+      "mode": "0o644"
+    }
+  },
+  "agent_state": "Test author interrupted; builder remains held. No test processes observed at pause.",
+  "next_action": "Report status to user. Do not release builder automatically from this checkpoint. Current independent test amendments need final inspection before any future release.",
+  "git_status": " M plugins/deliver/skills/deliver/references/compatibility.md\n M plugins/deliver/skills/deliver/references/shipping.md\n M plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs\n M plugins/deliver/skills/deliver/scripts/lib/integration.mjs\n M plugins/deliver/skills/deliver/scripts/lib/remote.mjs\n M plugins/deliver/skills/deliver/scripts/lib/state.mjs\n M plugins/deliver/skills/deliver/scripts/pm.mjs\n M tests/current-roundtrip.test.mjs\n M tests/operations.test.mjs\n M tests/remote.test.mjs\n?? .deliver/T05B-fix1-coverage-ready-native.json\n?? .deliver/T05B-fix1-design.json\n?? .deliver/T05B-fix1-expanded-test-author-report.json\n?? .deliver/T05B-fix1-expanded-test-preflight-native.json\n?? .deliver/T05B-fix1-identity-clarification.json\n?? .deliver/T05B-fix1-test-author-report.json\n?? .deliver/T05B-fix1-test-preflight-native.json\n?? .deliver/T05B-fix1-tests-expanded-manifest.json\n?? .deliver/T05B-fix1-tests-final-manifest.json\n?? .deliver/T05B-fix1-tests-manifest.json\n?? .deliver/T05B-fix2-advanced-base-fixture.json\n?? .deliver/T05B-fix2-design-preflight-native.json\n?? .deliver/T05B-fix2-design.json\n?? .deliver/T05B-fix2-tests-final-manifest.json\n?? .deliver/T05B-fix3-design-preflight-native.json\n?? .deliver/T05B-fix3-design-proposal-native.json\n?? .deliver/T05B-fix3-dispatch.json\n?? .deliver/T05B-fix3-mode-fixture-ruling.json\n?? .deliver/T05B-fix3-test-author/\n?? .deliver/T05B-operation-dispatch.md\n?? .deliver/T05B-supersession-dispatch.md\n?? .deliver/review-T05B-fix1.json\n?? .deliver/review-T05B-fix2.json\n?? .deliver/review-T05B-round1.json\n?? .deliver/runs/4fcd23c4-4b06-4a55-89ae-f2686bb3516f.json\n?? .deliver/task-starts/\n?? .deliver/tasks/T05B.json\n?? .deliver/verification-T05B-fix1.json\n?? .deliver/verification-T05B-fix2.json\n?? .deliver/verification-T05B-round1.json\n?? tests/remote-lifecycle.test.mjs\n"
+}

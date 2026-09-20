@@ -1,0 +1,42 @@
+# <Project> feature specification
+
+<!-- Product intent only. Keep architecture and implementation in docs/plan.md.
+Preserve existing US-, FR-, AC- and SM- identifiers. Mark unknowns inline as
+[NEEDS CLARIFICATION: <question>] instead of guessing. -->
+
+## Overview
+
+<What users need and why.>
+
+## User stories
+
+### US-001: <Title>
+
+As a <user>, I want <capability>, so that <outcome>.
+
+## Functional requirements
+
+- FR-001: <Testable requirement.>
+
+## Acceptance criteria
+
+<!-- Prefer: WHEN <condition or event>, THE SYSTEM SHALL <observable behavior>. -->
+
+- AC-001: WHEN <condition>, THE SYSTEM SHALL <observable behavior>.
+
+## Edge cases
+
+- <Failure mode and expected behavior.>
+
+## Success measures
+
+- SM-001: <Measurable outcome, marked non-buildable when it is a business measure.>
+
+## Assumptions
+
+- <Explicit assumption.>
+
+## Clarifications
+
+<!-- This section and all blocking markers must be resolved before planning. Record each answer
+here when it does not belong in a requirement, criterion or assumption. -->

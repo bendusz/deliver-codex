@@ -1,0 +1,211 @@
+{
+  "status": "FAIL",
+  "findings": [
+    {
+      "severity": "major",
+      "message": "current-pm.mjs validateAdmissionRecord/remoteAdmissionStatus accepts syntactically coherent completion without the required remote proof chain. It checks remote.version, optional slots only if present, completion target/branch/commit, then marks COMPLETE when commit is ancestor of HEAD. A record can omit source publication/merge proof, integration_evidence finalization, closure/handoff-repair proof and terminal artifact identities yet release admission. This directly violates initial-observations admission-proof ('syntactically valid completion.status alone cannot release hold').",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+      "resolved": true,
+      "resolution": "validateAdmissionRecord now calls validateRemotePublicationRecord with requireTerminal for completed records, and validateAdmissionTerminalGit checks terminal story and handoff bytes and modes."
+    },
+    {
+      "severity": "major",
+      "message": "closure/repair provider interruption is not implemented. reconcileExecutingAttempt is called only by source publish/merge. Closure executeProviderAttempt leaves thrown executing slots stuck; closure reconcile proves Git without settling the slot. Repair uses a bespoke runner that unconditionally allocates a new token whenever effect is null, overwriting an executing active token and permitting a second write; repair reconcile also never settles slots. This violates the all-stage prepared/executing/observed and read-only recovery contract. Fresh-process lost execution must remain UNKNOWN absent exact effect adoption; same-process ended+exact absence may replay the same token.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true,
+      "resolution": "Closure and repair use the shared durable provider engine. Fresh-process ambiguity remains read-only, while same-process ended invocation plus exact absence may replay the same token."
+    },
+    {
+      "severity": "major",
+      "message": "raced closure preimage checks compare only file text/hash, not Git mode. A concurrent 100644\u2192100755 mode change on a P/E/H path has identical committedText, is allowed as an in-scope changed path, then wrapper restores H's mode; code accepts it, overwriting the advanced-base entry despite exact-preimage requirement.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true,
+      "resolution": "Raced closure reconciliation compares complete committed entries at M and the advanced base, then requires the wrapper mode and OID to equal H."
+    },
+    {
+      "severity": "major",
+      "message": "H2 adoption compares only captureGitAnchor().protected_hash; unlike closure/completion it retains no protectedIgnoredEntries checkout proof, so worktree-local ignored protected metadata can drift between prepare/adopt without refusal.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true,
+      "resolution": "H2 preparation retains a whole-checkout proof, and adoption checks protected ignored entries, protected Git metadata and the branch attachment."
+    },
+    {
+      "severity": "major",
+      "message": "maybeSupersedeSourceAttempt changes old.disposition/superseded_by then refreshAttempt(old), but deliberately leaves slot.effect unchanged. Its effect.attempt_identity therefore points to the pre-mutation identity that no retained attempt now has. The supersession proof omits required predecessor attempt/effect identities and validateProviderSlot never checks reciprocal links/effect-to-attempt binding. After successor success old effect pointer is replaced, so old identity is not durably recoverable.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true,
+      "resolution": "Attempt identity covers the immutable header. Supersession retains predecessor effect evidence and validates reciprocal predecessor/successor and effect links."
+    },
+    {
+      "severity": "major",
+      "message": "rebase proof sets rebaseBase=parents[0] of final rebased commit and checks only rebaseBase..mergeCommit; for legitimate multi-commit source rebase, that parent is the preceding rebased source commit, so earlier rebased commits are outside bounded-path proof. Established premerge base is retained in merge attempt observation and should anchor the whole first-parent range. Current tests use one source commit.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true,
+      "resolution": "Rebase reconciliation anchors the complete first-parent range at the retained premerge base and checks every intermediate commit against the authorized source paths."
+    },
+    {
+      "severity": "major",
+      "message": "claimCurrentPm checks remote admission before entering transact but does not repeat it inside the transaction, contrary to the approved T05B admission dispatch. A remote record can become applicable in another checkout after the precheck and before the story write, and the claim then commits without the required hold.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+      "resolved": true,
+      "resolution": "claimCurrentPm repeats assertRemoteAdmissionClear inside the transaction immediately before changing the story."
+    },
+    {
+      "severity": "major",
+      "message": "validateRemoteEnvelope validates only provider-slot shells and retry range, while prepareRemoteClosureCheckout trusts truthy integration_evidence.finalized/finalization. It does not validate the identified finalization or its binding to the current snapshot, gates, review and verification; a malformed/rebound record can therefore enter P/E/H closure with forged finalized evidence.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true,
+      "resolution": "The state validator checks identified gates, review, verification and finalization and their snapshot and identity links before closure begins."
+    },
+    {
+      "severity": "major",
+      "message": "source merge interruption treats `MERGE_PENDING` as an absence state eligible for same-process replay (`mergeRemoteSource` passes `absenceStates: ['MERGE_PENDING']`). The frozen dispatch says replay requires exact provider absence and that open/queued remains pending; an open/queued PR may already retain a provider merge request, so it cannot prove no effect and must not authorize a second merge write. This needs to stay pending/read-only unless exact merge effect is adopted.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true,
+      "resolution": "MERGE_PENDING is no longer an absence state and cannot authorize replay."
+    },
+    {
+      "severity": "major",
+      "message": "prepareRemoteHandoff does not require an adopted story-closure E. remotePrepareArtifact assigns `parent = closure.commit`, which can be null, persists the handoff pending record, then writes H bytes. Adoption can never accept a real commit whose parent equals null, and the dirty H write then prevents preparing E, leaving the workflow wedged. The public operation should refuse before record/file mutation until E is adopted.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true,
+      "resolution": "remotePrepareArtifact rejects handoff preparation until the story-closure commit is adopted."
+    },
+    {
+      "severity": "major",
+      "message": "prepareHandoffRepair is not resumable across its own durable-preparation/file-write boundary. It first records a prepared attempt in withRecord, writes H2 bytes afterward, but every repeated prepare rejects whenever latest exists without race_proof. A crash after record persistence and before/while writeArtifact therefore cannot apply the retained pending after-image or return its token; the accepted prepare/adopt interruption model is broken.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true,
+      "resolution": "A retained prepared H2 attempt resumes with its original token for the exact retained before or after image."
+    },
+    {
+      "severity": "major",
+      "message": "Premerge supersession still violates the frozen qualification rules. integration.mjs:1940-1966 can supersede source publication after a successful source merge because it never checks the merge effect/proof; it also accepts PR_DRAFT, CHECKS_PENDING and CHECKS_FAILED as qualifying current observations. remoteObservation at 1928-1934 uses `result.remoteBase || observedRemoteBase(...)`, treating an explicitly null provider base like an omitted field. The dispatch requires successful merge to forbid supersession, pending/failed observations to remain read-only, and fallback only when remoteBase is absent. Add the merge-terminal veto, restrict the qualifying current states, and distinguish an absent property from a present invalid/null value before allocating a successor.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true,
+      "resolution": "Supersession vetoes an existing merge effect or proof, accepts only the pinned qualifying observations, and distinguishes omitted remoteBase from explicit null or malformed data."
+    },
+    {
+      "severity": "major",
+      "message": "The persisted provider-attempt validator checks transition identities and previous pointers but not the required state machine. At state.mjs:103-118, an observed attempt can be changed from prepared\u2192executing\u2192observed to prepared\u2192observed by removing executing, rebinding observed.previous and reidentifying that transition; stable attempt identity and effect binding still validate, so terminal admission accepts evidence without a retained executing boundary. Enforce first prepared, prepared\u2192executing, executing\u2192observed with the same invocation token, and executing\u2192prepared only with an exact replay proof; also bind active token and disposition to the legal terminal state.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+      "resolved": true,
+      "resolution": "The validator enforces the ordered transition state machine, invocation continuity, replay proof and active-token/disposition relationships."
+    },
+    {
+      "severity": "major",
+      "message": "Remote artifact interruption recovery does not require the retained clean checkout. After remote-close-prepare persists E, restore the owned story to pending.before, make an unrelated unstaged change such as src/unrelated.txt, then call remote-close-prepare with the retained hash. remotePrepareArtifact passes clean:false for pending state and applyPending checks only the owned story, so it writes E and returns the old token amid unrelated work. H2 resume has the same gap because its anchor comparison does not cover unstaged ordinary worktree changes. The contract requires exact interruption state and preservation of unrelated work. Validate the retained pending shape and generated P/E/H or H2 image, require status to contain only the owned pending paths, and on unrelated status refuse with both owned and unrelated bytes unchanged.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true,
+      "resolution": "P/E/H and H2 recovery validate pending content and permit checkout status only on the owned pending paths."
+    },
+    {
+      "severity": "major",
+      "message": "Terminal publication proof remains incompletely cross-bound. state.mjs:352-359 accepts handoff_repair.proof without requiring its retained pr_number to be a positive integer equal to the effect-bound merge attempt input.prNumber. For a normal closure, state.mjs:313-323 allows state `proven` while terminal_commit differs from the provider-bound merge_commit; rebinding that proof and completion together to a later commit that preserves the story/handoff entries can release admission even though the exact provider R was different. Require the repair PR equality and require a proven normal closure terminal to equal its merge effect commit.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+      "resolved": true,
+      "resolution": "Normal proven closure requires terminal_commit equal to merge_commit, and repair proof requires a positive PR number equal to the effect-bound attempt input."
+    },
+    {
+      "severity": "major",
+      "message": "Normal merge and squash reconciliation still use record.integration.base I as the provider base, while rebase correctly uses the effect-bound attempt's retained remote_observation.observed_remote_base. If the remote integration branch advances from I to proved N before the provider merge, a valid merge result with ordered parents [N,C] and exact merge-tree(N,C), or a valid squash direct child of N with that bounded source composition, is rejected at reconcileRemoteSource. T05B-AC2 and remote-lifecycle-interface.md:17 require proof against the uniquely established provider base and fresh evidence at the resulting fetched M. Derive N from the merge effect's retained observation for every method, validate it as the exact proved base, and use it for parent, bounded delta and recomputed-tree checks.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true,
+      "resolution": "Merge, squash and rebase all use the effect-bound retained provider base N and prove that N descends from approved I."
+    },
+    {
+      "severity": "major",
+      "message": "mergeRemoteSource does not implement the fix2 terminal fast path. After a source merge effect or source proof exists, it still calls remoteObservation/provider.inspect before executeProviderAttempt returns the retained effect. A same-input completed merge therefore depends on fresh provider and Git reads and can fail when the provider is unavailable, despite already having a durable result. T05B-fix2-design.json and T05B-supersession-dispatch.md require the successful merge to veto inspection, allocation and writes while preserving the same-input proven result.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true,
+      "resolution": "mergeRemoteSource checks the retained effect or source proof before provider inspection, validates the same intent and returns the retained result."
+    },
+    {
+      "severity": "major",
+      "message": "Handoff-repair replacements generate a stale BASE_COMMIT. After HANDOFF_BASE_RACE, prepareHandoffRepair correctly selects latest.race_proof.terminal_commit as the new repairBase and pending parent, but remoteArtifactGeneration still receives closureCommit=closure.terminal_commit. The public retry therefore creates H2 as a direct child of the latest N while its handoff bytes name the original closure terminal. Resume and adoption repeat the same stale generation input, and completion later refuses the result. remote-lifecycle-interface.md:31 requires each replacement H2 to use BASE_COMMIT N for its actual latest proved parent.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true,
+      "resolution": "Initial and replacement H2 generation, resume and adoption use the selected attempt.parent as closureCommit and BASE_COMMIT."
+    },
+    {
+      "severity": "major",
+      "message": "Remote verification-report preparation can overwrite existing project reports. architecture-state.md:216 says P adds only docs/verification/<story-id>.md and docs/checklists/verification-<story-id>.md, and remote-lifecycle-interface.md:25 retains the existing P contract. prepareRemoteVerificationReport passes those paths to materializeRemoteWrites, which accepts non-null committed before-images. When a fetched advanced M already contains either path, the public P operation replaces it instead of refusing before durable preparation.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true,
+      "resolution": "Report preparation checks both report paths are absent before durable mutation, and generation validation repeats the absence requirement."
+    },
+    {
+      "severity": "major",
+      "message": "Remote artifact generation is not independently bound to its parent or retained after adoption. validateRemoteGeneration regenerates report/closure bytes from generation.inputs.story_before supplied by the descriptor itself but never requires that story to equal the committed parent story or pending write.before, nor does it require the retained source contract/execution identity. A coherently reidentified same-contract, different-Execution descriptor can therefore resume and adopt an E that is not the legal transition from its parent. remoteAdoptArtifact then discards the generation descriptor and records only field/commit/parent/tree/writes, so terminal P/E/H proof no longer names the source proof or remote finalization that generated it. This violates remote-lifecycle-interface.md:19 and :25, which require receipts and closure preparation to remain bound to fetched M and its finalization.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true,
+      "resolution": "Generation is bound to committed parent story bytes, source contract and Execution, source proof, finalization and view, and the complete identified generation is retained under the adopted proof."
+    },
+    {
+      "severity": "major",
+      "message": "Remote artifact publication does not preserve executable Git mode. materializeRemoteWrites retains expected_mode, but applyPending writes through atomic, whose replacement file is created mode 0600, and never restores the owner's executable bit. A valid 100755 story or handoff therefore becomes 100644 during E, H or H2 preparation and cannot pass adoption's exact expected-mode check. Pending recovery also compares only text, so same-text executable-mode drift on an owned path is accepted as resumable. The existing P/E/H entry contract and remote state schema explicitly support both 100644 and 100755.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": true,
+      "resolution": "applyPending writes with the retained 100644 or 100755 mode, and pending recovery checks the live mode before resuming."
+    },
+    {
+      "severity": "major",
+      "message": "Remote terminal evidence validation does not establish exact acceptance coverage or independent actors. validateRemotePublicationRecord accepts any nonempty all-PASS verification criteria without matching their IDs exactly to source.packet.acceptance, and it does not enforce that the remote reviewer and verifier differ from the builder and each other or that required panel coverage remains present. Reidentifying a same-snapshot verification with one invented PASS criterion and colliding actors still permits finalization, closure and terminal admission. T05B-AC2 and remote-lifecycle-interface.md:19 require fresh independent review and distinct complete verification bound to M.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+      "resolved": true,
+      "resolution": "Terminal validation enforces exact unique acceptance IDs, reviewer/verifier/builder separation, panel actor and lens rules, derived aggregate findings and required lens coverage."
+    },
+    {
+      "severity": "major",
+      "message": "A retained provider replay proof is not bound to the attempt target. validateRemoteProviderSlot checks that replay.absence_result is identified PR_ABSENT evidence and binds its invocation token, but does not require absence_result.expectedHead to equal attempt.input.target.expectedHead. A reidentified replay transition can therefore claim exact absence for a different head and later support a terminal provider chain. remote-lifecycle-interface.md:9 requires exact attempt inputs and result identity before same-token replay.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+      "resolved": true,
+      "resolution": "Replay validation requires absence_result.expectedHead to equal the exact attempt target expectedHead."
+    },
+    {
+      "severity": "minor",
+      "message": "remoteAdmissionStatus reports the wrong terminal field before completion preparation. It selects value.remote.closure.proof.commit, but remote-closure-proof-v1 retains merge_commit and terminal_commit. A normal or stale REMOTE_CLOSURE_PROVEN record consequently returns remote_terminal_commit:null until a completion token exists, contrary to the exact remote-admission-status projection in T05B-operation-dispatch.md.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+      "resolved": true,
+      "resolution": "remoteAdmissionStatus projects closure.proof.terminal_commit."
+    },
+    {
+      "severity": "major",
+      "message": "The declared npm test gate did not complete for the frozen fix2 candidate: it terminated with ETIMEDOUT at 600 seconds. Packaging validation passed, the candidate snapshot remained unchanged, and no orphan test processes remained, but a timed-out gate is not a PASS and cannot establish T05B acceptance.",
+      "resolved": true,
+      "resolution": "The fix3 snapshot recorded npm test PASS with 349/349 tests in 486836ms and npm run validate PASS, both bound to snapshot 232f5d3e1c04cf155b6b0c96f85f988dec93c9588f6a2a70a2b9d7ef165a88d2."
+    },
+    {
+      "severity": "block",
+      "message": "A source merge attempted while checks are pending cannot persist its exact observed result. remote.mjs returns CHECKS_PENDING before issuing a merge write, executeProviderAttempt appends an observed transition with active disposition, and state.mjs rejects that legal no-effect state as 'source merge unresolved attempt has effect'. The record remains at executing. Later calls only return PENDING from read-only reconciliation, even after checks become ready, so the source lifecycle is wedged without any merge command having run.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/state.mjs:202",
+      "resolved": false
+    },
+    {
+      "severity": "block",
+      "message": "An observed MERGE_PENDING result cannot later be reconciled to the exact server merge. The pending observation clears active_token and retains no effect. mergeRemoteSource then replays the retained PENDING result, while reconcileRemoteSource settles only an active executing attempt. When the provider later returns MERGED, reconcileRemoteSource builds the Git proof but state validation rejects source.proof because source.merge.effect is still absent. This violates the required same-attempt queue-completion reconciliation.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs:2158",
+      "resolved": false
+    },
+    {
+      "severity": "block",
+      "message": "Remote evidence can still be reset after the closure checkout is prepared. prepareRemoteClosureCheckout checks finalization once, but assertRemoteEvidenceMutable freezes evidence only after an artifact is pending or committed. A later gate, review or verification clears finalization. P or E preparation then persists an artifact generation with finalization null; adoption rejects it, while the pending artifact prevents evidence from being finalized again. The lifecycle is permanently wedged.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs:2392",
+      "resolved": false
+    },
+    {
+      "severity": "block",
+      "message": "A real handoff-repair base race before the provider merge is not retained as HANDOFF_BASE_RACE. If the provider wrapper has parents [advanced-N,H2], reconcileRemoteHandoffRepair requires parents [attempt.parent,H2] and throws before writing race_proof or spending a bounded replacement retry. The adopted attempt then has neither proof nor race_proof, and prepareHandoffRepair cannot resume or allocate a replacement.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs:3026",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "Checkout-free terminal receipt validation does not enforce the recording API's review summary type and 8000-character bound. A coherently reidentified stored review can therefore contain a non-string or oversized summary and still pass validateRemotePublicationRecord, up to the broader integration-record byte limit.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/state.mjs:261",
+      "resolved": false
+    }
+  ],
+  "summary": "FAIL. The fix3 repairs resolve all 25 findings from review-T05B-fix2, and the frozen snapshot has passing npm test and packaging gates. Four current lifecycle defects remain. Pending checks wedge source merge before any provider write; an observed queued merge cannot acquire the effect needed for later exact reconciliation; evidence reset after closure-checkout preparation leaves an unadoptable artifact that also freezes re-finalization; and a true pre-merge H2 base race throws before durable race evidence and bounded replacement. The coordinator's disposable reproduction independently reproduced the first two defects in .deliver/checkpoints/T05B-fix3-candidate/fable-current-repro.log. The fresh-process replay objection was not retained because the approved fix2 contract explicitly permits replay only with same-process ended proof. The source premerge-N objection was not retained because the exact retained premerge-N rule is pinned by the approved design.",
+  "snapshot": "232f5d3e1c04cf155b6b0c96f85f988dec93c9588f6a2a70a2b9d7ef165a88d2"
+}

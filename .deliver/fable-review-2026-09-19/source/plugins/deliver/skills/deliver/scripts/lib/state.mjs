@@ -1,0 +1,954 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { createHash, randomUUID } from 'node:crypto';
+
+export const STATE_VERSION = 1;
+
+export class DeliverError extends Error {
+  constructor(message, code = 70, details = undefined) {
+    super(message);
+    this.name = 'DeliverError';
+    this.code = code;
+    this.details = details;
+  }
+}
+
+export const sha256 = (value) => createHash('sha256').update(value).digest('hex');
+
+export function canonical(value) {
+  if (Array.isArray(value)) return `[${value.map(canonical).join(',')}]`;
+  if (value && typeof value === 'object') {
+    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonical(value[key])}`).join(',')}}`;
+  }
+  return JSON.stringify(value);
+}
+
+const REMOTE_HASH = /^[0-9a-f]{64}$/;
+const REMOTE_OID = /^[0-9a-f]{40}(?:[0-9a-f]{24})?$/;
+const REMOTE_TOKEN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+
+const remoteRecord = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+const withoutRemoteIdentity = (value) => {
+  const { identity: _identity, ...body } = value;
+  return body;
+};
+const validRemoteIdentified = (value) => remoteRecord(value) && REMOTE_HASH.test(value.identity || '')
+  && value.identity === sha256(canonical(withoutRemoteIdentity(value)));
+const remoteInvalid = (message) => { throw new DeliverError(`invalid remote publication evidence: ${message}`, 66); };
+
+// Provider-attempt identity covers immutable intent. Transitions and reciprocal
+// disposition links are independently identified so later observations cannot
+// invalidate an effect that names the original attempt.
+export function remoteProviderAttemptIdentity(attempt) {
+  return sha256(canonical({
+    version: attempt.version,
+    token: attempt.token,
+    operation: attempt.operation,
+    ordinal: attempt.ordinal,
+    input: attempt.input,
+    input_identity: attempt.input_identity,
+    predecessor_record_hash: attempt.predecessor_record_hash,
+    retry: attempt.retry,
+    supersedes: attempt.supersedes,
+  }));
+}
+
+export function remoteProviderAttemptObservation(attempt) {
+  const observation = structuredClone(attempt?.input?.remote_observation);
+  if (!remoteRecord(observation) || observation.version !== 'remote-provider-observation-v1') return null;
+  const observed = attempt.transitions?.at(-1);
+  if (observed?.state !== 'observed') return observation;
+  const result = observed.result;
+  if (Object.hasOwn(result, 'repository')) {
+    if (!remoteRecord(result.repository)) return null;
+    observation.repository_identity = sha256(canonical(result.repository));
+  }
+  if (Object.hasOwn(result, 'pr')) {
+    if (!remoteRecord(result.pr) || !Number.isSafeInteger(result.pr.number) || result.pr.number <= 0
+      || typeof result.pr.headRefName !== 'string' || !result.pr.headRefName
+      || typeof result.pr.baseRefName !== 'string' || !result.pr.baseRefName
+      || !REMOTE_OID.test(result.pr.headRefOid || '')) return null;
+    observation.pr_number = result.pr.number;
+    observation.story_branch = result.pr.headRefName;
+    observation.integration_branch = result.pr.baseRefName;
+    observation.observed_remote_head = result.pr.headRefOid;
+  }
+  if (Object.hasOwn(result, 'remoteBase')) {
+    if (!REMOTE_OID.test(result.remoteBase || '')) return null;
+    observation.observed_remote_base = result.remoteBase;
+  }
+  observation.result_identity = observed.result_identity;
+  return observation;
+}
+
+function validateRemoteProviderSlot(slot, label) {
+  if (!remoteRecord(slot) || slot.version !== 'remote-provider-slot-v1' || !Array.isArray(slot.attempts)
+    || !(slot.active_token === null || REMOTE_TOKEN.test(slot.active_token || ''))
+    || !(slot.effect === null || validRemoteIdentified(slot.effect))) remoteInvalid(`${label} provider slot`);
+  const tokens = new Map();
+  for (const attempt of slot.attempts) {
+    if (!remoteRecord(attempt) || attempt.version !== 'remote-provider-attempt-v1'
+      || !REMOTE_TOKEN.test(attempt.token || '') || tokens.has(attempt.token)
+      || !Number.isSafeInteger(attempt.ordinal) || attempt.ordinal < 0
+      || attempt.ordinal !== tokens.size || typeof attempt.operation !== 'string'
+      || !REMOTE_HASH.test(attempt.input_identity || '')
+      || attempt.input_identity !== sha256(canonical(attempt.input))
+      || !REMOTE_HASH.test(attempt.predecessor_record_hash || '')
+      || !Number.isSafeInteger(attempt.retry) || attempt.retry < 0 || attempt.retry > 2
+      || !(attempt.supersedes === null || REMOTE_TOKEN.test(attempt.supersedes || ''))
+      || !(attempt.superseded_by === null || REMOTE_TOKEN.test(attempt.superseded_by || ''))
+      || !['active', 'superseded', 'proven'].includes(attempt.disposition)
+      || !Array.isArray(attempt.transitions) || !attempt.transitions.length
+      || attempt.identity !== remoteProviderAttemptIdentity(attempt)) remoteInvalid(`${label} provider attempt`);
+    let previous = null;
+    let previousTransition = null;
+    for (const [transitionIndex, transition] of attempt.transitions.entries()) {
+      if (!validRemoteIdentified(transition) || !['prepared', 'executing', 'observed'].includes(transition.state)
+        || transition.previous !== previous || typeof transition.at !== 'string') remoteInvalid(`${label} provider transition`);
+      if (transitionIndex === 0 && transition.state !== 'prepared') remoteInvalid(`${label} provider transition must begin prepared`);
+      if (transitionIndex > 0) {
+        const legal = previousTransition.state === 'prepared' ? transition.state === 'executing'
+          : previousTransition.state === 'executing' && ['prepared', 'observed'].includes(transition.state);
+        if (!legal) remoteInvalid(`${label} provider transition order`);
+      }
+      if (transition.state === 'executing' && (!remoteRecord(transition.invocation)
+        || !REMOTE_TOKEN.test(transition.invocation.token || '')
+        || !Number.isSafeInteger(transition.invocation.pid) || transition.invocation.pid <= 0
+        || !REMOTE_TOKEN.test(transition.invocation.process_instance || '')
+        || transition.invocation.operation !== attempt.operation
+        || transition.invocation.input_identity !== attempt.input_identity)) remoteInvalid(`${label} executing transition`);
+      if (transition.state === 'observed' && (!REMOTE_HASH.test(transition.result_identity || '')
+        || transition.result_identity !== sha256(canonical(transition.result)))) remoteInvalid(`${label} observed transition`);
+      if (transition.state === 'observed' && transition.invocation_token !== previousTransition?.invocation?.token) {
+        remoteInvalid(`${label} observed invocation binding`);
+      }
+      if (transition.state === 'prepared' && transitionIndex > 0) {
+        if (!validRemoteIdentified(transition.replay)
+          || transition.replay.version !== 'remote-provider-replay-proof-v1'
+          || transition.replay.invocation_token !== previousTransition?.invocation?.token
+          || transition.replay.absence_result?.state !== 'PR_ABSENT'
+          || transition.replay.absence_identity !== sha256(canonical(transition.replay.absence_result))) {
+          remoteInvalid(`${label} replay proof`);
+        }
+      } else if (transition.replay) remoteInvalid(`${label} unexpected replay proof`);
+      if (transition.supersession && !validRemoteIdentified(transition.supersession)) remoteInvalid(`${label} supersession proof`);
+      previous = transition.identity;
+      previousTransition = transition;
+    }
+    tokens.set(attempt.token, attempt);
+  }
+  if (slot.active_token !== null) {
+    const active = tokens.get(slot.active_token);
+    if (!active || active !== slot.attempts.at(-1) || active.disposition !== 'active'
+      || !['prepared', 'executing'].includes(active.transitions.at(-1).state)) remoteInvalid(`${label} active token`);
+  }
+  for (const attempt of slot.attempts) {
+    const terminal = attempt.transitions.at(-1);
+    if (['prepared', 'executing'].includes(terminal.state)
+      && (slot.active_token !== attempt.token || attempt.disposition !== 'active')) remoteInvalid(`${label} unfinished attempt state`);
+    if (terminal.state === 'observed' && slot.active_token === attempt.token) remoteInvalid(`${label} observed active token`);
+    if (attempt.disposition === 'proven' && terminal.state !== 'observed') remoteInvalid(`${label} proven disposition`);
+    if (attempt.disposition === 'superseded' && (terminal.state !== 'observed' || attempt.superseded_by === null)) {
+      remoteInvalid(`${label} superseded disposition`);
+    }
+  }
+  for (const attempt of slot.attempts) {
+    if (attempt.superseded_by !== null) {
+      const successor = tokens.get(attempt.superseded_by);
+      const proof = successor?.transitions?.[0]?.supersession;
+      const priorObservation = remoteProviderAttemptObservation(attempt);
+      const currentObservation = successor?.input?.remote_observation;
+      const changedFields = ['observed_remote_head', 'observed_remote_base']
+        .filter((field) => priorObservation?.[field] !== currentObservation?.[field]);
+      if (attempt.disposition !== 'superseded' || successor?.supersedes !== attempt.token
+        || !validRemoteIdentified(proof) || proof.predecessor_token !== attempt.token
+        || proof.predecessor_attempt_identity !== attempt.identity
+        || proof.successor_token !== successor.token
+        || !validRemoteObservation(priorObservation) || !validRemoteObservation(currentObservation)
+        || proof.prior_observation_identity !== sha256(canonical(priorObservation))
+        || proof.current_observation_identity !== sha256(canonical(currentObservation))
+        || canonical(proof.changed_fields) !== canonical(changedFields)
+        || changedFields.length === 0
+        || !(proof.predecessor_effect === null
+          ? proof.predecessor_effect_identity === null
+          : validRemoteIdentified(proof.predecessor_effect)
+            && proof.predecessor_effect.identity === proof.predecessor_effect_identity)) {
+        remoteInvalid(`${label} reciprocal supersession`);
+      }
+      if (proof.predecessor_effect) {
+        const priorObserved = attempt.transitions.find((transition) => transition.state === 'observed'
+          && transition.result_identity === proof.predecessor_effect.result_identity);
+        if (proof.predecessor_effect.attempt_identity !== attempt.identity || !priorObserved) {
+          remoteInvalid(`${label} predecessor effect history`);
+        }
+      }
+    }
+    if (attempt.supersedes !== null) {
+      const predecessor = tokens.get(attempt.supersedes);
+      if (!predecessor || predecessor.superseded_by !== attempt.token) remoteInvalid(`${label} predecessor link`);
+    }
+  }
+  if (slot.effect) {
+    const attempt = slot.attempts.find((item) => item.identity === slot.effect.attempt_identity);
+    const observed = attempt?.transitions?.find((item) => item.state === 'observed'
+      && item.result_identity === slot.effect.result_identity);
+    if (!attempt || !observed || !['proven', 'superseded'].includes(attempt.disposition)) remoteInvalid(`${label} effect binding`);
+  }
+  for (const attempt of slot.attempts) {
+    if (attempt.disposition === 'proven' && slot.effect?.attempt_identity !== attempt.identity) {
+      remoteInvalid(`${label} proven attempt lacks current effect`);
+    }
+    const effectState = ['PUBLISHED', 'READY', 'PR_DRAFT', 'CHECKS_PENDING', 'CHECKS_FAILED',
+      'MERGED', 'MERGED_BASE_ADVANCED'].includes(attempt.transitions.at(-1).result?.state);
+    if (attempt.disposition === 'active' && attempt.transitions.at(-1).state === 'observed'
+      && (slot.effect?.attempt_identity === attempt.identity || effectState)) {
+      remoteInvalid(`${label} unresolved attempt has effect`);
+    }
+  }
+}
+
+function requireRemoteIdentified(value, label) {
+  if (!validRemoteIdentified(value)) remoteInvalid(`${label} identity`);
+  return value;
+}
+
+function remoteEffectObservation(slot, label) {
+  if (!slot?.effect) return null;
+  const attempt = slot.attempts.find((item) => item.identity === slot.effect.attempt_identity);
+  const observed = attempt?.transitions?.find((item) => item.state === 'observed'
+    && item.result_identity === slot.effect.result_identity);
+  if (!attempt || !observed) remoteInvalid(`${label} effect observation`);
+  return { attempt, observed };
+}
+
+function validRemoteObservation(value) {
+  return remoteRecord(value) && value.version === 'remote-provider-observation-v1'
+    && (value.repository_identity === null || REMOTE_HASH.test(value.repository_identity || ''))
+    && (value.pr_number === null || Number.isSafeInteger(value.pr_number) && value.pr_number > 0)
+    && typeof value.story_branch === 'string' && value.story_branch.length > 0
+    && typeof value.integration_branch === 'string' && value.integration_branch.length > 0
+    && (value.observed_remote_head === null || REMOTE_OID.test(value.observed_remote_head || ''))
+    && (value.observed_remote_base === null || REMOTE_OID.test(value.observed_remote_base || ''))
+    && REMOTE_HASH.test(value.result_identity || '');
+}
+
+function validateRemoteEffectTarget(slot, expected, label, states) {
+  const effect = remoteEffectObservation(slot, label);
+  if (!effect) remoteInvalid(`${label} effect is missing`);
+  const target = effect.attempt.input?.target;
+  for (const [field, expectedValue] of Object.entries(expected)) {
+    if (target?.[field] !== expectedValue) remoteInvalid(`${label} target ${field}`);
+  }
+  if (effect.observed.result?.expectedHead !== expected.expectedHead
+    || !states.includes(effect.observed.result?.state)) remoteInvalid(`${label} provider result`);
+  return effect;
+}
+
+function validateRemoteWrite(write, label) {
+  if (!remoteRecord(write) || typeof write.path !== 'string' || !write.path
+    || typeof write.after !== 'string' || !REMOTE_HASH.test(write.hash || '')
+    || write.hash !== sha256(write.after)
+    || !['100644', '100755'].includes(write.mode || '')) remoteInvalid(`${label} write`);
+}
+
+/**
+ * Validate the identified, cross-bound remote publication envelope without
+ * consulting a checkout. Callers separately prove live Git objects and roots.
+ * Partial lifecycle states are accepted; requireTerminal demands the complete
+ * source/evidence/closure-or-repair/completion chain used for admission.
+ */
+export function validateRemotePublicationRecord(value, { requireTerminal = false } = {}) {
+  const remote = value?.remote;
+  if (remote === undefined || remote === null) {
+    if (requireTerminal) remoteInvalid('terminal envelope is missing');
+    return value;
+  }
+  if (!remoteRecord(remote) || remote.version !== 'remote-publication-v1' || !remoteRecord(remote.source)
+    || !remoteRecord(remote.handoff_repair) || !Array.isArray(remote.handoff_repair.attempts)
+    || !Number.isSafeInteger(remote.handoff_repair.publication_retry)
+    || remote.handoff_repair.publication_retry < 0 || remote.handoff_repair.publication_retry > 2) remoteInvalid('envelope');
+  validateRemoteProviderSlot(remote.source.publication, 'source publication');
+  validateRemoteProviderSlot(remote.source.merge, 'source merge');
+
+  const sourceProof = remote.source.proof;
+  if (sourceProof !== null && sourceProof !== undefined) {
+    requireRemoteIdentified(sourceProof, 'source proof');
+    if (sourceProof.version !== 'remote-source-proof-v1' || !REMOTE_OID.test(sourceProof.source_merge_commit || '')
+      || !REMOTE_OID.test(sourceProof.verified_integration_commit || '') || !Number.isSafeInteger(sourceProof.pr_number)
+      || !['merge', 'squash', 'rebase'].includes(sourceProof.method)
+      || remote.source.status !== 'proven' || !remote.source.merge.effect) remoteInvalid('source proof binding');
+    const mergeEffect = remoteEffectObservation(remote.source.merge, 'source merge');
+    const mergeAttempt = mergeEffect?.attempt;
+    const mergeObserved = mergeEffect?.observed;
+    if (!mergeAttempt || mergeAttempt.input?.method !== sourceProof.method
+      || mergeAttempt.input?.prNumber !== sourceProof.pr_number
+      || mergeObserved?.result?.mergeCommit !== sourceProof.source_merge_commit
+      || (sourceProof.repository && canonical(mergeObserved.result?.repository) !== canonical(sourceProof.repository))) {
+      remoteInvalid('source merge effect');
+    }
+  }
+
+  const evidence = remote.integration_evidence;
+  if (evidence !== null && evidence !== undefined) {
+    if (!remoteRecord(evidence) || evidence.version !== 'remote-integration-evidence-v1'
+      || !['ready'].includes(evidence.status) || !REMOTE_OID.test(evidence.commit || '')
+      || !REMOTE_HASH.test(evidence.snapshot_hash || '') || !remoteRecord(evidence.manifest)
+      || !REMOTE_HASH.test(evidence.manifest.hash || '') || !Array.isArray(evidence.gates)
+      || !Array.isArray(evidence.gate_history) || !Array.isArray(evidence.review_history)
+      || !Array.isArray(evidence.verification_history)
+      || sourceProof?.verified_integration_commit !== evidence.commit
+      || sourceProof?.evidence_branch !== evidence.branch) remoteInvalid('integration evidence binding');
+    const expectedSnapshot = sha256(canonical({ commit: evidence.commit, manifest: evidence.manifest.hash,
+      anchor: sha256(canonical(evidence.anchor)), checkout: sha256(canonical(evidence.checkout_proof)) }));
+    if (evidence.snapshot_hash !== expectedSnapshot) remoteInvalid('integration evidence snapshot');
+    for (const gate of evidence.gates) {
+      requireRemoteIdentified(gate, 'integration gate');
+      if (gate.integration_commit !== evidence.commit || gate.snapshot_hash !== evidence.snapshot_hash) remoteInvalid('integration gate binding');
+    }
+    if (evidence.review) {
+      requireRemoteIdentified(evidence.review, 'integration review');
+      if (evidence.review.snapshot_hash !== evidence.snapshot_hash) remoteInvalid('integration review binding');
+    }
+    if (evidence.verification) {
+      requireRemoteIdentified(evidence.verification, 'integration verification');
+      if (evidence.verification.snapshot_hash !== evidence.snapshot_hash) remoteInvalid('integration verification binding');
+    }
+    if (evidence.finalized || evidence.finalization) {
+      const finalization = requireRemoteIdentified(evidence.finalization, 'integration finalization');
+      if (!evidence.finalized || finalization.version !== 'remote-integration-finalization-v1'
+        || finalization.snapshot_hash !== evidence.snapshot_hash
+        || canonical(finalization.gates) !== canonical(evidence.gates.map((item) => item.identity).sort())
+        || finalization.review !== evidence.review?.identity
+        || finalization.verification !== evidence.verification?.identity
+        || evidence.gates.some((item) => item.status !== 'PASS')
+        || Object.entries(value.source?.packet?.commands || {}).some(([name, command]) => !evidence.gates.some((item) => (
+          item.name === name && item.command === command && item.status === 'PASS'
+          && item.snapshot_hash === evidence.snapshot_hash)))
+        || evidence.review?.status !== 'PASS' || !Array.isArray(evidence.review?.findings)
+        || evidence.review?.findings?.some((item) => !item.resolved && item.severity !== 'minor')
+        || !Array.isArray(evidence.verification?.criteria) || !evidence.verification.criteria.length
+        || evidence.verification.criteria.some((item) => item.status !== 'PASS')) remoteInvalid('integration finalization binding');
+    }
+  }
+
+  const closure = remote.closure;
+  if (closure !== null && closure !== undefined) {
+    if (!remoteRecord(closure) || closure.version !== 'remote-closure-v1' || !remoteRecord(closure.checkout)
+      || !remoteRecord(closure.artifacts) || !remoteRecord(closure.publication)) remoteInvalid('closure envelope');
+    validateRemoteProviderSlot(closure.publication.publish, 'closure publication');
+    validateRemoteProviderSlot(closure.publication.merge, 'closure merge');
+    if (closure.checkout.start_commit !== evidence?.commit) remoteInvalid('closure checkout start');
+    let parent = evidence?.commit;
+    for (const field of ['report', 'closure', 'handoff']) {
+      const slot = closure.artifacts[field];
+      if (!remoteRecord(slot)) remoteInvalid(`${field} artifact slot`);
+      if (slot.proof) {
+        requireRemoteIdentified(slot.proof, `${field} artifact proof`);
+        if (slot.proof.version !== 'remote-artifact-proof-v1' || slot.proof.field !== field
+          || slot.proof.commit !== slot.commit || slot.proof.parent !== parent
+          || !Array.isArray(slot.proof.writes) || !slot.proof.writes.length) remoteInvalid(`${field} artifact binding`);
+        for (const write of slot.proof.writes) validateRemoteWrite(write, field);
+        parent = slot.commit;
+      } else if (slot.commit !== null) remoteInvalid(`${field} artifact commit`);
+    }
+    if (closure.proof) {
+      requireRemoteIdentified(closure.proof, 'closure proof');
+      const mergeEffect = remoteEffectObservation(closure.publication.merge, 'closure merge');
+      if (!['proven', 'handoff-stale'].includes(closure.proof.state)
+        || closure.proof.base_commit !== evidence?.commit
+        || closure.proof.handoff_commit !== closure.artifacts.handoff.commit
+        || !REMOTE_OID.test(closure.proof.merge_commit || '')
+        || !REMOTE_OID.test(closure.proof.terminal_commit || '')
+        || !closure.publication.merge.effect
+        || mergeEffect?.observed?.result?.mergeCommit !== closure.proof.merge_commit
+        || mergeEffect?.attempt?.input?.prNumber !== closure.proof.pr_number
+        || (closure.proof.state === 'proven' && closure.proof.terminal_commit !== closure.proof.merge_commit)) {
+        remoteInvalid('closure proof binding');
+      }
+    }
+  }
+
+  for (const [index, repair] of remote.handoff_repair.attempts.entries()) {
+    if (!remoteRecord(repair) || repair.version !== 'remote-handoff-repair-v1'
+      || !REMOTE_TOKEN.test(repair.token || '') || repair.retry !== index
+      || !['prepared', 'adopted'].includes(repair.status) || !remoteRecord(repair.publication)) remoteInvalid('handoff repair attempt');
+    validateRemoteProviderSlot(repair.publication.publish, 'handoff repair publication');
+    validateRemoteProviderSlot(repair.publication.merge, 'handoff repair merge');
+    if (repair.race_proof) {
+      requireRemoteIdentified(repair.race_proof, 'handoff repair race proof');
+      const merged = repair.publication.merge.attempts.at(-1)?.transitions
+        ?.filter((item) => item.state === 'observed').at(-1)?.result?.mergeCommit;
+      if (repair.race_proof.merge_commit !== merged || !REMOTE_OID.test(repair.race_proof.terminal_commit || '')) {
+        remoteInvalid('handoff repair race binding');
+      }
+    }
+    if (index > 0 && remote.handoff_repair.attempts[index - 1].race_proof?.terminal_commit !== repair.parent) {
+      remoteInvalid('handoff repair replacement parent');
+    }
+    if (repair.proof) {
+      requireRemoteIdentified(repair.proof, 'handoff repair commit proof');
+      validateRemoteWrite(repair.proof.write, 'handoff repair');
+      if (repair.status !== 'adopted' || repair.proof.commit !== repair.commit || repair.proof.parent !== repair.parent) {
+        remoteInvalid('handoff repair commit binding');
+      }
+    }
+  }
+  if (remote.handoff_repair.proof) {
+    const proof = requireRemoteIdentified(remote.handoff_repair.proof, 'handoff repair proof');
+    const repair = remote.handoff_repair.attempts.at(-1);
+    const mergeEffect = remoteEffectObservation(repair?.publication?.merge, 'handoff repair merge');
+    if (!repair?.proof || !repair.publication.merge.effect || proof.version !== 'remote-handoff-repair-proof-v1'
+      || proof.parent !== repair.parent || proof.handoff_commit !== repair.commit
+      || !REMOTE_OID.test(proof.commit || '') || !Number.isSafeInteger(proof.pr_number) || proof.pr_number <= 0
+      || mergeEffect?.observed?.result?.mergeCommit !== proof.commit
+      || mergeEffect?.attempt?.input?.prNumber !== proof.pr_number) remoteInvalid('handoff repair proof binding');
+  }
+
+  const completion = remote.completion;
+  if (completion !== null && completion !== undefined) {
+    const terminal = remote.handoff_repair.proof?.commit
+      || (closure?.proof?.state === 'proven' ? closure.proof.terminal_commit : null);
+    if (!remoteRecord(completion) || completion.version !== 'remote-completion-v1'
+      || !['prepared', 'complete'].includes(completion.status) || !REMOTE_TOKEN.test(completion.token || '')
+      || !REMOTE_OID.test(completion.previous_head || '') || !REMOTE_OID.test(completion.target || '')
+      || completion.branch !== value.destination?.branch || completion.target !== terminal
+      || (completion.status === 'complete' && completion.commit !== completion.target)) remoteInvalid('completion binding');
+  }
+  if (requireTerminal && (!sourceProof || !remote.source.publication.effect || !remote.source.merge.effect
+    || !evidence?.finalized || !evidence.finalization || !closure?.proof
+    || !(closure.proof.state === 'proven' || remote.handoff_repair.proof)
+    || (value.reporting !== 'skipped' && !closure.artifacts.report.proof)
+    || !closure.artifacts.closure.proof || !closure.artifacts.handoff.proof
+    || completion?.status !== 'complete')) remoteInvalid('terminal proof chain is incomplete');
+  if (requireTerminal) {
+    const sourceTarget = { root: value.source.root, remote: remote.source.remote,
+      storyBranch: value.source.branch, integrationBranch: value.destination.branch,
+      expectedHead: value.source.candidate };
+    validateRemoteEffectTarget(remote.source.publication, sourceTarget, 'source publication',
+      ['PUBLISHED', 'READY', 'PR_DRAFT', 'CHECKS_PENDING', 'CHECKS_FAILED']);
+    validateRemoteEffectTarget(remote.source.merge, sourceTarget, 'source merge', ['MERGED', 'MERGED_BASE_ADVANCED']);
+    const closureTarget = { root: closure.checkout.root, remote: remote.source.remote,
+      storyBranch: closure.checkout.branch, integrationBranch: value.destination.branch,
+      expectedHead: closure.artifacts.handoff.commit };
+    validateRemoteEffectTarget(closure.publication.publish, closureTarget, 'closure publication',
+      ['PUBLISHED', 'READY', 'PR_DRAFT', 'CHECKS_PENDING', 'CHECKS_FAILED']);
+    validateRemoteEffectTarget(closure.publication.merge, closureTarget, 'closure merge', ['MERGED', 'MERGED_BASE_ADVANCED']);
+    if (remote.handoff_repair.proof) {
+      const repair = remote.handoff_repair.attempts.at(-1);
+      const repairTarget = { root: repair.root, remote: remote.source.remote,
+        storyBranch: repair.branch, integrationBranch: value.destination.branch,
+        expectedHead: repair.commit };
+      validateRemoteEffectTarget(repair.publication.publish, repairTarget, 'handoff repair publication',
+        ['PUBLISHED', 'READY', 'PR_DRAFT', 'CHECKS_PENDING', 'CHECKS_FAILED']);
+      validateRemoteEffectTarget(repair.publication.merge, repairTarget, 'handoff repair merge', ['MERGED', 'MERGED_BASE_ADVANCED']);
+    }
+    if (!remoteRecord(completion.anchor) || !remoteRecord(completion.checkout_proof)
+      || completion.checkout_proof.version !== 'whole-checkout-v1'
+      || !REMOTE_HASH.test(completion.checkout_proof.protected_hash || '')
+      || !remoteRecord(completion.checkout_proof.protected_ignored)) remoteInvalid('completion checkout proof');
+  }
+  return value;
+}
+
+export function readJsonFile(file, label = file) {
+  let raw;
+  try {
+    if (fs.statSync(file).size > 8 * 1024 * 1024) throw new Error('file exceeds 8 MiB');
+    raw = fs.readFileSync(file, 'utf8');
+  }
+  catch (error) { throw new DeliverError(`cannot read ${label}: ${error.message}`, 66); }
+  try { return JSON.parse(raw); }
+  catch (error) { throw new DeliverError(`invalid JSON in ${label}: ${error.message}`, 66); }
+}
+
+const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+const isStringArray = (value) => Array.isArray(value) && value.every((item) => typeof item === 'string');
+const safeBranch = (value) => typeof value === 'string' && value && value.length <= 512 && value !== '@'
+  && !value.startsWith('-') && !value.startsWith('/') && !value.endsWith('/') && !value.endsWith('.')
+  && !value.includes('..') && !value.includes('//') && !value.includes('@{')
+  && !/[\x00-\x20\x7f~^:?*[\\\]]/.test(value)
+  && value.split('/').every((part) => part && !part.startsWith('.') && !part.endsWith('.lock'));
+const safeRef = (value) => typeof value === 'string' && value.startsWith('refs/heads/') && safeBranch(value.slice('refs/heads/'.length));
+const safeRelativePath = (value) => typeof value === 'string' && value && !path.isAbsolute(value)
+  && !/[\x00-\x1f\x7f]/.test(value) && !value.split(/[\\/]/).some((part) => !part || part === '.' || part === '..')
+  && !/^(?:\.git|\.deliver)(?:[\\/]|$)/.test(value);
+const oid = (value) => typeof value === 'string' && /^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(value);
+const digest = (value) => typeof value === 'string' && /^[0-9a-f]{64}$/.test(value);
+const runId = (value) => typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(value);
+
+function validNestedAnchor(anchor) {
+  if (!isObject(anchor) || !['head', 'tree', 'index_tree', 'index_flags', 'protected_hash']
+    .every((key) => typeof anchor[key] === 'string')
+    || !oid(anchor.head) || !oid(anchor.tree) || !oid(anchor.index_tree)
+    || !digest(anchor.index_flags) || !digest(anchor.protected_hash)
+    || (anchor.metadata_version !== undefined && anchor.metadata_version !== 'protected-v2')) return false;
+  if (anchor.submodules === undefined) return true;
+  return isObject(anchor.submodules) && Object.entries(anchor.submodules)
+    .every(([rel, nested]) => safeRelativePath(rel) && validNestedAnchor(nested));
+}
+
+export function archiveEvidence(state, reason, details = {}, archivedAt = new Date().toISOString()) {
+  if (!isObject(state) || typeof reason !== 'string' || !reason.trim() || !isObject(details)
+    || typeof archivedAt !== 'string' || Number.isNaN(Date.parse(archivedAt))) {
+    throw new DeliverError('cannot archive evidence without a state, reason and detail object', 66);
+  }
+  const hasEvidence = state.gates.length > 0 || state.review !== null || state.verification !== null;
+  if (hasEvidence) {
+    if (state.evidence_history === undefined) state.evidence_history = [];
+    state.evidence_history.push({
+      at: archivedAt,
+      reason,
+      details: structuredClone(details),
+      gates: structuredClone(state.gates),
+      review: structuredClone(state.review),
+      verification: structuredClone(state.verification),
+    });
+  }
+  state.gates = [];
+  state.review = null;
+  state.verification = null;
+}
+
+export function validateTaskPacket(packet) {
+  if (!isObject(packet)) throw new DeliverError('task packet must be a JSON object', 66);
+  const unknown = Object.keys(packet).filter((key) => !['id', 'objective', 'acceptance', 'read_paths', 'touches', 'commands', 'specs'].includes(key));
+  if (unknown.length) throw new DeliverError(`unsupported task fields: ${unknown.join(', ')}`, 66);
+  for (const key of ['id', 'objective']) {
+    if (typeof packet[key] !== 'string' || packet[key].trim() === '') throw new DeliverError(`task packet ${key} must be a non-empty string`, 66);
+  }
+  if (!Array.isArray(packet.acceptance) || packet.acceptance.length === 0) {
+    throw new DeliverError('task packet acceptance must be a non-empty array', 66);
+  }
+  const acceptance = packet.acceptance.map((item, index) => {
+    if (!isObject(item) || typeof item.id !== 'string' || item.id.trim() === '' || typeof item.text !== 'string' || item.text.trim() === '') {
+      throw new DeliverError(`task packet acceptance[${index}] must contain non-empty id and text strings`, 66);
+    }
+    return { id: item.id, text: item.text };
+  });
+  if (new Set(acceptance.map((item) => item.id)).size !== acceptance.length) throw new DeliverError('task packet acceptance ids must be unique', 66);
+  if (!isStringArray(packet.read_paths) || !isStringArray(packet.touches)) {
+    throw new DeliverError('task packet read_paths and touches must be string arrays', 66);
+  }
+  if (packet.touches.length === 0) throw new DeliverError('task packet touches must not be empty', 66);
+  if (!isObject(packet.commands)) throw new DeliverError('task packet commands must be an object; use {} to record N/A', 66);
+  const commands = Object.create(null);
+  for (const [name, command] of Object.entries(packet.commands)) {
+    if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/.test(name) || typeof command !== 'string' || command.trim() === '') {
+      throw new DeliverError('task packet command names and values must be non-empty safe strings', 66);
+    }
+    commands[name] = command;
+  }
+  if (packet.specs !== undefined && !isStringArray(packet.specs)) throw new DeliverError('task packet specs must be an array of strings', 66);
+  return {
+    id: packet.id,
+    objective: packet.objective,
+    acceptance,
+    read_paths: [...packet.read_paths],
+    touches: [...packet.touches],
+    commands,
+    specs: [...(packet.specs || [])],
+  };
+}
+
+export function validateRunState(state) {
+  const fail = (message) => { throw new DeliverError(`invalid run state: ${message}`, 66); };
+  if (!isObject(state)) fail('root must be an object');
+  if (state.schema_version !== STATE_VERSION) fail(`schema_version must be ${STATE_VERSION}`);
+  if (typeof state.run_id !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(state.run_id)) fail('bad run_id');
+  if (!['quick', 'managed', 'governed'].includes(state.mode)) fail('bad mode');
+  if (!Number.isSafeInteger(state.revision) || state.revision < 0) fail('bad revision');
+  if (typeof state.project_root !== 'string' || !path.isAbsolute(state.project_root)) fail('bad project_root');
+  if (!isObject(state.plan) || (state.plan.path !== null && typeof state.plan.path !== 'string') || typeof state.plan.hash !== 'string') fail('bad plan');
+  if (state.approval !== null && (!isObject(state.approval) || typeof state.approval.approver !== 'string' || typeof state.approval.plan_hash !== 'string')) fail('bad approval');
+  if (!['initialized', 'starting', 'active', 'finished'].includes(state.phase)) fail('bad phase');
+  if (!isObject(state.counters) || !['retries', 'fixes', 'corrections'].every((key) => Number.isSafeInteger(state.counters[key]) && state.counters[key] >= 0)) fail('bad counters');
+  if (!Array.isArray(state.events) || !Array.isArray(state.gates) || !Array.isArray(state.checkpoints)) fail('bad collections');
+  if (state.task !== null) {
+    if (!isObject(state.task) || typeof state.task.builder !== 'string' || !isObject(state.task.packet)) fail('bad task');
+    validateTaskPacket(state.task.packet);
+  }
+  if (state.baseline !== null) {
+    if (!isObject(state.baseline) || !isObject(state.baseline.snapshot) || !isObject(state.baseline.snapshot.entries)
+      || typeof state.baseline.snapshot.git_meta !== 'string' || typeof state.baseline.snapshot.hash !== 'string'
+      || !isStringArray(state.baseline.dirty_paths)) fail('bad baseline');
+    const expectedHash = sha256(canonical({ entries: state.baseline.snapshot.entries, git_meta: state.baseline.snapshot.git_meta }));
+    if (state.baseline.snapshot.hash !== expectedHash) fail('baseline snapshot hash does not match its content');
+  }
+  if (state.pm_binding !== undefined && state.pm_binding !== null) {
+    const binding = state.pm_binding;
+    const safeActor = (value) => typeof value === 'string' && /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?-[a-f0-9]{12}$/.test(value);
+    const safeStoryPath = (value) => typeof value === 'string' && /^docs\/stories\/S\d+-\d+-[^/\\]+\.md$/.test(value);
+    if (!isObject(binding)) fail('bad PM binding');
+    if (binding.format === 'current') {
+      if (!['actor', 'story', 'story_path', 'contract_hash', 'execution_hash', 'plan_digest', 'branch', 'builder', 'integration_branch']
+        .every((key) => typeof binding[key] === 'string')) fail('bad current PM binding');
+      if (!safeActor(binding.actor) || !/^S\d+-\d+$/.test(binding.story) || !safeStoryPath(binding.story_path)
+        || !/^[0-9a-f]{64}$/.test(binding.contract_hash) || !/^[0-9a-f]{64}$/.test(binding.execution_hash)
+        || !/^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(binding.plan_digest)
+        || !safeBranch(binding.branch) || !safeBranch(binding.integration_branch)
+        || !['codex-builder', 'expert-builder'].includes(binding.builder)) fail('unsafe current PM binding');
+    } else {
+      if (binding.format !== undefined && binding.format !== 'legacy') fail('unsupported PM binding format');
+      if (!['actor', 'story', 'story_path', 'story_hash', 'integration_branch', 'actor_path'].every((key) => typeof binding[key] === 'string')) fail('bad legacy PM binding');
+      if (!safeActor(binding.actor) || binding.actor_path !== `pm/actors/${binding.actor}.json`
+        || !binding.story_path.startsWith('docs/stories/') || binding.story_path.split(/[\\/]/).includes('..')) fail('unsafe legacy PM binding');
+    }
+  }
+  if (state.git_anchor !== undefined && state.git_anchor !== null) {
+    const anchor = state.git_anchor;
+    if (!isObject(anchor) || !['head', 'ref', 'tree', 'index_tree', 'index_flags', 'protected_hash']
+      .every((key) => typeof anchor[key] === 'string')) fail('bad git anchor');
+    if (!oid(anchor.head) || !oid(anchor.tree) || !oid(anchor.index_tree)
+      || !digest(anchor.index_flags) || !digest(anchor.protected_hash)
+      || !safeRef(anchor.ref)
+      || (anchor.metadata_version !== undefined && anchor.metadata_version !== 'protected-v2')
+      || (anchor.submodules !== undefined && (!isObject(anchor.submodules) || !Object.entries(anchor.submodules)
+        .every(([rel, nested]) => safeRelativePath(rel) && validNestedAnchor(nested))))) fail('unsafe git anchor');
+  }
+  if (state.baseline_metadata_version !== undefined
+    && (state.baseline_metadata_version !== 'legacy-v1' || !state.git_anchor)) fail('bad baseline metadata compatibility marker');
+  if (state.execution_audit !== undefined && state.execution_audit !== null) {
+    const audit = state.execution_audit;
+    if (!isObject(audit) || typeof audit.story_path !== 'string' || typeof audit.contract_hash !== 'string'
+      || !(audit.original_entry === null || /^file:(?:644|755):[0-9a-f]{64}$/.test(audit.original_entry))
+      || !/^file:(?:644|755):[0-9a-f]{64}$/.test(audit.current_entry) || !Array.isArray(audit.transitions)
+      || !/^docs\/stories\/S\d+-\d+-[^/\\]+\.md$/.test(audit.story_path)
+      || !/^[0-9a-f]{64}$/.test(audit.contract_hash)) fail('bad Execution audit');
+    for (const item of audit.transitions) {
+      if (!isObject(item) || !['from', 'to', 'before_hash', 'after_hash', 'at'].every((key) => typeof item[key] === 'string')
+        || !['claimed', 'building', 'built', 'in-review', 'blocked'].includes(item.from)
+        || !['claimed', 'building', 'built', 'in-review', 'blocked'].includes(item.to)
+        || !/^[0-9a-f]{64}$/.test(item.before_hash) || !/^[0-9a-f]{64}$/.test(item.after_hash)
+        || !(item.reason === null || typeof item.reason === 'string')
+        || (item.attempt !== null && item.attempt !== undefined && !['fix', 'retry'].includes(item.attempt))) fail('bad Execution transition receipt');
+    }
+  }
+  if (state.commit_adoption !== undefined && state.commit_adoption !== null) {
+    const adoption = state.commit_adoption;
+    if (!isObject(adoption) || !Array.isArray(adoption.history) || !(adoption.pending === null || isObject(adoption.pending))) fail('bad commit adoption state');
+    const validPreparation = (pending) => {
+      if (!['token', 'parent', 'ref', 'expected_tree', 'expected_index_flags', 'content_hash', 'protected_hash', 'prepared_at'].every((key) => typeof pending[key] === 'string')
+        || !Array.isArray(pending.paths) || !isStringArray(pending.paths) || !pending.paths.every(safeRelativePath)
+        || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(pending.token)
+        || ![pending.parent, pending.expected_tree].every((value) => /^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(value))
+        || ![pending.expected_index_flags, pending.content_hash, pending.protected_hash].every(digest)
+        || !safeRef(pending.ref)) return false;
+      return true;
+    };
+    if (adoption.pending && !validPreparation(adoption.pending)) fail('bad pending commit adoption');
+    for (const item of adoption.history) {
+      if (!isObject(item) || typeof item.commit !== 'string' || typeof item.parent !== 'string'
+        || !/^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(item.commit)
+        || !/^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(item.parent)
+        || typeof item.tree !== 'string' || !/^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(item.tree)
+        || !safeRef(item.ref) || !isStringArray(item.paths) || !item.paths.every(safeRelativePath)
+        || !['claimed', 'building', 'built', 'in-review'].includes(item.execution_status)
+        || typeof item.execution_hash !== 'string' || !/^[0-9a-f]{64}$/.test(item.execution_hash)
+        || typeof item.adopted_at !== 'string') fail('bad commit adoption receipt');
+    }
+    if (adoption.cancellations !== undefined) {
+      if (!Array.isArray(adoption.cancellations)) fail('bad commit cancellation history');
+      for (const item of adoption.cancellations) {
+        if (!isObject(item) || !isObject(item.preparation) || !validPreparation(item.preparation)
+          || typeof item.reason !== 'string' || !item.reason.trim() || item.reason.length > 1000
+          || /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(item.reason)
+          || typeof item.cancelled_at !== 'string' || Number.isNaN(Date.parse(item.cancelled_at))) {
+          fail('bad commit cancellation receipt');
+        }
+      }
+    }
+  }
+  if (state.evidence_history !== undefined) {
+    if (!Array.isArray(state.evidence_history)) fail('bad evidence history');
+    for (const item of state.evidence_history) {
+      if (!isObject(item) || typeof item.at !== 'string' || typeof item.reason !== 'string' || !item.reason.trim()
+        || !isObject(item.details)
+        || !Array.isArray(item.gates) || !(item.review === null || isObject(item.review))
+        || !(item.verification === null || isObject(item.verification))) fail('bad evidence history item');
+    }
+  }
+  if (state.completion_snapshot !== undefined) {
+    const snap = state.completion_snapshot;
+    if (!isObject(snap) || !isObject(snap.entries) || typeof snap.git_meta !== 'string'
+      || snap.hash !== sha256(canonical({ entries: snap.entries, git_meta: snap.git_meta }))
+      || state.phase !== 'finished' || snap.hash !== state.review?.snapshot_hash || snap.hash !== state.verification?.snapshot_hash) fail('bad completion snapshot');
+  }
+  for (const gate of state.gates) {
+    if (!isObject(gate) || gate.provenance !== 'deliver-runtime-executed-v1' || typeof gate.name !== 'string'
+      || typeof gate.command !== 'string' || !['PASS', 'FAIL'].includes(gate.status)
+      || typeof gate.snapshot_hash !== 'string' || typeof gate.environment_hash !== 'string'
+      || typeof gate.environment_additions_hash !== 'string') fail('bad gate receipt');
+  }
+  if (state.review !== null && (!isObject(state.review) || !['PASS', 'FAIL'].includes(state.review.status)
+    || typeof state.review.builder !== 'string' || typeof state.review.reviewer !== 'string'
+    || !Array.isArray(state.review.findings) || typeof state.review.snapshot_hash !== 'string')) fail('bad review');
+  if (state.review?.panel !== undefined) {
+    const panel = state.review.panel;
+    if (!isObject(panel) || panel.snapshot_hash !== state.review.snapshot_hash || !Array.isArray(panel.members)
+      || !panel.members.length || panel.members.length > 16) fail('bad review panel');
+    for (const member of panel.members) {
+      if (!isObject(member) || typeof member.lens !== 'string' || !/^[a-z][a-z0-9-]{0,63}$/.test(member.lens)
+        || typeof member.reviewer !== 'string' || !['PASS', 'CONCERNS', 'FAIL'].includes(member.verdict)
+        || member.snapshot_hash !== panel.snapshot_hash || !Array.isArray(member.findings)) fail('bad review panel member');
+      for (const finding of member.findings) {
+        if (!isObject(finding) || !['block', 'major', 'minor'].includes(finding.severity)
+          || typeof finding.message !== 'string' || !finding.message.trim() || typeof finding.resolved !== 'boolean') fail('bad review panel finding');
+      }
+      if (member.verdict === 'PASS' && member.findings.some((finding) => !finding.resolved && finding.severity !== 'minor')) fail('invalid PASS panel member');
+      if (member.verdict === 'CONCERNS' && !member.findings.some((finding) => !finding.resolved)) fail('invalid CONCERNS panel member');
+    }
+    if (new Set(panel.members.map((member) => member.lens)).size !== panel.members.length) fail('duplicate review panel lens');
+    const derivedFindings = panel.members.flatMap((member) => member.findings
+      .map((finding) => ({ ...finding, lens: member.lens, reviewer: member.reviewer })));
+    const derivedStatus = panel.members.some((member) => member.verdict === 'FAIL')
+      || derivedFindings.some((finding) => !finding.resolved && finding.severity !== 'minor') ? 'FAIL' : 'PASS';
+    if (state.review.status !== derivedStatus || canonical(state.review.findings) !== canonical(derivedFindings)) fail('review panel aggregate is inconsistent');
+  }
+  if (state.verification !== null && (!isObject(state.verification) || typeof state.verification.verifier !== 'string'
+    || !Array.isArray(state.verification.criteria) || typeof state.verification.snapshot_hash !== 'string')) fail('bad verification');
+  if (['active', 'finished'].includes(state.phase) && (!state.task || !state.baseline)) fail('active/finished run needs a task and baseline');
+  if (state.task && state.review) {
+    if (state.review.builder !== state.task.builder || state.review.reviewer === state.task.builder) fail('review identity violates separation');
+    for (const finding of state.review.findings) {
+      if (!isObject(finding) || !['block', 'major', 'minor'].includes(finding.severity)
+        || typeof finding.message !== 'string' || !finding.message.trim() || typeof finding.resolved !== 'boolean') fail('bad review finding');
+    }
+  }
+  if (state.task && state.verification) {
+    const expected = state.task.packet.acceptance.map((criterion) => criterion.id).sort();
+    const actual = state.verification.criteria.map((criterion) => {
+      if (!isObject(criterion) || typeof criterion.id !== 'string' || !['PASS', 'FAIL', 'UNKNOWN'].includes(criterion.status)
+        || typeof criterion.evidence !== 'string' || !criterion.evidence.trim()) fail('bad verification criterion');
+      return criterion.id;
+    }).sort();
+    if (canonical(actual) !== canonical(expected)) fail('verification criteria do not match acceptance');
+    if (state.verification.verifier === state.task.builder) fail('verification identity violates separation');
+    if (state.pm_binding?.format === 'current' && state.review?.reviewer === state.verification.verifier) {
+      fail('current shared-project verifier must differ from reviewer');
+    }
+    if (state.pm_binding?.format === 'current'
+      && state.review?.panel?.members.some((member) => member.reviewer === state.verification.verifier)) {
+      fail('current shared-project verifier must differ from every panel reviewer');
+    }
+  }
+  if (state.contracts !== undefined && state.contracts !== null) {
+    if (!isObject(state.contracts) || !isObject(state.contracts.hashes) || !isStringArray(state.contracts.specs)
+      || !isStringArray(state.contracts.editable_paths)) fail('bad frozen contracts');
+    for (const [rel, hash] of Object.entries(state.contracts.hashes)) {
+      if (path.isAbsolute(rel) || rel.split(/[\\/]/).includes('..') || !/^[0-9a-f]{64}$/.test(hash)) fail('unsafe contract hash');
+    }
+  }
+  if (state.correction !== undefined && state.correction !== null) {
+    const correction = state.correction;
+    if (!isObject(correction) || correction.version !== 'integration-correction-v1'
+      || !runId(correction.token_id) || !digest(correction.token_identity)
+      || !['failed-integration', 'composition-conflict-no-m'].includes(correction.basis)
+      || typeof correction.integration_record !== 'string' || !path.isAbsolute(correction.integration_record)
+      || !runId(correction.root_run_id) || !runId(correction.source_run_id)
+      || !Number.isSafeInteger(correction.generation) || correction.generation < 1
+      || !isObject(correction.root_review_lineage) || !Array.isArray(correction.required_resolutions)
+      || canonical(correction.required_resolutions) !== canonical(correction.root_review_lineage.required_resolutions)) {
+      fail('bad integration correction binding');
+    }
+    for (const item of correction.required_resolutions) {
+      if (!isObject(item) || !digest(item.receipt_identity) || !Number.isSafeInteger(item.ordinal) || item.ordinal < 0
+        || !['block', 'major', 'minor'].includes(item.severity)
+        || typeof item.message !== 'string' || !item.message.trim() || item.message.length > 4000
+        || (item.path !== undefined && (typeof item.path !== 'string' || item.path.length > 1000))) {
+        fail('bad inherited correction finding');
+      }
+    }
+  }
+  return state;
+}
+
+export function currentPlanHash(state) {
+  if (state.plan.path === null) return state.plan.hash;
+  try { return sha256(fs.readFileSync(state.plan.path)); }
+  catch { return null; }
+}
+
+export function approvalIsCurrent(state) {
+  const hash = currentPlanHash(state);
+  return state.approval !== null && hash !== null && state.approval.plan_hash === hash;
+}
+
+export function syncPlan(state) {
+  const hash = currentPlanHash(state);
+  if (hash === null) throw new DeliverError(`plan is missing or unreadable: ${state.plan.path}`, 66);
+  if (hash !== state.plan.hash) {
+    archiveEvidence(state, 'plan_changed', { previous_plan_hash: state.plan.hash, next_plan_hash: hash });
+    state.plan.hash = hash;
+    state.approval = null;
+    state.events.push({ at: new Date().toISOString(), type: 'plan_changed', plan_hash: hash });
+  }
+  return hash;
+}
+
+function checkedDirectory(dir, create) {
+  try {
+    const stat = fs.lstatSync(dir);
+    if (!stat.isDirectory() || stat.isSymbolicLink()) throw new DeliverError(`runtime path must be a real directory: ${dir}`, 66);
+  } catch (error) {
+    if (error instanceof DeliverError) throw error;
+    if (error.code !== 'ENOENT' || !create) throw new DeliverError(`runtime directory is unavailable: ${dir}`, 66);
+    try { fs.mkdirSync(dir, { mode: 0o700 }); }
+    catch (mkdirError) {
+      if (mkdirError.code !== 'EEXIST') throw new DeliverError(`cannot create runtime directory: ${dir}`, 66);
+    }
+    const stat = fs.lstatSync(dir);
+    if (!stat.isDirectory() || stat.isSymbolicLink()) throw new DeliverError(`runtime path must be a real directory: ${dir}`, 66);
+  }
+  return dir;
+}
+
+export function internalDirectory(projectRoot, segments, create = true) {
+  const root = fs.realpathSync(projectRoot);
+  let cursor = checkedDirectory(path.join(root, '.deliver'), create);
+  for (const segment of segments) {
+    if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/.test(segment)) throw new DeliverError('unsafe runtime directory segment', 66);
+    cursor = checkedDirectory(path.join(cursor, segment), create);
+  }
+  return cursor;
+}
+
+function runsDir(projectRoot, create = true) { return internalDirectory(projectRoot, ['runs'], create); }
+
+function atomicWrite(file, value, exclusive = false) {
+  const temp = path.join(path.dirname(file), `.${path.basename(file)}.${process.pid}.${randomUUID()}.tmp`);
+  fs.writeFileSync(temp, `${JSON.stringify(value, null, 2)}\n`, { mode: 0o600, flag: 'wx' });
+  const tempFd = fs.openSync(temp, 'r');
+  try { fs.fsyncSync(tempFd); } finally { fs.closeSync(tempFd); }
+  try {
+    if (exclusive && fs.existsSync(file)) throw new DeliverError(`run state already exists: ${file}`, 66);
+    fs.renameSync(temp, file);
+    let dirFd;
+    try {
+      dirFd = fs.openSync(path.dirname(file), 'r');
+      fs.fsyncSync(dirFd);
+    } catch (error) {
+      if (process.platform !== 'win32') throw error;
+    } finally { if (dirFd !== undefined) fs.closeSync(dirFd); }
+  } finally {
+    try { fs.unlinkSync(temp); } catch {}
+  }
+}
+
+export function createRunState(projectRoot, mode, planPath = null, { fixedRunId = randomUUID(), createdAt = new Date().toISOString() } = {}) {
+  if (!['quick', 'managed', 'governed'].includes(mode)) throw new DeliverError('mode must be quick, managed, or governed', 64);
+  const root = fs.realpathSync(projectRoot);
+  if (!runId(fixedRunId)) throw new DeliverError('fixed run id must be a canonical UUID', 66);
+  if (typeof createdAt !== 'string' || Number.isNaN(Date.parse(createdAt))) throw new DeliverError('created time must be a valid timestamp', 66);
+  if (!planPath && mode !== 'quick') throw new DeliverError('--plan is required in managed and governed modes', 64);
+  const plan = planPath ? path.resolve(root, planPath) : null;
+  let planHash = sha256('quick:no-plan');
+  if (plan !== null) {
+    try { planHash = sha256(fs.readFileSync(plan)); }
+    catch (error) { throw new DeliverError(`cannot read plan: ${error.message}`, 66); }
+  }
+  const state = {
+    schema_version: STATE_VERSION,
+    run_id: fixedRunId,
+    mode,
+    revision: 0,
+    project_root: root,
+    created_at: createdAt,
+    updated_at: createdAt,
+    phase: 'initialized',
+    plan: { path: plan, hash: planHash },
+    approval: null,
+    task: null,
+    baseline: null,
+    gates: [],
+    review: null,
+    verification: null,
+    evidence_history: [],
+    checkpoints: [],
+    counters: { retries: 0, fixes: 0, corrections: 0 },
+    events: [{ at: createdAt, type: 'initialized', mode, plan_hash: planHash }],
+  };
+  validateRunState(state);
+  return state;
+}
+
+export function createRun(projectRoot, mode, planPath = null) {
+  const state = createRunState(projectRoot, mode, planPath);
+  const file = path.join(runsDir(state.project_root), `${state.run_id}.json`);
+  atomicWrite(file, state, true);
+  return { state, file };
+}
+
+export function resolveRunPath(runArg, cwd = process.cwd()) {
+  if (!runArg) throw new DeliverError('--run is required', 64);
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(runArg)) {
+    let cursor = path.resolve(cwd);
+    while (true) {
+      const candidate = path.join(cursor, '.deliver', 'runs', `${runArg}.json`);
+      if (fs.existsSync(candidate)) return candidate;
+      const parent = path.dirname(cursor);
+      if (parent === cursor) break;
+      cursor = parent;
+    }
+    return path.join(cwd, '.deliver', 'runs', `${runArg}.json`);
+  }
+  return path.resolve(cwd, runArg);
+}
+
+export function readRun(runArg, cwd = process.cwd()) {
+  const unresolvedFile = resolveRunPath(runArg, cwd);
+  let file;
+  let lexicalRoot;
+  try {
+    const runs = path.dirname(unresolvedFile);
+    const deliver = path.dirname(runs);
+    if (path.basename(runs) !== 'runs' || path.basename(deliver) !== '.deliver') throw new DeliverError('run state must be under .deliver/runs', 66);
+    for (const dir of [deliver, runs]) {
+      const stat = fs.lstatSync(dir);
+      if (!stat.isDirectory() || stat.isSymbolicLink()) throw new DeliverError(`runtime path must be a real directory: ${dir}`, 66);
+    }
+    const stat = fs.lstatSync(unresolvedFile);
+    if (!stat.isFile() || stat.isSymbolicLink()) throw new DeliverError('run state must be a regular file, not a symlink', 66);
+    lexicalRoot = fs.realpathSync(path.dirname(deliver));
+    file = fs.realpathSync(unresolvedFile);
+    const expected = path.join(lexicalRoot, '.deliver', 'runs', path.basename(unresolvedFile));
+    if (file !== expected) throw new DeliverError('run state is outside the canonical project runs directory', 66);
+  } catch (error) {
+    if (error instanceof DeliverError) throw error;
+    throw new DeliverError(`cannot read run state: ${error.message}`, 66);
+  }
+  const state = validateRunState(readJsonFile(file, 'run state'));
+  let actualRoot;
+  try { actualRoot = fs.realpathSync(state.project_root); } catch { throw new DeliverError('run project root no longer exists', 66); }
+  if (actualRoot !== state.project_root || actualRoot !== lexicalRoot) throw new DeliverError('run project root identity changed', 66);
+  if (path.basename(file) !== `${state.run_id}.json`) throw new DeliverError('run filename does not match run_id', 66);
+  return { state, file };
+}
+
+function acquireLock(file) {
+  const lock = `${file}.lock`;
+  let fd;
+  try { fd = fs.openSync(lock, 'wx', 0o600); }
+  catch (error) {
+    if (error.code === 'EEXIST') throw new DeliverError(`run is locked by another process: ${lock}`, 66);
+    throw error;
+  }
+  fs.writeFileSync(fd, `${process.pid} ${new Date().toISOString()}\n`);
+  return () => { try { fs.closeSync(fd); } finally { try { fs.unlinkSync(lock); } catch {} } };
+}
+
+export function updateRun(runArg, expectedRevision, mutate, cwd = process.cwd()) {
+  const file = readRun(runArg, cwd).file;
+  const unlock = acquireLock(file);
+  try {
+    const { state } = readRun(file, cwd);
+    if (expectedRevision !== undefined && state.revision !== expectedRevision) {
+      throw new DeliverError(`revision conflict: expected ${expectedRevision}, found ${state.revision}`, 66);
+    }
+    const result = mutate(state);
+    state.revision += 1;
+    state.updated_at = new Date().toISOString();
+    validateRunState(state);
+    atomicWrite(file, state);
+    return { state, file, result };
+  } finally { unlock(); }
+}

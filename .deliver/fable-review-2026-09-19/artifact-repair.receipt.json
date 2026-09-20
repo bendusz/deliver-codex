@@ -1,0 +1,66 @@
+{
+  "status": "FAIL",
+  "findings": [
+    {
+      "severity": "block",
+      "message": "Closure artifacts are never bound to a live evidence finalization. `prepareRemoteClosureCheckout` checks `evidence.finalized` once but stores no finalization identity on the checkout, although the interface says closure preparation names that identity. `assertRemoteEvidenceMutable` freezes evidence only after an artifact is pending or committed. Trigger: finalize, prepare or adopt the closure checkout, then call `runRemoteIntegrationGate` (even a failing run), `recordRemoteIntegrationReview` or `recordRemoteIntegrationVerification`. Each resets `finalized=false` and `finalization=null`. `remotePrepareArtifact`, `remoteAdoptArtifact`, `publishRemoteClosure`, `reconcileRemoteClosure`, `prepareRemoteCompletion` and `adoptRemoteCompletion` never re-check finalization. `remoteEvidenceView` hard-codes `view.evidence.finalized = true`, so the `renderVerificationArtifacts` guard is bypassed and the generation carries `finalization: null`. P/E/H can therefore be generated, merged remotely and locally adopted on unfinalized or failing evidence. Evidence is then frozen and cannot be re-finalized. The in-lock `validateRecord` call passes because it runs without `requireTerminal`, so `completion.status='complete'` is written. `remoteAdmissionStatus` then fails `requireTerminal` and returns UNKNOWN/blocking permanently.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs [2223-3034: prepareRemoteClosureCheckout, assertRemoteEvidenceMutable, remoteEvidenceView, remotePrepareArtifact]",
+      "resolved": false
+    },
+    {
+      "severity": "block",
+      "message": "A true handoff-repair base race is a hard failure instead of a retained `HANDOFF_BASE_RACE`. `reconcileRemoteHandoffRepair` first requires `parents[0] === attempt.parent` and `tree(S) === tree(H2)` and throws otherwise. If the integration tip advanced between H2 preparation and the provider merge, the normal merge wrapper has parents `[N', H2]`. The function fails with 'handoff repair wrapper does not have exact N/H2 parents and H2 tree' before any `race_proof` is written or a retry is spent. The attempt stays `adopted` with no `race_proof`. `prepareHandoffRepair` then always takes the resume branch (`latest && !latest.race_proof`) and fails on `latest.status !== 'prepared'`, so no bounded replacement is possible and the story is wedged. The only case recorded as a race is a tip advance after an exact `[N,H2]` merge.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs [2223-3034: reconcileRemoteHandoffRepair, prepareHandoffRepair]",
+      "resolved": false
+    },
+    {
+      "severity": "block",
+      "message": "A replacement H2 is generated with the wrong `BASE_COMMIT` and can never complete. After a race, `prepareHandoffRepair` uses `repairBase = latest.race_proof.terminal_commit`. It still builds the generation with `closureCommit: closure.terminal_commit`, the original N, and the resume path and `adoptHandoffRepair` validate with the same value. `handoffContent` therefore writes `BASE_COMMIT: <old N>`, while the interface requires `BASE_COMMIT` of the current N that H2 descends from. After S is proven, `adoptRemoteCompletion` requires `BASE_COMMIT: ${handoff_repair.proof.parent}`, which is the new N. Every retry (index >= 1) therefore fails with 'lacks a fresh handoff' after a successful remote merge. The handoff text also labels that value 'closed at E'.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs [2223-3034: prepareHandoffRepair, adoptHandoffRepair, adoptRemoteCompletion; 3444-3537: handoffContent]",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "`reconcileRemoteClosure` and `reconcileRemoteHandoffRepair` have no guard for an already-recorded proof and mutate what should be immutable. (a) Re-running `reconcileRemoteClosure` overwrites `closure.proof` with no history. A `proven` proof is downgraded to `handoff-stale` once the tip later advances. `terminal_commit` also moves under a prepared, not-yet-adopted repair attempt 0. `validateRemoteGeneration` then fails with 'generation basis changed' on both resume and adopt, and there is no reset path. `state.mjs` binds `repair.parent` to a predecessor only for `index>0`, so `attempts[0].parent` is never tied to `closure.proof.terminal_commit`. (b) Re-running `reconcileRemoteHandoffRepair` after `HANDOFF_REPAIRED`, once the tip has advanced, writes a `race_proof` on the proven attempt. It also increments `publication_retry` and returns `HANDOFF_BASE_RACE`, spending a retry without a real race. If the tip is unchanged, it rewrites the proof identity instead.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs [2223-3034: reconcileRemoteClosure, reconcileRemoteHandoffRepair]; plugins/deliver/skills/deliver/scripts/lib/state.mjs [handoff repair loop]",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "Actor independence can be bypassed by ordering, and the terminal validator does not recheck it. `recordRemoteIntegrationVerification` compares the verifier only with the review present at that moment. `recordRemoteIntegrationReview` never compares the reviewer or panel members with an existing `evidence.verification.verifier`, and it does not check panel member reviewers against `record.source.builder`. Trigger: record verification by X while `review` is null, then record a review by X, or a panel that includes the builder. `finalizeRemoteIntegrationEvidence` accepts this. `validateRemotePublicationRecord` with `requireTerminal` checks only PASS status and a non-empty criteria list. It does not check reviewer, verifier and builder distinctness, and it does not check that criteria cover each `source.packet.acceptance` id exactly once. Admission therefore accepts a terminal chain without the independent review and distinct verification the interface requires.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs [2223-3034: recordRemoteIntegrationReview, recordRemoteIntegrationVerification, finalizeRemoteIntegrationEvidence]; plugins/deliver/skills/deliver/scripts/lib/state.mjs [integration finalization binding / requireTerminal]",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "The terminal handoff names an ephemeral branch as the integration branch. `remoteEvidenceView` overrides `view.destination.branch` with the closure checkout branch, or with the repair branch. `handoffContent` then emits `BRANCH: <pm/...-closure-token> · INTEGRATION: <same>`. The handoff the next PM reads on the authoritative integration checkout therefore identifies a throwaway branch instead of `record.destination.branch`. The handoff's consumers (`project-state.mjs` and the handoff parser) are not in the packet, so the downstream effect is unverified. The content itself is wrong relative to the local `handoffContent` contract.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs [2223-3034: remoteEvidenceView; 3444-3537: handoffContent]",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "The raced-closure extra-path check uses porcelain `git diff --name-only parents[0] R` without `--no-renames`. Other checks use `diff-tree`. With `diff.renames` at its default, a wrapper that deletes a non-P/E/H file similar to a newly added allowed path, such as a new report, is reported only under the allowed destination name. The deletion escapes the 'exact advanced-base entries everywhere else' check. The proof also does not retain `parents[0]` (the advanced base), so the raced lineage cannot be re-validated from the record.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs [2223-3034: reconcileRemoteClosure]",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "Git mode and report overwrite handling are weak. `materializeRemoteWrites` silently overwrites a report or checklist that already exists at M, with no refusal or policy. If the deterministic report bytes equal the existing file, `diff-tree` lists no such path and `remoteAdoptArtifact` cannot succeed, leaving a pending artifact with no discard path. `applyPending` writes through `atomic()` with mode 0600. An existing 100755 entry therefore loses its executable bit in the worktree, and an ordinary commit then fails 'mode differs from preparation'. `committedArtifactImage` also lets a 120000 (symlink) parent entry through as `expected_mode` before the later refusal.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs [2223-3034: committedArtifactImage, materializeRemoteWrites, remoteAdoptArtifact; 3444-3537: applyPending]",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "`remoteAdmissionStatus` misreports proof state. It reports `REMOTE_CLOSURE_PROVEN` whenever `closure.proof` exists, including `state: 'handoff-stale'`, which is not a proven terminal. The terminal fallback reads `closure.proof.commit`, a field that does not exist; the proof has `merge_commit` and `terminal_commit`. `remote_terminal_commit` is therefore null in that state. `blocking` stays true, so this affects inspectors only.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs [296-436: remoteAdmissionStatus]",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "Interruption and recovery have several gaps.\n(a) `runRemoteIntegrationGate` runs a gate of up to 10 minutes inside `withRecord`'s `wx` lock. A killed process leaves `<record>.lock`, and no stale-lock recovery is visible in the packet, so every later operation fails with 'integration record is locked'.\n(b) `remoteEvidenceView` calls `tree(evidence.root, ...)`. Removing the evidence worktree after closure breaks `validateRemoteGeneration` for a later handoff repair.\n(c) `adoptRemoteCompletion` rejects `status 'complete'` instead of resuming idempotently, and the completion token does not name the wrapper proof identity.\n(d) `publishRemoteHandoffRepair` skips the up-front record-hash check and the clean, HEAD and protected-metadata check that `publishRemoteClosure` runs through `remoteClosureRoot`.\n(e) `reconcilePublication` binds `prNumber` only when a merge effect exists. A merge that completes later from a queue, with no retained effect, passes the provider and fetch steps and creates a proof ref. It then fails at state validation ('closure proof binding') with no recovery path visible.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs [2223-3034; 590-812: withRecord]",
+      "resolved": false
+    }
+  ],
+  "summary": "FAIL. All findings come from reading the supplied excerpts only. No tests, provider calls, model calls, or files outside the packet were run or inspected. The packet does not give exact line numbers inside integration.mjs [2223-3034], so findings cite function names within the supplied ranges. `review-T05B-fix2.json` was not supplied, so nothing here can be matched against its orientation findings.\n\nThree defects block the lifecycle. Evidence finalization is not bound to the closure artifacts and can be reset after the closure checkout is prepared. A real pre-merge repair base race throws and wedges the story instead of recording `HANDOFF_BASE_RACE`. Replacement H2 handoffs carry the original N as `BASE_COMMIT` and can never pass completion adoption. Major issues are the proof overwrite and retry spend in both reconcile functions, the actor-independence gaps in evidence recording and the terminal validator, and the ephemeral branch in the terminal handoff.\n\nOmitted helpers I could not inspect: `executeProviderAttempt`, `reconcileExecutingAttempt`, `remoteSlot`, `providerResult`, `domainProviderState`, `emptyProviderSlot`, `buildCheckoutProof`, `verifyCheckoutProof`, `boundManifest`, `assertRecordSource`, `validateIntegrationProofs`, `defaultFetchRemote`, `assertFetchPushIdentity`, `isAncestor` and `assertCommit`. Also omitted are the source publish/merge/proof functions, `remote.mjs`, `project-state.mjs`, the CLI wiring, the correction helpers and the tests.\n\nThe following are therefore unverified:\n- provider state transitions and how queued or pending results are handled\n- source merge, squash and rebase lineage proofs\n- whether `withRecord`'s source and proof assertions tolerate a removed source worktree or a fast-forwarded destination HEAD during remote phases\n- whether `buildCheckoutProof(root, previous)`, called with two arguments in `prepareRemoteCompletion`, is valid\n- native claim retention and release\n- whether a correction envelope permanently blocks remote operations through `withRecord`'s `allowCorrection` gate"
+}

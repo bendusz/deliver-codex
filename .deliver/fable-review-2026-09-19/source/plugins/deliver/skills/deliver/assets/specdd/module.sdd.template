@@ -1,0 +1,14 @@
+# Template: replace the example values before using this file as a module spec.
+Spec: Example module
+Purpose:
+  State why this module exists.
+Owns:
+  ./src/example.js
+Can modify:
+  ./src/example.test.js
+Exposes:
+  State the public function, type, command, or endpoint.
+Must:
+  State a behavior the implementation must satisfy.
+Done when:
+  State a testable outcome.

@@ -1,0 +1,19 @@
+{
+  "status": "FAIL",
+  "snapshot": "232f5d3e1c04cf155b6b0c96f85f988dec93c9588f6a2a70a2b9d7ef165a88d2",
+  "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "revision": 21,
+  "counters": {
+    "retries": 0,
+    "fixes": 3,
+    "corrections": 0
+  },
+  "gates": {
+    "test": "PASS349/349",
+    "validate": "PASS"
+  },
+  "review": ".deliver/review-T05B-fix3.json",
+  "verification": ".deliver/verification-T05B-fix3.json",
+  "fable_report": "docs/reviews/2026-09-19-claude-fable-5-1.md",
+  "next_action": "Await explicit decision before another repair. No main merge, no replacement run, no counter reset."
+}

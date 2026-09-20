@@ -1,0 +1,84 @@
+{
+  "status": "FAIL",
+  "findings": [
+    {
+      "severity": "block",
+      "message": "The executor and the record validator disagree, so a source-merge attempt can wedge in `executing`. `provider.merge` returns the readiness result unchanged when the PR is not READY (remote.mjs `merge()`: `if (readiness.state !== 'READY') return readiness`), so it can return PR_DRAFT, CHECKS_PENDING or CHECKS_FAILED with no write issued. `executeProviderAttempt` (integration.mjs ~1842-1870) appends `observed` and leaves the disposition `active`, because `successStates` is `['MERGED']`. `withRecord` then runs `validateRecord`, which reaches `validateRemoteProviderSlot` (state.mjs ~196-204). That check rejects any observed attempt with disposition `active` whose last result state is PUBLISHED, READY, PR_DRAFT, CHECKS_PENDING, CHECKS_FAILED, MERGED or MERGED_BASE_ADVANCED ('unresolved attempt has effect'). The observed write throws, the exact result is lost, and the attempt stays `executing`. Every later call goes through `reconcileExecutingAttempt`, which calls `reconcileMerged`, gets MERGE_PENDING for the open PR, and returns PENDING. The merge slot has no `absenceStates`, so replay is impossible. Trigger: call `mergeRemoteSource` while required checks are still pending or the PR is a draft. The source merge slot is then permanently stuck although no provider write happened.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs (~1762-1873) with plugins/deliver/skills/deliver/scripts/lib/state.mjs (~85-205)",
+      "resolved": false
+    },
+    {
+      "severity": "block",
+      "message": "A merge the server accepted, but that was not observed as exact MERGED, can never be proven. The adapter's `merge()` returns MERGE_PENDING when the merge is queued or accepted but not final. It returns MERGE_MISMATCH when the PR merged but `ls-remote` shows the base already advanced; it never returns MERGED_BASE_ADVANCED. `executeProviderAttempt` records both results as observed with disposition `active`, `effect` null and `active_token` null. `reconcileRemoteSource` (~2116-2204) runs `reconcileExecutingAttempt` only when `merge.active_token` is set, so it skips it here. It then builds the Git proof and writes `source.proof`, but never sets `source.merge.effect`. `validateRemotePublicationRecord` requires `remote.source.merge.effect`, and requires that the effect's observed result carries `mergeCommit === source_merge_commit` (state.mjs ~270-290). The final `withRecord` therefore throws 'source proof binding' after the proof ref has already been fetched. `mergeRemoteSource` cannot recover either. Its fresh inspect returns PR_MERGED, `maybeSupersedeSourceAttempt` requires a fresh READY or HEAD_MISMATCH, and `executeProviderAttempt` fails with 'input differs from the retained unresolved or terminal attempt'. The interface requires that later queue completion and post-merge base advance be reconciled on the same attempt. Trigger: a merge-queue repository, or any push to the integration branch between `gh pr merge` and the adapter's post-merge `ls-remote`.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs (~1842-1873, ~2116-2204) with remote.mjs merge() postmerge section",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "Each provider slot effectively gets one non-superseding attempt, so any proven no-write failure is terminal. In `executeProviderAttempt` the prepared step (~1767-1794) has three outcomes when the last attempt is observed. It returns the retained result if an effect exists, returns the retained result if the input identity matches, and otherwise fails ('input differs from the retained unresolved or terminal attempt'). A new attempt is created only when the slot is empty. Supersession covers only a prior HEAD_MISMATCH or MERGE_PENDING, or a moved head on a PUBLISHED attempt. States reached before any write therefore close the slot for good: AUTH_REQUIRED, UNAVAILABLE, GIT_ERROR, PR_LOOKUP_FAILED, PUSH_REJECTED, CHECKS_UNKNOWN, MERGE_REJECTED, and PR_NUMBER_MISMATCH from a mistyped `prNumber`. A retry either replays the cached failure without calling the provider or throws. Trigger: the first `publishRemoteSource` runs while `gh` is unauthenticated and AUTH_REQUIRED is observed. After login the fresh inspect differs, the input identity differs, and the call fails permanently. No recovery operation appears in the supplied code. Repair helpers outside the packet were not inspected.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs (~1762-1813, ~1940-1996)",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "The volatile `remote_observation` is part of the immutable attempt input and its `input_identity`. That observation includes the hash of the full inspect result, including the checks array, diagnostics and `remoteBase`. Resuming a `prepared` attempt requires a byte-identical fresh inspect. This affects a crash between prepared and executing, a PROVIDER_REPLAYABLE return to prepared, and the prepared successor made by `maybeSupersedeSourceAttempt`, which returns PROVIDER_SUPERSEDED and needs a second call to execute. If the integration base moves again or a check changes state between calls, `executeProviderAttempt` fails with 'active remote provider attempt has different immutable input'. `maybeSupersedeSourceAttempt` returns null whenever `active_token` is set, so the prepared attempt cannot be resumed or replaced. This conflicts with 'replay the same token' and 'a resumed operation does not spend a retry'.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs (~1795-1802, ~1928-1996, ~1998-2075)",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "The proof that a prior invocation has ended exists only in process memory. `reconcileExecutingAttempt` computes `endedHere` (~1913-1914) as `invocation.process_instance === PROCESS_INSTANCE` plus membership in the in-memory `ENDED_PROVIDER_INVOCATIONS` set. After a real crash, which is the main interruption case, a fresh process can never satisfy it. The recorded `pid` and `process_instance` are never used to show the old process is gone. A publication that crashed before PR creation is proven absent via PR_ABSENT yet returns PROVIDER_UNKNOWN forever, and `executeProviderAttempt` returns PROVIDER_EXECUTING. The merge slot passes no `absenceStates` at all. A crash, or a thrown `invoke`, after `executing` is persisted but before `gh pr merge` leaves `reconcileMerged` returning MERGE_PENDING, reported as PENDING, indefinitely with no replay path. The approved probes 'crash after push' and 'exact absence versus ambiguous lookup' cannot be satisfied across processes.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs (~1875-1926, ~2060-2064)",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "The Git proof assumes the pre-merge base observed at inspect time is the actual merge parent. `reconcileRemoteSource` takes `premergeBase` from `mergeAttempt.input.remote_observation.observed_remote_base`, captured before `provider.merge` ran. It requires `parents[0] === premergeBase` for merge and squash, and it is also the range base for rebase. If the integration branch advances between the inspect and the server-side merge, the legitimate merge commit's first parent is the newer tip, and the proof fails permanently. The interface asks the code to prove the merge commit's actual base parent, that the base descends from the approved integration base, and the recomputed tree; it does not ask for equality with a stale observation. Unprovable lineage is thrown through `fail()` after the proof ref is already fetched. It is never returned as the explicit `LINEAGE_UNPROVEN` state the interface requires, and that string appears nowhere in the supplied source.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs (~2150-2190)",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "The rebase and squash path-set checks can reject a correct result. `sourcePaths` and `rebasedPaths` come from porcelain `git diff --name-only` without `--no-renames`, so they depend on the user's `diff.renames` setting, which is on by default. Per-commit bounding uses plumbing `git diff-tree -r`, which does not detect renames. A source branch that renames a file yields only the destination path in `sourceSet`, while `diff-tree` reports the deleted old path as well. `boundedCommits` is then false, and a correct rebase is rejected with 'lacks a bounded unique first-parent source delta'. Separately, the required `sourcePaths == squashPaths` (or `rebasedPaths`) equality falsely fails when the base already holds identical content for a source-changed path, even though tree equality with the recomputed merge tree already holds. The rebase first-parent chain is also never checked for single-parent commits. Only the tip's `parents.length` is checked, so an intermediate two-parent commit confined to the source paths would pass.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs (~2160-2190)",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "Publication reconciliation adopts an effect that was not proven exact. After an interrupted publish, `reconcileExecutingAttempt` treats an inspect result of READY, PR_DRAFT, CHECKS_PENDING or CHECKS_FAILED as the proven effect. It sets disposition `proven`, sets `slot.effect` and sets status `published`. Inspect cannot show that the requested title or body were written, because an existing PR is edited only after the push. With `markReady` true, it cannot show that the PR left draft either. Once an effect exists, `executeProviderAttempt` returns the retained result for every later publish, so `gh pr ready` is never issued. The next `mergeRemoteSource` then gets PR_DRAFT and hits the validator wedge described in the first block finding. The reconciled return value is also forced to PUBLISHED (~1908), while the retained replay reports PENDING or FAILED for the same stored result.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs (~1889-1912, ~2009-2013)",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "`reconcileRemoteSource` neither reuses an existing proof nor retains it. It never checks for an existing `source.proof`. A second call before evidence preparation fetches a new proof ref and overwrites the proof with a new `evidence_token`, a new `evidence_branch` and possibly a newer M, keeping no history. After evidence preparation the overwrite fails validation, but only after another ref has been created. Every failure after `fetchRemote` leaves an orphan ref under `refs/deliver/remote-evidence/<id>/<token>` with no cleanup or reuse. Such failures include a lineage failure, a validator failure or a stale record hash. The caller's `prNumber` is checked against the retained merge attempt only by the validator at the final write, after the provider call and the fetch.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs (~2116-2204)",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "Remote-M review and verification independence depends on call order. `recordRemoteIntegrationVerification` excludes only reviewers already present, so with no review yet the set holds only `undefined`. `recordRemoteIntegrationReview` checks only `reviewer !== builder`. Recording verification first and then a review by the same actor passes both checks. The supplied state validator's finalization check does not enforce distinctness. The body of `finalizeRemoteIntegrationEvidence` is truncated in the packet, so whether it re-checks is unverified. Replacing a review also does not invalidate an existing verification.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs (~2290-2325)",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "`mergeRemoteSource` gates only on a truthy `publication.effect`. After a published-head supersession, `slot.effect` still points at the superseded attempt, and the validator permits that disposition. A failed or still-prepared successor publication does not block the merge. Safety then rests solely on the adapter's head checks and `--match-head-commit`.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs (~2049-2075)",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "The `publishRemoteSource` guard against publishing after a merge (~2014-2022) puts the refusal inside `invoke`. If the last publication attempt is a prepared successor, `executeProviderAttempt` durably moves it to `executing` and then throws. The catch returns PROVIDER_UNKNOWN, and because the fresh inspect yields PR_MERGED the attempt stays `executing` forever.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs (~2014-2022)",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "`inspectRemoteSourceReadiness` rejects only `status === 'empty'`. A record with no `remote` envelope at all (`record.remote` undefined) passes the 'publication is not prepared' guard.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs (~2033-2047)",
+      "resolved": false
+    }
+  ],
+  "summary": "FAIL on the static packet review. The supplied source-publication path has two blocking durable-state defects and several major recovery and proof gaps. The two blockers are: the state validator rejects the observed write for PR_DRAFT, CHECKS_PENDING or CHECKS_FAILED merge results, which wedges the attempt in `executing`; and merges observed as MERGE_PENDING or MERGE_MISMATCH never get a merge effect, so `reconcileRemoteSource` cannot persist its proof. The major gaps are: no-write failures that permanently close a slot; volatile observations bound into the immutable input identity; ended-invocation proof that exists only in process memory, plus no replay path for merges; a stale pre-merge base used as the required parent, with `LINEAGE_UNPROVEN` never returned; rename- and config-sensitive path checks that reject correct rebases and squashes; inexact publication adoption; and a source proof that can be overwritten. Line ranges are approximate positions inside the supplied 1659-2334 excerpt and state.mjs 1-452. All findings come from reading the packet code against the interface document. No tests, provider calls, model calls or files outside the packet were run or inspected. The review-T05B-fix2 orientation findings were not supplied, so nothing here is cross-referenced to them. Not supplied, and so not assessed: `finalizeRemoteIntegrationEvidence` (truncated), `assertRemoteEvidenceMutable`, `verifyCheckoutProof` and `buildCheckoutProof`, `validateIntegrationProofs`, the closure, handoff-repair and completion functions, CLI wiring, current-pm.mjs terminal admission, the local correction helpers and the test suite. Closure and repair races, the retry counters, terminal adoption and correction interactions remain unreviewed."
+}

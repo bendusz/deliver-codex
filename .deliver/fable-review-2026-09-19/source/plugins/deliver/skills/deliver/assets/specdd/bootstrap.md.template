@@ -1,0 +1,14 @@
+<!-- Template: replace the example wording where a project needs local rules. -->
+# SpecDD bootstrap
+
+Read the root and ancestor `.sdd` files before changing code. Stay inside explicit `Owns` paths
+and the union of `Owns` and `Can modify` for edits. A missing spec is not permission.
+
+`./` and `../` paths are relative to the current `.sdd` directory. `/` paths are relative to the
+selected content root. Unprefixed names and prose are not paths. `Platform` uses an inline value,
+such as `Platform: Node.js 22`.
+
+Deliver inspects literal paths only. Globs remain valid SpecDD text but are excluded from edit-scope
+enforcement. Globs in `Owns` or `Can modify` block enforcement, while context-only globs are
+warnings. `.sdd` files cannot become owned or editable paths. Inspection is read-only and does not
+initialize or install a SpecDD CLI.
