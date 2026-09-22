@@ -1,0 +1,15 @@
+{
+  "test_author": "/root/identity_tests",
+  "command": "node --test --test-name-pattern='explicit reconciliation' tests/integration.test.mjs",
+  "cwd": "/tmp/deliver-parity-t05l",
+  "exit_code": 1,
+  "tests": 34,
+  "passed": 6,
+  "failed": 28,
+  "distinct_defect_subtests": 26,
+  "failed_parent_tests": 2,
+  "production_sha256": "2fc035df9ec905d5a7afbacbb54d11873902f7539bd0b4ddd47b3d5fc22ccf90",
+  "test_sha256": "62511b6815f00834e0c3b782aaa41b24dd34b7932f8a477ab7ba281d61627915",
+  "log_sha256": "8bcd5276092cbc875e1ded4aaebdcc52576f4d1a3a4bd26df59a630e5ca2c051",
+  "provenance": "Independent test-engineer executed regression on unchanged fix6 production before production builder dispatch. Raw log retained."
+}

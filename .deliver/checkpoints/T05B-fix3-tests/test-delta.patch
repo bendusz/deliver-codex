@@ -1,0 +1,817 @@
+--- a/tests/remote-lifecycle.test.mjs
++++ b/tests/remote-lifecycle.test.mjs
+@@ -6,7 +6,9 @@
+ import { test } from 'node:test';
+ import { fileURLToPath } from 'node:url';
+ 
+-import { readStory } from '../plugins/deliver/skills/deliver/scripts/lib/story.mjs';
++import {
++  parseStory, readStory, replaceStoryExecution,
++} from '../plugins/deliver/skills/deliver/scripts/lib/story.mjs';
+ import {
+   canonical, remoteProviderAttemptIdentity, sha256, validateRemotePublicationRecord,
+ } from '../plugins/deliver/skills/deliver/scripts/lib/state.mjs';
+@@ -119,6 +121,7 @@
+ 
+ function finishedRemoteCandidate(t, {
+   scale = 'standard', verificationReport = true, prepareRecord = true, multiCommit = false,
++  executableArtifacts = false,
+ } = {}) {
+   const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'deliver-remote-source-')));
+   const integration = `${root}-integration`;
+@@ -144,6 +147,14 @@
+   write(root, '.gitignore', '.codex/config.toml\n');
+   git(root, 'add', 'docs', 'src', '.gitignore');
+   git(root, 'commit', '-qm', 'Planned remote project');
++  if (executableArtifacts) {
++    const actor = pm('actor-id').json.actor;
++    write(root, `docs/handoff/${actor}.md`,
++      `# HANDOFF\n\nBASE_COMMIT: ${git(root, 'rev-parse', 'HEAD')}\n`);
++    fs.chmodSync(path.join(root, 'docs/handoff', `${actor}.md`), 0o755);
++    git(root, 'add', `docs/handoff/${actor}.md`);
++    git(root, 'commit', '-qm', 'Track executable handoff contract');
++  }
+   assert.equal(pm('approve', '--approver', 'Ben').status, 0);
+   git(root, 'add', 'docs/approval.json');
+   git(root, 'commit', '-qm', 'Approve remote project');
+@@ -205,6 +216,7 @@
+   }, integration) : null;
+   return {
+     root, integration, remoteRoot, runId, runFile, candidate, sourceBytes, sourceCounters,
++    executableArtifacts,
+     record: prepared ? { file: prepared.file, record: prepared.record, hash: prepared.hash } : null,
+   };
+ }
+@@ -569,6 +581,158 @@
+   assertGeneratedPendingTamperRejected({
+     root, wrapper, selectPending, resume, multipleWrites: true,
+   });
++}
++
++function assertAdoptedArtifactGeneration(record, field, retainedGeneration, root) {
++  const proof = record.remote.closure.artifacts[field].proof;
++  assert.deepEqual(proof.generation, retainedGeneration,
++    `${field} proof retains the exact identified generation used by its pending image`);
++  assert.equal(proof.generation.identity, retainedGeneration.identity);
++  assert.equal(proof.generation.source_proof.identity, record.remote.source.proof.identity,
++    `${field} generation remains bound to the source proof`);
++  assert.equal(proof.generation.finalization.identity,
++    record.remote.integration_evidence.finalization.identity,
++    `${field} generation remains bound to remote-M finalization`);
++  assert.equal(proof.generation.view.integration.commit,
++    record.remote.integration_evidence.commit,
++    `${field} generation view remains bound to frozen M`);
++  if (typeof proof.generation.inputs.story_before === 'string') {
++    const committed = git(root, 'show', `${proof.parent}:${record.source.story_path}`);
++    assert.equal(proof.generation.inputs.story_before.trimEnd(), committed,
++      `${field} generation story input is the independently committed parent image`);
++    const story = parseStory(`${committed}\n`, record.source.story_path);
++    assert.equal(story.contractHash, record.source.contract_hash);
++    assert.equal(story.executionHash, record.source.execution_hash);
++    assert.equal(story.execution.status, 'in-review');
++  }
++  const rebound = structuredClone(record);
++  const reboundProof = rebound.remote.closure.artifacts[field].proof;
++  reboundProof.generation.finalization.identity = '0'.repeat(64);
++  reboundProof.generation = reidentify(reboundProof.generation);
++  rebound.remote.closure.artifacts[field].proof = reidentify(reboundProof);
++  assert.throws(() => validateRemotePublicationRecord(rebound),
++    /generation|finalization|artifact|binding|remote publication evidence/i,
++    `${field} proof refuses a coherently reidentified generation rebound away from finalization`);
++}
++
++function assertPendingStoryRebindingRejected({ root, wrapper, resume }) {
++  const pristineRecordBytes = fs.readFileSync(wrapper.file, 'utf8');
++  const forged = JSON.parse(pristineRecordBytes);
++  const pending = forged.remote.closure.artifacts.closure.pending;
++  const write = pending.writes[0];
++  const originalStory = parseStory(pending.generation.inputs.story_before, write.path);
++  const altered = replaceStoryExecution(originalStory, {
++    rounds: originalStory.execution.rounds + 1,
++  });
++  const alteredStory = parseStory(altered.after, write.path);
++  const closed = replaceStoryExecution(alteredStory, {
++    status: 'merged', updated: pending.generation.inputs.closed_at,
++  }, { note: `${pending.generation.inputs.closed_at} remotely integrated at ${forged.remote.integration_evidence.commit}` });
++  pending.generation.inputs.story_before = altered.after;
++  pending.generation.inputs.execution_hash = closed.executionHash;
++  pending.generation = reidentify(pending.generation);
++  write.after = closed.after;
++  write.hash = sha256(write.after);
++  pending.identity = reidentify(pending).identity;
++  const forgedBytes = `${JSON.stringify(forged, null, 2)}\n`;
++  fs.writeFileSync(wrapper.file, forgedBytes);
++  fs.writeFileSync(path.join(root, ...write.path.split('/')), originalStory.text);
++  const statusBefore = git(root, 'status', '--porcelain=v1', '--untracked-files=all');
++  let refusal = null;
++  try { resume(sha256(canonical(forged))); } catch (error) { refusal = error; }
++  const recordAfter = fs.readFileSync(wrapper.file, 'utf8');
++  const storyAfter = fs.readFileSync(path.join(root, ...write.path.split('/')), 'utf8');
++  const statusAfter = git(root, 'status', '--porcelain=v1', '--untracked-files=all');
++  fs.writeFileSync(wrapper.file, pristineRecordBytes);
++  fs.writeFileSync(path.join(root, ...write.path.split('/')), originalStory.text);
++  assert(refusal, 'reidentified pending story counters must refuse against the committed parent and source proof');
++  assert.match(refusal.message, /generation|story|parent|source|execution|identity|binding|committed/i);
++  assert.equal(recordAfter, forgedBytes);
++  assert.equal(storyAfter, originalStory.text);
++  assert.equal(statusAfter, statusBefore,
++    'pending story rebind refusal leaves its exact checkout state unchanged');
++}
++
++function refreshFinalizedEvidence(record, { review = false, verification = false } = {}) {
++  const evidence = record.remote.integration_evidence;
++  if (review) evidence.review = reidentify(evidence.review);
++  if (verification) evidence.verification = reidentify(evidence.verification);
++  if (review) evidence.finalization.review = evidence.review.identity;
++  if (verification) evidence.finalization.verification = evidence.verification.identity;
++  evidence.finalization = reidentify(evidence.finalization);
++}
++
++function assertFinalReceiptTamperRejections(record) {
++  assert.doesNotThrow(() => validateRemotePublicationRecord(record));
++  const evidence = record.remote.integration_evidence;
++  const requirements = evidence.finalization.review_requirements;
++  assert(requirements, 'finalization retains identified review requirements from frozen M');
++  const storyBytes = execFileSync('git', ['-C', evidence.root, 'show',
++    `${evidence.commit}:${record.source.story_path}`]);
++  const frozenStory = parseStory(storyBytes.toString('utf8'), record.source.story_path);
++  assert.equal(requirements.version, 'remote-review-requirements-v1');
++  assert.equal(requirements.commit, evidence.commit);
++  assert.equal(requirements.story_path, record.source.story_path);
++  assert.equal(requirements.story_before, storyBytes.toString('utf8'));
++  assert.equal(requirements.story_hash, sha256(storyBytes));
++  const manifestStory = evidence.manifest.entries[record.source.story_path];
++  const manifestStoryMatch = /^file:(644|755):([0-9a-f]{64})$/.exec(manifestStory);
++  assert(manifestStoryMatch, 'frozen M manifest retains the story file identity');
++  assert.equal(requirements.story_mode, `100${manifestStoryMatch[1]}`);
++  assert.equal(requirements.story_hash, manifestStoryMatch[2]);
++  assert.equal(requirements.contract_hash, record.source.contract_hash);
++  assert.equal(requirements.execution_hash, record.source.execution_hash);
++  assert.equal(requirements.scale, record.plan.scale);
++  assert.equal(requirements.reporting, record.reporting);
++  assert.deepEqual(requirements.required_lenses,
++    record.reporting === 'skipped' ? [] : [...new Set(frozenStory.reviewLenses)].sort());
++  assert.equal(requirements.identity, reidentify(requirements).identity);
++  const cases = [
++    ['missing acceptance criterion', (next) => {
++      next.remote.integration_evidence.verification.criteria = [];
++      refreshFinalizedEvidence(next, { verification: true });
++    }],
++    ['invented acceptance criterion', (next) => {
++      next.remote.integration_evidence.verification.criteria = [{
++        id: 'AC-INVENTED', status: 'PASS', evidence: 'Invented criterion cannot replace AC-1.',
++      }];
++      refreshFinalizedEvidence(next, { verification: true });
++    }],
++    ['duplicate acceptance criterion', (next) => {
++      next.remote.integration_evidence.verification.criteria.push(
++        structuredClone(next.remote.integration_evidence.verification.criteria[0]));
++      refreshFinalizedEvidence(next, { verification: true });
++    }],
++    ['reviewer equals source builder', (next) => {
++      next.remote.integration_evidence.review.reviewer = next.source.builder;
++      refreshFinalizedEvidence(next, { review: true });
++    }],
++    ['verifier equals source builder', (next) => {
++      next.remote.integration_evidence.verification.verifier = next.source.builder;
++      refreshFinalizedEvidence(next, { verification: true });
++    }],
++    ['verifier equals top-level reviewer', (next) => {
++      next.remote.integration_evidence.verification.verifier = next.remote.integration_evidence.review.reviewer;
++      refreshFinalizedEvidence(next, { verification: true });
++    }],
++    ['verifier equals panel reviewer', (next) => {
++      next.remote.integration_evidence.verification.verifier =
++        next.remote.integration_evidence.review.panel.members[0].reviewer;
++      refreshFinalizedEvidence(next, { verification: true });
++    }],
++    ['duplicate panel lens', (next) => {
++      const panel = next.remote.integration_evidence.review.panel;
++      panel.members.push({ ...structuredClone(panel.members[0]), reviewer: 'duplicate-lens-reviewer' });
++      refreshFinalizedEvidence(next, { review: true });
++    }],
++  ];
++  for (const [label, mutate] of cases) {
++    const forged = structuredClone(record);
++    mutate(forged);
++    assert.throws(() => validateRemotePublicationRecord(forged),
++      /acceptance|criteria|reviewer|verifier|panel|lens|independent|finalization|remote publication evidence/i,
++      label);
++  }
+ }
+ 
+ function providerFixture(fixture) {
+@@ -713,6 +877,43 @@
+   return { provider, state, calls, repository };
+ }
+ 
++function reusableSourceFixture(t) {
++  const fixture = finishedRemoteCandidate(t);
++  const fake = providerFixture(fixture);
++  const recordBytes = fs.readFileSync(fixture.record.file, 'utf8');
++  const providerState = structuredClone(fake.state);
++  const integrationBase = fixture.record.record.integration.base;
++  const storyRef = `refs/heads/${fixture.record.record.source.branch}`;
++  const sourceStatus = git(fixture.root, 'status', '--porcelain=v1', '--untracked-files=all');
++  const integrationStatus = git(fixture.integration, 'status', '--porcelain=v1', '--untracked-files=all');
++  const reset = () => {
++    fs.writeFileSync(fixture.record.file, recordBytes);
++    const remoteHead = git(fixture.remoteRoot, 'rev-parse', 'refs/heads/main');
++    if (remoteHead !== integrationBase) {
++      git(fixture.remoteRoot, 'update-ref', 'refs/heads/main', integrationBase, remoteHead);
++    }
++    git(fixture.remoteRoot, 'update-ref', '-d', storyRef);
++    Object.assign(fake.state, structuredClone(providerState));
++    fake.calls.length = 0;
++    assert.equal(fs.readFileSync(fixture.record.file, 'utf8'), recordBytes,
++      'shared fixture restores the exact initial integration record');
++    assert.equal(fs.readFileSync(fixture.runFile, 'utf8'), fixture.sourceBytes,
++      'shared fixture preserves the finished source record');
++    assert.deepEqual(JSON.parse(fs.readFileSync(fixture.runFile, 'utf8')).counters,
++      fixture.sourceCounters, 'shared fixture preserves source attempt counters');
++    assert.equal(git(fixture.root, 'rev-parse', 'HEAD'), fixture.candidate,
++      'shared fixture preserves source HEAD C');
++    assert.equal(git(fixture.integration, 'rev-parse', 'HEAD'), integrationBase,
++      'shared fixture preserves integration HEAD I');
++    assert.equal(git(fixture.root, 'status', '--porcelain=v1', '--untracked-files=all'), sourceStatus,
++      'shared fixture restores exact source checkout status');
++    assert.equal(git(fixture.integration, 'status', '--porcelain=v1', '--untracked-files=all'), integrationStatus,
++      'shared fixture restores exact integration checkout status');
++    return { fixture, fake };
++  };
++  return { fixture, fake, reset };
++}
++
+ function fetchFromFixture(fixture, calls) {
+   return ({ root, remote, branch, proofRef, expectedRemoteOid }) => {
+     calls.push({ root, remote, branch, proofRef, expectedRemoteOid });
+@@ -757,11 +958,22 @@
+     expectedRecordHash: state.hash, prNumber: fake.state.prNumber, method: 'merge',
+     subject: 'Merge S1-1', body: '', provider: fake.provider,
+   }, fixture.integration));
++  if (fixture.executableArtifacts) {
++    const sourceMerge = fake.state.mergeCommit;
++    const advanced = serverCommitMode(fixture, sourceMerge, storyRel,
++      'Preserve executable story mode at advanced remote M');
++    git(fixture.remoteRoot, 'update-ref', 'refs/heads/main', advanced, sourceMerge);
++    assert.equal(git(fixture.root, 'ls-tree', fixture.candidate, '--', storyRel).split(/\s+/)[0], '100644');
++    assert.equal(git(fixture.remoteRoot, 'ls-tree', advanced, '--', storyRel).split(/\s+/)[0], '100755');
++    assert.equal(git(fixture.remoteRoot, 'show', `${advanced}:${storyRel}`),
++      git(fixture.root, 'show', `${fixture.candidate}:${storyRel}`));
++  }
+   const reconciled = integrationApi.reconcileRemoteSource(state.file, {
+     expectedRecordHash: state.hash, prNumber: fake.state.prNumber, provider: fake.provider,
+     fetchRemote: fetchFromFixture(fixture, fetchCalls),
+   }, fixture.integration);
+-  assertWrapper(reconciled, 'source-reconcile', 'LINEAGE_PROVEN');
++  assertWrapper(reconciled, 'source-reconcile', fixture.executableArtifacts
++    ? 'SOURCE_BASE_ADVANCED' : 'LINEAGE_PROVEN');
+   state = wrapperState(reconciled);
+   const evidenceRoot = `${fixture.root}-final-evidence`;
+   t.after(() => fs.rmSync(evidenceRoot, { recursive: true, force: true }));
+@@ -794,8 +1006,8 @@
+   return { fixture, fake, fetchCalls, state: wrapperState(finalized) };
+ }
+ 
+-function finalizedRemoteEvidence(t) {
+-  return finalizeRemoteCandidate(t, finishedRemoteCandidate(t));
++function finalizedRemoteEvidence(t, options = {}) {
++  return finalizeRemoteCandidate(t, finishedRemoteCandidate(t, options));
+ }
+ 
+ function commitPrepared(root, message, preparation) {
+@@ -830,6 +1042,10 @@
+     expectedRecordHash: state.hash,
+   }, fixture.integration);
+   const e = commitPrepared(closureRoot, 'Remote story closure E', closure);
++  for (const preparedWrite of closure.record.remote.closure.artifacts.closure.pending.writes) {
++    assert.equal(git(closureRoot, 'ls-tree', e, '--', preparedWrite.path).split(/\s+/)[0],
++      preparedWrite.expected_mode, `E preserves the prepared ${preparedWrite.path} mode`);
++  }
+   state = wrapperState(integrationApi.adoptRemoteStoryClosure(closure.file, {
+     expectedRecordHash: closure.hash, token: closure.result.token, commit: e,
+   }, fixture.integration));
+@@ -1061,9 +1277,17 @@
+   });
+ 
+   await t.test('normal R closes remotely, requires local fast-forward, then releases a fresh-process claim', () => {
+-    const flow = finalizedRemoteEvidence(t);
++    const flow = finalizedRemoteEvidence(t, { executableArtifacts: true });
+     const { fixture, fake } = flow;
+     let state = flow.state;
++    const frozenM = state.record.remote.integration_evidence.commit;
++    const frozenMStory = readStory(state.record.remote.integration_evidence.root, storyRel);
++    assert.equal(git(fixture.root, 'ls-tree', fixture.candidate, '--', storyRel).split(/\s+/)[0], '100644');
++    assert.equal(git(fixture.remoteRoot, 'ls-tree', frozenM, '--', storyRel).split(/\s+/)[0], '100755');
++    assert.equal(frozenMStory.contractHash, state.record.source.contract_hash);
++    assert.equal(frozenMStory.executionHash, state.record.source.execution_hash);
++    assert.equal(frozenMStory.execution.status, 'in-review');
++    assert.equal(state.record.remote.integration_evidence.finalized, true);
+     const finalizedBytes = fs.readFileSync(state.file, 'utf8');
+     const finalizationRefusals = [];
+     for (const [label, mutate] of [
+@@ -1095,6 +1319,10 @@
+         evidence.finalization.verification = '0'.repeat(64);
+         evidence.finalization = reidentify(evidence.finalization);
+       }],
++      ['manifest story entry changed without recomputing its content hash', (record) => {
++        record.remote.integration_evidence.manifest.entries[record.source.story_path] =
++          `file:755:${'0'.repeat(64)}`;
++      }],
+     ]) {
+       const forged = JSON.parse(finalizedBytes);
+       mutate(forged);
+@@ -1106,7 +1334,7 @@
+           expectedRecordHash: forgedHash,
+         }, fixture.integration);
+       } catch (error) {
+-        refused = /finalization|evidence|identity|snapshot|gate|review|invalid|binding/i.test(error.message);
++        refused = /finalization|evidence|identity|snapshot|gate|review|lens|story|invalid|binding/i.test(error.message);
+       }
+       finalizationRefusals.push([label, refused]);
+       fs.writeFileSync(state.file, finalizedBytes);
+@@ -1130,6 +1358,13 @@
+       expectedRecordHash: state.hash,
+     }, fixture.integration);
+     assertWrapper(report, 'remote-report-prepare', 'PREPARED');
++    const reportGeneration = structuredClone(report.record.remote.closure.artifacts.report.pending.generation);
++    assert.deepEqual(report.record.remote.closure.artifacts.report.pending.writes.map((item) => item.expected_mode),
++      ['100644', '100644'], 'new P report paths use normal tracked file mode');
++    for (const write of report.record.remote.closure.artifacts.report.pending.writes) {
++      assert.equal(fs.statSync(path.join(closureRoot, ...write.path.split('/'))).mode & 0o111, 0,
++        'new P paths materialize as non-executable tracked files');
++    }
+     exerciseRemoteArtifactPendingResume({
+       root: closureRoot, wrapper: report,
+       selectPending: (record) => record.remote.closure.artifacts.report.pending,
+@@ -1194,6 +1429,17 @@
+       expectedRecordHash: state.hash,
+     }, fixture.integration);
+     assertWrapper(closure, 'remote-closure-prepare', 'PREPARED');
++    const closurePending = closure.record.remote.closure.artifacts.closure.pending;
++    const closureGeneration = structuredClone(closurePending.generation);
++    assert.equal(closurePending.writes[0].expected_mode, '100755');
++    assert.notEqual(fs.statSync(path.join(closureRoot, storyRel)).mode & 0o111, 0,
++      'E preparation preserves the legal executable story mode');
++    assertPendingStoryRebindingRejected({
++      root: closureRoot, wrapper: closure,
++      resume: (recordHash) => integrationApi.prepareRemoteStoryClosure(closure.file, {
++        expectedRecordHash: recordHash,
++      }, fixture.integration),
++    });
+     exerciseRemoteArtifactPendingResume({
+       root: closureRoot, wrapper: closure,
+       selectPending: (record) => record.remote.closure.artifacts.closure.pending,
+@@ -1205,7 +1451,27 @@
+         hash: recordHash, cwd: fixture.integration,
+       }),
+     });
++    const closureStoryFile = path.join(closureRoot, storyRel);
++    const closureRecordBeforeModeDrift = fs.readFileSync(closure.file, 'utf8');
++    const closureStoryBeforeModeDrift = fs.readFileSync(closureStoryFile, 'utf8');
++    fs.chmodSync(closureStoryFile, 0o644);
++    let closureModeDriftRefused = false;
++    try {
++      integrationApi.prepareRemoteStoryClosure(closure.file, {
++        expectedRecordHash: closure.hash,
++      }, fixture.integration);
++    } catch (error) {
++      closureModeDriftRefused = /mode|pending|image|status|changed|resume/i.test(error.message);
++    }
++    const closureRecordAfterModeDrift = fs.readFileSync(closure.file, 'utf8');
++    const closureStoryAfterModeDrift = fs.readFileSync(closureStoryFile, 'utf8');
++    fs.chmodSync(closureStoryFile, 0o755);
++    assert.equal(closureModeDriftRefused, true,
++      'same-text executable story mode drift refuses E recovery');
++    assert.equal(closureRecordAfterModeDrift, closureRecordBeforeModeDrift);
++    assert.equal(closureStoryAfterModeDrift, closureStoryBeforeModeDrift);
+     const e = commitPrepared(closureRoot, 'Remote story closure E', closure);
++    assert.equal(git(closureRoot, 'ls-tree', e, '--', storyRel).split(/\s+/)[0], '100755');
+     state = wrapperState(integrationApi.adoptRemoteStoryClosure(closure.file, {
+       expectedRecordHash: closure.hash, token: closure.result.token, commit: e,
+     }, fixture.integration));
+@@ -1215,6 +1481,11 @@
+       expectedRecordHash: state.hash, next: 'Continue with S1-2.',
+     }, fixture.integration);
+     assertWrapper(handoff, 'remote-handoff-prepare', 'PREPARED');
++    const handoffPending = handoff.record.remote.closure.artifacts.handoff.pending;
++    const handoffGeneration = structuredClone(handoffPending.generation);
++    assert.equal(handoffPending.writes[0].expected_mode, '100755');
++    assert.notEqual(fs.statSync(path.join(closureRoot, ...handoffPending.writes[0].path.split('/'))).mode & 0o111, 0,
++      'H preparation preserves the legal executable handoff mode');
+     exerciseRemoteArtifactPendingResume({
+       root: closureRoot, wrapper: handoff,
+       selectPending: (record) => record.remote.closure.artifacts.handoff.pending,
+@@ -1226,11 +1497,34 @@
+         hash: recordHash, cwd: fixture.integration, options: { next: 'Continue with S1-2.' },
+       }),
+     });
++    const handoffOwnedFile = path.join(closureRoot, ...handoffPending.writes[0].path.split('/'));
++    const handoffRecordBeforeModeDrift = fs.readFileSync(handoff.file, 'utf8');
++    const handoffBeforeModeDrift = fs.readFileSync(handoffOwnedFile, 'utf8');
++    fs.chmodSync(handoffOwnedFile, 0o644);
++    let handoffModeDriftRefused = false;
++    try {
++      integrationApi.prepareRemoteHandoff(handoff.file, {
++        expectedRecordHash: handoff.hash, next: 'Continue with S1-2.',
++      }, fixture.integration);
++    } catch (error) {
++      handoffModeDriftRefused = /mode|pending|image|status|changed|resume/i.test(error.message);
++    }
++    const handoffRecordAfterModeDrift = fs.readFileSync(handoff.file, 'utf8');
++    const handoffAfterModeDrift = fs.readFileSync(handoffOwnedFile, 'utf8');
++    fs.chmodSync(handoffOwnedFile, 0o755);
++    assert.equal(handoffModeDriftRefused, true,
++      'same-text executable handoff mode drift refuses H recovery');
++    assert.equal(handoffRecordAfterModeDrift, handoffRecordBeforeModeDrift);
++    assert.equal(handoffAfterModeDrift, handoffBeforeModeDrift);
+     const h = commitPrepared(closureRoot, 'Remote handoff H', handoff);
++    assert.equal(git(closureRoot, 'ls-tree', h, '--', handoffPending.writes[0].path).split(/\s+/)[0], '100755');
+     state = wrapperState(integrationApi.adoptRemoteHandoff(handoff.file, {
+       expectedRecordHash: handoff.hash, token: handoff.result.token, commit: h,
+     }, fixture.integration));
+     assert.equal(state.record.remote.closure.artifacts.handoff.commit, h);
++    assertAdoptedArtifactGeneration(state.record, 'report', reportGeneration, closureRoot);
++    assertAdoptedArtifactGeneration(state.record, 'closure', closureGeneration, closureRoot);
++    assertAdoptedArtifactGeneration(state.record, 'handoff', handoffGeneration, closureRoot);
+ 
+     let closurePublishWrites = 0;
+     let closureMergeWrites = 0;
+@@ -1313,6 +1607,9 @@
+     state = wrapperState(merged);
+     assert.equal(merged.result.closure_commit, fake.state.mergeCommit);
+     assert.equal(hasCommit(fixture.root, fake.state.mergeCommit), true);
++    const closureAdmission = currentPmApi.remoteAdmissionStatus(fixture.integration);
++    assert.equal(closureAdmission.remote_terminal_commit, merged.result.terminal_commit,
++      'admission projects the validated closure terminal before completion preparation');
+ 
+     const prepared = integrationApi.prepareRemoteCompletion(state.file, {
+       expectedRecordHash: state.hash,
+@@ -1351,6 +1648,31 @@
+       expectedRecordHash: prepared.hash, token: prepared.result.token,
+     }, fixture.integration);
+     assertWrapper(completed, 'remote-completion-adopt', 'COMPLETE');
++    assertFinalReceiptTamperRejections(completed.record);
++    const completedReceiptBytes = fs.readFileSync(completed.file, 'utf8');
++    for (const [label, mutate] of [
++      ['required review lens removed from an otherwise reidentified receipt', (record) => {
++        record.remote.integration_evidence.review.panel.members = [];
++        refreshFinalizedEvidence(record, { review: true });
++      }],
++      ['review requirements rebound away from the frozen M story', (record) => {
++        const finalization = record.remote.integration_evidence.finalization;
++        finalization.review_requirements.required_lenses = [];
++        finalization.review_requirements = reidentify(finalization.review_requirements);
++        record.remote.integration_evidence.finalization = reidentify(finalization);
++      }],
++    ]) {
++      const forged = JSON.parse(completedReceiptBytes);
++      mutate(forged);
++      const forgedBytes = `${JSON.stringify(forged, null, 2)}\n`;
++      fs.writeFileSync(completed.file, forgedBytes);
++      const receiptAdmission = currentPmApi.remoteAdmissionStatus(fixture.integration);
++      assert.equal(receiptAdmission.state, 'UNKNOWN', label);
++      assert.equal(receiptAdmission.blocking, true, label);
++      assert.equal(fs.readFileSync(completed.file, 'utf8'), forgedBytes,
++        `${label} admission is read-only`);
++      fs.writeFileSync(completed.file, completedReceiptBytes);
++    }
+     assert.equal(readStory(fixture.integration, storyRel).execution.status, 'merged');
+     assert.equal(fs.readFileSync(fixture.runFile, 'utf8'), fixture.sourceBytes);
+     assert.deepEqual(JSON.parse(fs.readFileSync(fixture.runFile, 'utf8')).counters, fixture.sourceCounters);
+@@ -1462,6 +1784,32 @@
+   }, fixture.integration);
+   const mergeBytes = fs.readFileSync(merged.file, 'utf8');
+   const mergeCalls = fake.calls.filter((item) => item.method === 'merge').length;
++  let terminalInspections = 0;
++  let terminalWrites = 0;
++  const terminalProvider = {
++    ...fake.provider,
++    inspect(target) {
++      terminalInspections += 1;
++      return fake.provider.inspect(target);
++    },
++    merge(target, options) {
++      terminalWrites += 1;
++      return fake.provider.merge(target, options);
++    },
++  };
++  const retainedAfterEffect = integrationApi.mergeRemoteSource(merged.file, {
++    expectedRecordHash: merged.hash, prNumber: fake.state.prNumber, method: 'merge',
++    subject: 'Merge S1-1 once', body: 'Stable merge body', provider: terminalProvider,
++  }, fixture.integration);
++  let changedMergeIntentRefused = false;
++  try {
++    integrationApi.mergeRemoteSource(merged.file, {
++      expectedRecordHash: merged.hash, prNumber: fake.state.prNumber, method: 'merge',
++      subject: 'Changed terminal merge intent', body: 'Stable merge body', provider: terminalProvider,
++    }, fixture.integration);
++  } catch (error) {
++    changedMergeIntentRefused = /input|intent|subject|differ|retained/i.test(error.message);
++  }
+   const changedHeadAfterMerge = serverCommitWithFile(fixture, fixture.candidate,
+     'src/post-merge-provider-head.txt', 'post-merge provider head\n', 'Move provider head after source merge');
+   git(fixture.remoteRoot, 'update-ref', `refs/heads/${fixture.record.record.source.branch}`,
+@@ -1508,12 +1856,26 @@
+   assert.equal(publicationAfterProof.record.remote.source.publication.attempts.length, 1,
+     'a proved source merge forbids publication supersession');
+   assert.equal(fs.readFileSync(proved.file, 'utf8'), proofBytes);
++  const retainedAfterProof = integrationApi.mergeRemoteSource(proved.file, {
++    expectedRecordHash: proved.hash, prNumber: fake.state.prNumber, method: 'merge',
++    subject: 'Merge S1-1 once', body: 'Stable merge body', provider: terminalProvider,
++  }, fixture.integration);
++  assert.equal(retainedAfterEffect.hash, merged.hash,
++    'same-input merge after a durable effect returns the retained record');
++  assert.equal(retainedAfterProof.hash, proved.hash,
++    'same-input merge after source proof returns the retained record');
++  assert.equal(terminalInspections, 0,
++    'terminal merge replay performs no provider inspection after effect or proof');
++  assert.equal(terminalWrites, 0,
++    'terminal merge replay and changed intent perform no provider write');
++  assert.equal(changedMergeIntentRefused, true,
++    'changed merge intent refuses against the retained terminal effect');
+ });
+ 
+ test('proved premerge head or base drift supersedes reciprocally before one successor provider write', async (t) => {
++  const shared = reusableSourceFixture(t);
+   await t.test('published source head drift prepares one linked successor and executes it on the next call', () => {
+-    const fixture = finishedRemoteCandidate(t);
+-    const fake = providerFixture(fixture);
++    const { fixture, fake } = shared.reset();
+     git(fixture.root, 'push', '-q', 'origin',
+       `${fixture.candidate}:refs/heads/${fixture.record.record.source.branch}`);
+     const changedHead = serverCommitWithFile(fixture, fixture.candidate, 'src/provider-head.txt',
+@@ -1624,8 +1986,7 @@
+   });
+ 
+   await t.test('pending merge base drift prepares one linked successor and executes it on the next call', () => {
+-    const fixture = finishedRemoteCandidate(t);
+-    const fake = providerFixture(fixture);
++    const { fixture, fake } = shared.reset();
+     let state = wrapperState(integrationApi.publishRemoteSource(fixture.record.file, {
+       expectedRecordHash: fixture.record.hash, remote: 'origin', title: 'Publish before base drift', body: '',
+       provider: fake.provider,
+@@ -1723,7 +2084,7 @@
+   });
+ 
+   await t.test('unknown, absent, failed and unproved mismatch observations never supersede or trigger a second write', () => {
+-    const fixture = finishedRemoteCandidate(t);
++    const { fixture } = shared.reset();
+     const initialBytes = fs.readFileSync(fixture.record.file, 'utf8');
+     for (const providerState of ['UNKNOWN', 'PR_ABSENT', 'PUSH_REJECTED', 'HEAD_MISMATCH']) {
+       fs.writeFileSync(fixture.record.file, initialBytes);
+@@ -1775,7 +2136,13 @@
+     subject: 'Merge before integration advances', body: '', provider: fake.provider,
+   }, fixture.integration));
+   const sourceMerge = fake.state.mergeCommit;
+-  const advanced = serverCommitWithFile(fixture, sourceMerge, 'src/value.txt',
++  const reportRel = 'docs/verification/S1-1.md';
++  const checklistRel = 'docs/checklists/verification-S1-1.md';
++  const advancedReport = serverCommitWithFile(fixture, sourceMerge, reportRel,
++    'retained provider-side verification report\n', 'Add existing verification report at advanced M');
++  const advancedChecklist = serverCommitWithFile(fixture, advancedReport, checklistRel,
++    'retained provider-side verification checklist\n', 'Add existing verification checklist at advanced M');
++  const advanced = serverCommitWithFile(fixture, advancedChecklist, 'src/value.txt',
+     'remote integration reviewed adjustment\n', 'Advance integration task bytes');
+   git(fixture.remoteRoot, 'update-ref', 'refs/heads/main', advanced, sourceMerge);
+   assert.equal(hasCommit(fixture.root, advanced), false);
+@@ -1823,6 +2190,37 @@
+   assert.equal(finalized.record.remote.integration_evidence.review.snapshot_hash, snapshot);
+   assert.equal(finalized.record.remote.integration_evidence.verification.snapshot_hash, snapshot);
+   assert.equal(fs.readFileSync(fixture.runFile, 'utf8'), fixture.sourceBytes);
++  const checkout = integrationApi.prepareRemoteClosureCheckout(finalized.file, {
++    expectedRecordHash: finalized.hash,
++  }, fixture.integration);
++  const closureRoot = `${fixture.root}-advanced-existing-report-closure`;
++  t.after(() => fs.rmSync(closureRoot, { recursive: true, force: true }));
++  git(fixture.root, 'worktree', 'add', '-q', '-b', checkout.result.branch,
++    closureRoot, checkout.result.start_commit);
++  const ready = integrationApi.adoptRemoteClosureCheckout(checkout.file, {
++    expectedRecordHash: checkout.hash, token: checkout.result.token, closureRoot,
++  }, fixture.integration);
++  const recordBeforeExistingReport = fs.readFileSync(ready.file, 'utf8');
++  const reportBefore = fs.readFileSync(path.join(closureRoot, reportRel), 'utf8');
++  const checklistBefore = fs.readFileSync(path.join(closureRoot, checklistRel), 'utf8');
++  let existingReportRefused = false;
++  try {
++    integrationApi.prepareRemoteVerificationReport(ready.file, {
++      expectedRecordHash: ready.hash,
++    }, fixture.integration);
++  } catch (error) {
++    existingReportRefused = /already|exist|report|checklist|absent|overwrite/i.test(error.message);
++  }
++  const recordAfterExistingReport = fs.readFileSync(ready.file, 'utf8');
++  const reportAfter = fs.readFileSync(path.join(closureRoot, reportRel), 'utf8');
++  const checklistAfter = fs.readFileSync(path.join(closureRoot, checklistRel), 'utf8');
++  assert.equal(existingReportRefused, true,
++    'remote P refuses when either generated report path already exists at valid advanced M');
++  assert.equal(recordAfterExistingReport, recordBeforeExistingReport,
++    'existing report refusal leaves the integration record unchanged');
++  assert.equal(reportAfter, reportBefore, 'existing report refusal preserves provider-side report bytes');
++  assert.equal(checklistAfter, checklistBefore,
++    'existing report refusal preserves provider-side checklist bytes');
+ });
+ 
+ test('rebase reconciliation permits empty server commits but rejects reverted unauthorized intermediate paths', async (t) => {
+@@ -2090,9 +2488,9 @@
+ });
+ 
+ test('provider interruption preserves one attempt across concurrency, fresh-process ambiguity, absence replay and merge adoption', async (t) => {
++  const shared = reusableSourceFixture(t);
+   await t.test('an executing publication rejects a concurrent provider write', () => {
+-    const fixture = finishedRemoteCandidate(t);
+-    const fake = providerFixture(fixture);
++    const { fixture, fake } = shared.reset();
+     let nested;
+     const provider = {
+       ...fake.provider,
+@@ -2120,8 +2518,7 @@
+   });
+ 
+   await t.test('fresh process keeps an ended executing attempt unknown, then same-process exact absence replays its token', () => {
+-    const fixture = finishedRemoteCandidate(t);
+-    const fake = providerFixture(fixture);
++    const { fixture, fake } = shared.reset();
+     let publishCalls = 0;
+     const title = 'Interrupted publish';
+     const body = 'Recover only after exact absence.';
+@@ -2184,6 +2581,17 @@
+       ['executing can return to prepared only with an exact replay proof', (record) => {
+         const candidate = record.remote.source.publication.attempts[0];
+         delete candidate.transitions[2].replay;
++        reidentifyAttemptTransitions(candidate);
++      }],
++      ['exact absence replay must bind the attempt expected head', (record) => {
++        const candidate = record.remote.source.publication.attempts[0];
++        const transition = candidate.transitions[2];
++        transition.replay.absence_result = {
++          ...transition.replay.absence_result,
++          expectedHead: '1'.repeat(40),
++        };
++        transition.replay.absence_identity = sha256(canonical(transition.replay.absence_result));
++        transition.replay = reidentify(transition.replay);
+         reidentifyAttemptTransitions(candidate);
+       }],
+       ['a retained prepared attempt must remain the active token', (record) => {
+@@ -2209,8 +2617,7 @@
+   });
+ 
+   await t.test('server merge completed before transport loss is reconciled onto the same attempt without replay', () => {
+-    const fixture = finishedRemoteCandidate(t);
+-    const fake = providerFixture(fixture);
++    const { fixture, fake } = shared.reset();
+     let state = wrapperState(integrationApi.publishRemoteSource(fixture.record.file, {
+       expectedRecordHash: fixture.record.hash, remote: 'origin', title: 'Publish before merge loss', body: '',
+       provider: fake.provider,
+@@ -2244,8 +2651,7 @@
+   });
+ 
+   await t.test('queued merge observation cannot replay an ended merge invocation', () => {
+-    const fixture = finishedRemoteCandidate(t);
+-    const fake = providerFixture(fixture);
++    const { fixture, fake } = shared.reset();
+     let state = wrapperState(integrationApi.publishRemoteSource(fixture.record.file, {
+       expectedRecordHash: fixture.record.hash, remote: 'origin', title: 'Publish before queued merge', body: '',
+       provider: fake.provider,
+@@ -2283,7 +2689,8 @@
+ 
+ test('raced closure preserves concurrent integration bytes and repairs only the handoff through H2 and S', (t) => {
+   requireRemoteApi();
+-  const flow = adoptedRemoteClosureArtifacts(t, finalizedRemoteEvidence(t));
++  const flow = adoptedRemoteClosureArtifacts(t,
++    finalizedRemoteEvidence(t, { executableArtifacts: true }));
+   const { fixture, fake, closureRoot, h } = flow;
+   let state = flow.state;
+   const published = integrationApi.publishRemoteClosure(state.file, {
+@@ -2322,7 +2729,11 @@
+   assertWrapper(repair, 'remote-handoff-repair-prepare', 'PREPARED');
+   const repairPreparedBytes = fs.readFileSync(repair.file, 'utf8');
+   const repairAttempt = repair.record.remote.handoff_repair.attempts.at(-1);
++  const repairGeneration = structuredClone(repairAttempt.preparation.generation);
++  assert.equal(repairAttempt.write.expected_mode, '100755');
+   const repairHandoff = path.join(repairRoot, ...repair.result.path.split('/'));
++  assert.notEqual(fs.statSync(repairHandoff).mode & 0o111, 0,
++    'H2 preparation preserves the legal executable handoff mode');
+   let exactAfterResumed = false;
+   try {
+     const resumed = freshProcessArtifactResume(fixture.root, {
+@@ -2363,6 +2774,20 @@
+   assert.equal(fs.readFileSync(repair.file, 'utf8'), repairPreparedBytes);
+   assert.equal(fs.readFileSync(repairHandoff, 'utf8'), 'partial handoff write\n');
+   fs.writeFileSync(repairHandoff, repairAttempt.write.after);
++  fs.chmodSync(repairHandoff, 0o644);
++  let repairModeDriftRefused = false;
++  try {
++    integrationApi.prepareHandoffRepair(repair.file, {
++      expectedRecordHash: repair.hash, integrationRoot: repairRoot,
++    }, fixture.integration);
++  } catch (error) {
++    repairModeDriftRefused = /mode|pending|image|status|changed|resume/i.test(error.message);
++  }
++  assert.equal(fs.readFileSync(repair.file, 'utf8'), repairPreparedBytes);
++  assert.equal(fs.readFileSync(repairHandoff, 'utf8'), repairAttempt.write.after);
++  fs.chmodSync(repairHandoff, 0o755);
++  assert.equal(repairModeDriftRefused, true,
++    'same-text executable handoff mode drift refuses H2 recovery');
+   git(repairRoot, 'add', '--', repair.result.path);
+   git(repairRoot, 'commit', '-qm', 'Fresh remote handoff H2');
+   const h2 = git(repairRoot, 'rev-parse', 'HEAD');
+@@ -2402,6 +2827,25 @@
+     expectedRecordHash: repair.hash, token: repair.result.token, commit: h2,
+   }, fixture.integration);
+   assertWrapper(adopted, 'remote-handoff-repair-adopt', 'ADOPTED');
++  const adoptedRepairProof = adopted.record.remote.handoff_repair.attempts.at(-1).proof;
++  assert.deepEqual(adoptedRepairProof.generation, repairGeneration,
++    'H2 proof retains the exact identified generation used by its pending image');
++  assert.equal(adoptedRepairProof.generation.finalization.identity,
++    adopted.record.remote.integration_evidence.finalization.identity);
++  assert.equal(adoptedRepairProof.generation.source_proof.identity,
++    adopted.record.remote.source.proof.identity);
++  assert.equal(adoptedRepairProof.generation.view.closure.commit, r);
++  assert.equal(adoptedRepairProof.generation.view.integration.commit,
++    adopted.record.remote.integration_evidence.commit);
++  assert.equal(adoptedRepairProof.write.mode, '100755');
++  const reboundRepairGeneration = structuredClone(adopted.record);
++  const reboundRepairProof = reboundRepairGeneration.remote.handoff_repair.attempts.at(-1).proof;
++  reboundRepairProof.generation.source_proof.identity = '0'.repeat(64);
++  reboundRepairProof.generation = reidentify(reboundRepairProof.generation);
++  reboundRepairGeneration.remote.handoff_repair.attempts.at(-1).proof = reidentify(reboundRepairProof);
++  assert.throws(() => validateRemotePublicationRecord(reboundRepairGeneration),
++    /generation|source|artifact|binding|remote publication evidence/i,
++    'H2 proof refuses a coherently reidentified generation rebound away from source proof');
+   assert.equal(git(repairRoot, 'diff-tree', '--no-commit-id', '--name-only', '-r', r, h2),
+     state.record.handoff.path);
+   assert.match(git(repairRoot, 'show', `${h2}:${state.record.handoff.path}`), new RegExp(`BASE_COMMIT: ${r}`));
+@@ -2681,6 +3125,52 @@
+   assertWrapper(reconciled, 'closure-reconcile', 'HANDOFF_STALE');
+   state = wrapperState(reconciled);
+   let parent = reconciled.result.terminal_commit;
++  const destinationStart = git(fixture.integration, 'rev-parse', 'HEAD');
++
++  const proveSuccessfulReplacement = (retry, current, attempt, h2) => {
++    const recordBytes = fs.readFileSync(current.file, 'utf8');
++    const providerState = structuredClone(fake.state);
++    const providerCallCount = fake.calls.length;
++    let successful = wrapperState(integrationApi.publishRemoteHandoffRepair(current.file, {
++      expectedRecordHash: current.hash, remote: 'origin', title: `Complete repair retry ${retry}`,
++      body: '', provider: fake.provider,
++    }, fixture.integration));
++    successful = wrapperState(integrationApi.publishRemoteHandoffRepair(successful.file, {
++      expectedRecordHash: successful.hash, remote: 'origin', title: `Complete repair retry ${retry}`,
++      body: '', provider: fake.provider,
++    }, fixture.integration));
++    const proved = integrationApi.reconcileRemoteHandoffRepair(successful.file, {
++      expectedRecordHash: successful.hash, prNumber: fake.state.prNumber, provider: fake.provider,
++      fetchRemote: fetchFromFixture(fixture, flow.fetchCalls),
++    }, fixture.integration);
++    assertWrapper(proved, 'handoff-repair-reconcile', 'HANDOFF_REPAIRED');
++    assert.equal(proved.record.remote.handoff_repair.proof.parent, attempt.parent);
++    assert.equal(proved.record.remote.handoff_repair.proof.handoff_commit, h2);
++    assert.match(git(attempt.root, 'show', `${h2}:${attempt.write.path}`),
++      new RegExp(`BASE_COMMIT: ${attempt.parent}`));
++    const completion = integrationApi.prepareRemoteCompletion(proved.file, {
++      expectedRecordHash: proved.hash,
++    }, fixture.integration);
++    git(fixture.integration, 'merge', '--ff-only', completion.result.target);
++    const completed = integrationApi.adoptRemoteCompletion(completion.file, {
++      expectedRecordHash: completion.hash, token: completion.result.token,
++    }, fixture.integration);
++    assertWrapper(completed, 'remote-completion-adopt', 'COMPLETE');
++    assert.equal(completed.record.remote.handoff_repair.attempts.at(-1).retry, retry);
++    git(fixture.integration, 'reset', '--hard', destinationStart);
++    const remoteHead = git(fixture.remoteRoot, 'rev-parse', 'refs/heads/main');
++    git(fixture.remoteRoot, 'update-ref', 'refs/heads/main', attempt.parent, remoteHead);
++    git(fixture.remoteRoot, 'update-ref', '-d', `refs/heads/${attempt.branch}`);
++    fs.writeFileSync(current.file, recordBytes);
++    Object.assign(fake.state, providerState);
++    fake.calls.length = providerCallCount;
++    assert.equal(fs.readFileSync(current.file, 'utf8'), recordBytes,
++      `retry ${retry} success probe restores the exact raced record`);
++    assert.equal(git(fixture.integration, 'rev-parse', 'HEAD'), destinationStart,
++      `retry ${retry} success probe restores destination I`);
++    assert.equal(git(fixture.remoteRoot, 'rev-parse', 'refs/heads/main'), attempt.parent,
++      `retry ${retry} success probe restores the proved race parent`);
++  };
+ 
+   for (let retry = 0; retry <= 2; retry++) {
+     const repairRoot = `${fixture.root}-repair-retry-${retry}`;
+@@ -2693,12 +3183,19 @@
+     const attempt = prepared.record.remote.handoff_repair.attempts.at(-1);
+     assert.equal(attempt.retry, retry);
+     assert.equal(attempt.parent, parent);
++    assert.equal(attempt.preparation.parent, parent);
++    assert.equal(attempt.preparation.generation.view.closure.commit, parent,
++      `replacement H2 generation ${retry} binds the latest proved parent`);
++    assert.match(attempt.write.after, new RegExp(`BASE_COMMIT: ${parent}`));
+     git(repairRoot, 'add', '--', prepared.result.path);
+     git(repairRoot, 'commit', '-qm', `Repair H2 retry ${retry}`);
+     const h2 = git(repairRoot, 'rev-parse', 'HEAD');
+     state = wrapperState(integrationApi.adoptHandoffRepair(prepared.file, {
+       expectedRecordHash: prepared.hash, token: prepared.result.token, commit: h2,
+     }, fixture.integration));
++    const adoptedAttempt = state.record.remote.handoff_repair.attempts.at(-1);
++    assert.equal(adoptedAttempt.proof.parent, parent);
++    if (retry > 0) proveSuccessfulReplacement(retry, state, adoptedAttempt, h2);
+     state = wrapperState(integrationApi.publishRemoteHandoffRepair(state.file, {
+       expectedRecordHash: state.hash, remote: 'origin', title: `Repair retry ${retry}`, body: '',
+       provider: fake.provider,

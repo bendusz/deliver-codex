@@ -1,0 +1,18 @@
+--- frozen/tests/integration.test.mjs
++++ probe/tests/integration.test.mjs
+@@ -728,6 +728,15 @@
+   assertVeto('missing active gate', (value) => { value.evidence.gates = []; }, /LEGACY_ACTIVE_EVIDENCE_MISSING/);
+   assertVeto('duplicate active gate', (value) => { value.evidence.gates.push(structuredClone(value.evidence.gates[0])); }, /LEGACY_ACTIVE_EVIDENCE_MISSING/);
+   assertVeto('stale active gate identity', (value) => { value.evidence.gates[0].identity = '0'.repeat(64); }, /receipt identity is invalid/);
++  assertVeto('active builder self-review', (value) => {
++    value.evidence.review = sign({ status: 'PASS', findings: [], reviewer: value.source.builder,
++      snapshot_hash: value.evidence.snapshot_hash, recorded_at: new Date(0).toISOString() });
++  }, /reviewer.*builder|independent/);
++  assertVeto('active missing verifier identity', (value) => {
++    value.evidence.verification = sign({ verifier: '', snapshot_hash: value.evidence.snapshot_hash,
++      recorded_at: new Date(0).toISOString(), criteria: [{ id: 'AC-1', status: 'PASS', evidence: 'Current result.' }] });
++  }, /verifier.*explicit|identity/);
++
+   assertVeto('active failed review', (value) => {
+     value.evidence.review = sign({ status: 'FAIL', findings: [], reviewer: 'current-reviewer',
+       snapshot_hash: value.evidence.snapshot_hash, recorded_at: new Date(0).toISOString() });

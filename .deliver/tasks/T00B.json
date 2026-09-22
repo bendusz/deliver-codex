@@ -1,0 +1,38 @@
+{
+  "id": "T00B",
+  "objective": "Remove packaged per-role sandbox overrides so all native roles inherit the explicitly selected session policy",
+  "read_paths": [
+    "AGENTS.md",
+    "docs/plans/2026-09-09-upstream-parity.md"
+  ],
+  "touches": [
+    "plugins/deliver/skills/deliver/assets/codex-agents/deliver-debugger.toml",
+    "plugins/deliver/skills/deliver/assets/codex-agents/deliver-security.toml",
+    "plugins/deliver/skills/deliver/assets/codex-agents/deliver-architecture.toml",
+    "plugins/deliver/skills/deliver/assets/codex-agents/deliver-verifier.toml",
+    "plugins/deliver/skills/deliver/assets/codex-agents/deliver-researcher.toml",
+    "plugins/deliver/skills/deliver/assets/codex-agents/deliver-explorer.toml",
+    "plugins/deliver/skills/deliver/assets/codex-agents/deliver-reviewer.toml",
+    "scripts/validate.mjs",
+    "tests/role-policy.test.mjs"
+  ],
+  "acceptance": [
+    {
+      "id": "T00B-AC1",
+      "text": "All bundled native roles inherit the effective session sandbox policy, with no default role-level sandbox override; launcher unsandboxed default and explicit sandbox opt-in remain unchanged."
+    },
+    {
+      "id": "T00B-AC2",
+      "text": "Read-only reviewer/researcher/explorer responsibilities and separation of duties remain behavioral instructions, while installed setup preserves existing user role and global configuration."
+    },
+    {
+      "id": "T00B-AC3",
+      "text": "Installed-copy regression and package validation reject reintroduced default role sandbox overrides without calling real model services or changing user configuration."
+    }
+  ],
+  "commands": {
+    "test": "npm test",
+    "validate": "npm run validate"
+  },
+  "specs": []
+}

@@ -6,7 +6,10 @@ The project setup command installs this self-contained skill and native TOML rol
 editing `.codex/config.toml` or global settings. Plugin installation distributes the skill;
 it does not by itself install TOML role definitions. Use setup for roles, or dispatch native
 agents with the matching role instructions. The launcher selects the main model; ordinary
-`codex` sessions retain their existing model configuration.
+`codex` sessions retain their existing model configuration. The launcher defaults its session
+to `danger-full-access` with approval set to `never`. Passing `--sandbox read-only` or
+`--sandbox workspace-write` opts into a sandbox and uses `on-request` approval. Native workers
+inherit the effective session policy. Inherited host restrictions still apply.
 
 Codex project AGENTS.md discovery follows the directory chain to the session's working
 directory. Do not assume nested `pm/AGENTS.md` automatically applies to a root-launched worker.
@@ -38,8 +41,9 @@ It does not own project progress. The low-level runtime still supports standalon
 without `pm/`, but those are not a shared project or an automatic cross-host handoff.
 
 Read `pm/pm-state.json`, your actor state, a current handoff, then the selected story and wiki index.
-Inspect actual Git state. Fetch, pull, rebase and commits remain separately authorized operations.
-Preserve unknown state fields. Use the original Git-derived actor ID, including its historical
+Inspect actual Git state. In an approved delivery, the PM may commit scoped work, push story
+branches, create or update pull requests, and merge verified code without repeated confirmation.
+Follow repository policy and preserve unknown state fields. Use the original Git-derived actor ID, including its historical
 `:pm-skill` salt; never create host-specific human identities to evade an existing claim.
 
 ## Start or continue in Codex
@@ -63,7 +67,7 @@ a host boundary. The helper refuses active/parallel actor
 work and explicit `expert-builder` stories until their routing is deliberately reconciled.
 Its shared route is `codex-builder`; native Sol/Luna execution remains controlled by Codex roles.
 Confirm `.gitattributes` contains `pm/log.md merge=union` and that PM files are not ignored. Add the
-merge attribute only within authorization. Commit the claim under the project's policy and check
+merge attribute only within scope. The PM commits the claim under the project's policy and checks
 out the recorded story branch before the task baseline. Helpers do not perform Git mutations.
 
 Build the task packet from the story's ID, exact checkbox criterion text in order, and bounded
@@ -84,19 +88,16 @@ or live concurrent editing of PM coordination records is supported by this bridg
 ## Verified is not merged
 
 Runtime `finish` records reviewed and verified code only. It does not release the shared claim,
-mark the actor merged, or imply permission to commit. After separately authorized commit/integration,
-check out the clean integration branch and run:
+mark the actor merged, or perform Git integration. Under the approved delivery authority, the PM
+commits candidate C and follows `references/shipping.md`. Current-format projects use the audited
+local C/M/P/E/H protocol or the separately installed remote path. Every declared gate runs again
+at actual M. Different bound content needs fresh M evidence or an explicit source correction; an
+old PASS is never relabeled. Only story-only closure E records `merged` and releases the claim.
+H writes `docs/handoff/<actor-id>.md` with `BASE_COMMIT: E`, so the unchanged upstream reader
+accepts its own handoff-only commit.
 
-```text
-node <pm> complete --run <run-id> --commit <full-integration-HEAD-sha> --next "Continue with the next ready story"
-```
-
-The integrated file contents must match the retained verified snapshot. Different integration
-content needs fresh verification; never relabel an old PASS. The helper then records `merged` and
-`PASS`, exports counters, clears `resolved_builder`, releases only this story's claim, appends the
-log and writes a current handoff. Story documents and other actors stay unchanged. Commit these
-PM records under the user's authorization so they travel with a clone. Do not advance the sprint
-without checking all its stories. The original framework reads the resulting files directly.
+The older `pm complete` command remains for tagged legacy 0.22 bindings. It updates legacy actor
+and PM files after exact verified integration. It cannot close a current story.
 
 ## Recovery and limits
 

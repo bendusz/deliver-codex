@@ -1,0 +1,54 @@
+{
+  "status": "FAIL",
+  "findings": [
+    {
+      "severity": "block",
+      "message": "Adopted P/E/H proofs are re-validated against volatile live evidence instead of their frozen identities, creating an unrecoverable record. validateIntegrationProofs() -> validateAdoptedArtifact() -> validateArtifactPending() calls assertEvidenceReady(record,{finalized:true}) for every adopted report/closure/handoff proof, and withRecord() runs validateIntegrationProofs() before every mutation. Trigger A: after report-adopt (or close-adopt), run integrate-gate/integrate-review/integrate-verify once; invalidateFinalization() sets evidence.finalized=false and the write succeeds (validateRecord() does not re-run proof validation), but every subsequent command (including integrate-finalize) fails in the pre-mutate validation with 'integration evidence finalization identity is missing or stale'. Trigger B: resume after P in a process whose inherited environment differs at all (environmentHandle() in gates.mjs hashes the entire process.env except _, SHLVL, OLDPWD, e.g. PWD/TERM_SESSION_ID), so assertEvidenceReady() reports 'fresh integration gate is missing or failed' inside the read-time validation and no command can proceed; gates cannot be re-run because the mutation path is blocked first. Impact: story cannot reach E/H through the tool; only manual JSON edits of the unauthenticated record recover it, which contradicts the AC2 fresh-process interruption/resume claim and AC3 P->E ordering. Fix: validate adopted proofs against stored identities (effective_review_identity, gate identities, stored env hash) rather than live conditions, and refuse evidence mutations once report.commit or closure.commit is set.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "No re-prepare or abandon path once an integration record exists. prepareLocalIntegration() returns the existing record from the fs.existsSync(file) branch keyed solely by run id: a 'failed' probe record is returned forever even after the integration branch is updated to resolve the conflict, and a 'prepared' record whose base I has advanced fails with 'prepared integration base is no longer current' with no supported way to re-probe against the new I. Since the PM has standing authority to merge other stories/upstream changes into I between prepare and adopt, this is a realistic dead end that requires manually deleting .deliver/integrations/<run>.json. Design recommendation, not a false-PASS defect: add an explicit supersede/re-prepare operation that archives the prior probe/preparation.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "major",
+      "message": "Whole-checkout proofs spawn one git subprocess per tracked blob and are recomputed several times per command. fingerprintBlob() runs `git cat-file blob <oid>` per entry; checkoutObjectEntries() walks `ls-tree -r <commit>` for the entire tree ('.'), and per command withRecord()->validateIntegrationProofs() validates the base I proof and the adopted M proof, then assertExecutableM()->executableProof()->verifyCheckoutProof()->validateCheckoutProofObjects() walks the tree again plus liveFingerprint() of every file; runIntegrationGate() does this twice more. On a repository with thousands of files each integrate-* command costs tens of thousands of process spawns. Recommendation (performance/design, not correctness): use the Git blob oid as the committed identity and `git cat-file --batch`/`hash-object --stdin-paths` for live comparison, and validate frozen proofs by hash rather than full recomputation.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "Two worktrees are mandatory and the source checkout must stay parked at C on the story branch until handoff H is adopted: assertRecordSource() fails with 'finished source checkout no longer remains at C' if HEAD/branch of state.project_root move, and prepareLocalIntegration() requires branch(sourceRoot)===pm_binding.branch while branch(integrationRoot)===integrationBranch, so the same directory can never serve both roles. This blocks starting the next story in the source checkout until P/E/H complete. Acceptable if documented as the sequential-delivery contract (shipping.md not supplied), otherwise an autonomy restriction worth relaxing by binding immutable C via object identity instead of checkout position.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "`--verification-report` is silently dropped for tiny/small scales: prepareLocalIntegration() computes reportingRequested = scale==='standard' && verificationReport===true, so an explicit user request on a tiny/small project yields reporting 'skipped' with no error or diagnostic. Either honor the request or fail loudly.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "Reuse and proof scope are stricter than the acceptance text implies and will frequently force fresh evidence or gate failure. (1) source_reusable requires the live completion snapshot (which includes ignored/untracked files under touches, per scope.mjs snapshotVersion) to equal committed C, so any build cache or coverage output inside a touched directory at finish makes C review non-reusable. (2) protectedIgnoredEntries() includes every ignored path matching (config|configs|contract|contracts) such as node_modules/**/config.js, so a gate that installs/updates dependencies fails verifyCheckoutProof() with 'protected Git metadata changed'. Both are inherited from scope.mjs protectedIgnored; conservative rather than wrong, but worth narrowing for practical autonomy.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "parseReviewReceipt() validates top-level `findings` when a `panel` is present but then discards them, returning only member-derived findings. A receipt that lists a finding at top level without attributing it to a member loses it silently. Require top-level findings to be empty or identical to the derived set when a panel is supplied.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "Small robustness/format issues: handoffContent() hardcodes budget denominators 'rounds x/3 · retries y/2' instead of deriving them from the recorded policy; prepareLocalIntegration()'s `merge-base --is-ancestor` try/catch treats any git failure as 'not an ancestor'; buildCheckoutProof() fails with 'initialized submodule is absent from expected M' when C removes a submodule still initialized in I (requires manual deinit) and raises a raw git error when the integration submodule clone lacks M's gitlink object instead of a 'fetch the submodule first' message.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "resolved": false
+    }
+  ],
+  "summary": "Design assessment: the C/I/M/P/E/H model is sound and largely serves the plan. Strengths verified in the supplied code: adoptLocalIntegration()/recheckM() enforce the exact no-ff I+C topology and merge-tree composition, integration gates run only the source-declared commands at actual M, reusability is limited to clean composition with identical bound manifests and recomputed on every read, effectiveEvidence() requires fresh M review and verification when inputs drift without touching C, distinct-verifier separation is enforced both at source (state.mjs patch, including panel members) and at M, P is required between M and E for large/regulated with exact paths and no self-referential hash, adoptArtifacts() bounds each commit to its prepared paths and bytes, closure retains owner/rounds/retries via replaceStoryExecution(), handoff uses closure E as BASE_COMMIT with H as its own handoff-only commit, and panel receipts retain member identities/verdicts/findings with legacy receipts still accepted. Actual bugs: the block finding (frozen P/E/H proofs revalidated against volatile finalized flag and live environment hash, producing an unrecoverable record after a post-P gate rerun or an environment change on resume) undermines AC2/AC3; the two majors are design/autonomy gaps (no re-prepare path; per-blob subprocess proofs). Known pending work, not counted as defects: T05C correction runs (source findings remain unresolved by design here), T11 risk-to-panel lens selection (coverage is only enforced at reporting time), T08 resume/doctor, T12 parallel lifecycle, and T14 documentation. Limitations: deliver.mjs, pm.mjs, shipping.md, compatibility.md and operations.json were not supplied, so CLI wiring, the 'finish leaves claim active' runtime behaviour and documentation of the dual-worktree contract could only be judged via the supplied tests; the '153/153 tests passed' claim and the untested combined root+overlay tree were not verified by this review."
+}

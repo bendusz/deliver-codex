@@ -1,0 +1,27 @@
+{
+  "version": "unaccepted-draft-checkpoint-v1",
+  "task": "T05B",
+  "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "captured_at": "2026-09-13T11:25:11.483425+00:00",
+  "base_commit": "7c1b68e38497c83f54a693d556ca7af359e42c14",
+  "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05b-delivery",
+  "phase": "Active initial implementation; not frozen, gated, reviewed or accepted",
+  "patch_sha256": "c342a981cf3117065c49710d91e7cfe23fa99b234b97fcaaca660e6f871fef8e",
+  "untracked_files": [
+    "tests/remote-lifecycle.test.mjs"
+  ],
+  "changed_files": {
+    "plugins/deliver/skills/deliver/references/compatibility.md": "746031f8813b689994d4c6d7abeca6625676fa8ceed240e1b2522bc945636b58",
+    "plugins/deliver/skills/deliver/references/shipping.md": "d40f652ec585050a98d30683d22d8142fbf2c5add24fbd7eadce2d16b7ab1d99",
+    "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs": "bbb00a23de22193170e0af0e03fac66f108b44f7e5e95aadb0759381b1baaef1",
+    "plugins/deliver/skills/deliver/scripts/lib/integration.mjs": "fa6d772a75daa0bbeb0316e1ccadb19685b4e2530e6251e986d7ee4701abe6b9",
+    "plugins/deliver/skills/deliver/scripts/lib/remote.mjs": "ba21914d8a131532ec38c66e40948621da9d81452449024d59ba5a837a10ea89",
+    "plugins/deliver/skills/deliver/scripts/pm.mjs": "22bb33abee9deedbe9a8c5fa6fb6825f652b6c2be026f72229d7cde100920a09",
+    "tests/current-roundtrip.test.mjs": "250a9606d526bd156095a264458c296d089eb5dc747f6e6f997789b8666122f3",
+    "tests/operations.test.mjs": "dde1af29f017b8816b77eb8e9211aff873bcde984b469f6aabaf3d273e6dc3f8",
+    "tests/remote.test.mjs": "8b3f797e85fdbaeadad3a457232050d156d0bbaadbd02cbba3173d394af40d82",
+    "tests/remote-lifecycle.test.mjs": "40d1a0814bc10a6cb826b22e2177ae934fa0caadca962e18cf39e452546842c9"
+  },
+  "authority": "Original task/approval/baseline/counters unchanged. This copy preserves draft bytes only.",
+  "reconstruction": "PASS: tracked patch applied to exact base via disposable index; every captured changed/untracked file hash matched. Not runtime or acceptance validation."
+}

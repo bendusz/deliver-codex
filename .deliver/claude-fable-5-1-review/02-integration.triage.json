@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "source_receipt": ".deliver/claude-fable-5-1-review/02-integration.receipt.json",
+  "source_receipt_sha256": "28ed3e07794210f1e89008a4716d050622168768bacdfc86c5eb36c9226be40d",
+  "reviewed_snapshot": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9",
+  "reproduction": {
+    "log": "/tmp/t05l-integration-finalization-triage.log",
+    "sha256": "6b53b635d3410ba45addb33f6ce51656e7573fea2b26ead92fcc8ab3a5675758",
+    "tests": 1,
+    "pass": 1
+  },
+  "findings": [
+    {
+      "source_finding": 1,
+      "verdict": "CONFIRMED",
+      "classification": "implemented_bug",
+      "severity": "block",
+      "evidence": [
+        "integration.mjs:536-550 validates every adopted proof before every mutation.",
+        "integration.mjs:1069-1077 reuses validateArtifactPending for an adopted proof; report/closure/handoff validation at 1149-1182 calls assertEvidenceReady({finalized:true}), which checks mutable finalized state and the current process environment.",
+        "integration.mjs:841-874 permits a gate at M after P exists and invalidateFinalization at 809-821 clears the identities needed to validate that already-adopted P proof.",
+        "gates.mjs:24-28 hashes almost all inherited process.env values. integration.mjs:928-958 compares a stored gate environment hash to the current consumer process rather than treating it as immutable gate provenance.",
+        "Disposable-repository reproduction: after P adoption, returning to M and running integrate-gate succeeded and set finalized=false/history=1; returning to P made close-prepare fail finalization validation and even another gate at M fail before mutation. In a separate P-adopted repo, changing only TERM_SESSION_ID made both close-prepare and integrate-gate fail fresh-gate validation."
+      ],
+      "contract_assessment": "This breaks T05L-AC2 fresh-process resume and T05L-AC3 mandatory C->M->P->E->H. The record fails closed but cannot use any supported command to recover.",
+      "required_change": "Split live evidence readiness from frozen artifact-proof validation. At finalize, persist a deterministic finalization identity over M/snapshot, the exact declared gate receipt identities, effective review and verification identities. Gate environment_hash remains stored gate provenance and must not be recomputed from a later consumer process. P/E/H pending and adopted proofs bind that finalization identity and their exact rendered bytes/topology. Once any P/E/H preparation or commit exists, gate/review/verify mutation must refuse rather than invalidate evidence underneath it. Validate adopted commits from their frozen proof, Git parents/tree/path/mode/blob/before/after images and bound finalization identity. Add fresh-process environment-change and post-P evidence-mutation regressions."
+    },
+    {
+      "source_finding": 2,
+      "verdict": "CONFIRMED",
+      "classification": "missing_recovery_operation",
+      "severity": "major",
+      "evidence": [
+        "integration.mjs:655-671 keys one record solely by source run id. A prepared record whose integration HEAD moved fails at line 667, while failed records are simply returned; neither has an archive/supersede path.",
+        "The accepted correction contract requires a moved integration ref to create a new preparation from the actual tip while retaining the prior attempt (docs/plans/parity-contracts/integration-correction-design.md:33-38). T05C consumes genuine correction records but does not make an ordinary stale clean preparation reusable."
+      ],
+      "contract_assessment": "A failed conflict record remains valid T05C input, but a stale prepared I and a failed record whose actual I changed need an explicit retained supersession; deleting the record manually is not an accepted operation.",
+      "required_change": "Add a token/hash/revision-bound reprepare operation that requires the same immutable source C/run/approval/scope/common repository, a clean exact current integration tip, and no adopted M/P/E/H. Archive the old base/probe/preparation and recompute the merge-tree, manifests and checkout proofs at current I. Do not overwrite or reinterpret an adopted or actively correcting attempt."
+    },
+    {
+      "source_finding": 3,
+      "verdict": "PARTIALLY_CONFIRMED",
+      "classification": "performance_risk_unmeasured",
+      "severity": "major",
+      "evidence": [
+        "fingerprintBlob invokes git cat-file per blob; checkout proof validation repeatedly walks the whole tree and live bytes. The asymptotic subprocess concern is concrete, but the receipt supplies no measured repository-size threshold or failed acceptance requirement."
+      ],
+      "contract_assessment": "This is credible scaling debt, not a demonstrated correctness failure in T05L acceptance.",
+      "required_change": "Add representative performance measurement before assigning release severity; batch object reads if the measured cost is material."
+    },
+    {
+      "source_finding": 4,
+      "verdict": "REJECTED",
+      "classification": "intended_contract",
+      "severity": "minor",
+      "evidence": [
+        "The accepted architecture explicitly requires a finished source story worktree plus a separate integration checkout and preserves source project_root/baseline identity (architecture-state.md:66-70)."
+      ],
+      "contract_assessment": "The frozen source checkout is deliberate lineage evidence through closure, not an accidental two-worktree restriction.",
+      "required_change": "No code change. Keep the two-checkout workflow documented."
+    },
+    {
+      "source_finding": 5,
+      "verdict": "REJECTED",
+      "classification": "intended_contract",
+      "severity": "minor",
+      "evidence": [
+        "architecture-state.md:216-219 and 360-362, plus shipping.md:68-70, explicitly say Standard may opt in while tiny/small skip P."
+      ],
+      "contract_assessment": "Ignoring the flag outside Standard implements the approved scale policy. A clearer diagnostic is optional UI wording.",
+      "required_change": "No semantic change."
+    },
+    {
+      "source_finding": 6,
+      "verdict": "REJECTED",
+      "classification": "accepted_evidence_boundary",
+      "severity": "minor",
+      "evidence": [
+        "Bound paths and protected ignored configuration are deliberately included in actual source/M identity so gates cannot execute unreviewed bytes or altered configuration."
+      ],
+      "contract_assessment": "Caches inside declared touches and ignored config-like inputs can affect execution; narrowing them without a new proof would weaken accepted safety.",
+      "required_change": "No change without a separate evidence-safe exclusion contract."
+    },
+    {
+      "source_finding": 7,
+      "verdict": "CONFIRMED",
+      "classification": "implemented_bug",
+      "severity": "minor",
+      "evidence": [
+        "review.mjs:26 validates top-level findings, but panel parsing at lines 49-58 derives and returns only member findings without requiring equality. A direct parser probe accepted PASS with an unresolved top-level major and returned findings:[]."
+      ],
+      "contract_assessment": "The architecture requires aggregate top-level verdict/findings to be derived from all members and rejects underreported aggregates (architecture-state.md:244-251). Silently discarding a supplied mismatch is inconsistent.",
+      "required_change": "When panel exists, require canonical normalized top-level findings to equal the member-derived aggregate, or require the supplied top-level array to be empty and document that shape. Add extra/missing/mismatched aggregate tests."
+    },
+    {
+      "source_finding": 8,
+      "verdict": "PARTIALLY_CONFIRMED",
+      "classification": "diagnostic_robustness",
+      "severity": "minor",
+      "evidence": [
+        "The fixed 3/2 limits match current policy. Generic merge-base failure handling and missing submodule-object messages can obscure the actionable cause, while submodule deinitialization remains a conservative safe requirement."
+      ],
+      "contract_assessment": "No additional correctness failure was established beyond diagnostics and operational friction.",
+      "required_change": "Distinguish Git query errors from a negative ancestor result and improve missing-object/deinit guidance in a later bounded maintenance task."
+    }
+  ],
+  "summary": "Packet02 finding 1 is a confirmed release-blocking T05L recovery defect. Finding 2 is a confirmed major stale-preparation recovery gap and finding 7 a confirmed minor receipt-consistency bug. Findings 4-6 implement explicit contracts; findings 3 and 8 are unmeasured performance or diagnostic concerns."
+}

@@ -1,0 +1,36 @@
+{
+  "packet": "04-planning-support",
+  "packet_sha256": "d9e59dbe0625e103a7f74f2716e5b1f197b31c51f87e86b42eacef96ee00265b",
+  "requested_model": "claude-fable-5-1",
+  "requested_effort": "high",
+  "environment_additions": {
+    "CLAUDE_CODE_EFFORT_LEVEL": "high"
+  },
+  "command": [
+    "node",
+    "/Users/ben/code/pm-skill-codex/plugins/deliver/skills/deliver/scripts/claude-review.mjs",
+    "--input",
+    "/Users/ben/code/pm-skill-codex/.deliver/claude-fable-5-1-review/04-planning-support.packet.json",
+    "--out",
+    "/Users/ben/code/pm-skill-codex/.deliver/claude-fable-5-1-review/04-planning-support.receipt.json",
+    "--model",
+    "claude-fable-5-1",
+    "--timeout-seconds",
+    "1800",
+    "--allow-external"
+  ],
+  "cwd": "/Users/ben/code/pm-skill-codex",
+  "started_at": "2026-09-10T09:57:27.246314+00:00",
+  "state": "COMPLETED",
+  "attempt": 1,
+  "authorization": "Explicit user request in conversation",
+  "tokens": null,
+  "cost": null,
+  "log_kind": "Bundled adapter stdout/stderr; not the raw provider envelope",
+  "exit_code": 0,
+  "review_status": "PASS",
+  "findings": 8,
+  "receipt_sha256": "0187ca120d8b0ace7d8a479111bb8852f9cf01f915e1e310dcd4630e9bfaf8f7",
+  "finished_at": "2026-09-10T10:01:15.428566+00:00",
+  "elapsed_seconds": 228.181
+}

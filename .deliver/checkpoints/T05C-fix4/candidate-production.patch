@@ -1,0 +1,1393 @@
+diff --git a/plugins/deliver/skills/deliver/references/shipping.md b/plugins/deliver/skills/deliver/references/shipping.md
+index 6b6f018..3d3662a 100644
+--- a/plugins/deliver/skills/deliver/references/shipping.md
++++ b/plugins/deliver/skills/deliver/references/shipping.md
+@@ -28,6 +28,27 @@ expected tree. `failed` records the real I/C merge-tree attempt, Git version, ex
+ exit and bounded log hashes without inventing M; do not run the merge. That record is the input
+ to the separate source-correction operation.
+ 
++When the record contains a current failed M gate/review/verification result, or contains the
++recorded I/C composition conflict without M, prepare a correction from the immutable finished
++source run. Preparation infers the failure basis and preserves the original task, approval,
++lineage and maximum spent attempts.
++
++```text
++node <pm> correction-prepare --run <source-run-file> --integration <file> --expected-record <hash>
++git worktree add -b <returned-branch> <correction-root> <returned-start-commit>
++cd <correction-root>
++node <deliver> correction-start --integration <absolute-record> --expected-record <returned-hash> --token <returned-token> --builder <id>
++```
++
++The PM creates only the exact returned branch at the exact returned I or M commit. Correction
++start requires that branch to have one attached clean worktree and publishes the fixed run plus
++the actual story Execution through a recoverable journal. It retains every inherited open
++finding, including minor findings and duplicates. The correction review must repeat each one
++with the same severity, message and path and mark it resolved. Run the full original gates,
++independent review and distinct verification before finishing correction candidate C2. A stopped
++publication is resumed with `pm.mjs recover`; if it stopped after the starting record but before
++the journal, repeat the identical correction-start command.
++
+ The runtime always executes every declared gate again at actual integration M. A clean no-ff
+ composition with an identical bound C/M manifest may reuse C review and verification. Use the
+ integration review and verification commands when evidence needs refreshing. They bind only M
+diff --git a/plugins/deliver/skills/deliver/scripts/deliver.mjs b/plugins/deliver/skills/deliver/scripts/deliver.mjs
+index 97a9856..93f8291 100755
+--- a/plugins/deliver/skills/deliver/scripts/deliver.mjs
++++ b/plugins/deliver/skills/deliver/scripts/deliver.mjs
+@@ -29,6 +29,7 @@ import {
+   transitionCurrentExecution,
+ } from './lib/transitions.mjs';
+ import { parseReviewReceipt } from './lib/review.mjs';
++import { startIntegrationCorrection } from './lib/integration.mjs';
+ 
+ const HELP = `Deliver deterministic runtime
+ 
+@@ -39,6 +40,7 @@ Usage:
+   deliver.mjs status --run <uuid|state.json>
+   deliver.mjs approve --run <run> --approver <id>
+   deliver.mjs start --run <run> --task <packet.json> --builder <id> [--story docs/stories/<story>.md]
++  deliver.mjs correction-start --integration <absolute-record> --expected-record <hash> --token <uuid> --builder <id>
+   deliver.mjs check --run <run>
+   deliver.mjs gate --run <run> --name <command-name> --command <exact-shell-command> [--cwd <relative-dir>] [--env <json>]
+   deliver.mjs review --run <run> --snapshot <sha256> --reviewer <id> --receipt <json>
+@@ -60,6 +62,7 @@ const VALUE_FLAGS = new Set([
+   '--name', '--command', '--cwd', '--env', '--reviewer', '--receipt', '--verifier', '--results',
+   '--label', '--kind', '--reason', '--snapshot', '--story',
+   '--token', '--commit',
++  '--integration', '--expected-record',
+ ]);
+ 
+ function args(argv) {
+@@ -194,6 +197,25 @@ function summarize(state, file) {
+ 
+ function output(value) { process.stdout.write(`${JSON.stringify(value)}\n`); }
+ 
++function assertCorrectionResolutions(state, review) {
++  const requiredFindings = state.correction?.required_resolutions || [];
++  if (!requiredFindings.length) return;
++  const key = (item) => JSON.stringify([item.severity, item.message, item.path ?? null]);
++  const requiredKeys = new Set(requiredFindings.map(key));
++  const remaining = review.findings.map((item) => ({
++    severity: item.severity, message: item.message, ...(item.path === undefined ? {} : { path: item.path }), resolved: item.resolved,
++  }));
++  for (const requiredFinding of requiredFindings) {
++    const index = remaining.findIndex((item) => item.resolved === true && item.severity === requiredFinding.severity
++      && item.message === requiredFinding.message && item.path === requiredFinding.path);
++    if (index < 0) throw new DeliverError('correction review omits an exact resolved inherited finding', 66);
++    remaining.splice(index, 1);
++  }
++  if (remaining.some((item) => requiredKeys.has(key(item)))) {
++    throw new DeliverError('correction review changes the required inherited finding multiplicity', 66);
++  }
++}
++
+ function main() {
+   const [command = 'help', ...rest] = process.argv.slice(2);
+   if (command === 'help' || command === '--help' || command === '-h') {
+@@ -201,6 +223,14 @@ function main() {
+     return;
+   }
+   const o = args(rest);
++  if (command === 'correction-start') {
++    const summary = startIntegrationCorrection(required(o, '--integration'), {
++      expectedRecordHash: required(o, '--expected-record'), token: required(o, '--token'),
++      builder: actor(required(o, '--builder'), '--builder'), correctionRoot: gitRoot(process.cwd()),
++    }, process.cwd());
++    output(summary);
++    return;
++  }
+   if (command === 'init') {
+     const root = gitRoot(process.cwd());
+     const format = detectProjectFormat(root);
+@@ -297,12 +327,13 @@ function main() {
+   if (command === 'review') {
+     const reviewer = actor(required(o, '--reviewer'), '--reviewer');
+     const reviewedSnapshot = snapshotArgument(o);
+-    const receipt = parseReviewReceipt(required(o, '--receipt'), { expectedSnapshot: reviewedSnapshot });
++      const receipt = parseReviewReceipt(required(o, '--receipt'), { expectedSnapshot: reviewedSnapshot });
+     const updated = updateRun(run, o.expectedRevision, (state) => {
+       active(state);
+       syncPlan(state);
+       requireCurrentApproval(state);
+       if (reviewer === state.task.builder) throw new DeliverError('reviewer must differ from builder', 66);
++      assertCorrectionResolutions(state, receipt);
+       const checked = inspectScope(state);
+       if (!checked.report.ok) throw new DeliverError('cannot review out-of-scope changes', 74, checked.report);
+       if (checked.current.hash !== reviewedSnapshot) throw new DeliverError('review snapshot is stale or does not match this run', 66);
+@@ -418,6 +449,7 @@ function main() {
+         || state.review.findings.some((finding) => !finding.resolved && finding.severity !== 'minor')) {
+         throw new DeliverError('independent PASS review is missing, unresolved, or stale', 66);
+       }
++      assertCorrectionResolutions(state, state.review);
+       if (!state.verification || state.verification.snapshot_hash !== checked.current.hash || state.verification.criteria.some((criterion) => criterion.status !== 'PASS')) {
+         throw new DeliverError('acceptance verification is missing, non-PASS, or stale', 66);
+       }
+diff --git a/plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs b/plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs
+index 0b8f4c8..514b39b 100644
+--- a/plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs
++++ b/plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs
+@@ -2,14 +2,17 @@ import fs from 'node:fs';
+ import path from 'node:path';
+ import { randomUUID } from 'node:crypto';
+ import { execFileSync } from 'node:child_process';
+-import { DeliverError, canonical, internalDirectory, readRun } from './state.mjs';
++import { DeliverError, canonical, createRunState, internalDirectory, readRun, sha256, validateRunState } from './state.mjs';
+ import { inspectProjectState, readApprovalMarker, readPlanPolicy } from './project-state.mjs';
+ import { isValidGitBranchName, parseStory, readStory, replaceStoryExecution, storyTaskContract } from './story.mjs';
++import { baselineDirtyPaths, captureGitAnchor, snapshot } from './scope.mjs';
++import { captureContracts } from './contracts.mjs';
+ 
+ const APPROVAL = 'docs/approval.json';
+ const PLAN = 'docs/plan.md';
+ const JOURNAL = '.deliver/current-pm-transaction.json';
+ const TRANSITION_JOURNAL = '.deliver/transition-transaction.json';
++const CORRECTION_JOURNAL = '.deliver/integration-correction-transaction.json';
+ const MAX_BYTES = 8 * 1024 * 1024;
+ const record = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+ const fail = (message) => { throw new DeliverError(message, 66); };
+@@ -43,7 +46,9 @@ function safeRel(rel) {
+   const parts = rel.split(/[\\/]/);
+   if (!parts.length || parts.some((part) => !part || part === '.' || part === '..')) fail('unsafe current project path');
+   const normalized = parts.join('/');
+-  if (normalized !== APPROVAL && normalized !== JOURNAL && !/^docs\/stories\/S\d+-\d+-[^/]+\.md$/.test(normalized)) fail('current project write is outside the transaction contract');
++  if (normalized !== APPROVAL && normalized !== JOURNAL && normalized !== CORRECTION_JOURNAL
++    && !/^docs\/stories\/S\d+-\d+-[^/]+\.md$/.test(normalized)
++    && !/^\.deliver\/runs\/[0-9a-f-]{36}\.json$/.test(normalized)) fail('current project write is outside the transaction contract');
+   return normalized;
+ }
+ 
+@@ -189,12 +194,14 @@ function applyJournal(root, journal) {
+ 
+ export function assertCurrentPmReady(root) {
+   if (read(root, JOURNAL) !== null) fail('interrupted current project transaction; run pm.mjs recover before continuing');
+-  let transition;
+-  try { transition = fs.lstatSync(path.join(rootPath(root), TRANSITION_JOURNAL)); }
+-  catch (error) { if (error.code !== 'ENOENT') throw error; }
+-  if (transition) {
+-    if (!transition.isFile() || transition.isSymbolicLink()) fail('invalid Execution transition journal');
+-    fail('interrupted Execution transition; run pm.mjs recover before continuing');
++  for (const [rel, label] of [[TRANSITION_JOURNAL, 'Execution transition'], [CORRECTION_JOURNAL, 'integration correction']]) {
++    let pending;
++    try { pending = fs.lstatSync(path.join(rootPath(root), rel)); }
++    catch (error) { if (error.code !== 'ENOENT') throw error; }
++    if (pending) {
++      if (!pending.isFile() || pending.isSymbolicLink()) fail(`invalid ${label} journal`);
++      fail(`interrupted ${label}; run pm.mjs recover before continuing`);
++    }
+   }
+ }
+ 
+@@ -456,3 +463,201 @@ export function assertCurrentBinding(state, { allowBlocked = false } = {}) {
+   if (state.task) packetMatchesStory(state.task.packet, document);
+   return binding;
+ }
++
++function correctionUnknown(execution) {
++  if (!execution) return {};
++  const value = structuredClone(execution);
++  for (const key of ['owner', 'builder', 'branch', 'status', 'rounds', 'retries', 'updated']) delete value[key];
++  return value;
++}
++
++function correctionRunPath(runId) {
++  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(runId || '')) {
++    fail('correction run id is invalid');
++  }
++  return `.deliver/runs/${runId}.json`;
++}
++
++export function buildIntegrationCorrectionPublication({
++  correctionRoot, integrationRecord, preparedRecordHash, token, builder, capturedAt,
++}) {
++  const root = rootPath(correctionRoot);
++  safeText(builder, 'correction builder', 128);
++  if (!record(token) || !/^[0-9a-f-]{36}$/.test(token.id || '') || !/^[0-9a-f]{64}$/.test(token.identity || '')
++    || !path.isAbsolute(integrationRecord || '') || !/^[0-9a-f]{64}$/.test(preparedRecordHash || '')
++    || typeof capturedAt !== 'string' || Number.isNaN(Date.parse(capturedAt))) fail('invalid correction publication input');
++  const before = readStory(root, token.story_path);
++  if (before.id !== token.story || before.contractHash !== token.story_contract_hash
++    || canonical(before.execution) !== canonical(token.actual_start_execution)) {
++    fail('correction story no longer matches the recorded actual start state');
++  }
++  const sourceExecution = token.source_execution;
++  if (!record(sourceExecution) || sourceExecution.owner !== token.actor || sourceExecution.builder !== token.execution_builder) {
++    fail('correction source Execution lineage is invalid');
++  }
++  if (before.execution && (before.execution.owner !== sourceExecution.owner || before.execution.builder !== sourceExecution.builder
++    || before.execution.status === 'merged' || canonical(correctionUnknown(before.execution)) !== canonical(correctionUnknown(sourceExecution)))) {
++    fail('correction start has foreign, merged or conflicting Execution metadata');
++  }
++  const nextExecution = {
++    ...structuredClone(sourceExecution),
++    owner: token.actor,
++    builder: token.execution_builder,
++    branch: token.branch,
++    status: 'building',
++    rounds: token.counter_maxima.fixes + 1,
++    retries: token.counter_maxima.retries,
++    updated: capturedAt.replace('T', ' ').replace('Z', '').slice(0, 16),
++  };
++  const transition = replaceStoryExecution(before, nextExecution);
++  const anchor = captureGitAnchor(root);
++  const baselineSnapshot = snapshot(root, [...token.original_packet.touches, ...token.original_packet.read_paths,
++    ...token.original_packet.specs, token.story_path]);
++  const dirtyPaths = baselineDirtyPaths(root);
++  if (dirtyPaths.length) fail(`correction checkout must be clean: ${dirtyPaths.join(', ')}`);
++  const state = createRunState(root, token.mode, 'docs/plan.md', { fixedRunId: token.run_id, createdAt: capturedAt });
++  if (state.plan.hash !== token.plan_hash) fail('correction approved plan bytes changed');
++  state.approval = structuredClone(token.runtime_approval);
++  state.task = { packet: structuredClone(token.original_packet), builder, started_at: capturedAt };
++  state.baseline = { captured_at: capturedAt, snapshot: baselineSnapshot, dirty_paths: dirtyPaths, git_anchor: anchor };
++  state.git_anchor = anchor;
++  state.pm_binding = {
++    format: 'current', actor: token.actor, story: token.story, story_path: token.story_path,
++    contract_hash: token.story_contract_hash, execution_hash: transition.executionHash,
++    plan_digest: token.plan_digest, branch: token.branch, builder: token.execution_builder,
++    integration_branch: token.integration_branch,
++  };
++  state.contracts = captureContracts(root, token.original_packet);
++  state.execution_audit = {
++    story_path: token.story_path,
++    contract_hash: token.story_contract_hash,
++    original_entry: baselineSnapshot.entries[token.story_path] ?? null,
++    current_entry: `file:${fs.lstatSync(path.join(root, token.story_path)).mode & 0o100 ? '755' : '644'}:${sha256(transition.after)}`,
++    transitions: [],
++  };
++  state.commit_adoption = { pending: null, history: [] };
++  state.counters = {
++    retries: token.counter_maxima.retries,
++    fixes: token.counter_maxima.fixes + 1,
++    corrections: token.counter_maxima.corrections,
++  };
++  state.correction = {
++    version: 'integration-correction-v1', token_id: token.id, token_identity: token.identity,
++    basis: token.basis.kind, integration_record: integrationRecord,
++    root_run_id: token.root_run_id, source_run_id: token.original_source_run,
++    generation: token.generation, root_review_lineage: structuredClone(token.root_review_lineage),
++    required_resolutions: structuredClone(token.root_review_lineage.required_resolutions),
++  };
++  state.phase = 'active';
++  state.revision = 1;
++  state.updated_at = capturedAt;
++  state.events.push({ at: capturedAt, type: 'baseline_captured', snapshot_hash: baselineSnapshot.hash, dirty_paths: dirtyPaths });
++  state.events.push({ at: capturedAt, type: 'integration_correction_start', token: token.id,
++    basis: token.basis.kind, generation: token.generation, from: structuredClone(before.execution) });
++  validateRunState(state);
++  const descriptor = {
++    kind: 'integration-correction-start-v1', token_id: token.id, token_identity: token.identity,
++    integration_record: integrationRecord, prepared_record_hash: preparedRecordHash,
++    correction_root: root, run_id: token.run_id, branch: token.branch, builder,
++    writes: [
++      { path: correctionRunPath(token.run_id), before: null, after: json(state) },
++      { path: token.story_path, before: before.text, after: transition.after },
++    ],
++  };
++  return { descriptor, descriptor_identity: sha256(canonical(descriptor)), state, transition, anchor, baseline: state.baseline };
++}
++
++export function readIntegrationCorrectionJournal(root) {
++  root = rootPath(root);
++  const raw = read(root, CORRECTION_JOURNAL);
++  if (raw === null) return null;
++  return parseJson(raw, 'integration correction journal');
++}
++
++export function integrationCorrectionJournalConflicts(root) {
++  root = rootPath(root);
++  return [CORRECTION_JOURNAL, JOURNAL, TRANSITION_JOURNAL].filter((rel) => {
++    try { return fs.lstatSync(path.join(root, rel)).isFile(); } catch (error) { if (error.code === 'ENOENT') return false; throw error; }
++  });
++}
++
++export function validateIntegrationCorrectionJournal(root, wrapper, expectedDescriptor, token) {
++  root = rootPath(root);
++  if (!record(wrapper) || !record(wrapper.descriptor) || typeof wrapper.descriptor_identity !== 'string'
++    || !/^[0-9a-f]{64}$/.test(wrapper.expected_starting_record_hash || '')
++    || wrapper.descriptor_identity !== sha256(canonical(wrapper.descriptor))
++    || canonical(wrapper.descriptor) !== canonical(expectedDescriptor)) fail('integration correction journal descriptor is invalid');
++  const descriptor = wrapper.descriptor;
++  if (descriptor.kind !== 'integration-correction-start-v1' || descriptor.correction_root !== root
++    || !Array.isArray(descriptor.writes) || descriptor.writes.length !== 2
++    || descriptor.writes[0].path !== correctionRunPath(descriptor.run_id) || descriptor.writes[0].before !== null
++    || descriptor.writes[1].path !== token?.story_path) fail('integration correction journal story target is invalid');
++  const runState = parseJson(descriptor.writes[0].after, 'correction run after-image');
++  validateRunState(runState);
++  const beforeStory = parseStory(descriptor.writes[1].before, descriptor.writes[1].path);
++  const afterStory = parseStory(descriptor.writes[1].after, descriptor.writes[1].path);
++  if (!record(token) || token.id !== descriptor.token_id || token.identity !== descriptor.token_identity) {
++    fail('integration correction journal token is invalid');
++  }
++  const legalStory = replaceStoryExecution(beforeStory, {
++    ...structuredClone(token.source_execution), owner: token.actor, builder: token.execution_builder,
++    branch: token.branch, status: 'building', rounds: token.counter_maxima.fixes + 1,
++    retries: token.counter_maxima.retries,
++    updated: runState.created_at.replace('T', ' ').replace('Z', '').slice(0, 16),
++  });
++  const originalEntry = runState.baseline?.snapshot?.entries?.[token.story_path];
++  const originalMatch = /^file:(644|755):([0-9a-f]{64})$/.exec(originalEntry || '');
++  const expectedCurrentEntry = originalMatch
++    ? `file:${originalMatch[1]}:${sha256(descriptor.writes[1].after)}`
++    : null;
++  if (runState.run_id !== descriptor.run_id || runState.project_root !== root || runState.phase !== 'active'
++    || beforeStory.id !== token.story || afterStory.id !== token.story
++    || beforeStory.contractHash !== token.story_contract_hash || afterStory.contractHash !== token.story_contract_hash
++    || canonical(beforeStory.execution) !== canonical(token.actual_start_execution)
++    || !originalMatch || originalMatch[2] !== sha256(descriptor.writes[1].before)
++    || legalStory.after !== descriptor.writes[1].after
++    || afterStory.contractHash !== beforeStory.contractHash || runState.pm_binding?.execution_hash !== afterStory.executionHash
++    || runState.correction?.token_id !== descriptor.token_id || runState.correction?.token_identity !== descriptor.token_identity
++    || runState.task?.builder !== descriptor.builder || canonical(runState.task?.packet) !== canonical(token.original_packet)
++    || runState.pm_binding?.branch !== descriptor.branch || runState.pm_binding?.actor !== token.actor
++    || runState.pm_binding?.story !== token.story || runState.pm_binding?.story_path !== token.story_path
++    || runState.pm_binding?.contract_hash !== token.story_contract_hash || runState.pm_binding?.plan_digest !== token.plan_digest
++    || runState.git_anchor?.head !== token.basis.start_commit || runState.baseline?.snapshot?.hash === undefined
++    || runState.execution_audit?.story_path !== token.story_path
++    || runState.execution_audit?.contract_hash !== token.story_contract_hash
++    || runState.execution_audit?.original_entry !== originalEntry
++    || runState.execution_audit?.current_entry !== expectedCurrentEntry
++    || runState.counters.fixes !== token.counter_maxima.fixes + 1
++    || runState.counters.retries !== token.counter_maxima.retries
++    || runState.counters.corrections !== token.counter_maxima.corrections
++    || canonical(runState.events.find((item) => item.type === 'integration_correction_start')?.from)
++      !== canonical(token.actual_start_execution)) {
++    fail('integration correction journal after-images are not a legal bound pair');
++  }
++  return { descriptor, runState, beforeStory, afterStory };
++}
++
++export function writeIntegrationCorrectionJournal(root, wrapper, expectedDescriptor, token) {
++  root = rootPath(root);
++  const conflicts = integrationCorrectionJournalConflicts(root);
++  if (conflicts.length) fail('integration correction transaction already exists or conflicts with another journal');
++  validateIntegrationCorrectionJournal(root, wrapper, expectedDescriptor, token);
++  atomic(root, CORRECTION_JOURNAL, json(wrapper));
++}
++
++export function applyIntegrationCorrectionJournal(root, wrapper, expectedDescriptor, token) {
++  root = rootPath(root);
++  validateIntegrationCorrectionJournal(root, wrapper, expectedDescriptor, token);
++  for (const item of wrapper.descriptor.writes) {
++    const current = read(root, item.path);
++    if (current !== item.before && current !== item.after) fail(`integration correction transaction conflict at ${item.path}`);
++  }
++  for (const item of wrapper.descriptor.writes) if (read(root, item.path) !== item.after) atomic(root, item.path, item.after);
++  return wrapper.descriptor.writes;
++}
++
++export function removeIntegrationCorrectionJournal(root) {
++  root = rootPath(root);
++  const file = checkedPath(root, CORRECTION_JOURNAL);
++  try { fs.unlinkSync(file); } catch (error) { if (error.code !== 'ENOENT') throw error; }
++}
+diff --git a/plugins/deliver/skills/deliver/scripts/lib/integration.mjs b/plugins/deliver/skills/deliver/scripts/lib/integration.mjs
+index 5f423bf..8abbe21 100644
+--- a/plugins/deliver/skills/deliver/scripts/lib/integration.mjs
++++ b/plugins/deliver/skills/deliver/scripts/lib/integration.mjs
+@@ -3,8 +3,17 @@ import path from 'node:path';
+ import { execFileSync, spawnSync } from 'node:child_process';
+ import { randomUUID } from 'node:crypto';
+ import { canonical, DeliverError, internalDirectory, readRun, sha256, validateTaskPacket } from './state.mjs';
+-import { assertCurrentBinding } from './current-pm.mjs';
+-import { readPlanPolicy } from './project-state.mjs';
++import {
++  applyIntegrationCorrectionJournal,
++  assertCurrentBinding,
++  buildIntegrationCorrectionPublication,
++  integrationCorrectionJournalConflicts,
++  readIntegrationCorrectionJournal,
++  removeIntegrationCorrectionJournal,
++  validateIntegrationCorrectionJournal,
++  writeIntegrationCorrectionJournal,
++} from './current-pm.mjs';
++import { inspectProjectState, readPlanPolicy } from './project-state.mjs';
+ import { parseReviewReceipt } from './review.mjs';
+ import { parseVerificationResults, renderVerificationArtifacts } from './reporting.mjs';
+ import { parseStory, readStory, replaceStoryExecution } from './story.mjs';
+@@ -123,6 +132,142 @@ function protectedIgnoredEntries(root) {
+   return entries;
+ }
+ 
++function gitDirectoryPaths(root) {
++  const gitDir = path.resolve(root, String(git(root, ['rev-parse', '--git-dir'])).trim());
++  const commonDir = path.resolve(root, String(git(root, ['rev-parse', '--git-common-dir'])).trim());
++  try {
++    return { gitDir: fs.realpathSync.native(gitDir), commonDir: fs.realpathSync.native(commonDir) };
++  } catch (error) {
++    fail(`cannot access protected Git directories: ${error.message}`);
++  }
++}
++
++function fileHashOrEmpty(file) {
++  try { return sha256(fs.readFileSync(file)); }
++  catch (error) {
++    if (error.code === 'ENOENT') return sha256('');
++    fail(`cannot read protected Git metadata: ${error.message}`);
++  }
++}
++
++function administrativeWorktree(commonDir, value) {
++  if (!value || value.startsWith('~')) return false;
++  let target;
++  try { target = fs.realpathSync.native(path.resolve(commonDir, value)); }
++  catch { return false; }
++  const top = spawnSync('git', ['-C', target, 'rev-parse', '--show-toplevel'], {
++    encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 30000, windowsHide: true,
++  });
++  const common = spawnSync('git', ['-C', target, 'rev-parse', '--git-common-dir'], {
++    encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 30000, windowsHide: true,
++  });
++  if (top.status !== 0 || common.status !== 0) return false;
++  try {
++    return fs.realpathSync.native(String(top.stdout).trim()) === target
++      && fs.realpathSync.native(path.resolve(target, String(common.stdout).trim())) === commonDir;
++  } catch { return false; }
++}
++
++function portableCommonConfig(commonDir) {
++  const file = path.join(commonDir, 'config');
++  if (!fs.existsSync(file)) return null;
++  const parsed = spawnSync('git', ['config', '--null', '--file', file, '--list'], {
++    encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 30000, windowsHide: true,
++  });
++  if (parsed.status !== 0 || parsed.error) fail('cannot parse protected common Git configuration');
++  return String(parsed.stdout).split('\0').filter(Boolean).map((row) => {
++    const split = row.indexOf('\n');
++    if (split < 0) fail('cannot parse protected common Git configuration entry');
++    const key = row.slice(0, split);
++    const value = row.slice(split + 1);
++    return key === 'core.worktree' && administrativeWorktree(commonDir, value)
++      ? `${key}\n<administrative-worktree>`
++      : row;
++  });
++}
++
++function inside(root, target) {
++  const relative = path.relative(root, target);
++  return relative === '' || (!relative.startsWith(`..${path.sep}`) && relative !== '..' && !path.isAbsolute(relative));
++}
++
++function portableHooks(root, commonDir) {
++  const configured = spawnSync('git', ['-C', root, 'config', '--path', '--get', 'core.hooksPath'], {
++    encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 30000, windowsHide: true,
++  });
++  if (configured.error || ![0, 1].includes(configured.status)) fail('cannot resolve protected Git hooks configuration');
++  const value = configured.status === 0 ? String(configured.stdout).trim() : '';
++  let location;
++  let authority;
++  if (!value) {
++    location = path.join(commonDir, 'hooks');
++    authority = { kind: 'default' };
++  } else if (path.isAbsolute(value)) {
++    location = path.resolve(value);
++    authority = { kind: 'external', path: location };
++  } else {
++    location = path.resolve(root, value);
++    authority = inside(root, location)
++      ? { kind: 'worktree-relative', path: path.relative(root, location).split(path.sep).join('/') || '.' }
++      : { kind: 'external', path: location };
++  }
++  const result = { authority, kind: 'missing', entries: [] };
++  let locationStat;
++  try { locationStat = fs.lstatSync(location); }
++  catch (error) {
++    if (error.code === 'ENOENT') return result;
++    fail(`cannot inspect protected Git hooks path: ${error.message}`);
++  }
++  let directory = location;
++  if (locationStat.isSymbolicLink()) {
++    result.kind = 'symlink';
++    result.target = fs.readlinkSync(location);
++    try { directory = fs.realpathSync.native(location); }
++    catch { fail('protected Git hooks path is a broken symlink'); }
++    if (!fs.statSync(directory).isDirectory()) fail('protected Git hooks path symlink must resolve to a directory');
++  } else if (locationStat.isDirectory()) result.kind = 'directory';
++  else fail('protected Git hooks path must be a directory or directory symlink');
++  const names = fs.readdirSync(directory).sort();
++  if (names.length > 1024) fail('protected Git hooks path has too many entries');
++  let total = 0;
++  for (const name of names) {
++    if (/[\x00-\x1f\x7f]/.test(name)) fail('protected Git hooks path contains an unsafe entry name');
++    const file = path.join(directory, name);
++    const stat = fs.lstatSync(file);
++    const mode = stat.mode & 0o777;
++    if (stat.isFile()) {
++      if (stat.size > 8 * 1024 * 1024 || total + stat.size > 32 * 1024 * 1024) fail('protected Git hooks exceed the metadata limit');
++      total += stat.size;
++      result.entries.push({ name, kind: 'file', mode, hash: sha256(fs.readFileSync(file)) });
++      continue;
++    }
++    if (stat.isSymbolicLink()) {
++      const target = fs.readlinkSync(file);
++      let resolved;
++      try { resolved = fs.statSync(file); } catch { fail(`protected Git hook is a broken symlink: ${name}`); }
++      if (!resolved.isFile() || resolved.size > 8 * 1024 * 1024 || total + resolved.size > 32 * 1024 * 1024) {
++        fail(`protected Git hook symlink has an unsafe target: ${name}`);
++      }
++      total += resolved.size;
++      result.entries.push({ name, kind: 'symlink', mode, target,
++        target_mode: resolved.mode & 0o777, target_hash: sha256(fs.readFileSync(file)) });
++      continue;
++    }
++    fail(`protected Git hooks path contains a nonregular entry: ${name}`);
++  }
++  return result;
++}
++
++function portableProtectedState(root) {
++  const { gitDir, commonDir } = gitDirectoryPaths(root);
++  return {
++    worktree_config: fileHashOrEmpty(path.join(gitDir, 'config.worktree')),
++    common_config: portableCommonConfig(commonDir),
++    exclude: fileHashOrEmpty(path.join(commonDir, 'info', 'exclude')),
++    hooks: portableHooks(root, commonDir),
++  };
++}
++
+ function parseTreeRows(root, commit, scopes, recursive = true) {
+   const args = ['ls-tree', ...(recursive ? ['-r'] : []), '-z', commit, '--', ...scopes];
+   const output = git(root, args, { buffer: true });
+@@ -284,6 +429,7 @@ function sourceBindings(state) {
+       verification: receiptIdentity(state.verification),
+       gates: state.gates.map((item) => receiptIdentity(item)),
+     },
++    ...(state.correction ? { correction: sha256(canonical(state.correction)) } : {}),
+   };
+ }
+ 
+@@ -392,8 +538,10 @@ function probeMergeTree(root, integration, candidate) {
+   const stdout = String(result.stdout || '');
+   const stderr = String(result.stderr || '');
+   const expected = stdout.trim().split(/\s+/)[0];
++  const conflict = result.status === 1 && !result.error && !result.signal && OID.test(expected);
+   return {
+     ok: result.status === 0 && !result.error && OID.test(expected),
++    conflict,
+     tree: result.status === 0 && !result.error && OID.test(expected) ? expected : null,
+     log: `command: git ${args.join(' ')}\nstarted: ${started}\nexit: ${result.status ?? 'null'}\n\n[stdout]\n${stdout}\n[stderr]\n${stderr}`,
+     attempt: {
+@@ -465,6 +613,54 @@ function preparationIdentity(record) {
+   }));
+ }
+ 
++function correctionTokenIdentity(token) {
++  if (!token || typeof token !== 'object' || Array.isArray(token)) return null;
++  const { identity, ...body } = token;
++  return sha256(canonical(body));
++}
++
++function validateCorrectionEnvelope(record) {
++  if (record.correction === undefined || record.correction === null) return;
++  const envelope = record.correction;
++  const token = envelope.token;
++  if (!envelope || typeof envelope !== 'object' || Array.isArray(envelope)
++    || !['prepared', 'starting', 'started'].includes(envelope.status)
++    || !token || typeof token !== 'object' || Array.isArray(token)
++    || !RUN_ID.test(token.id || '') || !RUN_ID.test(token.run_id || '') || !HASH.test(token.identity || '')
++    || token.identity !== correctionTokenIdentity(token)
++    || !Number.isSafeInteger(token.generation) || token.generation < 1
++    || typeof token.branch !== 'string' || !token.branch.startsWith(`pm/${record.source.story}-integration-fix-`)
++    || !['failed-integration', 'composition-conflict-no-m'].includes(token.basis?.kind)
++    || !OID.test(token.basis.start_commit || '') || canonical(token.original_packet) !== canonical(record.source.packet)
++    || token.original_source_run !== record.source.run_id || token.original_source_commit !== record.source.candidate
++    || token.story !== record.source.story || token.story_path !== record.source.story_path
++    || token.story_contract_hash !== record.source.contract_hash || token.plan_digest !== record.plan.approval_digest
++    || token.integration_branch !== record.plan.integration_branch || !token.root_review_lineage
++    || !Array.isArray(token.root_review_lineage.required_resolutions) || !token.counter_maxima) {
++    fail('invalid integration correction envelope');
++  }
++  if (token.basis.kind === 'failed-integration') {
++    if (token.basis.integration_commit !== token.basis.start_commit || token.basis.integration_commit !== record.integration.commit) {
++      fail('invalid failed-M correction basis');
++    }
++  } else if (Object.hasOwn(token.basis, 'integration_commit') || token.basis.integration_tip !== token.basis.start_commit
++    || token.basis.integration_tip !== record.integration.base) fail('invalid no-M correction basis');
++  if (envelope.status === 'prepared' && (envelope.starting !== null || envelope.started !== null)) fail('prepared correction contains publication state');
++  if (['starting', 'started'].includes(envelope.status)) {
++    const starting = envelope.starting;
++    if (!starting || !HASH.test(starting.prepared_record_hash || '') || !HASH.test(starting.descriptor_identity || '')
++      || typeof starting.correction_root !== 'string' || !path.isAbsolute(starting.correction_root)
++      || typeof starting.builder !== 'string' || !starting.captured_at || !starting.reconstruction) {
++      fail('invalid starting correction publication');
++    }
++  }
++  if (envelope.status === 'started') {
++    const started = envelope.started;
++    if (!started || !HASH.test(started.starting_record_hash || '') || !HASH.test(started.descriptor_identity || '')
++      || !HASH.test(started.run_hash || '') || !HASH.test(started.story_hash || '')) fail('invalid started correction publication');
++  }
++}
++
+ function validateRecord(record) {
+   if (!record || typeof record !== 'object' || Array.isArray(record) || !RUN_ID.test(record.id || '')) {
+     fail('integration record id must be a canonical run id');
+@@ -546,6 +742,7 @@ function validateRecord(record) {
+     || record.integration.token !== null || record.integration.expected_tree !== null || record.integration.manifest !== null
+     || record.integration.checkout_proof !== null || !hasReceiptIdentity(record.integration.failure))) fail('failed integration probe claims an M');
+   validateTaskPacket(record.source.packet);
++  validateCorrectionEnvelope(record);
+   return record;
+ }
+ 
+@@ -563,7 +760,7 @@ export function readIntegrationRecord(recordArg, cwd = process.cwd()) {
+   return { file, record, hash: recordHash(record) };
+ }
+ 
+-function withRecord(recordArg, expectedHash, mutate, cwd = process.cwd()) {
++function withRecord(recordArg, expectedHash, mutate, cwd = process.cwd(), { allowCorrection = false } = {}) {
+   const loaded = readIntegrationRecord(recordArg, cwd);
+   if (!HASH.test(expectedHash || '') || loaded.hash !== expectedHash) fail('integration record hash is missing or stale');
+   const lock = `${loaded.file}.lock`;
+@@ -578,8 +775,10 @@ function withRecord(recordArg, expectedHash, mutate, cwd = process.cwd()) {
+     if (needsFinalizationReconcile(current.record)) {
+       fail('LEGACY_FINALIZATION_RECONCILE_REQUIRED: run pm.mjs integrate-reconcile with this exact record hash');
+     }
+-    assertRecordSource(current.record);
++    if (current.record.correction) assertCorrectionRecordSource(current.record);
++    else assertRecordSource(current.record);
+     validateIntegrationProofs(current.record);
++    if (current.record.correction && !allowCorrection) fail('integration correction is prepared or active; finish its token-bound workflow first');
+     const result = mutate(current.record, current.file);
+     if (result?.[NO_MUTATION] === true) {
+       return { file: current.file, record: current.record, hash: current.hash, result: result.value, unchanged: true };
+@@ -587,7 +786,9 @@ function withRecord(recordArg, expectedHash, mutate, cwd = process.cwd()) {
+     current.record.revision += 1;
+     current.record.updated_at = now();
+     validateRecord(current.record);
+-    atomic(current.file, json(current.record));
++    const after = json(current.record);
++    if (Buffer.byteLength(after) > MAX_RECORD_BYTES) fail('integration record update exceeds the bounded record size');
++    atomic(current.file, after);
+     return { file: current.file, record: current.record, hash: recordHash(current.record), result };
+   } finally {
+     fs.closeSync(fd);
+@@ -829,6 +1030,7 @@ export function reconcileIntegrationEvidence(recordArg, { expectedRecordHash } =
+   try {
+     const current = readIntegrationRecord(loaded.file);
+     if (current.hash !== expectedRecordHash) fail('integration record changed concurrently');
++    if (current.record.correction) fail('integration correction is prepared or active; evidence reconciliation is frozen');
+     assertRecordSource(current.record);
+     assertActiveReconciliationEvidence(current.record);
+     const selected = legacyFinalizationCandidates(current.record);
+@@ -913,6 +1115,575 @@ function assertRecordSource(record) {
+   return state;
+ }
+ 
++function assertCorrectionRecordSource(record) {
++  const state = assertRecordSource(record);
++  assertClean(state.project_root);
++  assertOrdinaryIndex(state.project_root);
++  if (canonical(captureGitAnchor(state.project_root)) !== canonical(state.git_anchor)) {
++    fail('finished source C checkout, index or protected metadata changed');
++  }
++  return state;
++}
++
++function openFindingResolutions(receipt) {
++  if (!receipt || !hasReceiptIdentity(receipt)) return [];
++  return receipt.findings.flatMap((finding, ordinal) => finding.resolved ? [] : [{
++    receipt_identity: receipt.identity, ordinal, severity: finding.severity,
++    message: finding.message, ...(finding.path === undefined ? {} : { path: finding.path }),
++  }]);
++}
++
++function currentFailureBasis(record) {
++  if (record.integration.status === 'failed') {
++    const root = assertIntegrationHead(record, { requireCommit: false });
++    if (head(root) !== record.integration.base || branch(root) !== record.destination.branch) fail('no-M integration tip moved');
++    verifyCheckoutProof(root, record.integration.base, record.integration.base_checkout_proof, record.integration.base_anchor);
++    const probe = probeMergeTree(root, record.integration.base, record.source.candidate);
++    if (probe.ok || !probe.conflict || probe.attempt.git_version !== record.integration.failure.git_version
++      || record.integration.failure.status !== 1 || record.integration.failure.signal !== null
++      || record.integration.failure.error !== null) {
++      fail('recorded I/C failure is not a reproducible composition conflict');
++    }
++    return {
++      kind: 'composition-conflict-no-m', start_commit: record.integration.base,
++      integration_ref: record.destination.branch, integration_tip: record.integration.base,
++      integration_tree: tree(root, record.integration.base),
++      probe: {
++        argv: probe.attempt.argv, git_version: probe.attempt.git_version, exit: probe.attempt.status,
++        output_hash: sha256(canonical({ stdout: probe.attempt.stdout_hash, stderr: probe.attempt.stderr_hash })),
++        stdout_hash: probe.attempt.stdout_hash, stderr_hash: probe.attempt.stderr_hash,
++        started_at: probe.attempt.started_at, finished_at: probe.attempt.finished_at,
++        recorded_identity: record.integration.failure.identity,
++        recorded_log_path: record.integration.failure.log_path,
++        recorded_log_hash: record.integration.failure.log_hash,
++      },
++    };
++  }
++  if (record.integration.status !== 'adopted') fail('integration has no actual failed M or I/C conflict to correct');
++  assertExecutableM(record);
++  const failures = [];
++  for (const gate of record.evidence.gates) {
++    if (!hasReceiptIdentity(gate)) fail('current integration gate identity is invalid');
++    validateInternalLog(record, gate);
++    if (gate.status === 'FAIL' && gate.integration_commit === record.integration.commit
++      && gate.snapshot_hash === record.evidence.snapshot_hash
++      && record.source.packet.commands[gate.name] === gate.command) failures.push({ kind: 'gate', identity: gate.identity });
++  }
++  const review = record.evidence.review;
++  if (review) {
++    if (!hasReceiptIdentity(review) || review.snapshot_hash !== record.evidence.snapshot_hash
++      || typeof review.reviewer !== 'string' || !ACTOR_ID.test(review.reviewer) || review.reviewer === record.source.builder
++      || review.panel?.members.some((member) => !ACTOR_ID.test(member.reviewer) || member.reviewer === record.source.builder)) {
++      fail('current integration review identity or actor separation is invalid');
++    }
++    if (review.status === 'FAIL' || review.findings.some((finding) => !finding.resolved && ['block', 'major'].includes(finding.severity))) {
++      failures.push({ kind: 'review', identity: review.identity });
++    }
++  }
++  const verification = record.evidence.verification;
++  if (verification) {
++    const effectiveReview = review || record.source.review;
++    if (!hasReceiptIdentity(verification) || verification.snapshot_hash !== record.evidence.snapshot_hash
++      || canonical(verification.criteria.map((item) => item.id).sort())
++        !== canonical(record.source.packet.acceptance.map((item) => item.id).sort())) {
++      fail('current integration verification identity or criteria are invalid');
++    }
++    assertEvidenceActors(record, effectiveReview, verification, 'failed integration');
++    if (verification.criteria.some((item) => item.status === 'FAIL')) failures.push({ kind: 'verification', identity: verification.identity });
++  }
++  if (!failures.length) fail('current integration M has no qualifying active failure evidence');
++  return {
++    kind: 'failed-integration', start_commit: record.integration.commit,
++    integration_commit: record.integration.commit, integration_tree: record.integration.tree,
++    manifest_hash: record.integration.manifest.hash, snapshot_hash: record.evidence.snapshot_hash,
++    failures,
++  };
++}
++
++function correctionCounterState(sourceState, actualExecution, record) {
++  const runSource = (state) => ({
++    kind: 'run', run_id: state.run_id,
++    identity: sha256(canonical({ run_id: state.run_id, counters: state.counters,
++      phase: state.phase, completion_snapshot: state.completion_snapshot?.hash || null })),
++    counters: structuredClone(state.counters),
++  });
++  const recordSourceIdentity = sha256(canonical({
++    record_id: record.id, source_run: record.source.run_id, candidate: record.source.candidate,
++    counters: record.source.counters,
++  }));
++  const sources = [
++    runSource(sourceState),
++    { kind: 'integration-record-source', run_id: record.source.run_id, identity: recordSourceIdentity,
++      counters: structuredClone(record.source.counters) },
++    { kind: 'source-execution', run_id: record.source.run_id, identity: record.source.execution_hash,
++      counters: { fixes: sourceState.pm_binding ? readStory(sourceState.project_root, sourceState.pm_binding.story_path).execution.rounds : 0,
++        retries: sourceState.pm_binding ? readStory(sourceState.project_root, sourceState.pm_binding.story_path).execution.retries : 0,
++        corrections: sourceState.counters.corrections } },
++  ];
++  if (actualExecution) sources.push({ kind: 'start-execution', identity: sha256(canonical(actualExecution)),
++    counters: { fixes: actualExecution.rounds, retries: actualExecution.retries, corrections: 0 } });
++  for (const ancestor of sourceState.correction?.root_review_lineage?.source_runs || []) {
++    if (ancestor.run_id === sourceState.run_id) continue;
++    if (typeof ancestor.root !== 'string' || !path.isAbsolute(ancestor.root)) fail('correction ancestor run root is invalid');
++    const state = readRun(path.join(ancestor.root, '.deliver', 'runs', `${ancestor.run_id}.json`)).state;
++    if (state.run_id !== ancestor.run_id || state.phase !== 'finished') fail('correction ancestor run is missing or unfinished');
++    sources.push(runSource(state));
++  }
++  for (const item of sourceState.correction?.root_review_lineage?.counter_sources || []) sources.push(structuredClone(item));
++  const maxima = { fixes: 0, retries: 0, corrections: 0 };
++  for (const source of sources) for (const key of Object.keys(maxima)) maxima[key] = Math.max(maxima[key], source.counters[key] || 0);
++  sources.sort((left, right) => canonical(left).localeCompare(canonical(right)));
++  return { sources, maxima };
++}
++
++function executionUnknown(execution) {
++  if (!execution) return {};
++  const value = structuredClone(execution);
++  for (const key of ['owner', 'builder', 'branch', 'status', 'rounds', 'retries', 'updated']) delete value[key];
++  return value;
++}
++
++export function prepareIntegrationCorrection(runArg, { integrationRecord, expectedRecordHash } = {}, cwd = process.cwd()) {
++  const loadedRun = readRun(runArg, cwd);
++  const loadedRecord = readIntegrationRecord(integrationRecord, cwd);
++  if (loadedRun.file !== loadedRecord.record.source.run_path || loadedRun.state.run_id !== loadedRecord.record.source.run_id) {
++    fail('correction source run does not match the integration record');
++  }
++  return withRecord(loadedRecord.file, expectedRecordHash, (record) => {
++    if (record.correction) fail('integration correction is already prepared or started');
++    if (artifactStarted(record)) fail('integration artifacts already started; reconcile the integration workflow first');
++    const sourceState = assertCorrectionRecordSource(record);
++    const basis = currentFailureBasis(record);
++    const startRoot = rootPath(record.destination.root);
++    const actualStory = readStory(startRoot, record.source.story_path);
++    const sourceStory = readStory(sourceState.project_root, record.source.story_path);
++    if (actualStory.contractHash !== record.source.contract_hash || sourceStory.contractHash !== record.source.contract_hash
++      || !sourceStory.execution || sourceStory.execution.owner !== record.source.actor) fail('correction story contract or claim lineage changed');
++    if (actualStory.execution && (actualStory.execution.owner !== sourceStory.execution.owner
++      || actualStory.execution.builder !== sourceStory.execution.builder || actualStory.execution.status === 'merged'
++      || canonical(executionUnknown(actualStory.execution)) !== canonical(executionUnknown(sourceStory.execution)))) {
++      fail('correction start has foreign, merged or conflicting Execution metadata');
++    }
++    const project = inspectProjectState(startRoot, { actorId: record.source.actor });
++    if (!project?.approval?.implementation_ready || project.plan?.integrationBranch !== record.plan.integration_branch) {
++      fail('correction preparation requires the unchanged approved current project');
++    }
++    for (const story of project.stories) {
++      if (story.id !== record.source.story && story.execution?.status !== 'merged' && story.execution?.owner === record.source.actor) {
++        fail(`PARALLEL_BATCH_REQUIRED: actor already owns active story ${story.id}`);
++      }
++    }
++    const counters = correctionCounterState(sourceState, actualStory.execution, record);
++    if (counters.maxima.fixes >= 3) fail('correction fix limit of 3 has been reached');
++    const generation = (sourceState.correction?.generation || 0) + 1;
++    const correctionBranch = `pm/${record.source.story}-integration-fix-${generation}`;
++    const refs = String(git(startRoot, ['for-each-ref', '--format=%(refname)', `refs/heads/${correctionBranch}`, `refs/remotes/*/${correctionBranch}`])).trim();
++    if (refs) fail('correction branch already exists');
++    const requiredResolutions = [
++      ...openFindingResolutions(record.source.review),
++      ...openFindingResolutions(record.evidence.review),
++    ];
++    const rootRunId = sourceState.correction?.root_run_id || sourceState.run_id;
++    const lineage = {
++      version: 'integration-correction-lineage-v1', root_run_id: rootRunId,
++      source_runs: [...(sourceState.correction?.root_review_lineage?.source_runs || []), {
++        run_id: sourceState.run_id, candidate: record.source.candidate,
++        root: sourceState.project_root, branch: record.source.branch,
++        snapshot_hash: record.source.snapshot_hash, baseline_hash: sourceState.baseline.snapshot.hash,
++        review_identity: record.source.review.identity, verification_identity: record.source.verification.identity,
++        gate_identities: record.source.gates.map((item) => item.identity),
++      }],
++      integration_record: { id: record.id, path: loadedRecord.file, hash: loadedRecord.hash },
++      required_resolutions: requiredResolutions,
++      counter_sources: counters.sources,
++    };
++    const tokenBody = {
++      version: 'integration-correction-v1', id: randomUUID(), run_id: randomUUID(), generation,
++      branch: correctionBranch, basis, original_packet: structuredClone(record.source.packet),
++      original_source_run: record.source.run_id, original_source_commit: record.source.candidate,
++      root_run_id: rootRunId, original_root_run: rootRunId,
++      story: record.source.story, story_path: record.source.story_path,
++      story_contract_hash: record.source.contract_hash, plan_digest: record.plan.approval_digest,
++      integration_branch: record.plan.integration_branch, actor: record.source.actor,
++      execution_builder: sourceStory.execution.builder, source_execution: structuredClone(sourceStory.execution),
++      actual_start_execution: structuredClone(actualStory.execution), counter_sources: counters.sources,
++      counter_maxima: counters.maxima, root_review_lineage: lineage,
++      mode: sourceState.mode, plan_hash: sourceState.plan.hash, runtime_approval: structuredClone(sourceState.approval),
++      prepared_at: now(),
++    };
++    const token = { ...tokenBody, identity: sha256(canonical(tokenBody)) };
++    record.correction = { status: 'prepared', token, starting: null, started: null };
++    return { token: token.id, run_id: token.run_id, branch: token.branch, start_commit: basis.start_commit, basis: basis.kind };
++  }, cwd, { allowCorrection: true });
++}
++
++function assertCorrectionPublicationCheckout(root, storyWrite) {
++  const dirty = statusPaths(root);
++  const unexpected = dirty.filter((rel) => rel !== storyWrite.path);
++  if (unexpected.length) fail(`correction checkout has unrelated project paths: ${unexpected.sort().join(', ')}`);
++  let storyBytes;
++  try { storyBytes = fs.readFileSync(path.join(root, storyWrite.path), 'utf8'); }
++  catch (error) { fail(`cannot read correction story publication state: ${error.message}`); }
++  if (storyBytes !== storyWrite.before && storyBytes !== storyWrite.after) {
++    fail('correction story publication is neither its legal before-image nor after-image');
++  }
++  const indexTree = String(git(root, ['write-tree'])).trim();
++  if (indexTree !== tree(root)) fail('correction checkout index differs from its start commit');
++}
++
++function assertCorrectionProtectedProof(basisRoot, root, commit, proof, { storyWrite = null, nested = false } = {}) {
++  validateCheckoutProofObjects(root, commit, proof);
++  if (head(root) !== commit || tree(root) !== proof.tree) {
++    fail(`${nested ? 'correction submodule' : 'correction checkout'} is not at its prepared basis commit`);
++  }
++  if (nested) assertClean(root);
++  assertOrdinaryIndex(root);
++  for (const [rel, identity] of Object.entries(proof.entries)) {
++    if (String(identity).startsWith('gitlink:')) continue;
++    const live = liveFingerprint(root, rel);
++    if (storyWrite?.path === rel) {
++      const expected = /^file:(644|755):([0-9a-f]{64})$/.exec(identity);
++      if (!expected || expected[2] !== sha256(storyWrite.before)
++        || (live !== identity && live !== `file:${expected[1]}:${sha256(storyWrite.after)}`)) {
++        fail('correction story bytes, type or mode differ from the prepared basis');
++      }
++    } else if (live !== identity) fail(`correction tracked bytes differ from the prepared basis: ${rel}`);
++  }
++  if (canonical(portableProtectedState(root)) !== canonical(portableProtectedState(basisRoot))
++    || canonical(protectedIgnoredEntries(root)) !== canonical(proof.protected_ignored)) {
++    fail('correction checkout protected metadata changed from its prepared basis');
++  }
++  const links = Object.fromEntries(Object.entries(proof.entries)
++    .filter(([, value]) => /^gitlink:[0-9a-f]+$/.test(value)));
++  const initialized = initializedForLinks(root, links);
++  const basisInitialized = initializedForLinks(basisRoot, links);
++  if (canonical(Object.keys(initialized).sort()) !== canonical(Object.keys(proof.initialized).sort())) {
++    fail('correction checkout initialized submodules changed from its prepared basis');
++  }
++  for (const [rel, nestedProof] of Object.entries(proof.initialized)) {
++    const match = /^gitlink:([0-9a-f]+)$/.exec(proof.entries[rel]);
++    if (!match || !basisInitialized[rel]) fail(`prepared basis submodule is missing: ${rel}`);
++    assertCorrectionProtectedProof(basisInitialized[rel], initialized[rel], match[1], nestedProof, { nested: true });
++  }
++}
++
++function correctionBasisProof(record, token) {
++  return token.basis.kind === 'composition-conflict-no-m'
++    ? record.integration.base_checkout_proof
++    : record.integration.checkout_proof;
++}
++
++function assertUniqueCorrectionCheckout(record, token, correctionRoot, descriptor = null, runState = null) {
++  const root = rootPath(correctionRoot);
++  if (commonRepository(root) !== record.destination.common_repository) fail('correction checkout belongs to a different repository');
++  if (branch(root) !== token.branch || head(root) !== token.basis.start_commit || tree(root) !== tree(root, token.basis.start_commit)) {
++    fail('correction checkout is not the exact recorded branch and start commit');
++  }
++  if (descriptor) assertCorrectionPublicationCheckout(root, descriptor.writes[1]);
++  else assertClean(root);
++  assertOrdinaryIndex(root);
++  const anchor = captureGitAnchor(root);
++  if (anchor.head !== token.basis.start_commit) fail('correction checkout anchor differs from its recorded start');
++  const basisProof = correctionBasisProof(record, token);
++  const basisRoot = rootPath(record.destination.root);
++  verifyCheckoutProof(basisRoot, token.basis.start_commit, basisProof);
++  assertCorrectionProtectedProof(basisRoot, root, token.basis.start_commit, basisProof,
++    { storyWrite: descriptor?.writes?.[1] || null });
++  if (runState && canonical(anchor) !== canonical(runState.git_anchor)) {
++    fail('correction checkout anchor changed from its captured operational baseline');
++  }
++  const ref = String(git(root, ['rev-parse', '--verify', `refs/heads/${token.branch}`])).trim();
++  if (ref !== token.basis.start_commit) fail('correction branch ref moved from its recorded start');
++  const groups = String(git(root, ['worktree', 'list', '--porcelain'])).split(/\n\n+/).map((block) => Object.fromEntries(
++    block.split(/\r?\n/).filter(Boolean).map((line) => {
++      const split = line.indexOf(' ');
++      return split < 0 ? [line, true] : [line.slice(0, split), line.slice(split + 1)];
++    }),
++  ));
++  const attached = groups.filter((item) => item.branch === `refs/heads/${token.branch}`);
++  if (attached.length !== 1 || fs.realpathSync.native(attached[0].worktree) !== root) {
++    fail('correction branch must have one sole attached worktree');
++  }
++  const allowedBranches = new Set([token.branch, record.source.branch,
++    ...(token.root_review_lineage.source_runs || []).map((item) => item.branch).filter(Boolean)]);
++  const storyPrefix = `pm/${token.story}-`;
++  const storyRefs = String(git(root, ['for-each-ref', '--format=%(refname)', 'refs/heads', 'refs/remotes'])).split(/\r?\n/).filter(Boolean);
++  for (const refName of storyRefs) {
++    let refBranch = null;
++    if (refName.startsWith('refs/heads/')) refBranch = refName.slice('refs/heads/'.length);
++    else if (refName.startsWith('refs/remotes/')) refBranch = refName.slice('refs/remotes/'.length).split('/').slice(1).join('/');
++    if (refBranch?.startsWith(storyPrefix) && !allowedBranches.has(refBranch)) fail(`unrelated same-story ref blocks correction: ${refName}`);
++  }
++  const allowedRuns = new Set((token.root_review_lineage.source_runs || []).map((item) => item.run_id));
++  for (const worktree of groups) {
++    if (typeof worktree.worktree !== 'string') continue;
++    const worktreeRoot = rootPath(worktree.worktree);
++    const inventory = inspectProjectState(worktreeRoot, { actorId: token.actor });
++    if (inventory?.unreadable?.length) fail('attached worktree has unreadable story inventory');
++    for (const document of inventory?.stories || []) {
++      const execution = document.execution;
++      if (!execution || execution.status === 'merged') continue;
++      if (document.id !== token.story && execution.owner === token.actor) {
++        fail(`PARALLEL_BATCH_REQUIRED: actor already owns active other story ${document.id}`);
++      }
++      if (document.id === token.story && execution.owner === token.actor
++        && canonical(execution) !== canonical(token.actual_start_execution)
++        && canonical(execution) !== canonical(token.source_execution)
++        && !allowedBranches.has(execution.branch)) {
++        fail('unlinked same-story Execution blocks correction');
++      }
++    }
++    const runs = path.join(worktree.worktree, '.deliver', 'runs');
++    let names = [];
++    try { names = fs.readdirSync(runs).filter((name) => RUN_ID.test(name.replace(/\.json$/, '')) && name.endsWith('.json')); }
++    catch (error) { if (error.code !== 'ENOENT') throw error; }
++    for (const name of names) {
++      const runFile = path.join(runs, name);
++      const candidate = readRun(runFile).state;
++      if (candidate.run_id === token.run_id) {
++        const ownRun = descriptor?.writes?.[0];
++        if (worktreeRoot !== root || ownRun?.path !== `.deliver/runs/${token.run_id}.json`
++          || fs.readFileSync(runFile, 'utf8') !== ownRun.after) {
++          fail('correction run publication is not the exact token-bound after-image');
++        }
++        continue;
++      }
++      if (allowedRuns.has(candidate.run_id) && candidate.phase === 'finished') continue;
++      if (candidate.pm_binding?.format === 'current' && candidate.pm_binding.story === token.story) {
++        fail('another unlinked run already owns this story lineage');
++      }
++      if (candidate.pm_binding?.format === 'current' && candidate.pm_binding.actor === token.actor
++        && candidate.pm_binding.story !== token.story && candidate.phase !== 'finished') {
++        fail(`PARALLEL_BATCH_REQUIRED: actor already owns active story ${candidate.pm_binding.story}`);
++      }
++    }
++  }
++  const project = inspectProjectState(root, { actorId: token.actor });
++  if (!project?.approval?.implementation_ready || project.plan?.integrationBranch !== token.integration_branch) {
++    fail('correction checkout no longer has the approved current project');
++  }
++  for (const story of project.stories) {
++    if (story.id !== token.story && story.execution?.status !== 'merged' && story.execution?.owner === token.actor) {
++      fail(`PARALLEL_BATCH_REQUIRED: actor already owns active story ${story.id}`);
++    }
++  }
++  return root;
++}
++
++function assertStartTokenCurrent(record, token, correctionRoot, descriptor = null, runState = null) {
++  const sourceState = assertCorrectionRecordSource(record);
++  const basis = currentFailureBasis(record);
++  const stableBasis = (value) => {
++    const copy = structuredClone(value);
++    if (copy.probe) {
++      delete copy.probe.started_at;
++      delete copy.probe.finished_at;
++    }
++    return copy;
++  };
++  if (canonical(stableBasis(basis)) !== canonical(stableBasis(token.basis))) fail('correction failure basis changed after preparation');
++  const root = assertUniqueCorrectionCheckout(record, token, correctionRoot, descriptor, runState);
++  const story = readStory(root, token.story_path);
++  const storyWrite = descriptor?.writes?.[1];
++  const exactBefore = !storyWrite || story.text === storyWrite.before;
++  const exactAfter = Boolean(storyWrite && story.text === storyWrite.after);
++  if (story.contractHash !== token.story_contract_hash || (!exactBefore && !exactAfter)
++    || (exactBefore && canonical(story.execution) !== canonical(token.actual_start_execution))) {
++    fail('correction start story changed after preparation');
++  }
++  if (runState) {
++    const retained = runState.baseline?.snapshot;
++    const live = snapshot(root, [...token.original_packet.touches, ...token.original_packet.read_paths,
++      ...token.original_packet.specs, token.story_path]);
++    if (exactAfter) {
++      const retainedStory = retained?.entries?.[token.story_path];
++      const expected = /^file:(644|755):[0-9a-f]{64}$/.exec(retainedStory || '');
++      if (!expected || live.entries[token.story_path] !== `file:${expected[1]}:${sha256(storyWrite.after)}`) {
++        fail('correction story type or executable mode changed from its captured operational baseline');
++      }
++      live.entries[token.story_path] = retainedStory;
++    }
++    if (!retained || canonical(live.entries) !== canonical(retained.entries)
++      || live.git_meta !== retained.git_meta) {
++      fail('correction checkout changed from its captured operational baseline');
++    }
++  }
++  const currentCounters = correctionCounterState(sourceState, token.actual_start_execution, record);
++  if (canonical(currentCounters.maxima) !== canonical(token.counter_maxima)
++    || canonical(currentCounters.sources) !== canonical(token.counter_sources)) fail('correction attempt counters or lineage changed');
++  return { root, sourceState, story };
++}
++
++function startingEnvelope(publication, preparedRecordHash) {
++  return {
++    prepared_record_hash: preparedRecordHash,
++    descriptor_identity: publication.descriptor_identity,
++    correction_root: publication.descriptor.correction_root,
++    builder: publication.descriptor.builder,
++    captured_at: publication.state.created_at,
++    reconstruction: {
++      descriptor: publication.descriptor,
++      baseline_hash: publication.state.baseline.snapshot.hash,
++      anchor_hash: sha256(canonical(publication.state.git_anchor)),
++    },
++  };
++}
++
++function finishCorrectionStart(recordFile, startingHash, wrapper, token, cwd) {
++  applyIntegrationCorrectionJournal(wrapper.descriptor.correction_root, wrapper, wrapper.descriptor, token);
++  const updated = withRecord(recordFile, startingHash, (record) => {
++    if (record.correction?.status !== 'starting'
++      || record.correction.starting.descriptor_identity !== wrapper.descriptor_identity
++      || canonical(record.correction.starting.reconstruction.descriptor) !== canonical(wrapper.descriptor)) {
++      fail('starting correction record no longer matches its journal');
++    }
++    const runWrite = wrapper.descriptor.writes[0];
++    const storyWrite = wrapper.descriptor.writes[1];
++    record.correction.status = 'started';
++    record.correction.started = {
++      starting_record_hash: startingHash, descriptor_identity: wrapper.descriptor_identity,
++      correction_root: wrapper.descriptor.correction_root, builder: wrapper.descriptor.builder,
++      run_hash: sha256(runWrite.after), story_hash: sha256(storyWrite.after), started_at: now(),
++    };
++    return record.correction.started;
++  }, cwd, { allowCorrection: true });
++  removeIntegrationCorrectionJournal(wrapper.descriptor.correction_root);
++  const runFile = path.join(wrapper.descriptor.correction_root, '.deliver', 'runs', `${wrapper.descriptor.run_id}.json`);
++  const state = readRun(runFile).state;
++  return { run_id: state.run_id, revision: state.revision, phase: state.phase, state_path: runFile,
++    integration_record: updated.file, integration_record_hash: updated.hash };
++}
++
++export function startIntegrationCorrection(recordArg, {
++  expectedRecordHash, token: tokenId, builder, correctionRoot = process.cwd(),
++} = {}, cwd = process.cwd()) {
++  if (!RUN_ID.test(tokenId || '') || typeof builder !== 'string' || !ACTOR_ID.test(builder)) fail('correction token and builder are required', 64);
++  let loaded = readIntegrationRecord(recordArg, cwd);
++  const envelope = loaded.record.correction;
++  if (!envelope || envelope.token.id !== tokenId || envelope.status === 'started') fail('correction token is missing, different or already started');
++  const token = envelope.token;
++  if (envelope.status === 'prepared' && loaded.hash !== expectedRecordHash) fail('integration record hash is missing or stale');
++  if (envelope.status === 'starting' && envelope.starting.prepared_record_hash !== expectedRecordHash && loaded.hash !== expectedRecordHash) {
++    fail('starting correction predecessor hash is missing or stale');
++  }
++  assertStartTokenCurrent(loaded.record, token, correctionRoot);
++  let publication;
++  let startingHash;
++  if (envelope.status === 'prepared') {
++    const capturedAt = now();
++    publication = buildIntegrationCorrectionPublication({
++      correctionRoot, integrationRecord: loaded.file, preparedRecordHash: loaded.hash, token, builder, capturedAt,
++    });
++    const starting = startingEnvelope(publication, loaded.hash);
++    const changed = withRecord(loaded.file, loaded.hash, (record) => {
++      if (record.correction?.status !== 'prepared' || record.correction.token.identity !== token.identity) fail('correction token changed before start');
++      record.correction.status = 'starting';
++      record.correction.starting = starting;
++      return starting;
++    }, cwd, { allowCorrection: true });
++    startingHash = changed.hash;
++    loaded = changed;
++  } else {
++    const descriptor = envelope.starting.reconstruction.descriptor;
++    publication = buildIntegrationCorrectionPublication({
++      correctionRoot, integrationRecord: loaded.file, preparedRecordHash: envelope.starting.prepared_record_hash,
++      token, builder: envelope.starting.builder, capturedAt: envelope.starting.captured_at,
++    });
++    if (publication.descriptor_identity !== envelope.starting.descriptor_identity
++      || canonical(publication.descriptor) !== canonical(descriptor)) fail('starting correction cannot be reconstructed exactly');
++    startingHash = loaded.hash;
++  }
++  const wrapper = {
++    descriptor: publication.descriptor,
++    descriptor_identity: publication.descriptor_identity,
++    expected_starting_record_hash: startingHash,
++  };
++  const conflicts = integrationCorrectionJournalConflicts(publication.descriptor.correction_root);
++  if (!conflicts.length) writeIntegrationCorrectionJournal(publication.descriptor.correction_root, wrapper, publication.descriptor, token);
++  else {
++    if (conflicts.length !== 1 || conflicts[0] !== '.deliver/integration-correction-transaction.json') {
++      fail('more than one transaction journal is present');
++    }
++    const existing = readIntegrationCorrectionJournal(publication.descriptor.correction_root);
++    validateIntegrationCorrectionJournal(publication.descriptor.correction_root, existing, publication.descriptor, token);
++    if (existing.expected_starting_record_hash !== startingHash) fail('correction journal starting record hash is stale');
++  }
++  return finishCorrectionStart(loaded.file, startingHash, wrapper, token, cwd);
++}
++
++function readCompletedCorrectionImage(root, rel, label) {
++  const parts = rel.split('/');
++  let file = root;
++  for (let index = 0; index < parts.length - 1; index++) {
++    file = path.join(file, parts[index]);
++    let stat;
++    try { stat = fs.lstatSync(file); }
++    catch (error) { fail(`started correction ${label} publication is missing or inaccessible: ${error.message}`); }
++    if (stat.isSymbolicLink() || !stat.isDirectory()) {
++      fail(`started correction ${label} publication has an unsafe parent`);
++    }
++  }
++  file = path.join(file, parts.at(-1));
++  let before;
++  try { before = fs.lstatSync(file); }
++  catch (error) { fail(`started correction ${label} publication is missing or inaccessible: ${error.message}`); }
++  if (before.isSymbolicLink() || !before.isFile()) fail(`started correction ${label} publication is not a regular file`);
++  let fd;
++  try { fd = fs.openSync(file, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0)); }
++  catch (error) { fail(`started correction ${label} publication cannot be opened safely: ${error.message}`); }
++  try {
++    const stat = fs.fstatSync(fd);
++    if (!stat.isFile() || stat.size > MAX_RECORD_BYTES) {
++      fail(`started correction ${label} publication is not a bounded regular file`);
++    }
++    return fs.readFileSync(fd, 'utf8');
++  } finally {
++    fs.closeSync(fd);
++  }
++}
++
++export function recoverIntegrationCorrectionStart(root) {
++  root = rootPath(root);
++  const conflicts = integrationCorrectionJournalConflicts(root);
++  if (!conflicts.includes('.deliver/integration-correction-transaction.json')) return { recovered: false };
++  if (conflicts.length !== 1) fail('more than one transaction journal is present');
++  const wrapper = readIntegrationCorrectionJournal(root);
++  const loaded = readIntegrationRecord(wrapper?.descriptor?.integration_record, root);
++  const envelope = loaded.record.correction;
++  if (!envelope || !['starting', 'started'].includes(envelope.status)
++    || envelope.token.id !== wrapper.descriptor.token_id || envelope.token.identity !== wrapper.descriptor.token_identity
++    || envelope.starting.descriptor_identity !== wrapper.descriptor_identity
++    || canonical(envelope.starting.reconstruction.descriptor) !== canonical(wrapper.descriptor)) {
++    fail('integration correction journal does not match its active token');
++  }
++  const publication = validateIntegrationCorrectionJournal(root, wrapper,
++    envelope.starting.reconstruction.descriptor, envelope.token);
++  if (envelope.starting.reconstruction.baseline_hash !== publication.runState.baseline.snapshot.hash
++    || envelope.starting.reconstruction.anchor_hash !== sha256(canonical(publication.runState.git_anchor))) {
++    fail('correction starting record does not match its captured baseline or anchor');
++  }
++  assertStartTokenCurrent(loaded.record, envelope.token, root, wrapper.descriptor, publication.runState);
++  if (envelope.status === 'started') {
++    const [runWrite, storyWrite] = wrapper.descriptor.writes;
++    if (envelope.started.starting_record_hash !== wrapper.expected_starting_record_hash
++      || envelope.started.descriptor_identity !== wrapper.descriptor_identity
++      || envelope.started.run_hash !== sha256(runWrite.after)
++      || envelope.started.story_hash !== sha256(storyWrite.after)) {
++      fail('started correction publication hashes do not match its surviving journal after-images');
++    }
++    const liveRun = readCompletedCorrectionImage(root, runWrite.path, 'run');
++    const liveStory = readCompletedCorrectionImage(root, storyWrite.path, 'story');
++    if (liveRun !== runWrite.after || liveStory !== storyWrite.after) {
++      fail('started correction publication does not contain both exact journal after-images');
++    }
++    removeIntegrationCorrectionJournal(root);
++    return { recovered: true, run_id: wrapper.descriptor.run_id, phase: 'active' };
++  }
++  if (loaded.hash !== wrapper.expected_starting_record_hash) fail('correction journal does not match the current starting record hash');
++  const summary = finishCorrectionStart(loaded.file, loaded.hash, wrapper, envelope.token, root);
++  return { recovered: true, ...summary };
++}
++
+ export function prepareLocalIntegration(runArg, { integrationRoot = process.cwd(), verificationReport = false } = {}, cwd = process.cwd()) {
+   const loaded = readRun(runArg, cwd);
+   const state = loaded.state;
+diff --git a/plugins/deliver/skills/deliver/scripts/lib/state.mjs b/plugins/deliver/skills/deliver/scripts/lib/state.mjs
+index 61e2583..bfd6a67 100644
+--- a/plugins/deliver/skills/deliver/scripts/lib/state.mjs
++++ b/plugins/deliver/skills/deliver/scripts/lib/state.mjs
+@@ -47,6 +47,7 @@ const safeRelativePath = (value) => typeof value === 'string' && value && !path.
+   && !/^(?:\.git|\.deliver)(?:[\\/]|$)/.test(value);
+ const oid = (value) => typeof value === 'string' && /^[0-9a-f]{40}(?:[0-9a-f]{24})?$/.test(value);
+ const digest = (value) => typeof value === 'string' && /^[0-9a-f]{64}$/.test(value);
++const runId = (value) => typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(value);
+ 
+ function validNestedAnchor(anchor) {
+   if (!isObject(anchor) || !['head', 'tree', 'index_tree', 'index_flags', 'protected_hash']
+@@ -310,6 +311,27 @@ export function validateRunState(state) {
+       if (path.isAbsolute(rel) || rel.split(/[\\/]/).includes('..') || !/^[0-9a-f]{64}$/.test(hash)) fail('unsafe contract hash');
+     }
+   }
++  if (state.correction !== undefined && state.correction !== null) {
++    const correction = state.correction;
++    if (!isObject(correction) || correction.version !== 'integration-correction-v1'
++      || !runId(correction.token_id) || !digest(correction.token_identity)
++      || !['failed-integration', 'composition-conflict-no-m'].includes(correction.basis)
++      || typeof correction.integration_record !== 'string' || !path.isAbsolute(correction.integration_record)
++      || !runId(correction.root_run_id) || !runId(correction.source_run_id)
++      || !Number.isSafeInteger(correction.generation) || correction.generation < 1
++      || !isObject(correction.root_review_lineage) || !Array.isArray(correction.required_resolutions)
++      || canonical(correction.required_resolutions) !== canonical(correction.root_review_lineage.required_resolutions)) {
++      fail('bad integration correction binding');
++    }
++    for (const item of correction.required_resolutions) {
++      if (!isObject(item) || !digest(item.receipt_identity) || !Number.isSafeInteger(item.ordinal) || item.ordinal < 0
++        || !['block', 'major', 'minor'].includes(item.severity)
++        || typeof item.message !== 'string' || !item.message.trim() || item.message.length > 4000
++        || (item.path !== undefined && (typeof item.path !== 'string' || item.path.length > 1000))) {
++        fail('bad inherited correction finding');
++      }
++    }
++  }
+   return state;
+ }
+ 
+@@ -385,9 +407,11 @@ function atomicWrite(file, value, exclusive = false) {
+   }
+ }
+ 
+-export function createRun(projectRoot, mode, planPath = null) {
++export function createRunState(projectRoot, mode, planPath = null, { fixedRunId = randomUUID(), createdAt = new Date().toISOString() } = {}) {
+   if (!['quick', 'managed', 'governed'].includes(mode)) throw new DeliverError('mode must be quick, managed, or governed', 64);
+   const root = fs.realpathSync(projectRoot);
++  if (!runId(fixedRunId)) throw new DeliverError('fixed run id must be a canonical UUID', 66);
++  if (typeof createdAt !== 'string' || Number.isNaN(Date.parse(createdAt))) throw new DeliverError('created time must be a valid timestamp', 66);
+   if (!planPath && mode !== 'quick') throw new DeliverError('--plan is required in managed and governed modes', 64);
+   const plan = planPath ? path.resolve(root, planPath) : null;
+   let planHash = sha256('quick:no-plan');
+@@ -395,16 +419,14 @@ export function createRun(projectRoot, mode, planPath = null) {
+     try { planHash = sha256(fs.readFileSync(plan)); }
+     catch (error) { throw new DeliverError(`cannot read plan: ${error.message}`, 66); }
+   }
+-  const runId = randomUUID();
+-  const now = new Date().toISOString();
+   const state = {
+     schema_version: STATE_VERSION,
+-    run_id: runId,
++    run_id: fixedRunId,
+     mode,
+     revision: 0,
+     project_root: root,
+-    created_at: now,
+-    updated_at: now,
++    created_at: createdAt,
++    updated_at: createdAt,
+     phase: 'initialized',
+     plan: { path: plan, hash: planHash },
+     approval: null,
+@@ -416,9 +438,15 @@ export function createRun(projectRoot, mode, planPath = null) {
+     evidence_history: [],
+     checkpoints: [],
+     counters: { retries: 0, fixes: 0, corrections: 0 },
+-    events: [{ at: now, type: 'initialized', mode, plan_hash: planHash }],
++    events: [{ at: createdAt, type: 'initialized', mode, plan_hash: planHash }],
+   };
+-  const file = path.join(runsDir(root), `${runId}.json`);
++  validateRunState(state);
++  return state;
++}
++
++export function createRun(projectRoot, mode, planPath = null) {
++  const state = createRunState(projectRoot, mode, planPath);
++  const file = path.join(runsDir(state.project_root), `${state.run_id}.json`);
+   atomicWrite(file, state, true);
+   return { state, file };
+ }
+diff --git a/plugins/deliver/skills/deliver/scripts/pm.mjs b/plugins/deliver/skills/deliver/scripts/pm.mjs
+index ab2ebba..9a887c6 100644
+--- a/plugins/deliver/skills/deliver/scripts/pm.mjs
++++ b/plugins/deliver/skills/deliver/scripts/pm.mjs
+@@ -22,6 +22,7 @@ import {
+   adoptVerificationReport,
+   finalizeIntegrationEvidence,
+   prepareIntegrationHandoff,
++  prepareIntegrationCorrection,
+   prepareLocalIntegration,
+   prepareStoryClosure,
+   prepareVerificationReport,
+@@ -29,6 +30,7 @@ import {
+   recordIntegrationReview,
+   recordIntegrationVerification,
+   runIntegrationGate,
++  recoverIntegrationCorrectionStart,
+ } from './lib/integration.mjs';
+ 
+ const help = `Shared Deliver project state
+@@ -46,6 +48,7 @@ const help = `Shared Deliver project state
+   pm.mjs integrate-verify --integration FILE --expected-record HASH --verifier ID --results JSON
+   pm.mjs integrate-finalize --integration FILE --expected-record HASH
+   pm.mjs integrate-reconcile --integration FILE --expected-record HASH
++  pm.mjs correction-prepare --run RUN --integration FILE --expected-record HASH
+   pm.mjs report-prepare|close-prepare --integration FILE --expected-record HASH
+   pm.mjs report-adopt|close-adopt --integration FILE --expected-record HASH --token TOKEN --commit SHA
+   pm.mjs handoff-prepare --integration FILE --expected-record HASH [--next TEXT]
+@@ -83,6 +86,7 @@ try {
+       'integrate-gate': ['--integration', '--expected-record', '--name'], 'integrate-review': ['--integration', '--expected-record', '--reviewer', '--receipt'],
+       'integrate-verify': ['--integration', '--expected-record', '--verifier', '--results'], 'integrate-finalize': ['--integration', '--expected-record'],
+       'integrate-reconcile': ['--integration', '--expected-record'],
++      'correction-prepare': ['--run', '--integration', '--expected-record'],
+       'report-prepare': ['--integration', '--expected-record'], 'report-adopt': ['--integration', '--expected-record', '--token', '--commit'],
+       'close-prepare': ['--integration', '--expected-record'], 'close-adopt': ['--integration', '--expected-record', '--token', '--commit'],
+       'handoff-prepare': ['--integration', '--expected-record', '--next'], 'handoff-adopt': ['--integration', '--expected-record', '--token', '--commit'],
+@@ -173,6 +177,9 @@ try {
+     else if (command === 'integrate-reconcile') result = reconcileIntegrationEvidence(options['--integration'], {
+       expectedRecordHash: options['--expected-record'],
+     }, root);
++    else if (command === 'correction-prepare') result = prepareIntegrationCorrection(options['--run'], {
++      integrationRecord: options['--integration'], expectedRecordHash: options['--expected-record'],
++    }, root);
+     else if (command === 'report-prepare') result = prepareVerificationReport(options['--integration'], {
+       expectedRecordHash: options['--expected-record'],
+     }, root);
+@@ -192,7 +199,8 @@ try {
+       expectedRecordHash: options['--expected-record'], token: options['--token'], commit: options['--commit'],
+     }, root);
+     else {
+-      result = recoverExecutionTransition(root);
++      result = recoverIntegrationCorrectionStart(root);
++      if (!result.recovered) result = recoverExecutionTransition(root);
+       if (!result.recovered) result = recoverCurrentPm(root);
+       if (!result.recovered) result = recoverPm(root);
+     }

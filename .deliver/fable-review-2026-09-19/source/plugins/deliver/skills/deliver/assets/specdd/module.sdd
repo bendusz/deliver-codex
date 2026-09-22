@@ -1,0 +1,20 @@
+Spec: SpecDD support module
+Purpose:
+  Parse and inspect current-dialect SpecDD ownership contracts for Deliver.
+Platform: Node.js 22 or newer
+Owns:
+  ./scripts/specdd.mjs
+  ./assets/specdd
+  ./tests/specdd.test.mjs
+Can modify:
+  ./fixtures
+Exposes:
+  parseSpec(text)
+  inspectSpecs(root, specPaths)
+Must:
+  Resolve ./ and ../ from each spec directory and / from the content root.
+  Keep prose in Owns out of filesystem ownership.
+  Use Owns and Can modify as the editable union while keeping Owns exclusive.
+Done when:
+  Literal traversal and symlink escapes are rejected.
+  Inspection performs no writes.

@@ -1,0 +1,28 @@
+{
+  "source": "Executed commands and results reported by native deliver-builder /root/recover_t05c; full runtime gate logs are retained separately",
+  "snapshot": "6878683c7c9e3511d86a2d59507c28805816398b43ed8737740dea8a875ea0e3",
+  "checks": [
+    {
+      "command": "node --check plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+      "status": "PASS"
+    },
+    {
+      "command": "git diff --check",
+      "status": "PASS"
+    },
+    {
+      "scope": "new started-publication tests in current-lifecycle.test.mjs",
+      "status": "PASS",
+      "total": 7,
+      "passed": 7,
+      "duration_ms": 62996.301292
+    },
+    {
+      "scope": "existing torn-publication recovery group in integration-correction.test.mjs",
+      "status": "PASS",
+      "total": 7,
+      "passed": 7,
+      "duration_ms": 71338.478208
+    }
+  ]
+}

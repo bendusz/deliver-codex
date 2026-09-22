@@ -1,0 +1,60 @@
+{
+  "snapshot": "b8c66ec574464337ae65d7b4e810d742a34b381e758f4b21f9e53964ac481d97",
+  "run_id": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
+  "revision": 20,
+  "counters": {
+    "fixes": 3,
+    "retries": 0,
+    "corrections": 0
+  },
+  "evidence_history_entries": 3,
+  "gates": {
+    "test": "PASS287/287",
+    "validate": "PASS"
+  },
+  "review": "FAIL: eight prior findings resolved, one new completed-publication recovery major",
+  "verification": {
+    "T05C-AC1": "PASS",
+    "T05C-AC2": "FAIL",
+    "T05C-AC3": "FAIL"
+  },
+  "probe_results": {
+    "started": "four failing leaf cases plus two failing parents, one valid control PASS",
+    "config_v1": "setup error at detached nested HEAD; superseded, no production verdict",
+    "config_v2": "setup error at untracked administrative sibling; superseded, no production verdict",
+    "config_v3": "PASS4/4, retargeting refused unchanged; hypothesis not reproduced"
+  },
+  "next": "Request one additional bounded fix round on unchanged run/baseline; do not dispatch fix4 without decision.",
+  "proposal": "docs/reviews/2026-09-13-correction-recovery-proposal.md",
+  "artifacts": {
+    "candidate-manifest.json": "c5ff23eff04c2da111886ac91786e4c29019933c4e04e6a00546529d7a96ca87",
+    "candidate-production.patch": "db73b9d56c5e969d3fc19fe86ef048f355ad01fe6c1f907aefb2fbe7b36b19be",
+    "candidate-scope-check.json": "5f66226e86044693eb001b53c3818ed599c3243e668d7f28c4315d62396e8ba0",
+    "config-probe-v2.json": "52cbd5c108da26a714999e474c6c5e6bf0aad90db08ceab6717ee30071b56660",
+    "config-probe-v2.log": "fc77260f8fc11336a23f79026b8a9e684ec8f01f039ea5e03cb248b80b839857",
+    "config-probe-v3.json": "f013663ad9b33bfb785b3c0c965c92d494fb3b6855f74739c3e7d2114fe2804d",
+    "config-probe-v3.log": "aeb8482d19f3d9d12be475c542a3bae232fd0f46f92fa8cda4265be6d5d92e9c",
+    "config-probe.json": "b7f29b1083ebda9c4810d79ccc7f889e6852cefd073c97e76597807e71ac0f42",
+    "config-probe.log": "211ed32fbd07445cdba398b8fa2a5f8a5d523ccdb90f6a4ca3309a94cc84aaed",
+    "core-worktree-probe-v2.test.mjs": "886176b29662583dccc40915f8864a70919cc0b9e91f7475f769f243d7a3ddb2",
+    "core-worktree-probe-v3.test.mjs": "9c2895b8b312543fd7b2285a1d99e098a92026d1ac2202d8c4320ea4451a4efd",
+    "core-worktree-started-probe.test.mjs": "fae33daa9a81cd86de3a63f88741d48f91c1d713a22bf69402b8032a7fbb5104",
+    "focused-results.json": "b630b2c07ebca1ed2a8ea6242c2e93eb9c6973d7802ba45de652e08f28527335",
+    "frozen-current-lifecycle.test.mjs": "371de8ed4d0ebe1491b3cd1f57ba5ff7f972af241dd95e59ed5933be5e348baf",
+    "frozen-integration-correction.test.mjs": "a764d071d5123dc3b1fd9a346139364f656c715fd48a9ff24422cb500bd38137",
+    "post-probe-scope-check.json": "26c7908589f789e69f9eef7adf15f024085f956a219abdc99676413b002a5535",
+    "red-result.json": "294e43b6b390dbae760e80f9a35be43121d76d213ed693a98dca1c0277d0a371",
+    "red-scope-check.json": "6afc7c99d48de2befda1912c43baba0a04401aa37276ee5206447af6b5451a47",
+    "review-round4.json": "d7500f6a34cc18264cfe70efed529f1611bab8f2da5b883b7109b446499c3473",
+    "run-after-failed-acceptance.json": "db7a803fabc1a6c5d0397ca2fcdd8311ae4d2994b7c7228387dfac1ec8f3009a",
+    "run-after-gates.json": "569a42c7537d8dabd2c4caf2742744b559ad7643a0a314c8746529bd0b5e02c4",
+    "started-probe.json": "48d44b2855868cac5611ed53d2ab463df9f1f4c5e31a3aceecc2b138b9a623d5",
+    "started-probe.log": "4c036764d92f01d1a28faa18e476c7c5e1781a3d59ef0f145e5d79ca53b760a4",
+    "test-delta-review.json": "ce2f24ba8f010daa5ac4a0ffa39a1c38a187fcf5432cc7dfbb922caa1bdf8803",
+    "test.json": "8084478d33ddaca614770541c0f1fbe58416cb35ff3c987bd8617b33dbf97d6b",
+    "test.log": "e001a85fb6d95666a7782c764526bb4da11da7411014133587e6c18f59d40da7",
+    "validate.json": "4e9d1b6d665597077e257747304ba62b283dd8e98c28367bc05ac9e258d9bdf4",
+    "validate.log": "a6171d7f66bde2074c906af25ca12b22544832654e63b0b9d2acd06c386a89da",
+    "verification-round4.json": "867d4702c5cf1e411ee2ea03695ff2745b97b5c459ac6ceb9c2d30442d0a5dc4"
+  }
+}

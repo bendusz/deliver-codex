@@ -1,0 +1,25 @@
+{
+  "status": "RECOMMENDED",
+  "contract": {
+    "library": {
+      "signature": "inspectDoctor(root,{runId?,storyId?,environment?:boolean})",
+      "default": "environment defaults to false",
+      "validation": "Reject any supplied non-boolean environment value with DeliverError code 64.",
+      "effects": "Always observational and nonwriting. environment:false performs no environment probes. environment:true checks only fixed executable names and declared config/role/instruction names for availability; it never executes commands, gates or models, uses the network, or exposes values, resolved executable paths, file contents or secrets.",
+      "result": "Return {selection,native_reference,checks}; environment findings use the existing bounded check shape, deterministic order and OK|MISSING|DRIFT|UNKNOWN statuses. For executable checks, path is the executable name; for declared files, path is a safe project-relative name."
+    },
+    "cli": {
+      "grammar": "pm.mjs doctor [--run RUN] [--story STORY] [--environment] [--output tmp/environment-check.md]",
+      "environment_flag": "--environment is a valueless boolean flag. Its absence passes environment:false; its presence passes environment:true.",
+      "stdout": "Every successful invocation writes exactly one UTF-8 JSON line using the existing convention: {\"ok\":true,...inspectDoctorResult}. pm doctor --environment includes the environment checks in checks and writes no file.",
+      "file": "--output is accepted only with --environment and only when its value is the literal project-relative path tmp/environment-check.md. It writes a deterministic Markdown rendering of the same environment checks, using names and statuses only. The CLI performs no second probe. Stdout remains the same JSON diagnostic result, augmented with environment_report:{written:true,path:\"tmp/environment-check.md\"}.",
+      "errors": "A valued --environment, --output without --environment, any other output path, duplicate option or missing output value returns the existing JSON error envelope and exit code 64. Report creation must reject symlink/nonregular targets and escape from the project root."
+    }
+  },
+  "evidence": [
+    "architecture-state.md:156-163 requires observational inspection, an explicit CLI report action, name/availability-only probes, and forbids gate/model execution, mutation and secret values.",
+    "architecture-state.md:189-195 requires stdout as the default environment-report destination and tmp/environment-check.md writing only as an explicit caller action.",
+    "architecture-state.md:405-412 fixes the inspectDoctor option name/result family and requires the hook to disable environment probes.",
+    "pm.mjs already emits one JSON line as {ok:true,...result}, treats specially declared flags as booleans and rejects unknown, duplicate or missing options with exit code 64."
+  ]
+}

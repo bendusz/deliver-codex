@@ -1,0 +1,19 @@
+{
+  "name": "deliver",
+  "version": "0.1.0",
+  "license": "GPL-3.0-or-later",
+  "description": "Codex-first delivery with bounded tasks, restartable state and optional Claude review",
+  "author": {
+    "name": "Ben Vegh"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Deliver",
+    "shortDescription": "Plan, build, review and resume software delivery.",
+    "longDescription": "Quick, Managed and Governed delivery with native Codex agents, scope checks, evidence, optional SpecDD and opt-in Claude review.",
+    "developerName": "Ben Vegh",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"],
+    "defaultPrompt": "Use $deliver to plan and deliver a bounded change."
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T04-AC1",
+      "status": "FAIL",
+      "evidence": "The transition path records counters with story/run before-image publication and the lifecycle tests cover legal forward/fix transitions, but recoverExecutionTransition validates only file paths and string images. It does not prove unchanged story contract/ownership or monotonic legal counters before applying a pending journal, so conflict-aware recovery can overwrite contract or budget state."
+    },
+    {
+      "id": "T04-AC2",
+      "status": "FAIL",
+      "evidence": "Direct-parent HEAD, branch, exact tree/index, protected Git metadata, pending tokens and stale-evidence archival are checked, and prepare currently rejects a dirty real index. However prepareCommitAdoption selects all unstaged dirty paths under touches, including an unchanged path recorded dirty at baseline, and expectedTree stages it. The implementation therefore permits a commit containing preexisting user work that was not a task change; regression coverage also needs to preserve the clean-index rejection for pre-start staged entries without changing them."
+    },
+    {
+      "id": "T04-AC3",
+      "status": "FAIL",
+      "evidence": "Coordinator npm test and npm run validate both passed at snapshot 5d760a5e70c0d61eb3df4cf71f63c7705f56b2262118e070b77a646e0b817499, including real temporary-repository lifecycle, unauthorized commit, protected metadata, ignored source, stale receipt and pre-T04 baseline cases. The suite lacks acceptance-critical regressions for unchanged pre-start unstaged work being committed, preservation/rejection of pre-start staged work, and a journal after-image that changes the story contract while current files match the before images."
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "version": "coordinator-initial-implementation-observations-v1",
+  "task": "T05B",
+  "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "purpose": "Root observations sent during active initial implementation, before candidate freeze/gates. Not a formal review, task acceptance, or separate fix-round dispatch. Recheck against final candidate; some have been addressed in changing source.",
+  "observations": [
+    {
+      "id": "fetch-before-object-proof",
+      "requirement": "Reconcile must fetch server-created merge objects before checking local object existence; the actual fetched ref/object must match provider identity.",
+      "final_candidate_status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "advanced-m-evidence",
+      "requirement": "Allow advanced remote M with changed task bytes only through fresh bound evidence/review/verification; preserve local I/L receipts.",
+      "final_candidate_status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "bounded-rebase",
+      "requirement": "Prove unique source/integration base, bounded first-parent range, every intermediate path delta and exact expected final tree. Empty edges are permitted by native architecture ruling. Derive source delta from source lineage rather than reversing unrelated I changes.",
+      "final_candidate_status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "provider-interruption",
+      "requirement": "Persist executing before effects; concurrent calls do not reconcile/replay live writes. Exact effect adoption, same-process ended plus exact absence replay, fresh-process UNKNOWN and same-token replay must work.",
+      "final_candidate_status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "provider-idempotence",
+      "requirement": "Repeated proven/pending/ambiguous calls cannot allocate fresh writes; qualified premerge head/base change may supersede only linked unmerged attempts.",
+      "final_candidate_status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "raced-closure",
+      "requirement": "R with [advanced-base,H] parents requires advanced-base descent from M, exact M preimages on closure paths, exact H closure blobs and exact advanced-base entries elsewhere.",
+      "final_candidate_status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "repair-retry",
+      "requirement": "Only proved HANDOFF_BASE_RACE permits one replacement retry; ordinary polls, unrelated fetched tips and repeated reconciliation cannot spend another retry. Retain initial0 plus retry1/retry2 histories.",
+      "final_candidate_status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "protected-adoption",
+      "requirement": "H2 and completion adoption must verify captured protected Git metadata, branch attachment and exact bytes, not merely capture an unused anchor.",
+      "final_candidate_status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "completion-idempotence",
+      "requirement": "Repeated preparation preserves the original token and before/after identities through local FF interruption; no reallocation or baseline reset.",
+      "final_candidate_status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "admission-proof",
+      "requirement": "Read bounded canonical validated records and actual completion proof; syntactically valid completion.status alone cannot release the native hold. Copied/rebound/malformed evidence remains UNKNOWN.",
+      "final_candidate_status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "admission-history",
+      "requirement": "Retained legitimately complete remote records cannot permanently block subsequent remote stories through a blanket candidates.length>1 check.",
+      "final_candidate_status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "retained-provider-review",
+      "requirement": "Bind fetch/push destination and preserve strict ambiguous PR/CLEAN rules from earlier Fable triage.",
+      "final_candidate_status": "NOT_YET_VERIFIED"
+    },
+    {
+      "id": "report-policy",
+      "requirement": "Reject explicit tiny/small verificationReport=true before record creation; preserve standard opt-in and large/regulated required policy.",
+      "final_candidate_status": "NOT_YET_VERIFIED"
+    }
+  ],
+  "contract_ruling": ".deliver/T05B-rebase-contract-ruling.json",
+  "initial_empty_rebase_red_disposition": "Test overconstraint; corrected to positive with unauthorized intermediate reverted-path negative. Do not treat the earlier empty-commit red as a production defect."
+}

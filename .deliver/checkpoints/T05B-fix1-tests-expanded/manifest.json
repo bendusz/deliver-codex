@@ -1,0 +1,22 @@
+{
+  "task": "T05B",
+  "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "status": "Expanded independent fix1 tests frozen; coverage recheck pending, production remains paused",
+  "test_author": "/root/correction_regressions",
+  "files": {
+    "tests/remote.test.mjs": "8b3f797e85fdbaeadad3a457232050d156d0bbaadbd02cbba3173d394af40d82",
+    "tests/remote-lifecycle.test.mjs": "2cd7b63a0c06262402bbf1ce979fce05d096c66f844a33c2eb43e737fbc7325d",
+    "tests/current-roundtrip.test.mjs": "453327ad0a522e122ae3a39ab91564aababf3cd5425d007e2475ecc47175b0d6",
+    "tests/operations.test.mjs": "dde1af29f017b8816b77eb8e9211aff873bcde984b469f6aabaf3d273e6dc3f8"
+  },
+  "snapshot": "252b5d01ff07f8e3515df534efa55e995e6a7a3f02c28a935675e62432b6a9f8",
+  "counters": {
+    "retries": 0,
+    "fixes": 1,
+    "corrections": 0
+  },
+  "production_matches_pause": true,
+  "prior_checkpoint": ".deliver/checkpoints/T05B-fix1-tests",
+  "coverage_preflight": ".deliver/T05B-fix1-test-preflight-native.json",
+  "identity_clarification": ".deliver/T05B-fix1-identity-clarification.json"
+}

@@ -1,0 +1,42 @@
+{
+  "id": "T05C",
+  "objective": "Continue failed integrations through token-bound correction runs without resetting claims, scope or attempts",
+  "read_paths": [
+    "AGENTS.md",
+    "docs/plans/2026-09-09-upstream-parity.md",
+    "docs/plans/parity-contracts/architecture-state.md",
+    "docs/plans/parity-contracts/integration-correction-design.md",
+    "docs/plans/parity-contracts/integration-correction-interface.md"
+  ],
+  "touches": [
+    "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+    "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+    "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+    "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+    "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+    "plugins/deliver/skills/deliver/scripts/pm.mjs",
+    "plugins/deliver/skills/deliver/references/shipping.md",
+    "tests/integration-correction.test.mjs",
+    "tests/integration.test.mjs",
+    "tests/current-lifecycle.test.mjs"
+  ],
+  "acceptance": [
+    {
+      "id": "T05C-AC1",
+      "text": "Correction preparation binds an actual failed M result or a discriminated no-M I/C conflict probe record to an immutable token and unchanged approved contract; free-form failures, stale identities, changed scope and duplicate work fail before mutation."
+    },
+    {
+      "id": "T05C-AC2",
+      "text": "Correction start verifies the exact clean recorded M or no-M I checkout on its unique branch and publishes only a typed legal Execution/run pair, retaining original finished runs, actual starting story state and MAX spent budgets across generations; exhausted attempts and invalid journals cannot mutate state."
+    },
+    {
+      "id": "T05C-AC3",
+      "text": "Fresh correction gates/review/distinct verification cover the full original task lineage and inherited findings before C2 integration; temporary Git regressions exercise both basis variants, unclaimed/older I, active duplicates, raised MAX, torn token/story/run recovery and rejected drift without baseline or budget reset."
+    }
+  ],
+  "commands": {
+    "test": "npm test",
+    "validate": "npm run validate"
+  },
+  "specs": []
+}

@@ -1,0 +1,39 @@
+{
+  "version": "agent-reported-development-tests-v1",
+  "task": "T05B",
+  "phase": "Active initial implementation; these are not declared gate or acceptance receipts. Raw logs and immutable source hashes were not supplied for these reports.",
+  "reports": [
+    {
+      "agent": "/root/correction_regressions",
+      "command": "node --test --test-name-pattern='handoff repair permits retries' tests/remote-lifecycle.test.mjs",
+      "pass": 0,
+      "fail": 1,
+      "duration_seconds": 39.9,
+      "failure": "Third proved H2/S base race attempts counter 3 and throws invalid remote publication envelope instead of EXHAUSTED retaining cap2 and all three attempts.",
+      "earlier_assertions": "Retry0/1/2 setup, first two HANDOFF_BASE_RACE transitions and repeated-poll no-spend assertions passed.",
+      "locations": [
+        "tests/remote-lifecycle.test.mjs:1261",
+        "plugins/deliver/skills/deliver/scripts/lib/integration.mjs:2615"
+      ],
+      "disposition": "Builder notified; final candidate verification pending."
+    },
+    {
+      "agent": "/root/correction_regressions",
+      "group": "provider interruption",
+      "duration_seconds": 31.4,
+      "failure": "Concurrent publish returned PROVIDER_UNKNOWN instead of immediate PROVIDER_EXECUTING; same-process exact-absence replay used stale record hash after returning same token to prepared.",
+      "control": "Merge response-loss recovery passed with same attempt and one provider merge.",
+      "disposition": "Builder subsequently reported group4/4 PASS; declared gate and final review still pending."
+    },
+    {
+      "agent": "/root/correction_regressions",
+      "group": "empty rebase commit",
+      "duration_seconds": 10.7,
+      "pass": 0,
+      "fail": 1,
+      "failure": "Test expected rejection of extra empty first-parent commit with exact final tree.",
+      "disposition": "Native architecture identified unsupported test restriction. Empty commit is now a positive case, with unauthorized intermediate reverted-path negative. Original red is not a confirmed production defect.",
+      "ruling": ".deliver/T05B-rebase-contract-ruling.json"
+    }
+  ]
+}

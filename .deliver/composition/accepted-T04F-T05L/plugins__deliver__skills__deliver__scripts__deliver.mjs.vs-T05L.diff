@@ -1,0 +1,66 @@
+diff --git a/plugins/deliver/skills/deliver/scripts/deliver.mjs b/plugins/deliver/skills/deliver/scripts/deliver.mjs
+index 15bbb12..97a9856 100755
+--- a/plugins/deliver/skills/deliver/scripts/deliver.mjs
++++ b/plugins/deliver/skills/deliver/scripts/deliver.mjs
+@@ -19,7 +19,15 @@ import { executeGate, gateIsCurrent, parseEnvironment } from './lib/gates.mjs';
+ import { captureContracts } from './lib/contracts.mjs';
+ import { preparePmBinding } from './lib/pm.mjs';
+ import { detectProjectFormat, inspectProjectState } from './lib/project-state.mjs';
+-import { adoptPreparedCommit, assertFinalCandidate, prepareCommitAdoption, transitionCurrentExecution } from './lib/transitions.mjs';
++import {
++  adoptPreparedCommit,
++  assertFinalCandidate,
++  assertNoPendingCommitMutation,
++  cancelPreparedCommit,
++  commitCancellationContinuation,
++  prepareCommitAdoption,
++  transitionCurrentExecution,
++} from './lib/transitions.mjs';
+ import { parseReviewReceipt } from './lib/review.mjs';
+ 
+ const HELP = `Deliver deterministic runtime
+@@ -38,6 +46,7 @@ Usage:
+   deliver.mjs checkpoint --run <run> --label <text>
+   deliver.mjs correct-course --run <run> --kind retry|fix|plan --reason <text> [--plan <file>]
+   deliver.mjs commit-prepare --run <run>
++  deliver.mjs commit-cancel --run <run> --token <uuid> --expected-revision <n> --reason <text>
+   deliver.mjs commit-adopt --run <run> --token <uuid> --commit <full-sha>
+   deliver.mjs finish --run <run>
+ 
+@@ -171,6 +180,14 @@ function summarize(state, file) {
+       snapshot_hash: state.verification.snapshot_hash,
+       counts: Object.fromEntries(['PASS', 'FAIL', 'UNKNOWN'].map((status) => [status, state.verification.criteria.filter((criterion) => criterion.status === status).length])),
+     },
++    commit_preparation: state.commit_adoption?.pending ? {
++      token: state.commit_adoption.pending.token,
++      parent: state.commit_adoption.pending.parent,
++      ref: state.commit_adoption.pending.ref,
++      paths: [...state.commit_adoption.pending.paths],
++      prepared_at: state.commit_adoption.pending.prepared_at,
++      cancellation_command: commitCancellationContinuation(state),
++    } : null,
+     counters: state.counters,
+   };
+ }
+@@ -344,6 +361,7 @@ function main() {
+     }
+     const updated = updateRun(run, o.expectedRevision, (state) => {
+       if (state.phase === 'finished') throw new DeliverError('finished runs cannot be corrected', 66);
++      assertNoPendingCommitMutation(state);
+       if (kind === 'plan') {
+         const newPlan = path.resolve(state.project_root, required(o, '--plan'));
+         let hash;
+@@ -368,6 +386,13 @@ function main() {
+     output({ ...summarize(prepared.state, prepared.file), preparation: prepared.result });
+     return;
+   }
++  if (command === 'commit-cancel') {
++    const cancelled = cancelPreparedCommit(run, {
++      token: required(o, '--token'), reason: required(o, '--reason'), expectedRevision: o.expectedRevision,
++    });
++    output({ ...summarize(cancelled.state, cancelled.file), cancellation: cancelled.result });
++    return;
++  }
+   if (command === 'commit-adopt') {
+     const adopted = adoptPreparedCommit(run, {
+       token: required(o, '--token'), commit: required(o, '--commit'), expectedRevision: o.expectedRevision,

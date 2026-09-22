@@ -1,0 +1,38 @@
+▶ native remote lifecycle exports every settled operation and drives durable source publication with real Git proof
+  ✔ tiny and small reject requested verification reporting before record creation (12737.881ms)
+  ✔ source publish, readiness and merge retain exact attempts without touching source history (11855.519042ms)
+  ✔ source reconciliation binds the fetch destination and records fresh M evidence in its own checkout (16965.148083ms)
+  ✖ normal R closes remotely, requires local fast-forward, then releases a fresh-process claim (25545.820541ms)
+✖ native remote lifecycle exports every settled operation and drives durable source publication with real Git proof (67181.276083ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 3
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 67224.125209
+
+✖ failing tests:
+
+test at tests/remote-lifecycle.test.mjs:1275:11
+✖ normal R closes remotely, requires local fast-forward, then releases a fresh-process claim (25545.820541ms)
+  AssertionError [ERR_ASSERTION]: E preparation preserves the legal executable story mode
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/t05b-delivery/tests/remote-lifecycle.test.mjs:1431:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/t05b-delivery/tests/remote-lifecycle.test.mjs:1275:11)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+real 67.25
+user 34.34
+sys 25.04

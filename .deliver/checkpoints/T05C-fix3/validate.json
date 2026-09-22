@@ -1,0 +1,51 @@
+{
+  "gate": {
+    "provenance": "deliver-runtime-executed-v1",
+    "name": "validate",
+    "command": "npm run validate",
+    "cwd": ".",
+    "environment_keys": [],
+    "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "environment_hash": "8e25184df06998149fc0f7488083329d165f7b595a6f272f52294d3df7a17bcb",
+    "snapshot_hash": "b8c66ec574464337ae65d7b4e810d742a34b381e758f4b21f9e53964ac481d97",
+    "status": "PASS",
+    "exit_code": 0,
+    "signal": null,
+    "error": null,
+    "log_path": ".deliver/logs/d7c72357-2f28-4ac9-b364-09c3b1b0628a/validate-5b4ba9cd-0e46-4eb9-a49e-ce23e56e565c.log",
+    "output": {
+      "stdout_bytes": 150,
+      "stderr_bytes": 0,
+      "truncated": false
+    },
+    "scope": {
+      "ok": true,
+      "changed": [
+        "plugins/deliver/skills/deliver/references/shipping.md",
+        "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+        "plugins/deliver/skills/deliver/scripts/pm.mjs",
+        "tests/current-lifecycle.test.mjs",
+        "tests/integration-correction.test.mjs"
+      ],
+      "added": [
+        "tests/integration-correction.test.mjs"
+      ],
+      "deleted": [],
+      "renames": [],
+      "out_of_scope": [],
+      "preexisting_dirty_changed": [],
+      "symlink_escapes": [],
+      "git_metadata_changed": false,
+      "ignored_advisory_changed": [],
+      "coordinator_execution_changed": null,
+      "git_metadata_compatibility": null,
+      "contracts_changed": []
+    },
+    "started_at": "2026-09-13T09:37:16.511Z",
+    "finished_at": "2026-09-13T09:37:17.926Z"
+  },
+  "log_sha256": "a6171d7f66bde2074c906af25ca12b22544832654e63b0b9d2acd06c386a89da"
+}

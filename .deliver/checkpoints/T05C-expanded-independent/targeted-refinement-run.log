@@ -1,0 +1,37 @@
+▶ failed-M qualification accepts current review or verification failure and rejects invalid authority or UNKNOWN alone
+  ✔ current review FAIL qualifies and retains its actor and finding origin (13158.0675ms)
+  ✔ current verification FAIL qualifies (13267.880375ms)
+  ✔ UNKNOWN-only verification does not qualify (13150.909709ms)
+  ✔ invalid reviewer identity (13201.17125ms)
+  ✔ reviewer equals builder (13152.894834ms)
+  ✔ panel reviewer equals builder (13256.957875ms)
+  ✔ verifier equals builder (13256.607125ms)
+  ✔ verifier equals reviewer (13213.632875ms)
+  ✔ verifier equals panel member (13120.280209ms)
+  ✔ invalid verifier identity (13141.291834ms)
+  ✔ malformed FAIL criteria cannot qualify (13978.495834ms)
+  ✔ stale review snapshot cannot qualify (13440.22225ms)
+  ✔ superseded review FAIL does not qualify (14549.579958ms)
+✔ failed-M qualification accepts current review or verification failure and rejects invalid authority or UNKNOWN alone (174002.845875ms)
+✔ fresh correction review must resolve the inherited finding multiset exactly (14734.140166ms)
+✔ a genuine prior correction remains in root lineage and cannot hide MAX attempts behind a new generation (21727.342125ms)
+▶ correction start rejects dirty, moved and duplicate checkouts without consuming its token
+  ✔ dirty exact branch (9167.739208ms)
+  ✔ moved branch (13186.132083ms)
+  ✔ second checkout attached to the same correction ref (9259.336333ms)
+  ✔ unrelated active same-story branch and worktree (9283.048417ms)
+  ✔ same-owner active other-story worktree (9633.782875ms)
+✔ correction start rejects dirty, moved and duplicate checkouts without consuming its token (50580.077666ms)
+▶ correction start revalidates approval, plan and no-M probe identities before publication
+  ✔ approval drift (8586.2655ms)
+  ✔ plan drift (8674.459833ms)
+  ✔ probe log drift (8953.478917ms)
+✔ correction start revalidates approval, plan and no-M probe identities before publication (26245.148ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 26
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 287330.972292

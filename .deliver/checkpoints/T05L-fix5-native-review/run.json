@@ -1,0 +1,1847 @@
+{
+  "schema_version": 1,
+  "run_id": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
+  "mode": "managed",
+  "revision": 34,
+  "project_root": "/private/tmp/deliver-parity-t05l",
+  "created_at": "2026-09-10T02:09:34.122Z",
+  "updated_at": "2026-09-10T11:47:24.829Z",
+  "phase": "active",
+  "plan": {
+    "path": "/private/tmp/deliver-parity-t05l/docs/plans/2026-09-09-upstream-parity.md",
+    "hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+  },
+  "approval": {
+    "approver": "Ben",
+    "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb",
+    "approved_at": "2026-09-10T02:09:34.190Z"
+  },
+  "task": {
+    "packet": {
+      "id": "T05L",
+      "objective": "Implement verified local integration, fresh integration evidence, reporting and story closure with handoff",
+      "acceptance": [
+        {
+          "id": "T05L-AC1",
+          "text": "Finish alone leaves claims active; every current shared-project completion requires a verifier distinct from both builder and reviewer, regardless of runtime mode/scale; merged Execution is recorded only after checking real integration against fresh verified evidence, retaining identity, criteria and spent counters."
+        },
+        {
+          "id": "T05L-AC2",
+          "text": "Both current upstream/Codex story-boundary directions and fresh-process interruption/resume pass against unchanged pinned reader; handoff BASE_COMMIT matches the recorded integration and tolerates its own handoff-only commit."
+        },
+        {
+          "id": "T05L-AC3",
+          "text": "Large/regulated closure requires a separately prepared and adopted evidence-derived verification report/checklist commit P between proven integration M and story-only closure E; exact report paths and C/M/evidence references avoid self-referential hashes, unsupported PASS claims and hidden source changes."
+        },
+        {
+          "id": "T05L-AC4",
+          "text": "Integration always runs exact declared gates at actual M; C review is reusable only for proven clean composition and identical bound manifests. Fresh independent M review and distinct verification can resolve evidence-only drift without rewriting finished C. Actual source findings remain explicit and unresolved pending the T05C correction operation."
+        },
+        {
+          "id": "T05L-AC5",
+          "text": "Structured panel receipts retain exact member identities/verdicts/findings and required lens coverage, while standalone legacy receipt compatibility remains."
+        }
+      ],
+      "read_paths": [
+        "AGENTS.md",
+        "docs/plans/2026-09-09-upstream-parity.md",
+        "docs/plans/parity-contracts/architecture-state.md",
+        "docs/plans/parity-contracts/integration-correction-design.md"
+      ],
+      "touches": [
+        "plugins/deliver/skills/deliver/SKILL.md",
+        "plugins/deliver/skills/deliver/assets/operations.json",
+        "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
+        "plugins/deliver/skills/deliver/references/compatibility.md",
+        "plugins/deliver/skills/deliver/references/shipping.md",
+        "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/pm.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+        "plugins/deliver/skills/deliver/scripts/pm.mjs",
+        "tests/current-roundtrip.test.mjs",
+        "tests/integration.test.mjs",
+        "tests/operations.test.mjs",
+        "tests/reporting.test.mjs",
+        "tests/review-panel.test.mjs"
+      ],
+      "commands": {
+        "test": "npm test",
+        "validate": "npm run validate"
+      },
+      "specs": []
+    },
+    "builder": "benchmark_builder",
+    "started_at": "2026-09-10T02:09:34.282Z"
+  },
+  "baseline": {
+    "captured_at": "2026-09-10T02:09:34.445Z",
+    "snapshot": {
+      "entries": {
+        ".gitattributes": "file:644:6866769d73d3e4da4eb37df56a8f4d7c13b76931f43c98b22a0a3dca560b1c98",
+        ".gitignore": "file:644:8180e47269e938c10fac903c5b91adb9d99b17056e0aae991e6129bf77102a0e",
+        "AGENTS.md": "file:644:880f8a032e9e90eead7c3aef538b7c6d8dabf4b50e607405df4a45c20ad66392",
+        "LICENSE": "file:644:3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+        "NOTICE.md": "file:644:7162a1387603b078c268f64c43f3b31a1a61a861269994541d7496400b46b80f",
+        "README.md": "file:644:c5627680bfccb102c3ec5f5440f5f10ff0a627a317123435c4aeda0940a0953a",
+        "bin/deliver.mjs": "file:755:6a417373d0df05ba24464665d4dd9c758e504d8168f23d7257d4e74846f4f0c3",
+        "docs/evaluation.md": "file:644:6d2279f74f772d980261545244c24a0af5e01b22d53ca5bb46646052cf780e67",
+        "docs/parity-contract.json": "file:644:85e82c0b50551fe862db8854f45d3904db53b075e7ea5d6db0368391ec62de42",
+        "docs/plans/2026-09-09-upstream-parity.md": "file:644:d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb",
+        "docs/plans/parity-contracts/architecture-state.md": "file:644:a75179aad3cb59cd03b04731f6716420a744fb48b5c22a50a2bfa292b7eb4a14",
+        "docs/plans/parity-contracts/evaluation-plan.md": "file:644:23099481f1eaddc0a87dea6ccf8e0a9869c0a9cf66107e23c077cddb1a49b38a",
+        "docs/plans/parity-contracts/integration-correction-design.md": "file:644:35dfc6d1f9abd4e4a3fa40d3df0c0bb0b2e52d5aff20b502706bf7093e4315eb",
+        "docs/plans/parity-contracts/knowledge-design.md": "file:644:e9007986f0e81459e7c6e1bbbd2a320e9876a40d79c9905c60a804f6a30789c2",
+        "docs/plans/parity-contracts/migration-design.md": "file:644:01e3ab93aba9bea04eecc991ec563d38db707ad239133d3b0ba7190f5c24aaa3",
+        "docs/plans/parity-contracts/migration-findings.md": "file:644:f1600df3508fbe29f7e592090fae9d7d7653026ee2b4f5b72705c0ac832547cc",
+        "docs/plans/parity-contracts/parallel-design.md": "file:644:502f6759a83c042f577ae28081073813dfc56bd82db28cd2d5260aa99985e07c",
+        "docs/plans/parity-contracts/project-report-design.md": "file:644:caa4a30319864913e7828946e21d2ef7333a94e72e4ff32c160f0e1b4d5d7202",
+        "docs/plans/parity-contracts/remote-design.md": "file:644:aea280e97defe219463ef944c66b534ee16862850f72c5b23b906ec5423a2a1e",
+        "docs/plans/parity-contracts/retrospective-design.md": "file:644:647662202a308c7f3d60029dbb53a951e1477fca2e1c2cbef336537da84c2a53",
+        "package.json": "file:644:b940bba2da59045db4c25d7493a6ef8927d7c52a77507c8f2a33d3e81b8b9a7c",
+        "plugins/deliver/.codex-plugin/plugin.json": "file:644:d40d65e4854068d62bd8a9be1b7fa09f1d8d959c1867078953b6a4e1c7018ddd",
+        "plugins/deliver/LICENSE": "file:644:3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+        "plugins/deliver/NOTICE.md": "file:644:7162a1387603b078c268f64c43f3b31a1a61a861269994541d7496400b46b80f",
+        "plugins/deliver/hooks/context.mjs": "file:644:41ad585d4951f565ea30983b7abaf54fbfcee5a14601dc43367fe8c038fd02a4",
+        "plugins/deliver/hooks/hooks.json": "file:644:f9a2302b52033fa6af046fa4651b981c4c00d1842e798df569a3dd62acbcb987",
+        "plugins/deliver/skills/deliver/SKILL.md": "file:644:0634012fa62e2722eace6f1c85c48c7b6ae0de356c35571cfabeed330a43cd62",
+        "plugins/deliver/skills/deliver/agents/openai.yaml": "file:644:0b0770232401e052f05911e92ff824b44cf5be438f942d170448600a97026e98",
+        "plugins/deliver/skills/deliver/assets/benchmark-result.schema.json": "file:644:2733b412ed03d5d5300a8591214e603cbcb843c80913cf62382993c8b8762f28",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-architecture.toml": "file:644:b1593f47eb67e12c76f6a9b16f31c4b37da14b3f9017a16bade6c47be2c1a1cb",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-builder.toml": "file:644:90a875b6ddab5e7c5a7f09163bb880c32c39b19ee1a7c922c5cb22288d93596e",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-claude-reviewer.toml": "file:644:acbc55f4e601a05cff1ffb6b86339acb28e04989565fc6f3dd9848a0efb85f76",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-debugger.toml": "file:644:2d2596f8b91fdc7f96ee51584533790a905a558b3a074cdecc41b19d9f478e87",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-explorer.toml": "file:644:d3eeea764c9547be95c2e284262988190f63cf10d11f39e935eac9c7b366aa0a",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-librarian.toml": "file:644:2f374ceea41385aae9170bc147190ae5286e84f248b27c2b465d609fd1cac26a",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-researcher.toml": "file:644:b514e1c74d964ceb4cdcd0a3faa1e6880ed854bdcb06051339fb2011878c5f63",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-reviewer.toml": "file:644:f5d104358894e5bfaa6e1338590069af60c6dc4f7aab6f5b3624f6df69998e86",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-security.toml": "file:644:c71af097a8b5fb3d6f3d8b6d3420ee53ad0aa0ee07cdf9f8b1b452d617656594",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-spec-architect.toml": "file:644:0ac7d6d7fd59bcbe10f08f8174bbda340ae0688e95529b9551f2c7393d6bc6b3",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-technical-writer.toml": "file:644:7d6f8c26947421eff4517d8082e8a50437096e06b7bc393d2bf15dfe8abefccd",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-test-engineer.toml": "file:644:479ed373405dde5fdf265f140829a3d8f27e88a425fcd3599335488df851f905",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-verifier.toml": "file:644:a776cc1bde5da656ef5e5abee4036ea8584f5351fd5342dd329d38bb3658fdd0",
+        "plugins/deliver/skills/deliver/assets/operations.json": "file:644:20ef9c2c0c7eef6765c94ca799bea412e2db806b2588f00f64cb5ccb3b610fbc",
+        "plugins/deliver/skills/deliver/assets/review.example.json": "file:644:44ca24764896b56c10a97a0f8df84d4bc1d46ff34ec0f87c0c8d1fb5de75f98b",
+        "plugins/deliver/skills/deliver/assets/specdd/bootstrap.md": "file:644:50db90f302d0167930cbad84fabb1461b0ad6e2fc9e65b6b50dfa21027e11687",
+        "plugins/deliver/skills/deliver/assets/specdd/bootstrap.md.template": "file:644:29075149fe2e0c7bbad76374f137dd460cc5b0faf2002b7e3beeaf14f18a16e6",
+        "plugins/deliver/skills/deliver/assets/specdd/module.sdd": "file:644:88f343d6e95ed72e1989863ea72340f7683bf50162a6d72e53fc1a33134c9ce1",
+        "plugins/deliver/skills/deliver/assets/specdd/module.sdd.template": "file:644:d61c9152b875b407185d05b13d3eee1703caa6288f20d4218a6f00db69d380af",
+        "plugins/deliver/skills/deliver/assets/specdd/root.sdd": "file:644:26f1f3f07f5eb173fd0791a6c6404c980686a9567ca0f3af01504d4102767955",
+        "plugins/deliver/skills/deliver/assets/specdd/root.sdd.template": "file:644:b43e572f3831dfeb3b23e0787366073f5ebe805db8947e6fb840c3927acde437",
+        "plugins/deliver/skills/deliver/assets/task.example.json": "file:644:0ce2fce1d34fa454d4e9fd0b1b40533b17dc61939bd7adca1849cd2108b32c8e",
+        "plugins/deliver/skills/deliver/assets/templates/AGENTS.md.template": "file:644:1c437085281939246e1519ddd9efa5ab0bcbdd6124b946fb9cd4916f5d9a7202",
+        "plugins/deliver/skills/deliver/assets/templates/approval.json.template": "file:644:91465c46c86cf5ea709a772cc2ae4c8aee72e187dfce994adbab5fc3c030dbca",
+        "plugins/deliver/skills/deliver/assets/templates/checklist-plan-quality.md.template": "file:644:7a49ed878197d353c3319f15fdf229438392b654d9abfd9a589407b1c5689e55",
+        "plugins/deliver/skills/deliver/assets/templates/checklist-spec-quality.md.template": "file:644:d93f8412dcc5669fea74c79b6c977dd574ed4bf6948a0608aa46739e5947b423",
+        "plugins/deliver/skills/deliver/assets/templates/checklist-story-readiness.md.template": "file:644:23d09f511665383ee640b31963066e3c36a0c033c97ec98184085c89752e7b01",
+        "plugins/deliver/skills/deliver/assets/templates/checklist-verification-quality.md.template": "file:644:8af9c1b1e5a352e89383e79c937d451851c86b922cfdbed571926eae6e0f37ad",
+        "plugins/deliver/skills/deliver/assets/templates/completion-report.md.template": "file:644:7f4ffaa30a2827146a600e198b74851b323a1a5be389b484f1c5067a8637f3d2",
+        "plugins/deliver/skills/deliver/assets/templates/constitution.md.template": "file:644:5aa9c9533b1c3c9e9d532f06002e7267c7e3cb8dfdb52e033eaa3d867789a687",
+        "plugins/deliver/skills/deliver/assets/templates/plan.md.template": "file:644:894763dd8a4a3815bf70398a2c76c4cd4abcd591b0df2047bca1d3133a34c9dc",
+        "plugins/deliver/skills/deliver/assets/templates/spec.md.template": "file:644:d22b061f0b7b253ffbf5d22a3e2015dbefc83c4b3ddd4dd5d064fd2e67f68129",
+        "plugins/deliver/skills/deliver/assets/templates/story.md.template": "file:644:978eaa0ea415e0b58b7076eea602a1ffc31618dc20e4bfc9a5890aa3947a4c0c",
+        "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template": "file:644:1d2992b97a7839f502a9b38f9259978da46eea4c495c55fc6915ef8665454d3c",
+        "plugins/deliver/skills/deliver/assets/verification.example.json": "file:644:12e375d51e1ff51b35afb1ad42cd3e442000efdb0f1d383207e57656ee16bb74",
+        "plugins/deliver/skills/deliver/references/claude-review.md": "file:644:ad1fff062eefbb7049c34e898675c1277dbae14c3ca78bb5d77134ccfcd5a4d1",
+        "plugins/deliver/skills/deliver/references/compatibility.md": "file:644:6f16e1ec716c434bf47025b6fe3b9fe3da6d1e83e04b93cd66630e02cf26cdc8",
+        "plugins/deliver/skills/deliver/references/decomposition.md": "file:644:aa36f1e27a01333629c8e36c3fc9fa653f980b065360b8b767bedc65ba745f68",
+        "plugins/deliver/skills/deliver/references/discovery.md": "file:644:6ca3b2e4e31f48f046b9d95aec6bc73fac1209d0a1d3f1b8c967f90621401a6f",
+        "plugins/deliver/skills/deliver/references/governance.md": "file:644:cc372b7a60823ba5f9071633d7c0b9e244bc00ea9a83d81e4fd557dfcfc709e2",
+        "plugins/deliver/skills/deliver/references/knowledge.md": "file:644:c71b90e563decd626fc5e10256194be794ae85b9dfa33e09f920a982aeac55c5",
+        "plugins/deliver/skills/deliver/references/operations.md": "file:644:8b5d0f782e20147cb62390096fd594cf543efd084f52d8044bfe4259b0700f4e",
+        "plugins/deliver/skills/deliver/references/parallel.md": "file:644:b46b95edfd32c5c486d86d0897726830f54e2e654e6590416d03686ea5ab132b",
+        "plugins/deliver/skills/deliver/references/planning.md": "file:644:ebf852da0258012528ea937e9302f580747671c92b16213ab1f76c91b711c20e",
+        "plugins/deliver/skills/deliver/references/recovery.md": "file:644:3c4fd34bb36cb356e07285aa529730abef557a5b438ba8803914b4206f79189d",
+        "plugins/deliver/skills/deliver/references/runtime.md": "file:644:7465e22a6e7cdafd9b62650c2fd210f260c0f837e195e78e3b7701cf7192523f",
+        "plugins/deliver/skills/deliver/references/scale-profiles.md": "file:644:42c08d624392888a20061a9a18faf61c7bfc6be82edc5284d6d7d2d081e9fe91",
+        "plugins/deliver/skills/deliver/references/specdd.md": "file:644:7f379875904acda43c7a197784e96602fd796ccb28da95e1c37faeac840edadc",
+        "plugins/deliver/skills/deliver/references/specification.md": "file:644:5469cbc552858712622b77517ba8734322e6b2b11ce691986534d1114d8b9a11",
+        "plugins/deliver/skills/deliver/references/workflow.md": "file:644:883b594ee96df35b340912ba69417c5d439a5e09c3d7a3ff4827174478cb669d",
+        "plugins/deliver/skills/deliver/scripts/analyze.mjs": "file:644:927712768fa406df2237961b35032a97acc6044734f97390b185bba243cac7b3",
+        "plugins/deliver/skills/deliver/scripts/benchmark.mjs": "file:644:cbc58df431d1d4ba86dc4aadaf6c057077d43555e9defe86dd8f4434fc91d099",
+        "plugins/deliver/skills/deliver/scripts/claude-review.mjs": "file:644:1a1d9271a74b4079353de0651f19c8cf159e3a8ed3f497329ec87c41ccf920cf",
+        "plugins/deliver/skills/deliver/scripts/deliver.mjs": "file:755:6ac9b704b88f2d0ecc48110f0d37d867df2eba1e25c2a4cc572a2ce7acb2fb00",
+        "plugins/deliver/skills/deliver/scripts/lib/analyze.mjs": "file:644:aaab86b26c5b137b327fdbf7b7159b3c1cbe45341ce05ac8b98e592b054e17c5",
+        "plugins/deliver/skills/deliver/scripts/lib/benchmark.mjs": "file:644:599ff7c875e4a0e1de23bd7da16a8ed8989589690bde6be62f601401ceee3ff0",
+        "plugins/deliver/skills/deliver/scripts/lib/contracts.mjs": "file:644:a251f7f98ac1475463cfc557fde86aa042a1ad5ff993ede65e225204f4753cc2",
+        "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs": "file:644:d4a3b49f77e4ff29a8ab0c048c0a071a4d3763f995d1076c7b9f072d7c191905",
+        "plugins/deliver/skills/deliver/scripts/lib/gates.mjs": "file:644:097a86b03827a4cab1668ca4038879155e4d30c8d92007e2e32d2a79e829367c",
+        "plugins/deliver/skills/deliver/scripts/lib/pm.mjs": "file:644:ae097d29de9b5f4b3fd2d59eb9cd8952ea79d6bc3f49cb54475ce4272436fd26",
+        "plugins/deliver/skills/deliver/scripts/lib/project-state.mjs": "file:644:5c69402512a6422f88136f7ab6b758e194f1e317caa511282f73f25e1d95b3ff",
+        "plugins/deliver/skills/deliver/scripts/lib/scope.mjs": "file:644:1d022432902104bb0eadbb4ba5116ef3b326b76f4c9d24a44fdcee06b2dedce6",
+        "plugins/deliver/skills/deliver/scripts/lib/state.mjs": "file:644:08acec113acf0e08b068e6fa1b7d3389a8ce2d3686d53138ae46bd32fcf11688",
+        "plugins/deliver/skills/deliver/scripts/lib/story.mjs": "file:644:cad0f9457cbe02865108fb179db3ddcce62b1f222eb02a75799f0277a79e1d98",
+        "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs": "file:644:ca85b02c9ea059bc39d37ee08e1d588d60923da5b13582c3e0833ce5978c7303",
+        "plugins/deliver/skills/deliver/scripts/pm.mjs": "file:644:3d9efcd4380b071fdc93c9233b71fc3534645c6208c34468cc0c96b9021ae48a",
+        "plugins/deliver/skills/deliver/scripts/specdd.mjs": "file:644:bfae9d5eb24f1784d264e7d70dc0821b4f41a9828d3d473a0346b4ee498ac9c0",
+        "scripts/validate.mjs": "file:755:b7e922fae146e438c28a72956b5ab90e93250495463c2a8e3d108fa2492009cf",
+        "tests/analysis.test.mjs": "file:644:e72f51441639f20b1aeb87985a82a4c1c2444dfd4dc68646eb86fe28c566f9ca",
+        "tests/benchmark.test.mjs": "file:644:b350ad5413baac73c7558556b8ca3c97b5d27d62e04d540c8227ccef8aa1ae8b",
+        "tests/claude-review.test.mjs": "file:644:679c7dae6cf6973880743009ebd29c3ba3fde937e042fe87bff56da8bc22af07",
+        "tests/contracts-integration.test.mjs": "file:644:8eb3c09725dfbe514b5ecfd5ed8520d425d80dcd5d1a3bf0a4e4e78803574fe3",
+        "tests/current-lifecycle.test.mjs": "file:644:54299b6cdfd5238972f09a10184b640b283d27055eb6c41badb35e6b6744b050",
+        "tests/fixtures/upstream-v0.22.0/NOTICE.md": "file:644:f43d5a7ad780077f17700936b7f7bc348567edac78d4c3be0e8de790ececace5",
+        "tests/fixtures/upstream-v0.22.0/hooks/lib.mjs": "file:644:1f9a8ff3a3f4eb300851fcbac7569509050f738a4dd56d22be2e6459f8242339",
+        "tests/fixtures/upstream-v0.22.0/hooks/session-context.mjs": "file:644:820c41410e07ef11f65ad3888971d8c862a7946a9133a2a49479c1b4b1d47c6d",
+        "tests/fixtures/upstream-v0.22.0/templates/actor-state.json.template": "file:644:ae6ae65ca6d3edb00228726b78884e920416dc854f5d0a77a723e8f30ea46d64",
+        "tests/fixtures/upstream-v0.22.0/templates/pm-state.json.template": "file:644:9bdf7ee6b341cf31b94c73ed9cbdade42293db737d6e600d17de791a086d8aa3",
+        "tests/fixtures/upstream-v0.25.1/NOTICE.md": "file:644:5ed9deec2942fd7ca5b3d0da184dd06aa0a57b734f3dc7e43bc83617d6e86458",
+        "tests/fixtures/upstream-v0.25.1/hooks/lib.mjs": "file:644:157bc7afe458d9ce4e05dd9bd3a8bb3326e791d3f5578737bfc17ad7e6dcfaea",
+        "tests/fixtures/upstream-v0.25.1/provenance.json": "file:644:8f1d82ab397d3c5e77e97bda2d2b7896172c8349ea6bebcaaf93d1fcbcab6032",
+        "tests/fixtures/upstream-v0.25.1/templates/AGENTS.md.template": "file:644:e188fbe70d50050a1ea2b5225eff41155366cfb9bcfbd9ac44336e40fa127823",
+        "tests/fixtures/upstream-v0.25.1/templates/CLAUDE.md.template": "file:644:e8d5dd46d7bdc6f6cc5e4b9b845611660d6db84fc647d8519e2fd59f59575ccc",
+        "tests/fixtures/upstream-v0.25.1/templates/HANDOFF.md.template": "file:644:ec44977ce51a36fa54aa30e9a6f9489a5ed235eeb9b9ca43901db35cd7bebc1f",
+        "tests/fixtures/upstream-v0.25.1/templates/approval.json.template": "file:644:91465c46c86cf5ea709a772cc2ae4c8aee72e187dfce994adbab5fc3c030dbca",
+        "tests/fixtures/upstream-v0.25.1/templates/checklist-plan-quality.md.template": "file:644:2cf69e59c44b12f7b22b2b5035b1bcb19a8d25647521ff35206279bf5af9ef25",
+        "tests/fixtures/upstream-v0.25.1/templates/checklist-spec-quality.md.template": "file:644:193518525bdca5760a80b91b7519f7e894cd339a3daed9bb824077a157e1f2fd",
+        "tests/fixtures/upstream-v0.25.1/templates/checklist-story-readiness.md.template": "file:644:f5f365e215233a00629b8c098b0d3f767fd8185c4d5b7089328e93138595d765",
+        "tests/fixtures/upstream-v0.25.1/templates/checklist-verification-quality.md.template": "file:644:f05149e21bfa28f300cab1b1470598c01f0624ce43d0f4a14926a6366dacf68a",
+        "tests/fixtures/upstream-v0.25.1/templates/claude-settings-hardening.json.template": "file:644:730f3279d940a1644f9b0815ade5266757d2e8b93f1e708ee2fb98622f78ebb9",
+        "tests/fixtures/upstream-v0.25.1/templates/completion-report.md.template": "file:644:8b5bee3b93a16a127c3d2c46ae286eff2c18d267d5ffc25f9bc9a3c314d8ec30",
+        "tests/fixtures/upstream-v0.25.1/templates/constitution.md.template": "file:644:0a7dac3ac9c1fb0a0162ef048cf570a5cf9140ba01080d263910edca844ff513",
+        "tests/fixtures/upstream-v0.25.1/templates/plan.md.template": "file:644:95455a8d9e0a86df7484f027ead29d847ecc8964e704c5bbb75d444137a8083f",
+        "tests/fixtures/upstream-v0.25.1/templates/retro.md.template": "file:644:79e642d07644f58c73274ed92d689a27dd13bd610fa717117177d313a6f4ac6d",
+        "tests/fixtures/upstream-v0.25.1/templates/sdd-module.template": "file:644:f8324f4ff59c184bc1ee865847a6a72a4e8cc4feac888f3c6f815c64790a4d88",
+        "tests/fixtures/upstream-v0.25.1/templates/sdd-root.template": "file:644:8169f1e6a0fdb17e4f89b73deaeee1e4b3a5930ad2f65ddc3bf387a65dc991ba",
+        "tests/fixtures/upstream-v0.25.1/templates/spec.md.template": "file:644:29e4c5630f18b5d7458b54b00138826d72d220a3863429a7fc2b0260f415b4d4",
+        "tests/fixtures/upstream-v0.25.1/templates/specdd-bootstrap.md.template": "file:644:2bc3c3175dc0eb5f9ad669517857a0ee324d18d47725552143e0e63dff59ea0a",
+        "tests/fixtures/upstream-v0.25.1/templates/story.md.template": "file:644:2bfa9c32cc339f4b7b8764ff73e4e59e6562ab42dc720192ec8235342bf8c383",
+        "tests/fixtures/upstream-v0.25.1/templates/verification-report.md.template": "file:644:9f82e7857ce5e633918156712b56a2ff6e4c38325c3e8c16006e09c07a6a7006",
+        "tests/fixtures/upstream-v0.25.1/templates/wiki-index.md.template": "file:644:a0f8c0fbb36296a24a1be6567e28eaf0cd9808f8e0696084808c72adeefa037d",
+        "tests/fixtures/upstream-v0.25.1/templates/wiki-page.md.template": "file:644:fda4f3d0e37bab47d79774b865752360d5b0bb3acf8cf7e8249d93b0900daeed",
+        "tests/fixtures/upstream-v0.25.1/templates/wiki-schema.md.template": "file:644:f2b5981a07b942d2b87d108c9d90b19cb4738cd632f3e908a75cc14a5c89b0e7",
+        "tests/hooks-and-environment.test.mjs": "file:644:e86d20b3c8eceeefa9608b7bf33f10c9459b1258ff4405a8d778fbcf794b06fb",
+        "tests/launcher-integration.test.mjs": "file:644:faa8fc096ae55c3c57b03b3ccbd1c575f6683c7dafe426f5ec0e117963f8ba98",
+        "tests/operations.test.mjs": "file:644:1bc76156f04123c7ed17fbbf40256779fb5fcb6bbe5f5d01752a38506ab93d1e",
+        "tests/pm-compatibility.test.mjs": "file:644:9cf761f4a5cbc21c9d023630e671a0d135ee10d947a92d88753c4e81b6a90e61",
+        "tests/project-state.test.mjs": "file:644:f37ac20382b22e9368fdabbdc8a43748f2b0d346dc853736bc5db70b97b24b3d",
+        "tests/role-policy.test.mjs": "file:644:ece1cddfc9c290330e328e2db5154f93c96192670c6bab813730a9c635d242c0",
+        "tests/runtime.test.mjs": "file:644:98c143640801b2de4f31edf2ea09aa414cf8a51f582e14075c5869a9465aa236",
+        "tests/scope-regressions.test.mjs": "file:644:c9feabbbbb45bb00bcbd195adae1660b2c7c1315d863487615553bcf5e707d95",
+        "tests/setup.test.mjs": "file:644:6ce8238f45e9ecc6b33eb060794054b746e1d0bd9364e35d14f6bd4472c62096",
+        "tests/specdd.test.mjs": "file:644:5893857063ae810717d0d118d4bc728fecfe49350b62e81d76135eeda5c0b88b",
+        "tests/story.test.mjs": "file:644:ab849d6f6d854f5a51e964ecccd8761782a76000d8d57d5c6ab5e19c39eb67ee",
+        "tests/template-compatibility.test.mjs": "file:644:3e70d479879392cf1686afe149f95a0eb8ea0786ba1d7495a1ad7f85c8dcb625",
+        "tests/transitions.test.mjs": "file:644:863dfa1caa253a11c85f49fd0aa3069cce4a411cae3c044f4fe103d8c9892f34",
+        "tests/upstream-contract.test.mjs": "file:644:443c98e946e9719ce528ff1bf248f7d89f76fb7c2507479017e5943b5e7b0542"
+      },
+      "git_meta": "e2a31704baf4a2ae8451d048b9dbacdbbcafe7eae89a80a0d2ae7010fe6b7eeb",
+      "ignored_advisory": {},
+      "hash": "557ab5fbd1cc95784b2eca820cd8cea8fae5fe4c7096a24de8eef6685a9b8fc4"
+    },
+    "dirty_paths": []
+  },
+  "gates": [
+    {
+      "provenance": "deliver-runtime-executed-v1",
+      "name": "test",
+      "command": "npm test",
+      "cwd": ".",
+      "environment_keys": [],
+      "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "environment_hash": "5bba4de411fabb8dddf059f48481db133b81a3d15144ac87a9193fe0903e631d",
+      "snapshot_hash": "f74deb232127a910f84a997b17fee8e250bca37d9be7b321f761d144900280ab",
+      "status": "PASS",
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "log_path": ".deliver/logs/df1605ed-56c6-4ee7-8368-01ede0f3c9c4/test-b77c53ed-f3d4-4fb2-ba00-6cc72ed7931a.log",
+      "output": {
+        "stdout_bytes": 14433,
+        "stderr_bytes": 0,
+        "truncated": false
+      },
+      "scope": {
+        "ok": true,
+        "changed": [
+          "plugins/deliver/skills/deliver/SKILL.md",
+          "plugins/deliver/skills/deliver/assets/operations.json",
+          "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
+          "plugins/deliver/skills/deliver/references/compatibility.md",
+          "plugins/deliver/skills/deliver/references/shipping.md",
+          "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+          "plugins/deliver/skills/deliver/scripts/pm.mjs",
+          "tests/current-roundtrip.test.mjs",
+          "tests/integration.test.mjs",
+          "tests/operations.test.mjs",
+          "tests/reporting.test.mjs",
+          "tests/review-panel.test.mjs"
+        ],
+        "added": [
+          "plugins/deliver/skills/deliver/references/shipping.md",
+          "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+          "tests/current-roundtrip.test.mjs",
+          "tests/integration.test.mjs",
+          "tests/reporting.test.mjs",
+          "tests/review-panel.test.mjs"
+        ],
+        "deleted": [],
+        "renames": [],
+        "out_of_scope": [],
+        "preexisting_dirty_changed": [],
+        "symlink_escapes": [],
+        "git_metadata_changed": false,
+        "ignored_advisory_changed": [],
+        "coordinator_execution_changed": null,
+        "git_metadata_compatibility": null,
+        "contracts_changed": []
+      },
+      "started_at": "2026-09-10T11:30:53.617Z",
+      "finished_at": "2026-09-10T11:35:34.949Z"
+    },
+    {
+      "provenance": "deliver-runtime-executed-v1",
+      "name": "validate",
+      "command": "npm run validate",
+      "cwd": ".",
+      "environment_keys": [],
+      "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "environment_hash": "5bba4de411fabb8dddf059f48481db133b81a3d15144ac87a9193fe0903e631d",
+      "snapshot_hash": "f74deb232127a910f84a997b17fee8e250bca37d9be7b321f761d144900280ab",
+      "status": "PASS",
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "log_path": ".deliver/logs/df1605ed-56c6-4ee7-8368-01ede0f3c9c4/validate-9063ffe4-e27b-4d1d-b895-f651c5e63b29.log",
+      "output": {
+        "stdout_bytes": 150,
+        "stderr_bytes": 0,
+        "truncated": false
+      },
+      "scope": {
+        "ok": true,
+        "changed": [
+          "plugins/deliver/skills/deliver/SKILL.md",
+          "plugins/deliver/skills/deliver/assets/operations.json",
+          "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
+          "plugins/deliver/skills/deliver/references/compatibility.md",
+          "plugins/deliver/skills/deliver/references/shipping.md",
+          "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+          "plugins/deliver/skills/deliver/scripts/pm.mjs",
+          "tests/current-roundtrip.test.mjs",
+          "tests/integration.test.mjs",
+          "tests/operations.test.mjs",
+          "tests/reporting.test.mjs",
+          "tests/review-panel.test.mjs"
+        ],
+        "added": [
+          "plugins/deliver/skills/deliver/references/shipping.md",
+          "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+          "tests/current-roundtrip.test.mjs",
+          "tests/integration.test.mjs",
+          "tests/reporting.test.mjs",
+          "tests/review-panel.test.mjs"
+        ],
+        "deleted": [],
+        "renames": [],
+        "out_of_scope": [],
+        "preexisting_dirty_changed": [],
+        "symlink_escapes": [],
+        "git_metadata_changed": false,
+        "ignored_advisory_changed": [],
+        "coordinator_execution_changed": null,
+        "git_metadata_compatibility": null,
+        "contracts_changed": []
+      },
+      "started_at": "2026-09-10T11:35:35.187Z",
+      "finished_at": "2026-09-10T11:35:36.512Z"
+    }
+  ],
+  "review": {
+    "status": "FAIL",
+    "findings": [
+      {
+        "severity": "major",
+        "message": "Integration preparation makes the accepted evidence-refresh and conflict-correction routes unreachable. boundManifest throws when the source snapshot's bound live bytes differ from committed C, and prepareLocalIntegration throws when a clean expected M manifest differs from C, labelling both as source correction even though fresh independent M review and distinct verification are the specified resolution for evidence-only drift. expectedMergeTree also throws before persisting any record on a real non-clean composition, so T05C has no validated failure input. Persist whether C evidence is reusable separately from the actual M manifest and permit fresh M evidence when it is not; for a merge-tree conflict, persist a discriminated failure token bound to actual I, finished C, the failed probe and attempt provenance without claiming that M exists.",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+        "resolved": true
+      },
+      {
+        "severity": "major",
+        "message": "Fresh integration gates are not bound to the live bytes or durable logs they claim to test. assertClean trusts porcelain status and write-tree, so assume-unchanged or skip-worktree changes can be invisible while a gate executes bytes different from recorded M; a review reproduction produced empty status and an index tree equal to HEAD while the live bound file contained different content. assertEvidenceReady validates only the receipt's stored log_hash and never reads, type-checks or hashes log_path, so deleted or altered logs still finalize. Re-running a gate filters out the previous same-name receipt, erasing failed evidence rather than retaining gate history. Bind the actual executable worktree to M before and after every gate, validate exact bounded regular log bytes at consumption, and retain prior gate receipts as immutable history.",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+        "resolved": true
+      },
+      {
+        "severity": "major",
+        "message": "The integration record is not confined to its canonical per-source-run path. validateRecord accepts any string id, recordPath interpolates it through path.join, and assertRecordSource never requires record.id === record.source.run_id. Traversal components can therefore normalize outside destination/.deliver/integrations while readIntegrationRecord's equality check still succeeds, after which withRecord locks and rewrites that escaped JSON path. Require the canonical run-id grammar and equality to source.run_id, resolve the expected basename under the real integrations directory, and reject every lexical or realpath escape before locking or mutation.",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+        "resolved": true
+      },
+      {
+        "severity": "major",
+        "message": "P/E/H proofs and their user-visible evidence are not durable after adoption. Adoption clears the only pending parent/path/hash data and later stages trust report.commit, closure.commit and reporting without re-proving their commit topology or deriving reporting from scale and the persisted standard opt-in. A coherent-looking record changed to reporting=skipped or report.commit=M can bypass required P, and handoff preparation trusts an arbitrary recorded closure commit without checking the merged story. The generated report also omits retained panel findings and inserts multiline verifier evidence as raw Markdown, allowing injected headings/check boxes; handoff always states OPEN_FINDINGS: none even when a PASS panel retains unresolved minor CONCERNS. Retain and revalidate adopted parent/tree/mode/path/blob proofs, bind the derived reporting choice, render bounded escaped evidence plus retained findings, and make the handoff's open findings reflect effective evidence.",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+        "resolved": true
+      },
+      {
+        "severity": "major",
+        "message": "A clean initialized submodule inside a task-bound touch/read/spec scope cannot reach adopted M. The committed manifest encodes its gitlink as `gitlink:<oid>` at integration.mjs:108-123, while scope.snapshot encodes the same clean checkout as `gitlink:<oid>:<nested-git-meta>` and adds nested entries at scope.mjs:309-321. snapshotManifest carries those incompatible live entries into executableProof, which therefore rejects exact clean M at integration.mjs:97-105. A temporary repository probe reproduced these two shapes for the same gitlink. In addition, protectedShape compares nested HEAD/tree/index at I with M, so a legitimate gitlink update would remain rejected even after normalizing the manifest. Define one comparable committed/live gitlink identity, validate the initialized checkout against M's gitlink while retaining recursive dirty/index/metadata protection, and add an initialized scoped-submodule integration regression.",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+        "resolved": true
+      },
+      {
+        "severity": "minor",
+        "message": "When bound drift requires a fresh M review, handoff OPEN_FINDINGS considers only that effective M review. An unresolved minor retained in the source C review can therefore remain listed as open in the deterministic report while H says `OPEN_FINDINGS: none` if the fresh M receipt omits it. Preserve or explicitly resolve retained source concerns consistently across the report and handoff.",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+        "resolved": true
+      },
+      {
+        "severity": "major",
+        "message": "Fix2 handles a task scope equal to an initialized gitlink, but exact recursive M identity remains incomplete in two supported cases. First, a scope inside a submodule such as vendor/dependency/value.txt is valid under the task/scope contracts, yet superproject `git ls-tree -r ... -- <nested-path>` returns no entry; committedEntries records null while scope.snapshot resolves the parent gitlink and nested file, so executableProof rejects exact M. Second, protectedShape now drops nested HEAD/tree/index for every submodule while normalizeSnapshotGitlinks checks only gitlinks present in the bound manifest. A status-suppressed unbound submodule can therefore execute bytes different from M: a temporary repository with tracked `submodule.*.ignore=all` had empty root porcelain and index tree equal to HEAD while its live submodule HEAD differed from the recorded gitlink, a state the current adoption proof does not reject. Resolve gitlink ancestors for nested scopes and separately prove every initialized submodule checkout recursively against M, allowing only the legitimate I-to-M gitlink changes while retaining dirt, hidden-index and protected-metadata checks.",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+        "resolved": true
+      },
+      {
+        "severity": "major",
+        "message": "The new whole-checkout proof rejects a normal tracked but uninitialized submodule, blocking integration even when that submodule is unrelated to the task. A fresh Git clone represents an uninitialized gitlink as an empty directory; `git -C <empty-directory> rev-parse --show-toplevel` discovers the parent superproject. moduleRoot(...,{required:false}) checks that reported root after only treating a thrown Git command on an empty directory as uninitialized, so it emits `submodule checkout has an unexpected Git root` instead of returning null. buildCheckoutProof calls this for every expected/current gitlink, making integrate-prepare unusable until every submodule is initialized. A temporary clone reproduced the exact empty directory and parent-root result. Treat a canonical empty optional gitlink directory as uninitialized while continuing to reject nonempty, symlinked, escaping and malformed roots, and add an unrelated-uninitialized-submodule preparation regression.",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+        "resolved": true
+      },
+      {
+        "severity": "block",
+        "message": "Resolved in fix5: artifact validation now binds P/E/H preparations and proofs to an immutable integration-finalization-v1 identity over M/tree, bound snapshot/manifest, exact gate receipts and logs, effective review/verification and reporting policy. Historical gate environment hashes are validated as provenance without recomputing them from a later process. Gate/review/verification mutations are rejected before commands, logs or record changes after any artifact starts; identical finalization returns without a revision or byte change. Fresh-terminal and skipped-report closure regressions prove continuation.",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+        "resolved": true
+      },
+      {
+        "severity": "minor",
+        "message": "Resolved in fix5: nonempty panel aggregates must equal the complete normalized member-derived finding multiset, including duplicate multiplicity, severity, message, path, resolution and any supplied lens/reviewer attribution. Empty findings remains the explicit derive sentinel, and legacy no-panel receipts retain their findings.",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+        "resolved": true
+      },
+      {
+        "severity": "block",
+        "message": "Legacy finalization reconciliation can restore an older PASS finalization while ignoring newer contradictory evidence. legacyFinalizationCandidates builds candidates only from the old finalized descriptor and finalization_history; current or retained gate/review/verification receipts are searched only when a chosen descriptor names their identity. A bounded disposable-repository probe changed the shipped post-P replacement gate to a valid newer FAIL receipt and integrate-reconcile still selected the older PASS, updated the record and allowed closure preparation. The approved repair contract requires contradictory legacy evidence to remain unresolved, because this path can otherwise record merged Execution after a later actual-M failure. Before selecting a candidate, inspect all later/current gate, review and verification evidence for the same M/snapshot and reject any failed, incomplete or unresolved contradiction without writing the record; cover gate FAIL plus contradictory review/verification regressions.",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+        "resolved": false
+      }
+    ],
+    "summary": "T05L fix5 remains FAIL at frozen snapshot f74deb232127a910f84a997b17fee8e250bca37d9be7b321f761d144900280ab. The frozen-finalization, fresh-terminal, pre-effect mutation guards and exact panel aggregate repair are implemented, and the prior eight native findings remain resolved. However explicit legacy reconciliation can select an older PASS finalization while ignoring a newer failing actual-M receipt, contrary to the approved no-inferred-PASS rule and allowing unsupported closure. Coordinator npm test passed 158/158 and npm run validate passed at the exact snapshot. The previously reported advanced-I and failed-no-M operations remain pending T05B/T05C dependency scope and are not counted as T05L defects.",
+    "builder": "benchmark_builder",
+    "reviewer": "state_architecture",
+    "snapshot_hash": "f74deb232127a910f84a997b17fee8e250bca37d9be7b321f761d144900280ab",
+    "recorded_at": "2026-09-10T11:47:24.424Z"
+  },
+  "verification": {
+    "verifier": "state_architecture",
+    "criteria": [
+      {
+        "id": "T05L-AC1",
+        "status": "FAIL",
+        "evidence": "The normal current completion path still requires a verifier distinct from builder, top reviewer and every panel member, validates real M, and retains identity/counters. But legacy integrate-reconcile can restore older PASS evidence despite a newer valid FAIL gate at the same M/snapshot, after which E can record merged Execution. Thus the universal verified-evidence condition is not satisfied."
+      },
+      {
+        "id": "T05L-AC2",
+        "status": "PASS",
+        "evidence": "The frozen finalization removes later-process environment dependence; fresh-process P-to-E continuation and closure-only continuation pass, current/upstream roundtrips remain covered, and H retains the verified BASE_COMMIT topology. The separate advanced-I reprepare and failed-no-M correction gaps are explicitly assigned to T05B-AC2 and T05C by 02-integration.scope-disposition.json and are not T05L-AC2 failures."
+      },
+      {
+        "id": "T05L-AC3",
+        "status": "FAIL",
+        "evidence": "Normal large/regulated P preparation and adoption bind exact report/checklist bytes and P/E/H topology to the frozen finalization. The legacy repair path can nevertheless attach an older PASS finalization to an adopted P while ignoring a newer failing gate, then permit E/H; this can turn contradictory retained evidence into an unsupported PASS claim."
+      },
+      {
+        "id": "T05L-AC4",
+        "status": "FAIL",
+        "evidence": "Exact declared gates still execute against live verified M with durable bounded logs, C reuse remains constrained by exact source/C/M identities, and fresh M review/verification remains available for evidence-only drift. The bounded probe established that legacy reconciliation ignores a newer active FAIL gate when finalization_history names an older PASS receipt, so effective integration evidence is not always the honest result of the retained actual-M gates."
+      },
+      {
+        "id": "T05L-AC5",
+        "status": "PASS",
+        "evidence": "parseReviewReceipt now checks any nonempty top-level aggregate as an order-independent attributed multiset equal to member-derived findings, retaining duplicate multiplicity and normalized lens/reviewer attribution. Tests cover hidden/extra/missing/altered findings, mixed duplicate order, empty derive sentinel, normalized roundtrip and unchanged legacy no-panel receipts."
+      }
+    ],
+    "snapshot_hash": "f74deb232127a910f84a997b17fee8e250bca37d9be7b321f761d144900280ab",
+    "recorded_at": "2026-09-10T11:47:24.829Z"
+  },
+  "evidence_history": [
+    {
+      "at": "2026-09-10T03:54:06.793Z",
+      "reason": "correct_course",
+      "details": {
+        "kind": "fix",
+        "reason": "Independent T05L review: support fresh M evidence and durable no-M failure; bind live gates/logs/history; canonicalize records; retain/revalidate P/E/H/reporting and honest escaped findings.",
+        "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+      },
+      "gates": [
+        {
+          "provenance": "deliver-runtime-executed-v1",
+          "name": "test",
+          "command": "npm test",
+          "cwd": ".",
+          "environment_keys": [],
+          "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "environment_hash": "da9241d5f58e42d0b6904101c8f95584baac916c810eda2122fa4ea3b4709134",
+          "snapshot_hash": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3",
+          "status": "PASS",
+          "exit_code": 0,
+          "signal": null,
+          "error": null,
+          "log_path": ".deliver/logs/df1605ed-56c6-4ee7-8368-01ede0f3c9c4/test-c3ebcd05-ceb2-4f48-8772-5d6b090896c9.log",
+          "output": {
+            "stdout_bytes": 12877,
+            "stderr_bytes": 0,
+            "truncated": false
+          },
+          "scope": {
+            "ok": true,
+            "changed": [
+              "plugins/deliver/skills/deliver/SKILL.md",
+              "plugins/deliver/skills/deliver/assets/operations.json",
+              "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
+              "plugins/deliver/skills/deliver/references/compatibility.md",
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+              "plugins/deliver/skills/deliver/scripts/pm.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/operations.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "added": [
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "deleted": [],
+            "renames": [],
+            "out_of_scope": [],
+            "preexisting_dirty_changed": [],
+            "symlink_escapes": [],
+            "git_metadata_changed": false,
+            "ignored_advisory_changed": [],
+            "coordinator_execution_changed": null,
+            "git_metadata_compatibility": null,
+            "contracts_changed": []
+          },
+          "started_at": "2026-09-10T03:18:06.971Z",
+          "finished_at": "2026-09-10T03:19:18.384Z"
+        },
+        {
+          "provenance": "deliver-runtime-executed-v1",
+          "name": "validate",
+          "command": "npm run validate",
+          "cwd": ".",
+          "environment_keys": [],
+          "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "environment_hash": "da9241d5f58e42d0b6904101c8f95584baac916c810eda2122fa4ea3b4709134",
+          "snapshot_hash": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3",
+          "status": "PASS",
+          "exit_code": 0,
+          "signal": null,
+          "error": null,
+          "log_path": ".deliver/logs/df1605ed-56c6-4ee7-8368-01ede0f3c9c4/validate-194627d6-c766-460d-9e46-2a4940d0e5c5.log",
+          "output": {
+            "stdout_bytes": 150,
+            "stderr_bytes": 0,
+            "truncated": false
+          },
+          "scope": {
+            "ok": true,
+            "changed": [
+              "plugins/deliver/skills/deliver/SKILL.md",
+              "plugins/deliver/skills/deliver/assets/operations.json",
+              "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
+              "plugins/deliver/skills/deliver/references/compatibility.md",
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+              "plugins/deliver/skills/deliver/scripts/pm.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/operations.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "added": [
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "deleted": [],
+            "renames": [],
+            "out_of_scope": [],
+            "preexisting_dirty_changed": [],
+            "symlink_escapes": [],
+            "git_metadata_changed": false,
+            "ignored_advisory_changed": [],
+            "coordinator_execution_changed": null,
+            "git_metadata_compatibility": null,
+            "contracts_changed": []
+          },
+          "started_at": "2026-09-10T03:19:18.621Z",
+          "finished_at": "2026-09-10T03:19:19.943Z"
+        }
+      ],
+      "review": {
+        "status": "FAIL",
+        "findings": [
+          {
+            "severity": "major",
+            "message": "Integration preparation makes the accepted evidence-refresh and conflict-correction routes unreachable. boundManifest throws when the source snapshot's bound live bytes differ from committed C, and prepareLocalIntegration throws when a clean expected M manifest differs from C, labelling both as source correction even though fresh independent M review and distinct verification are the specified resolution for evidence-only drift. expectedMergeTree also throws before persisting any record on a real non-clean composition, so T05C has no validated failure input. Persist whether C evidence is reusable separately from the actual M manifest and permit fresh M evidence when it is not; for a merge-tree conflict, persist a discriminated failure token bound to actual I, finished C, the failed probe and attempt provenance without claiming that M exists.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": false
+          },
+          {
+            "severity": "major",
+            "message": "Fresh integration gates are not bound to the live bytes or durable logs they claim to test. assertClean trusts porcelain status and write-tree, so assume-unchanged or skip-worktree changes can be invisible while a gate executes bytes different from recorded M; a review reproduction produced empty status and an index tree equal to HEAD while the live bound file contained different content. assertEvidenceReady validates only the receipt's stored log_hash and never reads, type-checks or hashes log_path, so deleted or altered logs still finalize. Re-running a gate filters out the previous same-name receipt, erasing failed evidence rather than retaining gate history. Bind the actual executable worktree to M before and after every gate, validate exact bounded regular log bytes at consumption, and retain prior gate receipts as immutable history.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": false
+          },
+          {
+            "severity": "major",
+            "message": "The integration record is not confined to its canonical per-source-run path. validateRecord accepts any string id, recordPath interpolates it through path.join, and assertRecordSource never requires record.id === record.source.run_id. Traversal components can therefore normalize outside destination/.deliver/integrations while readIntegrationRecord's equality check still succeeds, after which withRecord locks and rewrites that escaped JSON path. Require the canonical run-id grammar and equality to source.run_id, resolve the expected basename under the real integrations directory, and reject every lexical or realpath escape before locking or mutation.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": false
+          },
+          {
+            "severity": "major",
+            "message": "P/E/H proofs and their user-visible evidence are not durable after adoption. Adoption clears the only pending parent/path/hash data and later stages trust report.commit, closure.commit and reporting without re-proving their commit topology or deriving reporting from scale and the persisted standard opt-in. A coherent-looking record changed to reporting=skipped or report.commit=M can bypass required P, and handoff preparation trusts an arbitrary recorded closure commit without checking the merged story. The generated report also omits retained panel findings and inserts multiline verifier evidence as raw Markdown, allowing injected headings/check boxes; handoff always states OPEN_FINDINGS: none even when a PASS panel retains unresolved minor CONCERNS. Retain and revalidate adopted parent/tree/mode/path/blob proofs, bind the derived reporting choice, render bounded escaped evidence plus retained findings, and make the handoff's open findings reflect effective evidence.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": false
+          }
+        ],
+        "summary": "T05L fails review at frozen snapshot 663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3. The normal-path tests demonstrate distinct current verification, finish-with-held-claim behavior, C/M/P/E/H creation, upstream-readable closure and handoff, structured panel retention, and standalone receipt compatibility. The implementation still rejects the promised evidence-only M refresh path, cannot hand a validated no-M conflict result to T05C, does not bind gates to actual live M bytes or retained logs, accepts noncanonical integration records, and can lose or bypass required reporting/closure proof. Coordinator npm test and npm run validate passed at the exact snapshot, but the missing adversarial and drift cases are acceptance-critical.",
+        "builder": "t01_builder",
+        "reviewer": "state_architecture",
+        "snapshot_hash": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3",
+        "recorded_at": "2026-09-10T03:54:06.149Z"
+      },
+      "verification": {
+        "verifier": "state_architecture",
+        "criteria": [
+          {
+            "id": "T05L-AC1",
+            "status": "FAIL",
+            "evidence": "Runtime and state validation enforce a verifier distinct from the current story's builder, top reviewer and panel members, and the subprocess lifecycle test proves finish leaves Execution in-review until integration. Normal adoption records M before E. However finalization accepts gate receipts whose log is missing or altered and whose command may have executed hidden assume-unchanged/skip-worktree bytes rather than M, so merged Execution is not always conditioned on fresh verified integration evidence. The integration record also lacks a canonical id/source binding and durable adopted-artifact validation."
+          },
+          {
+            "id": "T05L-AC2",
+            "status": "FAIL",
+            "evidence": "The unchanged pinned reader accepts the generated merged Execution and treats the handoff-only H as current with BASE_COMMIT E; current-roundtrip tests also preserve upstream Execution identity and unknown fields in both parser directions, and pending report recovery runs through fresh CLI processes. After E adoption, however, the record retains only closure.commit and execution_hash, and handoff preparation does not re-prove E's direct parent, story-only diff or merged story bytes. A structurally edited record with a recomputed concurrency hash can therefore produce H from an unproven closure, so the durable interruption/recovery boundary is incomplete."
+          },
+          {
+            "id": "T05L-AC3",
+            "status": "FAIL",
+            "evidence": "The normal standard opt-in path creates exactly the two report paths at direct-child P, references C/M/manifest/gate/review/verification identities without self-hashing, rejects missing lenses and non-PASS criteria, then creates story-only E. But adopted P proof is discarded, reporting is not re-derived from large/regulated scale or bound to the standard opt-in, and close-prepare trusts report.commit; reporting=skipped or report.commit=M can bypass required P. Rendering also omits retained panel findings and emits multiline verification evidence without Markdown neutralization, while H falsely says OPEN_FINDINGS none for permitted minor concerns."
+          },
+          {
+            "id": "T05L-AC4",
+            "status": "FAIL",
+            "evidence": "Every declared command is run by integrate-gate at recorded M in the normal test, with an M snapshot and environment identity, and fresh M review/verification APIs preserve source C. The preparation rejects source-snapshot/C drift and clean C/M manifest drift before a record can select fresh M evidence, and a merge-tree conflict leaves no discriminated failure record for T05C. Gate cleanliness can be bypassed by index flags, log_path/log_hash are not revalidated, and same-name retries erase earlier failed receipts. Thus neither exact actual-M gate identity nor the promised evidence-only refresh/correction handoff is complete."
+          },
+          {
+            "id": "T05L-AC5",
+            "status": "PASS",
+            "evidence": "parseReviewReceipt validates one shared snapshot, bounded safe member identities, unique lenses, PASS/CONCERNS/FAIL verdicts and each member's findings; it derives the aggregate status/findings instead of trusting top-level claims and retains unresolved minor CONCERNS under aggregate PASS. Reporting enforces the story-declared lenses plus code-integrity-reviewer and regulated security-auditor. Receipts without panel retain the legacy status/findings/summary shape, and the complete coordinator test suite passed 142 tests plus packaging validation at snapshot 663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3."
+          }
+        ],
+        "snapshot_hash": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3",
+        "recorded_at": "2026-09-10T03:54:06.554Z"
+      }
+    },
+    {
+      "at": "2026-09-10T04:41:29.134Z",
+      "reason": "correct_course",
+      "details": {
+        "kind": "fix",
+        "reason": "Review round2: normalize committed/live scoped gitlinks and allow proven I-to-M gitlink advancement while retaining recursive cleanliness and metadata checks; preserve unresolved source concerns consistently in report and handoff.",
+        "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+      },
+      "gates": [
+        {
+          "provenance": "deliver-runtime-executed-v1",
+          "name": "test",
+          "command": "npm test",
+          "cwd": ".",
+          "environment_keys": [],
+          "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "environment_hash": "da9241d5f58e42d0b6904101c8f95584baac916c810eda2122fa4ea3b4709134",
+          "snapshot_hash": "477c3fb8d6ae901dc3c6160406acab0834ab7123c3c65a9b7c8cffbf499dab92",
+          "status": "PASS",
+          "exit_code": 0,
+          "signal": null,
+          "error": null,
+          "log_path": ".deliver/logs/df1605ed-56c6-4ee7-8368-01ede0f3c9c4/test-fbc880a1-e5fa-48ae-897d-d142d7b6d541.log",
+          "output": {
+            "stdout_bytes": 13323,
+            "stderr_bytes": 0,
+            "truncated": false
+          },
+          "scope": {
+            "ok": true,
+            "changed": [
+              "plugins/deliver/skills/deliver/SKILL.md",
+              "plugins/deliver/skills/deliver/assets/operations.json",
+              "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
+              "plugins/deliver/skills/deliver/references/compatibility.md",
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+              "plugins/deliver/skills/deliver/scripts/pm.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/operations.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "added": [
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "deleted": [],
+            "renames": [],
+            "out_of_scope": [],
+            "preexisting_dirty_changed": [],
+            "symlink_escapes": [],
+            "git_metadata_changed": false,
+            "ignored_advisory_changed": [],
+            "coordinator_execution_changed": null,
+            "git_metadata_compatibility": null,
+            "contracts_changed": []
+          },
+          "started_at": "2026-09-10T04:23:36.403Z",
+          "finished_at": "2026-09-10T04:25:01.932Z"
+        },
+        {
+          "provenance": "deliver-runtime-executed-v1",
+          "name": "validate",
+          "command": "npm run validate",
+          "cwd": ".",
+          "environment_keys": [],
+          "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "environment_hash": "da9241d5f58e42d0b6904101c8f95584baac916c810eda2122fa4ea3b4709134",
+          "snapshot_hash": "477c3fb8d6ae901dc3c6160406acab0834ab7123c3c65a9b7c8cffbf499dab92",
+          "status": "PASS",
+          "exit_code": 0,
+          "signal": null,
+          "error": null,
+          "log_path": ".deliver/logs/df1605ed-56c6-4ee7-8368-01ede0f3c9c4/validate-8ad66aa4-f1d3-4011-84aa-105997797b9a.log",
+          "output": {
+            "stdout_bytes": 150,
+            "stderr_bytes": 0,
+            "truncated": false
+          },
+          "scope": {
+            "ok": true,
+            "changed": [
+              "plugins/deliver/skills/deliver/SKILL.md",
+              "plugins/deliver/skills/deliver/assets/operations.json",
+              "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
+              "plugins/deliver/skills/deliver/references/compatibility.md",
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+              "plugins/deliver/skills/deliver/scripts/pm.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/operations.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "added": [
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "deleted": [],
+            "renames": [],
+            "out_of_scope": [],
+            "preexisting_dirty_changed": [],
+            "symlink_escapes": [],
+            "git_metadata_changed": false,
+            "ignored_advisory_changed": [],
+            "coordinator_execution_changed": null,
+            "git_metadata_compatibility": null,
+            "contracts_changed": []
+          },
+          "started_at": "2026-09-10T04:25:02.174Z",
+          "finished_at": "2026-09-10T04:25:03.546Z"
+        }
+      ],
+      "review": {
+        "status": "FAIL",
+        "findings": [
+          {
+            "severity": "major",
+            "message": "Integration preparation makes the accepted evidence-refresh and conflict-correction routes unreachable. boundManifest throws when the source snapshot's bound live bytes differ from committed C, and prepareLocalIntegration throws when a clean expected M manifest differs from C, labelling both as source correction even though fresh independent M review and distinct verification are the specified resolution for evidence-only drift. expectedMergeTree also throws before persisting any record on a real non-clean composition, so T05C has no validated failure input. Persist whether C evidence is reusable separately from the actual M manifest and permit fresh M evidence when it is not; for a merge-tree conflict, persist a discriminated failure token bound to actual I, finished C, the failed probe and attempt provenance without claiming that M exists.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "Fresh integration gates are not bound to the live bytes or durable logs they claim to test. assertClean trusts porcelain status and write-tree, so assume-unchanged or skip-worktree changes can be invisible while a gate executes bytes different from recorded M; a review reproduction produced empty status and an index tree equal to HEAD while the live bound file contained different content. assertEvidenceReady validates only the receipt's stored log_hash and never reads, type-checks or hashes log_path, so deleted or altered logs still finalize. Re-running a gate filters out the previous same-name receipt, erasing failed evidence rather than retaining gate history. Bind the actual executable worktree to M before and after every gate, validate exact bounded regular log bytes at consumption, and retain prior gate receipts as immutable history.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "The integration record is not confined to its canonical per-source-run path. validateRecord accepts any string id, recordPath interpolates it through path.join, and assertRecordSource never requires record.id === record.source.run_id. Traversal components can therefore normalize outside destination/.deliver/integrations while readIntegrationRecord's equality check still succeeds, after which withRecord locks and rewrites that escaped JSON path. Require the canonical run-id grammar and equality to source.run_id, resolve the expected basename under the real integrations directory, and reject every lexical or realpath escape before locking or mutation.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "P/E/H proofs and their user-visible evidence are not durable after adoption. Adoption clears the only pending parent/path/hash data and later stages trust report.commit, closure.commit and reporting without re-proving their commit topology or deriving reporting from scale and the persisted standard opt-in. A coherent-looking record changed to reporting=skipped or report.commit=M can bypass required P, and handoff preparation trusts an arbitrary recorded closure commit without checking the merged story. The generated report also omits retained panel findings and inserts multiline verifier evidence as raw Markdown, allowing injected headings/check boxes; handoff always states OPEN_FINDINGS: none even when a PASS panel retains unresolved minor CONCERNS. Retain and revalidate adopted parent/tree/mode/path/blob proofs, bind the derived reporting choice, render bounded escaped evidence plus retained findings, and make the handoff's open findings reflect effective evidence.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "A clean initialized submodule inside a task-bound touch/read/spec scope cannot reach adopted M. The committed manifest encodes its gitlink as `gitlink:<oid>` at integration.mjs:108-123, while scope.snapshot encodes the same clean checkout as `gitlink:<oid>:<nested-git-meta>` and adds nested entries at scope.mjs:309-321. snapshotManifest carries those incompatible live entries into executableProof, which therefore rejects exact clean M at integration.mjs:97-105. A temporary repository probe reproduced these two shapes for the same gitlink. In addition, protectedShape compares nested HEAD/tree/index at I with M, so a legitimate gitlink update would remain rejected even after normalizing the manifest. Define one comparable committed/live gitlink identity, validate the initialized checkout against M's gitlink while retaining recursive dirty/index/metadata protection, and add an initialized scoped-submodule integration regression.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": false
+          },
+          {
+            "severity": "minor",
+            "message": "When bound drift requires a fresh M review, handoff OPEN_FINDINGS considers only that effective M review. An unresolved minor retained in the source C review can therefore remain listed as open in the deterministic report while H says `OPEN_FINDINGS: none` if the fresh M receipt omits it. Preserve or explicitly resolve retained source concerns consistently across the report and handoff.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": false
+          }
+        ],
+        "summary": "T05L fix1 remains FAIL at frozen snapshot 477c3fb8d6ae901dc3c6160406acab0834ab7123c3c65a9b7c8cffbf499dab92. The four archived blocker groups are resolved for ordinary files: evidence-only drift and no-M states are durable, gates bind live M and retained logs, record paths are canonical, and P/E/H/reporting proofs survive restart and tampering checks. The unchanged upstream boundary, distinct current verifier, structured panels, reporting and normal C/M/P/E/H lifecycle are demonstrated. Integration still cannot adopt an otherwise exact M when a bound scope contains an initialized submodule because committed and live manifest formats are incompatible; legitimate changed gitlinks also conflict with the I-to-M protected-shape comparison. Coordinator npm test passed 147/147 and npm run validate passed at the exact snapshot with clean declared scope, but no scoped-submodule integration regression covers this failure.",
+        "builder": "t01_builder",
+        "reviewer": "state_architecture",
+        "snapshot_hash": "477c3fb8d6ae901dc3c6160406acab0834ab7123c3c65a9b7c8cffbf499dab92",
+        "recorded_at": "2026-09-10T04:41:28.507Z"
+      },
+      "verification": {
+        "verifier": "state_architecture",
+        "criteria": [
+          {
+            "id": "T05L-AC1",
+            "status": "FAIL",
+            "evidence": "Current run/state validation and integration reconciliation require a verifier distinct from builder, top reviewer and every panel member; the subprocess lifecycle proves finish leaves the current claim in-review, and normal M/P/E/H adoption gates merged Execution on finalized evidence. Fix1 revalidates live M, logs and artifact topology. However a clean initialized submodule in a bound scope is encoded incompatibly by the committed manifest and live snapshot, so executableProof rejects the real integration before fresh gates or closure even when its gitlink and nested checkout are exact."
+          },
+          {
+            "id": "T05L-AC2",
+            "status": "PASS",
+            "evidence": "current-roundtrip.test.mjs proves both upstream-to-Codex and Codex-to-unchanged-upstream Execution parsing while preserving contract and unknown identity fields. The full integration subprocess test resumes prepared report state through fresh CLI processes, proves E is a story-only legal merged transition, adopts a separate H whose BASE_COMMIT is E, and the pinned upstream inspector treats that handoff as current. Adopted closure and handoff parent/tree/path/mode/blob proofs are revalidated from Git objects before later mutations."
+          },
+          {
+            "id": "T05L-AC3",
+            "status": "PASS",
+            "evidence": "Reporting policy is re-derived as required for large/regulated, requested only from the persisted standard opt-in, and skipped otherwise. Finalized evidence deterministically renders only docs/verification/<story>.md and docs/checklists/verification-<story>.md with C, source snapshot, M, manifest and current gate/review/verification identities; it rejects missing lenses and non-PASS criteria, escapes multiline evidence, retains findings, adopts exact direct-child P proof, then requires P before story-only E. Coherent reporting/proof tampering is rejected in the integration tests."
+          },
+          {
+            "id": "T05L-AC4",
+            "status": "FAIL",
+            "evidence": "Fix1 separately binds committed C, certified live source snapshot and expected M manifests; the tests prove source-only bound dirt and clean I-to-M bound drift select fresh M review plus distinct verification while preserving finished C, and a conflict persists an honest no-M I/C probe/log record. Gate execution proves live bytes, index flags, recursive anchor and exact M before and after each command, rehashes current/history logs, and retains failed reruns/finalization history. For an initialized scoped submodule, though, boundManifest uses `gitlink:<oid>` while snapshot uses `gitlink:<oid>:<nested-meta>` plus nested entries, so exact M is always rejected; protectedShape also freezes nested I HEAD/tree across a legitimate gitlink change. Thus declared gates cannot always run at the actual valid combined M."
+          },
+          {
+            "id": "T05L-AC5",
+            "status": "PASS",
+            "evidence": "parseReviewReceipt validates one shared snapshot, bounded safe identities, unique lenses, PASS/CONCERNS/FAIL member verdicts and exact member findings, then derives aggregate status/findings rather than trusting an underreported top level. Reporting enforces story-declared lenses plus code-integrity-reviewer and regulated security-auditor, while receipts without panel retain the legacy status/findings/summary shape. Coordinator gates passed 147/147 tests and packaging validation at snapshot 477c3fb8d6ae901dc3c6160406acab0834ab7123c3c65a9b7c8cffbf499dab92."
+          }
+        ],
+        "snapshot_hash": "477c3fb8d6ae901dc3c6160406acab0834ab7123c3c65a9b7c8cffbf499dab92",
+        "recorded_at": "2026-09-10T04:41:28.903Z"
+      }
+    },
+    {
+      "at": "2026-09-10T05:04:06.396Z",
+      "reason": "correct_course",
+      "details": {
+        "kind": "fix",
+        "reason": "Review round3: recursively resolve committed nested submodule scopes and separately prove every initialized submodule checkout against actual M regardless of bound scope or status suppression; preserve metadata and dirty/index checks.",
+        "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+      },
+      "gates": [
+        {
+          "provenance": "deliver-runtime-executed-v1",
+          "name": "test",
+          "command": "npm test",
+          "cwd": ".",
+          "environment_keys": [],
+          "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "environment_hash": "da9241d5f58e42d0b6904101c8f95584baac916c810eda2122fa4ea3b4709134",
+          "snapshot_hash": "1475f6e6676d9b95fe255e0e2d6500fbdf1a6fc6f24f1315be8bc4ae0248a315",
+          "status": "PASS",
+          "exit_code": 0,
+          "signal": null,
+          "error": null,
+          "log_path": ".deliver/logs/df1605ed-56c6-4ee7-8368-01ede0f3c9c4/test-1d5a3023-28d4-4486-8ca9-f0bd3e2a1cb3.log",
+          "output": {
+            "stdout_bytes": 13450,
+            "stderr_bytes": 0,
+            "truncated": false
+          },
+          "scope": {
+            "ok": true,
+            "changed": [
+              "plugins/deliver/skills/deliver/SKILL.md",
+              "plugins/deliver/skills/deliver/assets/operations.json",
+              "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
+              "plugins/deliver/skills/deliver/references/compatibility.md",
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+              "plugins/deliver/skills/deliver/scripts/pm.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/operations.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "added": [
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "deleted": [],
+            "renames": [],
+            "out_of_scope": [],
+            "preexisting_dirty_changed": [],
+            "symlink_escapes": [],
+            "git_metadata_changed": false,
+            "ignored_advisory_changed": [],
+            "coordinator_execution_changed": null,
+            "git_metadata_compatibility": null,
+            "contracts_changed": []
+          },
+          "started_at": "2026-09-10T04:54:33.305Z",
+          "finished_at": "2026-09-10T04:56:25.229Z"
+        },
+        {
+          "provenance": "deliver-runtime-executed-v1",
+          "name": "validate",
+          "command": "npm run validate",
+          "cwd": ".",
+          "environment_keys": [],
+          "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "environment_hash": "da9241d5f58e42d0b6904101c8f95584baac916c810eda2122fa4ea3b4709134",
+          "snapshot_hash": "1475f6e6676d9b95fe255e0e2d6500fbdf1a6fc6f24f1315be8bc4ae0248a315",
+          "status": "PASS",
+          "exit_code": 0,
+          "signal": null,
+          "error": null,
+          "log_path": ".deliver/logs/df1605ed-56c6-4ee7-8368-01ede0f3c9c4/validate-7167ba56-bd63-400e-8675-eac241df8007.log",
+          "output": {
+            "stdout_bytes": 150,
+            "stderr_bytes": 0,
+            "truncated": false
+          },
+          "scope": {
+            "ok": true,
+            "changed": [
+              "plugins/deliver/skills/deliver/SKILL.md",
+              "plugins/deliver/skills/deliver/assets/operations.json",
+              "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
+              "plugins/deliver/skills/deliver/references/compatibility.md",
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+              "plugins/deliver/skills/deliver/scripts/pm.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/operations.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "added": [
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "deleted": [],
+            "renames": [],
+            "out_of_scope": [],
+            "preexisting_dirty_changed": [],
+            "symlink_escapes": [],
+            "git_metadata_changed": false,
+            "ignored_advisory_changed": [],
+            "coordinator_execution_changed": null,
+            "git_metadata_compatibility": null,
+            "contracts_changed": []
+          },
+          "started_at": "2026-09-10T04:56:25.469Z",
+          "finished_at": "2026-09-10T04:56:26.822Z"
+        }
+      ],
+      "review": {
+        "status": "FAIL",
+        "findings": [
+          {
+            "severity": "major",
+            "message": "Integration preparation makes the accepted evidence-refresh and conflict-correction routes unreachable. boundManifest throws when the source snapshot's bound live bytes differ from committed C, and prepareLocalIntegration throws when a clean expected M manifest differs from C, labelling both as source correction even though fresh independent M review and distinct verification are the specified resolution for evidence-only drift. expectedMergeTree also throws before persisting any record on a real non-clean composition, so T05C has no validated failure input. Persist whether C evidence is reusable separately from the actual M manifest and permit fresh M evidence when it is not; for a merge-tree conflict, persist a discriminated failure token bound to actual I, finished C, the failed probe and attempt provenance without claiming that M exists.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "Fresh integration gates are not bound to the live bytes or durable logs they claim to test. assertClean trusts porcelain status and write-tree, so assume-unchanged or skip-worktree changes can be invisible while a gate executes bytes different from recorded M; a review reproduction produced empty status and an index tree equal to HEAD while the live bound file contained different content. assertEvidenceReady validates only the receipt's stored log_hash and never reads, type-checks or hashes log_path, so deleted or altered logs still finalize. Re-running a gate filters out the previous same-name receipt, erasing failed evidence rather than retaining gate history. Bind the actual executable worktree to M before and after every gate, validate exact bounded regular log bytes at consumption, and retain prior gate receipts as immutable history.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "The integration record is not confined to its canonical per-source-run path. validateRecord accepts any string id, recordPath interpolates it through path.join, and assertRecordSource never requires record.id === record.source.run_id. Traversal components can therefore normalize outside destination/.deliver/integrations while readIntegrationRecord's equality check still succeeds, after which withRecord locks and rewrites that escaped JSON path. Require the canonical run-id grammar and equality to source.run_id, resolve the expected basename under the real integrations directory, and reject every lexical or realpath escape before locking or mutation.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "P/E/H proofs and their user-visible evidence are not durable after adoption. Adoption clears the only pending parent/path/hash data and later stages trust report.commit, closure.commit and reporting without re-proving their commit topology or deriving reporting from scale and the persisted standard opt-in. A coherent-looking record changed to reporting=skipped or report.commit=M can bypass required P, and handoff preparation trusts an arbitrary recorded closure commit without checking the merged story. The generated report also omits retained panel findings and inserts multiline verifier evidence as raw Markdown, allowing injected headings/check boxes; handoff always states OPEN_FINDINGS: none even when a PASS panel retains unresolved minor CONCERNS. Retain and revalidate adopted parent/tree/mode/path/blob proofs, bind the derived reporting choice, render bounded escaped evidence plus retained findings, and make the handoff's open findings reflect effective evidence.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "A clean initialized submodule inside a task-bound touch/read/spec scope cannot reach adopted M. The committed manifest encodes its gitlink as `gitlink:<oid>` at integration.mjs:108-123, while scope.snapshot encodes the same clean checkout as `gitlink:<oid>:<nested-git-meta>` and adds nested entries at scope.mjs:309-321. snapshotManifest carries those incompatible live entries into executableProof, which therefore rejects exact clean M at integration.mjs:97-105. A temporary repository probe reproduced these two shapes for the same gitlink. In addition, protectedShape compares nested HEAD/tree/index at I with M, so a legitimate gitlink update would remain rejected even after normalizing the manifest. Define one comparable committed/live gitlink identity, validate the initialized checkout against M's gitlink while retaining recursive dirty/index/metadata protection, and add an initialized scoped-submodule integration regression.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "minor",
+            "message": "When bound drift requires a fresh M review, handoff OPEN_FINDINGS considers only that effective M review. An unresolved minor retained in the source C review can therefore remain listed as open in the deterministic report while H says `OPEN_FINDINGS: none` if the fresh M receipt omits it. Preserve or explicitly resolve retained source concerns consistently across the report and handoff.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "Fix2 handles a task scope equal to an initialized gitlink, but exact recursive M identity remains incomplete in two supported cases. First, a scope inside a submodule such as vendor/dependency/value.txt is valid under the task/scope contracts, yet superproject `git ls-tree -r ... -- <nested-path>` returns no entry; committedEntries records null while scope.snapshot resolves the parent gitlink and nested file, so executableProof rejects exact M. Second, protectedShape now drops nested HEAD/tree/index for every submodule while normalizeSnapshotGitlinks checks only gitlinks present in the bound manifest. A status-suppressed unbound submodule can therefore execute bytes different from M: a temporary repository with tracked `submodule.*.ignore=all` had empty root porcelain and index tree equal to HEAD while its live submodule HEAD differed from the recorded gitlink, a state the current adoption proof does not reject. Resolve gitlink ancestors for nested scopes and separately prove every initialized submodule checkout recursively against M, allowing only the legitimate I-to-M gitlink changes while retaining dirt, hidden-index and protected-metadata checks.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": false
+          }
+        ],
+        "summary": "T05L fix2 remains FAIL at frozen snapshot 1475f6e6676d9b95fe255e0e2d6500fbdf1a6fc6f24f1315be8bc4ae0248a315. The prior ordinary-file evidence, record-path and durable P/E/H corrections remain sound. Fix2 now supports and tests a root-scoped initialized gitlink advancing from I to M while rejecting nested dirt, assume-unchanged bytes and protected config drift, and H now retains source-C concerns alongside effective-M concerns. Recursive scopes below a gitlink still produce no committed manifest entry, and unbound initialized submodules with status suppression are not proved against M after nested content was removed from protectedShape. Coordinator npm test passed 148/148 and npm run validate passed at the exact clean-scope snapshot.",
+        "builder": "t01_builder",
+        "reviewer": "state_architecture",
+        "snapshot_hash": "1475f6e6676d9b95fe255e0e2d6500fbdf1a6fc6f24f1315be8bc4ae0248a315",
+        "recorded_at": "2026-09-10T05:04:05.768Z"
+      },
+      "verification": {
+        "verifier": "state_architecture",
+        "criteria": [
+          {
+            "id": "T05L-AC1",
+            "status": "FAIL",
+            "evidence": "Current verifier separation, held claim, ordinary-file M/P/E/H evidence and durable adoption proofs remain enforced. Fix2 proves a clean initialized root-scoped gitlink can advance and reach M. A valid scope below a gitlink still cannot be represented by committedEntries, and a status-suppressed unbound initialized submodule can differ from M without failing adoption, so merged Execution is not yet conditioned on exact whole-checkout integration evidence in all supported repositories."
+          },
+          {
+            "id": "T05L-AC2",
+            "status": "PASS",
+            "evidence": "The unchanged pinned reader accepts the generated merged Execution and handoff-only H with BASE_COMMIT E; both current boundary directions preserve contract and unknown identity fields, fresh-process recovery is exercised, and retained E/H topology, paths, modes and bytes are revalidated from Git objects."
+          },
+          {
+            "id": "T05L-AC3",
+            "status": "PASS",
+            "evidence": "Derived large/regulated and standard opt-in reporting policy, exact deterministic report/checklist paths, C/source-snapshot/M/manifest/receipt identities, required lenses, escaped evidence, retained findings, direct-child P and story-only E remain enforced and covered by normal and coherent-tamper tests."
+          },
+          {
+            "id": "T05L-AC4",
+            "status": "FAIL",
+            "evidence": "Separate C/source-snapshot/M manifests, fresh M review plus distinct verification for evidence-only drift, honest no-M records, exact gate logs/history and before/after live-M checks remain implemented. Fix2 validates root-scoped gitlink advancement and bound nested dirt/index/config rejection. It still cannot resolve a declared nested submodule path into its committed ancestor gitlink, and it no longer compares unbound nested HEAD/tree/index while status can be suppressed, so declared gates may execute a checkout different from actual M."
+          },
+          {
+            "id": "T05L-AC5",
+            "status": "PASS",
+            "evidence": "Structured panel parsing still binds exact member identities, verdicts, snapshots and findings, derives the aggregate, enforces reporting lens coverage, and preserves no-panel standalone compatibility. Fix2 additionally renders both retained source-C and effective-M open concerns in H. Coordinator gates passed 148/148 tests and packaging validation at snapshot 1475f6e6676d9b95fe255e0e2d6500fbdf1a6fc6f24f1315be8bc4ae0248a315."
+          }
+        ],
+        "snapshot_hash": "1475f6e6676d9b95fe255e0e2d6500fbdf1a6fc6f24f1315be8bc4ae0248a315",
+        "recorded_at": "2026-09-10T05:04:06.167Z"
+      }
+    },
+    {
+      "at": "2026-09-10T09:31:52.918Z",
+      "reason": "user_authorized_extra_fix",
+      "details": {
+        "kind": "fix",
+        "reason": "Explicit user-approved fourth fix for the recorded uninitialized submodule defect",
+        "approval_path": ".deliver/T05L-extra-fix-approval.json",
+        "approval_hash": "458f8eee34fa9abeade430b1d7e2b6bfdec23e24c1245352e05d74a96f372416",
+        "previous_fixes": 3,
+        "authorized_fixes": 4
+      },
+      "gates": [
+        {
+          "provenance": "deliver-runtime-executed-v1",
+          "name": "test",
+          "command": "npm test",
+          "cwd": ".",
+          "environment_keys": [],
+          "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "environment_hash": "da9241d5f58e42d0b6904101c8f95584baac916c810eda2122fa4ea3b4709134",
+          "snapshot_hash": "260df67738389280469cf5f365537764a040ddcc9f117d32fd3394d9fe46cdff",
+          "status": "PASS",
+          "exit_code": 0,
+          "signal": null,
+          "error": null,
+          "log_path": ".deliver/logs/df1605ed-56c6-4ee7-8368-01ede0f3c9c4/test-1023d80f-42dc-49d0-b742-816a70bef680.log",
+          "output": {
+            "stdout_bytes": 13728,
+            "stderr_bytes": 0,
+            "truncated": false
+          },
+          "scope": {
+            "ok": true,
+            "changed": [
+              "plugins/deliver/skills/deliver/SKILL.md",
+              "plugins/deliver/skills/deliver/assets/operations.json",
+              "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
+              "plugins/deliver/skills/deliver/references/compatibility.md",
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+              "plugins/deliver/skills/deliver/scripts/pm.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/operations.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "added": [
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "deleted": [],
+            "renames": [],
+            "out_of_scope": [],
+            "preexisting_dirty_changed": [],
+            "symlink_escapes": [],
+            "git_metadata_changed": false,
+            "ignored_advisory_changed": [],
+            "coordinator_execution_changed": null,
+            "git_metadata_compatibility": null,
+            "contracts_changed": []
+          },
+          "started_at": "2026-09-10T05:35:32.168Z",
+          "finished_at": "2026-09-10T05:38:47.980Z"
+        },
+        {
+          "provenance": "deliver-runtime-executed-v1",
+          "name": "validate",
+          "command": "npm run validate",
+          "cwd": ".",
+          "environment_keys": [],
+          "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "environment_hash": "da9241d5f58e42d0b6904101c8f95584baac916c810eda2122fa4ea3b4709134",
+          "snapshot_hash": "260df67738389280469cf5f365537764a040ddcc9f117d32fd3394d9fe46cdff",
+          "status": "PASS",
+          "exit_code": 0,
+          "signal": null,
+          "error": null,
+          "log_path": ".deliver/logs/df1605ed-56c6-4ee7-8368-01ede0f3c9c4/validate-3bd639ce-b269-41a8-a9e5-49072881bd54.log",
+          "output": {
+            "stdout_bytes": 150,
+            "stderr_bytes": 0,
+            "truncated": false
+          },
+          "scope": {
+            "ok": true,
+            "changed": [
+              "plugins/deliver/skills/deliver/SKILL.md",
+              "plugins/deliver/skills/deliver/assets/operations.json",
+              "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
+              "plugins/deliver/skills/deliver/references/compatibility.md",
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+              "plugins/deliver/skills/deliver/scripts/pm.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/operations.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "added": [
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "deleted": [],
+            "renames": [],
+            "out_of_scope": [],
+            "preexisting_dirty_changed": [],
+            "symlink_escapes": [],
+            "git_metadata_changed": false,
+            "ignored_advisory_changed": [],
+            "coordinator_execution_changed": null,
+            "git_metadata_compatibility": null,
+            "contracts_changed": []
+          },
+          "started_at": "2026-09-10T05:38:48.216Z",
+          "finished_at": "2026-09-10T05:38:49.556Z"
+        }
+      ],
+      "review": {
+        "status": "FAIL",
+        "findings": [
+          {
+            "severity": "major",
+            "message": "Integration preparation makes the accepted evidence-refresh and conflict-correction routes unreachable. boundManifest throws when the source snapshot's bound live bytes differ from committed C, and prepareLocalIntegration throws when a clean expected M manifest differs from C, labelling both as source correction even though fresh independent M review and distinct verification are the specified resolution for evidence-only drift. expectedMergeTree also throws before persisting any record on a real non-clean composition, so T05C has no validated failure input. Persist whether C evidence is reusable separately from the actual M manifest and permit fresh M evidence when it is not; for a merge-tree conflict, persist a discriminated failure token bound to actual I, finished C, the failed probe and attempt provenance without claiming that M exists.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "Fresh integration gates are not bound to the live bytes or durable logs they claim to test. assertClean trusts porcelain status and write-tree, so assume-unchanged or skip-worktree changes can be invisible while a gate executes bytes different from recorded M; a review reproduction produced empty status and an index tree equal to HEAD while the live bound file contained different content. assertEvidenceReady validates only the receipt's stored log_hash and never reads, type-checks or hashes log_path, so deleted or altered logs still finalize. Re-running a gate filters out the previous same-name receipt, erasing failed evidence rather than retaining gate history. Bind the actual executable worktree to M before and after every gate, validate exact bounded regular log bytes at consumption, and retain prior gate receipts as immutable history.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "The integration record is not confined to its canonical per-source-run path. validateRecord accepts any string id, recordPath interpolates it through path.join, and assertRecordSource never requires record.id === record.source.run_id. Traversal components can therefore normalize outside destination/.deliver/integrations while readIntegrationRecord's equality check still succeeds, after which withRecord locks and rewrites that escaped JSON path. Require the canonical run-id grammar and equality to source.run_id, resolve the expected basename under the real integrations directory, and reject every lexical or realpath escape before locking or mutation.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "P/E/H proofs and their user-visible evidence are not durable after adoption. Adoption clears the only pending parent/path/hash data and later stages trust report.commit, closure.commit and reporting without re-proving their commit topology or deriving reporting from scale and the persisted standard opt-in. A coherent-looking record changed to reporting=skipped or report.commit=M can bypass required P, and handoff preparation trusts an arbitrary recorded closure commit without checking the merged story. The generated report also omits retained panel findings and inserts multiline verifier evidence as raw Markdown, allowing injected headings/check boxes; handoff always states OPEN_FINDINGS: none even when a PASS panel retains unresolved minor CONCERNS. Retain and revalidate adopted parent/tree/mode/path/blob proofs, bind the derived reporting choice, render bounded escaped evidence plus retained findings, and make the handoff's open findings reflect effective evidence.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "A clean initialized submodule inside a task-bound touch/read/spec scope cannot reach adopted M. The committed manifest encodes its gitlink as `gitlink:<oid>` at integration.mjs:108-123, while scope.snapshot encodes the same clean checkout as `gitlink:<oid>:<nested-git-meta>` and adds nested entries at scope.mjs:309-321. snapshotManifest carries those incompatible live entries into executableProof, which therefore rejects exact clean M at integration.mjs:97-105. A temporary repository probe reproduced these two shapes for the same gitlink. In addition, protectedShape compares nested HEAD/tree/index at I with M, so a legitimate gitlink update would remain rejected even after normalizing the manifest. Define one comparable committed/live gitlink identity, validate the initialized checkout against M's gitlink while retaining recursive dirty/index/metadata protection, and add an initialized scoped-submodule integration regression.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "minor",
+            "message": "When bound drift requires a fresh M review, handoff OPEN_FINDINGS considers only that effective M review. An unresolved minor retained in the source C review can therefore remain listed as open in the deterministic report while H says `OPEN_FINDINGS: none` if the fresh M receipt omits it. Preserve or explicitly resolve retained source concerns consistently across the report and handoff.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "Fix2 handles a task scope equal to an initialized gitlink, but exact recursive M identity remains incomplete in two supported cases. First, a scope inside a submodule such as vendor/dependency/value.txt is valid under the task/scope contracts, yet superproject `git ls-tree -r ... -- <nested-path>` returns no entry; committedEntries records null while scope.snapshot resolves the parent gitlink and nested file, so executableProof rejects exact M. Second, protectedShape now drops nested HEAD/tree/index for every submodule while normalizeSnapshotGitlinks checks only gitlinks present in the bound manifest. A status-suppressed unbound submodule can therefore execute bytes different from M: a temporary repository with tracked `submodule.*.ignore=all` had empty root porcelain and index tree equal to HEAD while its live submodule HEAD differed from the recorded gitlink, a state the current adoption proof does not reject. Resolve gitlink ancestors for nested scopes and separately prove every initialized submodule checkout recursively against M, allowing only the legitimate I-to-M gitlink changes while retaining dirt, hidden-index and protected-metadata checks.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "The new whole-checkout proof rejects a normal tracked but uninitialized submodule, blocking integration even when that submodule is unrelated to the task. A fresh Git clone represents an uninitialized gitlink as an empty directory; `git -C <empty-directory> rev-parse --show-toplevel` discovers the parent superproject. moduleRoot(...,{required:false}) checks that reported root after only treating a thrown Git command on an empty directory as uninitialized, so it emits `submodule checkout has an unexpected Git root` instead of returning null. buildCheckoutProof calls this for every expected/current gitlink, making integrate-prepare unusable until every submodule is initialized. A temporary clone reproduced the exact empty directory and parent-root result. Treat a canonical empty optional gitlink directory as uninitialized while continuing to reject nonempty, symlinked, escaping and malformed roots, and add an unrelated-uninitialized-submodule preparation regression.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": false
+          }
+        ],
+        "summary": "T05L fix3 remains FAIL at frozen snapshot 260df67738389280469cf5f365537764a040ddcc9f117d32fd3394d9fe46cdff. All archived defects are now resolved: recursive nested touch/read/spec/missing/symlink manifests work across multiple gitlinks, expected advancement is accepted, and the whole-checkout proof rejects bound and unbound nested byte/index/protected-metadata drift at adoption and later gates without treating arbitrary ignored caches as source. Ordinary C/M/P/E/H, evidence refresh, no-M, record, log/history, reporting, upstream and panel behavior remains intact. The new enumerator nevertheless mistakes the ordinary empty directory for an uninitialized submodule as an unsafe nested Git root, so any uninitialized gitlink blocks unrelated integration. Coordinator npm test passed 151/151 and npm run validate passed at the exact clean-scope snapshot.",
+        "builder": "t01_builder",
+        "reviewer": "state_architecture",
+        "snapshot_hash": "260df67738389280469cf5f365537764a040ddcc9f117d32fd3394d9fe46cdff",
+        "recorded_at": "2026-09-10T05:45:32.221Z"
+      },
+      "verification": {
+        "verifier": "state_architecture",
+        "criteria": [
+          {
+            "id": "T05L-AC1",
+            "status": "FAIL",
+            "evidence": "Current verifier separation, held claims and ordinary M/P/E/H finalization remain enforced, and fix3 now binds initialized submodules recursively to actual M. A normal empty uninitialized submodule directory is misclassified as an unexpected nested Git root during buildCheckoutProof, so integrate-prepare fails for an otherwise valid shared project before its real integration can be checked."
+          },
+          {
+            "id": "T05L-AC2",
+            "status": "PASS",
+            "evidence": "Both current upstream/Codex Execution directions preserve contract and unknown identity fields. Fresh-process pending recovery, exact story-only E, handoff-only H with BASE_COMMIT E, retained findings and unchanged pinned-reader acceptance remain covered; adopted artifact topology, paths, modes and bytes are revalidated."
+          },
+          {
+            "id": "T05L-AC3",
+            "status": "PASS",
+            "evidence": "Large/regulated and persisted standard opt-in reporting policy, exact evidence-derived report/checklist paths, C/source-snapshot/M/manifest/current receipt identities, lens/PASS requirements, escaped retained findings, direct-child P and story-only E remain enforced with coherent-tamper regressions."
+          },
+          {
+            "id": "T05L-AC4",
+            "status": "FAIL",
+            "evidence": "Fix3 resolves nested and deep committed/live scopes through gitlinks and separately proves all initialized modules against expected M, including valid advancement, tracked modes/bytes, ordinary indexes, protected ignored/config/hooks state, and status-suppressed unbound wrong HEAD before adoption and gates. But the optional module detector treats the standard empty uninitialized gitlink directory as an unsafe parent-root checkout, preventing any gate at M for otherwise valid repositories that intentionally leave unrelated submodules uninitialized."
+          },
+          {
+            "id": "T05L-AC5",
+            "status": "PASS",
+            "evidence": "Structured panel receipts still retain exact members, snapshots, verdicts and findings, derive the aggregate, enforce required reporting lenses and preserve no-panel compatibility; handoff output retains source-C and effective-M concerns. Coordinator gates passed 151/151 tests and packaging validation at snapshot 260df67738389280469cf5f365537764a040ddcc9f117d32fd3394d9fe46cdff."
+          }
+        ],
+        "snapshot_hash": "260df67738389280469cf5f365537764a040ddcc9f117d32fd3394d9fe46cdff",
+        "recorded_at": "2026-09-10T05:45:32.625Z"
+      }
+    },
+    {
+      "at": "2026-09-10T10:53:27.721Z",
+      "reason": "user_authorized_review_repair",
+      "details": {
+        "approval_sha256": "8d1ef909fa598aceab81189fb25c927c7fd2b195a46816623f514e817ed19007",
+        "previous_fixes": 4,
+        "authorized_fixes": 5,
+        "scope": "Frozen artifact finalization, historical evidence recovery, panel aggregate consistency"
+      },
+      "gates": [
+        {
+          "provenance": "deliver-runtime-executed-v1",
+          "name": "test",
+          "command": "npm test",
+          "cwd": ".",
+          "environment_keys": [],
+          "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "environment_hash": "5bba4de411fabb8dddf059f48481db133b81a3d15144ac87a9193fe0903e631d",
+          "snapshot_hash": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9",
+          "status": "PASS",
+          "exit_code": 0,
+          "signal": null,
+          "error": null,
+          "log_path": ".deliver/logs/df1605ed-56c6-4ee7-8368-01ede0f3c9c4/test-61aa3a5d-47fc-4810-8750-0a2c0d754844.log",
+          "output": {
+            "stdout_bytes": 13918,
+            "stderr_bytes": 0,
+            "truncated": false
+          },
+          "scope": {
+            "ok": true,
+            "changed": [
+              "plugins/deliver/skills/deliver/SKILL.md",
+              "plugins/deliver/skills/deliver/assets/operations.json",
+              "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
+              "plugins/deliver/skills/deliver/references/compatibility.md",
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+              "plugins/deliver/skills/deliver/scripts/pm.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/operations.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "added": [
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "deleted": [],
+            "renames": [],
+            "out_of_scope": [],
+            "preexisting_dirty_changed": [],
+            "symlink_escapes": [],
+            "git_metadata_changed": false,
+            "ignored_advisory_changed": [],
+            "coordinator_execution_changed": null,
+            "git_metadata_compatibility": null,
+            "contracts_changed": []
+          },
+          "started_at": "2026-09-10T09:38:30.267Z",
+          "finished_at": "2026-09-10T09:42:24.908Z"
+        },
+        {
+          "provenance": "deliver-runtime-executed-v1",
+          "name": "validate",
+          "command": "npm run validate",
+          "cwd": ".",
+          "environment_keys": [],
+          "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "environment_hash": "5bba4de411fabb8dddf059f48481db133b81a3d15144ac87a9193fe0903e631d",
+          "snapshot_hash": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9",
+          "status": "PASS",
+          "exit_code": 0,
+          "signal": null,
+          "error": null,
+          "log_path": ".deliver/logs/df1605ed-56c6-4ee7-8368-01ede0f3c9c4/validate-2095be09-b802-4e25-91e0-3a12675d2986.log",
+          "output": {
+            "stdout_bytes": 150,
+            "stderr_bytes": 0,
+            "truncated": false
+          },
+          "scope": {
+            "ok": true,
+            "changed": [
+              "plugins/deliver/skills/deliver/SKILL.md",
+              "plugins/deliver/skills/deliver/assets/operations.json",
+              "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template",
+              "plugins/deliver/skills/deliver/references/compatibility.md",
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+              "plugins/deliver/skills/deliver/scripts/pm.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/operations.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "added": [
+              "plugins/deliver/skills/deliver/references/shipping.md",
+              "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/reporting.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+              "tests/current-roundtrip.test.mjs",
+              "tests/integration.test.mjs",
+              "tests/reporting.test.mjs",
+              "tests/review-panel.test.mjs"
+            ],
+            "deleted": [],
+            "renames": [],
+            "out_of_scope": [],
+            "preexisting_dirty_changed": [],
+            "symlink_escapes": [],
+            "git_metadata_changed": false,
+            "ignored_advisory_changed": [],
+            "coordinator_execution_changed": null,
+            "git_metadata_compatibility": null,
+            "contracts_changed": []
+          },
+          "started_at": "2026-09-10T09:42:25.164Z",
+          "finished_at": "2026-09-10T09:42:26.542Z"
+        }
+      ],
+      "review": {
+        "status": "FAIL",
+        "findings": [
+          {
+            "severity": "major",
+            "message": "Integration preparation makes the accepted evidence-refresh and conflict-correction routes unreachable. boundManifest throws when the source snapshot's bound live bytes differ from committed C, and prepareLocalIntegration throws when a clean expected M manifest differs from C, labelling both as source correction even though fresh independent M review and distinct verification are the specified resolution for evidence-only drift. expectedMergeTree also throws before persisting any record on a real non-clean composition, so T05C has no validated failure input. Persist whether C evidence is reusable separately from the actual M manifest and permit fresh M evidence when it is not; for a merge-tree conflict, persist a discriminated failure token bound to actual I, finished C, the failed probe and attempt provenance without claiming that M exists.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "Fresh integration gates are not bound to the live bytes or durable logs they claim to test. assertClean trusts porcelain status and write-tree, so assume-unchanged or skip-worktree changes can be invisible while a gate executes bytes different from recorded M; a review reproduction produced empty status and an index tree equal to HEAD while the live bound file contained different content. assertEvidenceReady validates only the receipt's stored log_hash and never reads, type-checks or hashes log_path, so deleted or altered logs still finalize. Re-running a gate filters out the previous same-name receipt, erasing failed evidence rather than retaining gate history. Bind the actual executable worktree to M before and after every gate, validate exact bounded regular log bytes at consumption, and retain prior gate receipts as immutable history.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "The integration record is not confined to its canonical per-source-run path. validateRecord accepts any string id, recordPath interpolates it through path.join, and assertRecordSource never requires record.id === record.source.run_id. Traversal components can therefore normalize outside destination/.deliver/integrations while readIntegrationRecord's equality check still succeeds, after which withRecord locks and rewrites that escaped JSON path. Require the canonical run-id grammar and equality to source.run_id, resolve the expected basename under the real integrations directory, and reject every lexical or realpath escape before locking or mutation.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "P/E/H proofs and their user-visible evidence are not durable after adoption. Adoption clears the only pending parent/path/hash data and later stages trust report.commit, closure.commit and reporting without re-proving their commit topology or deriving reporting from scale and the persisted standard opt-in. A coherent-looking record changed to reporting=skipped or report.commit=M can bypass required P, and handoff preparation trusts an arbitrary recorded closure commit without checking the merged story. The generated report also omits retained panel findings and inserts multiline verifier evidence as raw Markdown, allowing injected headings/check boxes; handoff always states OPEN_FINDINGS: none even when a PASS panel retains unresolved minor CONCERNS. Retain and revalidate adopted parent/tree/mode/path/blob proofs, bind the derived reporting choice, render bounded escaped evidence plus retained findings, and make the handoff's open findings reflect effective evidence.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "A clean initialized submodule inside a task-bound touch/read/spec scope cannot reach adopted M. The committed manifest encodes its gitlink as `gitlink:<oid>` at integration.mjs:108-123, while scope.snapshot encodes the same clean checkout as `gitlink:<oid>:<nested-git-meta>` and adds nested entries at scope.mjs:309-321. snapshotManifest carries those incompatible live entries into executableProof, which therefore rejects exact clean M at integration.mjs:97-105. A temporary repository probe reproduced these two shapes for the same gitlink. In addition, protectedShape compares nested HEAD/tree/index at I with M, so a legitimate gitlink update would remain rejected even after normalizing the manifest. Define one comparable committed/live gitlink identity, validate the initialized checkout against M's gitlink while retaining recursive dirty/index/metadata protection, and add an initialized scoped-submodule integration regression.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "minor",
+            "message": "When bound drift requires a fresh M review, handoff OPEN_FINDINGS considers only that effective M review. An unresolved minor retained in the source C review can therefore remain listed as open in the deterministic report while H says `OPEN_FINDINGS: none` if the fresh M receipt omits it. Preserve or explicitly resolve retained source concerns consistently across the report and handoff.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "Fix2 handles a task scope equal to an initialized gitlink, but exact recursive M identity remains incomplete in two supported cases. First, a scope inside a submodule such as vendor/dependency/value.txt is valid under the task/scope contracts, yet superproject `git ls-tree -r ... -- <nested-path>` returns no entry; committedEntries records null while scope.snapshot resolves the parent gitlink and nested file, so executableProof rejects exact M. Second, protectedShape now drops nested HEAD/tree/index for every submodule while normalizeSnapshotGitlinks checks only gitlinks present in the bound manifest. A status-suppressed unbound submodule can therefore execute bytes different from M: a temporary repository with tracked `submodule.*.ignore=all` had empty root porcelain and index tree equal to HEAD while its live submodule HEAD differed from the recorded gitlink, a state the current adoption proof does not reject. Resolve gitlink ancestors for nested scopes and separately prove every initialized submodule checkout recursively against M, allowing only the legitimate I-to-M gitlink changes while retaining dirt, hidden-index and protected-metadata checks.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "The new whole-checkout proof rejects a normal tracked but uninitialized submodule, blocking integration even when that submodule is unrelated to the task. A fresh Git clone represents an uninitialized gitlink as an empty directory; `git -C <empty-directory> rev-parse --show-toplevel` discovers the parent superproject. moduleRoot(...,{required:false}) checks that reported root after only treating a thrown Git command on an empty directory as uninitialized, so it emits `submodule checkout has an unexpected Git root` instead of returning null. buildCheckoutProof calls this for every expected/current gitlink, making integrate-prepare unusable until every submodule is initialized. A temporary clone reproduced the exact empty directory and parent-root result. Treat a canonical empty optional gitlink directory as uninitialized while continuing to reject nonempty, symlinked, escaping and malformed roots, and add an unrelated-uninitialized-submodule preparation regression.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "block",
+            "message": "Adopted P/E/H proofs depend on mutable live evidence. validateAdoptedArtifact re-runs validateArtifactPending, which requires evidence.finalized and recomputes each gate environment hash from the current process. A post-P gate can succeed at M and clear finalization, after which the adopted P proof prevents every command, while a fresh process with only TERM_SESSION_ID changed cannot close or rerun a gate. Bind artifacts to a frozen finalization identity and refuse evidence mutation after artifact preparation/adoption.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": false
+          },
+          {
+            "severity": "major",
+            "message": "An existing prepared integration record cannot be superseded when its base I moves, and a failed record is returned forever even when the actual integration tip changes. The accepted recovery contract requires a new preparation at actual I while retaining the previous attempt. Add a bounded hash/token/revision checked reprepare operation that archives the old preparation and refuses adopted or actively correcting records.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+            "resolved": false
+          },
+          {
+            "severity": "minor",
+            "message": "Panel receipt parsing validates but discards top-level findings without requiring them to equal the member-derived aggregate. An unresolved top-level major with PASS members is accepted and returned as findings:[]. Require an exact normalized aggregate or an explicitly empty top-level array.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/review.mjs",
+            "resolved": false
+          }
+        ],
+        "summary": "T05L is now FAIL at frozen snapshot 10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9 after the requested independent Claude review exposed a reproduced post-P/fresh-process deadlock. The prior eight native findings remain resolved, and coordinator gates passed 153/153 plus validation, but those tests do not cover volatile resume environments or evidence mutation after P. A stale integration-base reprepare gap and a minor panel aggregate inconsistency also remain open.",
+        "builder": "t01_builder",
+        "reviewer": "state_architecture",
+        "snapshot_hash": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9",
+        "recorded_at": "2026-09-10T10:12:54.337Z"
+      },
+      "verification": {
+        "verifier": "state_architecture",
+        "criteria": [
+          {
+            "id": "T05L-AC1",
+            "status": "PASS",
+            "evidence": "The held-claim, distinct-verifier and verified-M safety checks remain enforced; no path was found that records merged without the required evidence."
+          },
+          {
+            "id": "T05L-AC2",
+            "status": "FAIL",
+            "evidence": "A P-adopted record cannot resume in a process with changed TERM_SESSION_ID: close-prepare and integrate-gate both fail pre-mutation because stored gate environment provenance is compared with the new process. A moved prepared I also has no retained reprepare operation."
+          },
+          {
+            "id": "T05L-AC3",
+            "status": "FAIL",
+            "evidence": "After adopted report P, a gate rerun at M succeeds and clears evidence.finalized; the adopted P proof then requires that cleared live finalization and blocks close-prepare and every recovery mutation, so mandatory P->E->H cannot complete."
+          },
+          {
+            "id": "T05L-AC4",
+            "status": "PASS",
+            "evidence": "Exact actual-M gates, C/source/M manifests, fresh M review and verification, durable logs/history and recursive checkout proofs remain implemented. The new blocker concerns evidence/artifact lifecycle after M finalization."
+          },
+          {
+            "id": "T05L-AC5",
+            "status": "FAIL",
+            "evidence": "Member identities, verdicts and findings are retained when correctly placed, but a panel receipt with an unresolved top-level major and PASS members is accepted and returned with no findings; aggregate consistency is not enforced."
+          }
+        ],
+        "snapshot_hash": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9",
+        "recorded_at": "2026-09-10T10:12:54.754Z"
+      }
+    }
+  ],
+  "checkpoints": [],
+  "counters": {
+    "retries": 1,
+    "fixes": 5,
+    "corrections": 0
+  },
+  "events": [
+    {
+      "at": "2026-09-10T02:09:34.122Z",
+      "type": "initialized",
+      "mode": "managed",
+      "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+    },
+    {
+      "at": "2026-09-10T02:09:34.190Z",
+      "type": "approved",
+      "approver": "Ben",
+      "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+    },
+    {
+      "at": "2026-09-10T02:09:34.445Z",
+      "type": "baseline_captured",
+      "snapshot_hash": "557ab5fbd1cc95784b2eca820cd8cea8fae5fe4c7096a24de8eef6685a9b8fc4",
+      "dirty_paths": []
+    },
+    {
+      "at": "2026-09-10T02:20:39.074Z",
+      "type": "correct_course",
+      "kind": "retry",
+      "reason": "Native host selected model at capacity; resume same builder/model and preserve any partial work.",
+      "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+    },
+    {
+      "at": "2026-09-10T03:19:18.384Z",
+      "type": "gate_executed",
+      "name": "test",
+      "status": "PASS",
+      "snapshot_hash": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3"
+    },
+    {
+      "at": "2026-09-10T03:19:19.943Z",
+      "type": "gate_executed",
+      "name": "validate",
+      "status": "PASS",
+      "snapshot_hash": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3"
+    },
+    {
+      "at": "2026-09-10T03:54:06.149Z",
+      "type": "review_recorded",
+      "reviewer": "state_architecture",
+      "status": "FAIL",
+      "snapshot_hash": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3"
+    },
+    {
+      "at": "2026-09-10T03:54:06.554Z",
+      "type": "verification_recorded",
+      "verifier": "state_architecture",
+      "snapshot_hash": "663ffe1c969685eda5099a27886cf22daa175668c6a22de9f53e70f386e3a9d3"
+    },
+    {
+      "at": "2026-09-10T03:54:06.793Z",
+      "type": "correct_course",
+      "kind": "fix",
+      "reason": "Independent T05L review: support fresh M evidence and durable no-M failure; bind live gates/logs/history; canonicalize records; retain/revalidate P/E/H/reporting and honest escaped findings.",
+      "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+    },
+    {
+      "at": "2026-09-10T04:25:01.932Z",
+      "type": "gate_executed",
+      "name": "test",
+      "status": "PASS",
+      "snapshot_hash": "477c3fb8d6ae901dc3c6160406acab0834ab7123c3c65a9b7c8cffbf499dab92"
+    },
+    {
+      "at": "2026-09-10T04:25:03.546Z",
+      "type": "gate_executed",
+      "name": "validate",
+      "status": "PASS",
+      "snapshot_hash": "477c3fb8d6ae901dc3c6160406acab0834ab7123c3c65a9b7c8cffbf499dab92"
+    },
+    {
+      "at": "2026-09-10T04:41:28.507Z",
+      "type": "review_recorded",
+      "reviewer": "state_architecture",
+      "status": "FAIL",
+      "snapshot_hash": "477c3fb8d6ae901dc3c6160406acab0834ab7123c3c65a9b7c8cffbf499dab92"
+    },
+    {
+      "at": "2026-09-10T04:41:28.903Z",
+      "type": "verification_recorded",
+      "verifier": "state_architecture",
+      "snapshot_hash": "477c3fb8d6ae901dc3c6160406acab0834ab7123c3c65a9b7c8cffbf499dab92"
+    },
+    {
+      "at": "2026-09-10T04:41:29.134Z",
+      "type": "correct_course",
+      "kind": "fix",
+      "reason": "Review round2: normalize committed/live scoped gitlinks and allow proven I-to-M gitlink advancement while retaining recursive cleanliness and metadata checks; preserve unresolved source concerns consistently in report and handoff.",
+      "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+    },
+    {
+      "at": "2026-09-10T04:56:25.229Z",
+      "type": "gate_executed",
+      "name": "test",
+      "status": "PASS",
+      "snapshot_hash": "1475f6e6676d9b95fe255e0e2d6500fbdf1a6fc6f24f1315be8bc4ae0248a315"
+    },
+    {
+      "at": "2026-09-10T04:56:26.822Z",
+      "type": "gate_executed",
+      "name": "validate",
+      "status": "PASS",
+      "snapshot_hash": "1475f6e6676d9b95fe255e0e2d6500fbdf1a6fc6f24f1315be8bc4ae0248a315"
+    },
+    {
+      "at": "2026-09-10T05:04:05.768Z",
+      "type": "review_recorded",
+      "reviewer": "state_architecture",
+      "status": "FAIL",
+      "snapshot_hash": "1475f6e6676d9b95fe255e0e2d6500fbdf1a6fc6f24f1315be8bc4ae0248a315"
+    },
+    {
+      "at": "2026-09-10T05:04:06.167Z",
+      "type": "verification_recorded",
+      "verifier": "state_architecture",
+      "snapshot_hash": "1475f6e6676d9b95fe255e0e2d6500fbdf1a6fc6f24f1315be8bc4ae0248a315"
+    },
+    {
+      "at": "2026-09-10T05:04:06.396Z",
+      "type": "correct_course",
+      "kind": "fix",
+      "reason": "Review round3: recursively resolve committed nested submodule scopes and separately prove every initialized submodule checkout against actual M regardless of bound scope or status suppression; preserve metadata and dirty/index checks.",
+      "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+    },
+    {
+      "at": "2026-09-10T05:38:47.980Z",
+      "type": "gate_executed",
+      "name": "test",
+      "status": "PASS",
+      "snapshot_hash": "260df67738389280469cf5f365537764a040ddcc9f117d32fd3394d9fe46cdff"
+    },
+    {
+      "at": "2026-09-10T05:38:49.556Z",
+      "type": "gate_executed",
+      "name": "validate",
+      "status": "PASS",
+      "snapshot_hash": "260df67738389280469cf5f365537764a040ddcc9f117d32fd3394d9fe46cdff"
+    },
+    {
+      "at": "2026-09-10T05:45:32.221Z",
+      "type": "review_recorded",
+      "reviewer": "state_architecture",
+      "status": "FAIL",
+      "snapshot_hash": "260df67738389280469cf5f365537764a040ddcc9f117d32fd3394d9fe46cdff"
+    },
+    {
+      "at": "2026-09-10T05:45:32.625Z",
+      "type": "verification_recorded",
+      "verifier": "state_architecture",
+      "snapshot_hash": "260df67738389280469cf5f365537764a040ddcc9f117d32fd3394d9fe46cdff"
+    },
+    {
+      "at": "2026-09-10T09:31:52.914Z",
+      "type": "user_authorized_extra_fix",
+      "kind": "fix",
+      "reason": "Explicit user-approved fourth fix for the recorded uninitialized submodule defect",
+      "approval_path": ".deliver/T05L-extra-fix-approval.json",
+      "approval_hash": "458f8eee34fa9abeade430b1d7e2b6bfdec23e24c1245352e05d74a96f372416",
+      "previous_fixes": 3,
+      "authorized_fixes": 4
+    },
+    {
+      "at": "2026-09-10T09:42:24.908Z",
+      "type": "gate_executed",
+      "name": "test",
+      "status": "PASS",
+      "snapshot_hash": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9"
+    },
+    {
+      "at": "2026-09-10T09:42:26.542Z",
+      "type": "gate_executed",
+      "name": "validate",
+      "status": "PASS",
+      "snapshot_hash": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9"
+    },
+    {
+      "at": "2026-09-10T09:48:45.448Z",
+      "type": "review_recorded",
+      "reviewer": "state_architecture",
+      "status": "PASS",
+      "snapshot_hash": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9"
+    },
+    {
+      "at": "2026-09-10T09:48:45.861Z",
+      "type": "verification_recorded",
+      "verifier": "state_architecture",
+      "snapshot_hash": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9"
+    },
+    {
+      "at": "2026-09-10T10:12:54.337Z",
+      "type": "review_recorded",
+      "reviewer": "state_architecture",
+      "status": "FAIL",
+      "snapshot_hash": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9"
+    },
+    {
+      "at": "2026-09-10T10:12:54.754Z",
+      "type": "verification_recorded",
+      "verifier": "state_architecture",
+      "snapshot_hash": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9"
+    },
+    {
+      "at": "2026-09-10T10:53:27.722Z",
+      "type": "user_authorized_extra_fix",
+      "previous_fixes": 4,
+      "spent_fixes": 5,
+      "approval_sha256": "8d1ef909fa598aceab81189fb25c927c7fd2b195a46816623f514e817ed19007",
+      "builder": "benchmark_builder",
+      "original_baseline_hash": "557ab5fbd1cc95784b2eca820cd8cea8fae5fe4c7096a24de8eef6685a9b8fc4"
+    },
+    {
+      "at": "2026-09-10T11:35:34.949Z",
+      "type": "gate_executed",
+      "name": "test",
+      "status": "PASS",
+      "snapshot_hash": "f74deb232127a910f84a997b17fee8e250bca37d9be7b321f761d144900280ab"
+    },
+    {
+      "at": "2026-09-10T11:35:36.512Z",
+      "type": "gate_executed",
+      "name": "validate",
+      "status": "PASS",
+      "snapshot_hash": "f74deb232127a910f84a997b17fee8e250bca37d9be7b321f761d144900280ab"
+    },
+    {
+      "at": "2026-09-10T11:47:24.424Z",
+      "type": "review_recorded",
+      "reviewer": "state_architecture",
+      "status": "FAIL",
+      "snapshot_hash": "f74deb232127a910f84a997b17fee8e250bca37d9be7b321f761d144900280ab"
+    },
+    {
+      "at": "2026-09-10T11:47:24.829Z",
+      "type": "verification_recorded",
+      "verifier": "state_architecture",
+      "snapshot_hash": "f74deb232127a910f84a997b17fee8e250bca37d9be7b321f761d144900280ab"
+    }
+  ],
+  "pm_binding": null,
+  "contracts": null,
+  "builder_history": [
+    {
+      "builder": "t01_builder",
+      "until_revision": 29,
+      "reason": "Authorized bounded repair reassignment; original source authorship retained"
+    }
+  ]
+}

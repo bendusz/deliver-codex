@@ -1,0 +1,39 @@
+<!-- Generated deterministically at P as docs/verification/<story-id>.md. -->
+# Verification: <story-id>
+
+- Story: docs/stories/<story-file>.md
+- Candidate C: <full source candidate commit>
+- Source snapshot: <source snapshot SHA-256>
+- Integrated M: <full integration commit>
+- Manifest: <bound C/M manifest SHA-256>
+- Gate receipts: <immutable receipt identities or none declared>
+- Review receipt: <immutable receipt identity>
+- Verification receipt: <immutable receipt identity>
+
+## Gates
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| <declared name> | `<exact declared command>` | PASS |
+
+## Review panel
+
+| Lens | Reviewer | Verdict |
+| --- | --- | --- |
+| code-integrity-reviewer | <identity> | PASS |
+
+## Retained findings
+
+| Evidence | Lens | Reviewer | Status | Finding |
+| --- | --- | --- | --- | --- |
+| Source C or effective M | <lens> | <identity> | minor / open | <escaped single-line finding> |
+
+## Acceptance verification
+
+| Criterion | Result | Evidence |
+| --- | --- | --- |
+| <criterion-id> | PASS | <escaped single-line current evidence> |
+
+## Integration status
+
+Integrated at M <full integration commit>. This report does not identify its own commit P.

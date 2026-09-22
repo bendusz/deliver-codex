@@ -1,0 +1,29 @@
+{
+  "criteria": [
+    {
+      "id": "T05L-AC1",
+      "status": "FAIL",
+      "evidence": "Current verifier separation, held claim, ordinary-file M/P/E/H evidence and durable adoption proofs remain enforced. Fix2 proves a clean initialized root-scoped gitlink can advance and reach M. A valid scope below a gitlink still cannot be represented by committedEntries, and a status-suppressed unbound initialized submodule can differ from M without failing adoption, so merged Execution is not yet conditioned on exact whole-checkout integration evidence in all supported repositories."
+    },
+    {
+      "id": "T05L-AC2",
+      "status": "PASS",
+      "evidence": "The unchanged pinned reader accepts the generated merged Execution and handoff-only H with BASE_COMMIT E; both current boundary directions preserve contract and unknown identity fields, fresh-process recovery is exercised, and retained E/H topology, paths, modes and bytes are revalidated from Git objects."
+    },
+    {
+      "id": "T05L-AC3",
+      "status": "PASS",
+      "evidence": "Derived large/regulated and standard opt-in reporting policy, exact deterministic report/checklist paths, C/source-snapshot/M/manifest/receipt identities, required lenses, escaped evidence, retained findings, direct-child P and story-only E remain enforced and covered by normal and coherent-tamper tests."
+    },
+    {
+      "id": "T05L-AC4",
+      "status": "FAIL",
+      "evidence": "Separate C/source-snapshot/M manifests, fresh M review plus distinct verification for evidence-only drift, honest no-M records, exact gate logs/history and before/after live-M checks remain implemented. Fix2 validates root-scoped gitlink advancement and bound nested dirt/index/config rejection. It still cannot resolve a declared nested submodule path into its committed ancestor gitlink, and it no longer compares unbound nested HEAD/tree/index while status can be suppressed, so declared gates may execute a checkout different from actual M."
+    },
+    {
+      "id": "T05L-AC5",
+      "status": "PASS",
+      "evidence": "Structured panel parsing still binds exact member identities, verdicts, snapshots and findings, derives the aggregate, enforces reporting lens coverage, and preserves no-panel standalone compatibility. Fix2 additionally renders both retained source-C and effective-M open concerns in H. Coordinator gates passed 148/148 tests and packaging validation at snapshot 1475f6e6676d9b95fe255e0e2d6500fbdf1a6fc6f24f1315be8bc4ae0248a315."
+    }
+  ]
+}

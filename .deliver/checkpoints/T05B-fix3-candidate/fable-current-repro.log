@@ -1,0 +1,11 @@
+{"reproduced":"pending-check merge leaves executing and cannot resume when checks become ready","error":"invalid remote publication evidence: source merge unresolved attempt has effect","state":"PENDING"}
+{"reproduced":"queued merge completed by provider cannot record source proof","error":"invalid remote publication evidence: source proof binding"}
+✔ Fable current-source reproduction: pending checks and queued merge durable-state failures (10823.539375ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10919.258833

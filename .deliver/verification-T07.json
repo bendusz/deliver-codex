@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T07-AC1",
+      "status": "PASS",
+      "evidence": "Independent inspection and tests verify located deterministic findings for clarification, FR/AC plan/story coverage, dependency errors and cycles, overlapping parallel scope, malformed/missing commands and gates, mandatory declared lenses, approval drift, malformed stories and missing/invalid required preimplementation artifacts. Input uncertainty remains UNKNOWN and semantic risk/architecture candidates remain judgment-required rather than factual PASS claims."
+    },
+    {
+      "id": "T07-AC2",
+      "status": "PASS",
+      "evidence": "The analyzer is bounded and read-only, separates factual findings from explicit semantic prompts, and exports story-scoped claim readiness identities. Corrected analysis binds constitution, exact phase checklist paths, SpecDD bootstrap and every exact strict-parser-declared .sdd file; changed contract bytes change content and analysis identities, missing files block, and nonregular inputs become UNKNOWN. A targeted independent complete large fixture reached factual CLEAR/REVIEW_REQUIRED, while the missing-prerequisite fixture is BLOCKED without demanding completion evidence. Runtime claim wiring is correctly deferred to T08."
+    },
+    {
+      "id": "T07-AC3",
+      "status": "PASS",
+      "evidence": "Four installed checklist templates remain unchecked evidence contracts with fixed destinations, concrete evidence fields and remediation/UNKNOWN guidance. Governance now documents phase-appropriate large/regulated checklist and contract inventory, exact content identity, no wildcard discovery or installation, read-only behavior, and the rule that file or checkbox presence is not semantic PASS. Coordinator npm test and npm run validate passed at frozen snapshot 823d14c5c7a5566376e2fc3ad2adef00bb3b38bce6cb9927372eef261aee9949 with no scope drift."
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "version": "frozen-candidate-v1",
+  "task": "T05B",
+  "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "snapshot": "89d174d040b90ceeb474576fc53939086084ecbd1466be08f0653a51c13fac1d",
+  "worktree": "/Users/ben/code/pm-skill-codex-worktrees/t05b-delivery",
+  "base": "7c1b68e38497c83f54a693d556ca7af359e42c14",
+  "files": {
+    "plugins/deliver/skills/deliver/scripts/lib/integration.mjs": "7afb45831123a43e55b0f64d52d64cfa16a1c5a9513616dd0dcd867b36b088f7",
+    "plugins/deliver/skills/deliver/scripts/lib/remote.mjs": "ba21914d8a131532ec38c66e40948621da9d81452449024d59ba5a837a10ea89",
+    "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs": "bbb00a23de22193170e0af0e03fac66f108b44f7e5e95aadb0759381b1baaef1",
+    "plugins/deliver/skills/deliver/scripts/pm.mjs": "22bb33abee9deedbe9a8c5fa6fb6825f652b6c2be026f72229d7cde100920a09",
+    "plugins/deliver/skills/deliver/references/shipping.md": "d40f652ec585050a98d30683d22d8142fbf2c5add24fbd7eadce2d16b7ab1d99",
+    "plugins/deliver/skills/deliver/references/compatibility.md": "746031f8813b689994d4c6d7abeca6625676fa8ceed240e1b2522bc945636b58",
+    "tests/remote.test.mjs": "8b3f797e85fdbaeadad3a457232050d156d0bbaadbd02cbba3173d394af40d82",
+    "tests/remote-lifecycle.test.mjs": "ba632cd811d9b678c3824c57e21b833ed75126b1ef1c70d3be006b76b3fcaaa5",
+    "tests/current-roundtrip.test.mjs": "250a9606d526bd156095a264458c296d089eb5dc747f6e6f997789b8666122f3",
+    "tests/operations.test.mjs": "dde1af29f017b8816b77eb8e9211aff873bcde984b469f6aabaf3d273e6dc3f8"
+  },
+  "new_test": ".deliver/checkpoints/T05B-tests/tests/remote-lifecycle.test.mjs",
+  "patch_sha256": "3568305f722f584532f9915f1816a3b98e391e1a75ada41cf62f7774bcc5ea01",
+  "status": "Frozen; full gates/review/distinct verification pending",
+  "builder": "/root/recover_t05c",
+  "test_author": "/root/correction_regressions",
+  "builder_reported_final_focus": {
+    "command": "node --test --test-name-pattern='proved premerge head or base drift' tests/remote-lifecycle.test.mjs",
+    "pass": 4,
+    "fail": 0,
+    "duration_seconds": 42.5
+  },
+  "scope_check": "PASS",
+  "counters": {
+    "retries": 0,
+    "fixes": 0,
+    "corrections": 0
+  }
+}

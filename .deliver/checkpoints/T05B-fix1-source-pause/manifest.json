@@ -1,0 +1,32 @@
+{
+  "task": "T05B",
+  "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "status": "Unaccepted partial repair paused for independent regression additions; no full gates or final review",
+  "snapshot": "45feb36bb616c473c2a2443bee48dd3f2bb4ed68d78983960f397a761fb7f8a9",
+  "files": {
+    "plugins/deliver/skills/deliver/SKILL.md": "d2f5aa3004648eac530b9cafae75c4e3a68f4614ab576a6d84d1946aa588fd9e",
+    "plugins/deliver/skills/deliver/assets/operations.json": "b3a23ed104859f4c56e154e9a459d6180799f901383a545bb42684c498a04623",
+    "plugins/deliver/skills/deliver/references/compatibility.md": "746031f8813b689994d4c6d7abeca6625676fa8ceed240e1b2522bc945636b58",
+    "plugins/deliver/skills/deliver/references/shipping.md": "d40f652ec585050a98d30683d22d8142fbf2c5add24fbd7eadce2d16b7ab1d99",
+    "plugins/deliver/skills/deliver/scripts/deliver.mjs": "438c242de87b79d7261eaa7ea9db73f0530dece4bfed3b0df4574ffdd02a2905",
+    "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs": "07ea55559cdbfdc1c5bdcd6f3fa962cac385bf02ffb32e05ce3d7067e1623e7b",
+    "plugins/deliver/skills/deliver/scripts/lib/integration.mjs": "f96cb2122728cfbeb8d9269fb32898aa07e9c4f9f3121604ff09142003c4a08a",
+    "plugins/deliver/skills/deliver/scripts/lib/remote.mjs": "ba21914d8a131532ec38c66e40948621da9d81452449024d59ba5a837a10ea89",
+    "plugins/deliver/skills/deliver/scripts/lib/state.mjs": "555627931d833313c16e4564d112496f4501e717692ca56d2dc34e481a7ee3e5",
+    "plugins/deliver/skills/deliver/scripts/pm.mjs": "22bb33abee9deedbe9a8c5fa6fb6825f652b6c2be026f72229d7cde100920a09",
+    "tests/current-roundtrip.test.mjs": "453327ad0a522e122ae3a39ab91564aababf3cd5425d007e2475ecc47175b0d6",
+    "tests/operations.test.mjs": "dde1af29f017b8816b77eb8e9211aff873bcde984b469f6aabaf3d273e6dc3f8",
+    "tests/remote-lifecycle.test.mjs": "d067eec0121a02e9dbfc52cd5ff942d4576defebd75f05038095f25c9f9e5424",
+    "tests/remote.test.mjs": "8b3f797e85fdbaeadad3a457232050d156d0bbaadbd02cbba3173d394af40d82"
+  },
+  "counters": {
+    "retries": 0,
+    "fixes": 1,
+    "corrections": 0
+  },
+  "builder": "/root/recover_t05c",
+  "builder_report": "Paused production/docs writes and further tests. The already-running native lifecycle group completed before pause: 5/5 PASS in 71.4s, including finalization tamper refusals, fresh closure publish/merge interruption recovery, pre-E refusal, terminal-chain admission negatives and normal completion. Earlier focused results: syntax 3/3 PASS; claim race 1/1 PASS; rebase group 5/5 PASS; provider interruption 5/5 PASS. I will remain read-only until the expanded tests are reviewed, frozen and released.",
+  "report_qualification": "Exact agent-reported focused results, not coordinator-run formal gates.",
+  "patch_sha256": "f2bf1cccee450309491454d38be602180a790cc44caeef54c76ddd2004a3b1d1",
+  "new_test_source": ".deliver/checkpoints/T05B-fix1-tests/tests/remote-lifecycle.test.mjs"
+}

@@ -1,41 +1,209 @@
 #!/usr/bin/env node
+import fs from 'node:fs';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { DeliverError } from './lib/state.mjs';
 import { gitRoot, snapshot } from './lib/scope.mjs';
 import { initializePm, readPm, approvePm, claimPm, completePm, recoverPm, pmActorId } from './lib/pm.mjs';
+import { detectProjectFormat, inspectProjectState } from './lib/project-state.mjs';
+import {
+  approveCurrentPm,
+  assertCurrentPmReady,
+  claimCurrentPm,
+  initializeCurrentPm,
+  recoverCurrentPm,
+  revokeCurrentPm,
+} from './lib/current-pm.mjs';
+import { recoverExecutionTransition, transitionCurrentExecution } from './lib/transitions.mjs';
+import {
+  adoptIntegrationHandoff,
+  adoptLocalIntegration,
+  adoptStoryClosure,
+  adoptVerificationReport,
+  finalizeIntegrationEvidence,
+  prepareIntegrationHandoff,
+  prepareIntegrationCorrection,
+  prepareLocalIntegration,
+  prepareStoryClosure,
+  prepareVerificationReport,
+  reconcileIntegrationEvidence,
+  recordIntegrationReview,
+  recordIntegrationVerification,
+  runIntegrationGate,
+  recoverIntegrationCorrectionStart,
+} from './lib/integration.mjs';
 
-const help = `Shared Deliver project state (upstream 0.22.0)
-  pm.mjs init [--name PROJECT]
+const help = `Shared Deliver project state
+  pm.mjs init [--name PROJECT] [--format current|legacy]
   pm.mjs status
   pm.mjs actor-id
   pm.mjs approve --approver ACTUAL_USER
+  pm.mjs revoke [--reason TEXT]
   pm.mjs claim --story docs/stories/S1-1-example.md [--branch pm/S1-1-example]
+  pm.mjs transition --run RUN --to building|built|in-review|blocked [--attempt fix|retry] [--reason TEXT]
+  pm.mjs integrate-prepare --run RUN [--verification-report]
+  pm.mjs integrate-adopt --integration FILE --expected-record HASH --token TOKEN --commit SHA
+  pm.mjs integrate-gate --integration FILE --expected-record HASH --name GATE
+  pm.mjs integrate-review --integration FILE --expected-record HASH --reviewer ID --receipt JSON
+  pm.mjs integrate-verify --integration FILE --expected-record HASH --verifier ID --results JSON
+  pm.mjs integrate-finalize --integration FILE --expected-record HASH
+  pm.mjs integrate-reconcile --integration FILE --expected-record HASH
+  pm.mjs correction-prepare --run RUN --integration FILE --expected-record HASH
+  pm.mjs report-prepare|close-prepare --integration FILE --expected-record HASH
+  pm.mjs report-adopt|close-adopt --integration FILE --expected-record HASH --token TOKEN --commit SHA
+  pm.mjs handoff-prepare --integration FILE --expected-record HASH [--next TEXT]
+  pm.mjs handoff-adopt --integration FILE --expected-record HASH --token TOKEN --commit SHA
   pm.mjs complete --run UUID --commit FULL_INTEGRATION_SHA --next "Next ready story or decision"
   pm.mjs recover
 
 Run in the project checkout. These commands never commit, merge, push or execute a model.
+The explicit integrate-gate command executes only a gate declared by the finished source task.
 Complete records a verified, committed story boundary, not an unmerged implementation.
 Recover completes an interrupted journal only when every file matches its before/after image.
 `;
+
+function durableCurrentMarker(root) {
+  if (fs.existsSync(path.join(root, 'docs', 'approval.json'))) return true;
+  for (const args of [
+    ['ls-files', '--error-unmatch', '--', 'docs/approval.json'],
+    ['cat-file', '-e', 'HEAD:docs/approval.json'],
+  ]) {
+    try {
+      execFileSync('git', ['-C', root, ...args], { stdio: 'ignore', timeout: 5000 });
+      return true;
+    } catch {}
+  }
+  return false;
+}
 try {
   const [command = 'help', ...rest] = process.argv.slice(2);
   if (['help', '--help', '-h'].includes(command)) process.stdout.write(help);
   else {
-    const allowed = { init: ['--name'], status: [], 'actor-id': [], approve: ['--approver'], claim: ['--story', '--branch'], complete: ['--run', '--commit', '--next'], recover: [] };
+    const allowed = {
+      init: ['--name', '--format'], status: [], 'actor-id': [], approve: ['--approver'], revoke: ['--reason'], claim: ['--story', '--branch'],
+      transition: ['--run', '--to', '--attempt', '--reason', '--expected-revision'], complete: ['--run', '--commit', '--next'], recover: [],
+      'integrate-prepare': ['--run', '--verification-report'], 'integrate-adopt': ['--integration', '--expected-record', '--token', '--commit'],
+      'integrate-gate': ['--integration', '--expected-record', '--name'], 'integrate-review': ['--integration', '--expected-record', '--reviewer', '--receipt'],
+      'integrate-verify': ['--integration', '--expected-record', '--verifier', '--results'], 'integrate-finalize': ['--integration', '--expected-record'],
+      'integrate-reconcile': ['--integration', '--expected-record'],
+      'correction-prepare': ['--run', '--integration', '--expected-record'],
+      'report-prepare': ['--integration', '--expected-record'], 'report-adopt': ['--integration', '--expected-record', '--token', '--commit'],
+      'close-prepare': ['--integration', '--expected-record'], 'close-adopt': ['--integration', '--expected-record', '--token', '--commit'],
+      'handoff-prepare': ['--integration', '--expected-record', '--next'], 'handoff-adopt': ['--integration', '--expected-record', '--token', '--commit'],
+    };
     if (!Object.hasOwn(allowed, command)) throw new DeliverError('unknown shared PM command', 64);
     const options = {};
-    for (let i = 0; i < rest.length; i += 2) {
-      if (!allowed[command].includes(rest[i]) || !rest[i + 1] || Object.hasOwn(options, rest[i])) throw new DeliverError('unknown, duplicate or missing PM option', 64);
-      options[rest[i]] = rest[i + 1];
+    for (let i = 0; i < rest.length;) {
+      const flag = rest[i++];
+      if (!allowed[command].includes(flag) || Object.hasOwn(options, flag)) throw new DeliverError('unknown, duplicate or missing PM option', 64);
+      if (flag === '--verification-report') options[flag] = true;
+      else {
+        if (!rest[i]) throw new DeliverError('unknown, duplicate or missing PM option', 64);
+        options[flag] = rest[i++];
+      }
     }
     const root = gitRoot(process.cwd());
+    const format = detectProjectFormat(root);
     let result;
-    if (command === 'init') result = initializePm(root, options['--name']);
-    else if (command === 'status') { const shared = readPm(root); result = { managed: Boolean(shared), ...shared }; }
+    if (command === 'init') {
+      const requested = options['--format'];
+      if (requested !== undefined && !['current', 'legacy'].includes(requested)) throw new DeliverError('--format must be current or legacy', 64);
+      if (format === 'legacy' && requested === 'current') throw new DeliverError('explicit migration is required before converting a legacy project to current format', 66);
+      if (format === 'current' && requested === 'legacy') {
+        const current = inspectProjectState(root, { actorId: null });
+        const executionEvidence = current?.stories.some((story) => story.execution !== null);
+        if (durableCurrentMarker(root) || executionEvidence) throw new DeliverError('current projects cannot initialize legacy state alongside current artifacts', 66);
+      }
+      const selected = requested || (format === 'legacy' ? 'legacy' : 'current');
+      result = selected === 'legacy' ? initializePm(root, options['--name']) : initializeCurrentPm(root, options['--name']);
+    }
+    else if (command === 'status') {
+      assertCurrentPmReady(root);
+      if (format === 'current') result = inspectProjectState(root);
+      else {
+        const shared = readPm(root);
+        result = { managed: Boolean(shared), ...shared };
+      }
+    }
     else if (command === 'actor-id') result = { actor: pmActorId(root) };
-    else if (command === 'approve') result = approvePm(root, options['--approver']);
-    else if (command === 'claim') result = claimPm(root, options['--story'], options['--branch']);
-    else if (command === 'complete') result = completePm(root, options['--run'], options['--commit'], options['--next'], snapshot);
-    else result = recoverPm(root);
+    else if (command === 'approve') result = format === 'current'
+      ? approveCurrentPm(root, options['--approver']) : approvePm(root, options['--approver']);
+    else if (command === 'revoke') {
+      if (format !== 'current') throw new DeliverError('revoke is available for current-format projects', 66);
+      result = revokeCurrentPm(root, options['--reason']);
+    }
+    else if (command === 'claim') result = format === 'current'
+      ? claimCurrentPm(root, options['--story'], options['--branch']) : claimPm(root, options['--story'], options['--branch']);
+    else if (command === 'transition') {
+      if (format !== 'current') throw new DeliverError('Execution transitions require a current-format project', 66);
+      const revision = options['--expected-revision'];
+      if (revision !== undefined && !/^(0|[1-9][0-9]*)$/.test(revision)) throw new DeliverError('--expected-revision must be a non-negative integer', 64);
+      const transitioned = transitionCurrentExecution(options['--run'], {
+        to: options['--to'], attempt: options['--attempt'], reason: options['--reason'],
+        expectedRevision: revision === undefined ? undefined : Number(revision),
+      }, root);
+      result = {
+        run_id: transitioned.state.run_id,
+        revision: transitioned.state.revision,
+        story: transitioned.state.pm_binding.story,
+        status: transitioned.execution.status,
+        rounds: transitioned.execution.rounds,
+        retries: transitioned.execution.retries,
+        noop: transitioned.noop,
+      };
+    }
+    else if (command === 'complete') {
+      if (format === 'current') throw new DeliverError('current story completion requires the integration workflow', 66);
+      result = completePm(root, options['--run'], options['--commit'], options['--next'], snapshot);
+    }
+    else if (command === 'integrate-prepare') result = prepareLocalIntegration(options['--run'], {
+      integrationRoot: root, verificationReport: options['--verification-report'] === true,
+    }, root);
+    else if (command === 'integrate-adopt') result = adoptLocalIntegration(options['--integration'], {
+      expectedRecordHash: options['--expected-record'], token: options['--token'], commit: options['--commit'],
+    }, root);
+    else if (command === 'integrate-gate') result = runIntegrationGate(options['--integration'], {
+      expectedRecordHash: options['--expected-record'], name: options['--name'],
+    }, root);
+    else if (command === 'integrate-review') result = recordIntegrationReview(options['--integration'], {
+      expectedRecordHash: options['--expected-record'], reviewer: options['--reviewer'], receipt: options['--receipt'],
+    }, root);
+    else if (command === 'integrate-verify') result = recordIntegrationVerification(options['--integration'], {
+      expectedRecordHash: options['--expected-record'], verifier: options['--verifier'], results: options['--results'],
+    }, root);
+    else if (command === 'integrate-finalize') result = finalizeIntegrationEvidence(options['--integration'], {
+      expectedRecordHash: options['--expected-record'],
+    }, root);
+    else if (command === 'integrate-reconcile') result = reconcileIntegrationEvidence(options['--integration'], {
+      expectedRecordHash: options['--expected-record'],
+    }, root);
+    else if (command === 'correction-prepare') result = prepareIntegrationCorrection(options['--run'], {
+      integrationRecord: options['--integration'], expectedRecordHash: options['--expected-record'],
+    }, root);
+    else if (command === 'report-prepare') result = prepareVerificationReport(options['--integration'], {
+      expectedRecordHash: options['--expected-record'],
+    }, root);
+    else if (command === 'report-adopt') result = adoptVerificationReport(options['--integration'], {
+      expectedRecordHash: options['--expected-record'], token: options['--token'], commit: options['--commit'],
+    }, root);
+    else if (command === 'close-prepare') result = prepareStoryClosure(options['--integration'], {
+      expectedRecordHash: options['--expected-record'],
+    }, root);
+    else if (command === 'close-adopt') result = adoptStoryClosure(options['--integration'], {
+      expectedRecordHash: options['--expected-record'], token: options['--token'], commit: options['--commit'],
+    }, root);
+    else if (command === 'handoff-prepare') result = prepareIntegrationHandoff(options['--integration'], {
+      expectedRecordHash: options['--expected-record'], next: options['--next'],
+    }, root);
+    else if (command === 'handoff-adopt') result = adoptIntegrationHandoff(options['--integration'], {
+      expectedRecordHash: options['--expected-record'], token: options['--token'], commit: options['--commit'],
+    }, root);
+    else {
+      result = recoverIntegrationCorrectionStart(root);
+      if (!result.recovered) result = recoverExecutionTransition(root);
+      if (!result.recovered) result = recoverCurrentPm(root);
+      if (!result.recovered) result = recoverPm(root);
+    }
     process.stdout.write(`${JSON.stringify({ ok: true, ...result })}\n`);
   }
 } catch (error) {

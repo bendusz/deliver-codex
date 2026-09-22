@@ -1,0 +1,13 @@
+# Template: replace the example values before using this file as a project root spec.
+Spec: Example project
+Purpose:
+  State why this project exists and what its top-level boundary is.
+Platform: Node.js 22 or newer
+Structure:
+  /src: Application source.
+Owns:
+  Project-wide contracts and boundaries.
+Must:
+  State a project-wide rule.
+Must not:
+  State a project-wide boundary.

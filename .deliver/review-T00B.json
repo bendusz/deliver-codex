@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "findings": [
+    {
+      "severity": "minor",
+      "message": "The regression pins opaque SHA-256 hashes of each complete developer_instructions block. This proves the current sandbox-only edit, but legitimate planned role-duty updates such as T11 will require unexplained hash churn. Prefer direct assertions for the duty-boundary phrases that must remain, while installed-copy byte equality and diff review continue to prove packaging fidelity.",
+      "path": "tests/role-policy.test.mjs",
+      "resolved": false
+    }
+  ],
+  "summary": "Independent review verified that every bundled native role now inherits the launcher-selected sandbox policy, the seven affected roles retain their behavioral duty boundaries byte-for-byte, and fresh setup installs both role copies without changing existing custom role or Codex configuration. Exact-snapshot test and validation gates passed; full-body instruction hashes create only nonblocking maintenance coupling."
+}

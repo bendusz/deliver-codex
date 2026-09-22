@@ -1,0 +1,23 @@
+{
+  "task": "T05B",
+  "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "status": "Independently authored final fix2 regression freeze after one narrow PR-response fixture correction; ready for production repair, not acceptance",
+  "snapshot": "2511cd8c1137abacb93a6421426d0b36165b1584509b2504b9bc291fdd866412",
+  "revision": 12,
+  "counters": {
+    "retries": 0,
+    "fixes": 2,
+    "corrections": 0
+  },
+  "test_author": "/root/correction_regressions",
+  "files": {
+    "tests/current-roundtrip.test.mjs": "453327ad0a522e122ae3a39ab91564aababf3cd5425d007e2475ecc47175b0d6",
+    "tests/operations.test.mjs": "dde1af29f017b8816b77eb8e9211aff873bcde984b469f6aabaf3d273e6dc3f8",
+    "tests/remote-lifecycle.test.mjs": "2f8b5f499f32e4ba2e663b989b853b7b27add5905f92cb3f1b87c08c532b1f61",
+    "tests/remote.test.mjs": "8b3f797e85fdbaeadad3a457232050d156d0bbaadbd02cbba3173d394af40d82"
+  },
+  "production_and_docs_match": "362dc4fcaff3b952f52cde2e8388fd91359a441cf9df2e895445f6936744722a",
+  "previous_test_snapshot": "4591c845188c530e6541576b82ce000f0b4419d8a00589e448a2f81e5ffed7e1",
+  "pr_fixture_delta_sha256": "21aa852913c8ca15b9c7abd181569a83304f774e89ac7bb5543d935681ef9080",
+  "coordinator_inspection": "Full test delta and narrow PR Y response correction inspected. All production/docs hashes still match fix1 candidate; no task/baseline/counter change."
+}

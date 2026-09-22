@@ -1,0 +1,29 @@
+{
+  "criteria": [
+    {
+      "id": "T05L-AC1",
+      "status": "PASS",
+      "evidence": "The held-claim, distinct-verifier and verified-M safety checks remain enforced; no path was found that records merged without the required evidence."
+    },
+    {
+      "id": "T05L-AC2",
+      "status": "FAIL",
+      "evidence": "A P-adopted record cannot resume in a process with changed TERM_SESSION_ID: close-prepare and integrate-gate both fail pre-mutation because stored gate environment provenance is compared with the new process. A moved prepared I also has no retained reprepare operation."
+    },
+    {
+      "id": "T05L-AC3",
+      "status": "FAIL",
+      "evidence": "After adopted report P, a gate rerun at M succeeds and clears evidence.finalized; the adopted P proof then requires that cleared live finalization and blocks close-prepare and every recovery mutation, so mandatory P->E->H cannot complete."
+    },
+    {
+      "id": "T05L-AC4",
+      "status": "PASS",
+      "evidence": "Exact actual-M gates, C/source/M manifests, fresh M review and verification, durable logs/history and recursive checkout proofs remain implemented. The new blocker concerns evidence/artifact lifecycle after M finalization."
+    },
+    {
+      "id": "T05L-AC5",
+      "status": "FAIL",
+      "evidence": "Member identities, verdicts and findings are retained when correctly placed, but a panel receipt with an unresolved top-level major and PASS members is accepted and returned with no findings; aggregate consistency is not enforced."
+    }
+  ]
+}

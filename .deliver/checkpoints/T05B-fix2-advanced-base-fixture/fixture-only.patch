@@ -1,0 +1,27 @@
+diff --git a/Users/ben/code/pm-skill-codex/.deliver/checkpoints/T05B-fix2-tests-final/tests/remote-lifecycle.test.mjs b/Users/ben/code/pm-skill-codex-worktrees/t05b-delivery/tests/remote-lifecycle.test.mjs
+index 688745a..7a55f92 100644
+--- a/Users/ben/code/pm-skill-codex/.deliver/checkpoints/T05B-fix2-tests-final/tests/remote-lifecycle.test.mjs
++++ b/Users/ben/code/pm-skill-codex-worktrees/t05b-delivery/tests/remote-lifecycle.test.mjs
+@@ -2003,6 +2003,7 @@ test('merge and squash reconciliation use the effect-bound advanced provider bas
+       `independent integration bytes before ${method}\n`, `Advance integration before ${method}`);
+     git(fixture.remoteRoot, 'update-ref', 'refs/heads/main', n, i);
+     fake.state.inspectRemoteBase = observedBase === 'actual' ? n : observedBase;
++    fake.state.advancedBase = n;
+     fake.state.squashComposeBase = method === 'squash';
+     let state = wrapperState(integrationApi.publishRemoteSource(fixture.record.file, {
+       expectedRecordHash: fixture.record.hash, remote: 'origin', title: `Publish before advanced ${method}`,
+@@ -2012,7 +2013,13 @@ test('merge and squash reconciliation use the effect-bound advanced provider bas
+       expectedRecordHash: state.hash, prNumber: fake.state.prNumber, method,
+       subject: `Apply advanced ${method}`, body: '', provider: fake.provider,
+     }, fixture.integration));
+-    return { n, state, m: fake.state.mergeCommit };
++    const m = fake.state.mergeCommit;
++    assert.equal(git(fixture.remoteRoot, 'show', `${m}:src/integration-before-${method}.txt`),
++      `independent integration bytes before ${method}`,
++      `the fake provider's ${method} result preserves N before reconciliation`);
++    assert.equal(git(fixture.remoteRoot, 'show', `${m}:src/value.txt`), 'remote candidate',
++      `the fake provider's ${method} result contains C before reconciliation`);
++    return { n, state, m };
+   };
+   for (const method of ['merge', 'squash']) {
+     await t.test(`valid ${method} preserves N and proves against the retained observed base`, () => {

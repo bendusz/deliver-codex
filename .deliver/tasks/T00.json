@@ -1,0 +1,38 @@
+{
+  "id": "T00",
+  "objective": "Implement unsandboxed launcher defaults and PM standing delivery authority",
+  "acceptance": [
+    {
+      "id": "T00-AC1",
+      "text": "Default launch passes danger-full-access and approval never without modifying configuration."
+    },
+    {
+      "id": "T00-AC2",
+      "text": "An explicit sandbox option accepts only supported values and propagates as one argv value; fake-launcher tests prove defaults and override."
+    },
+    {
+      "id": "T00-AC3",
+      "text": "Instructions grant PM scoped commits, branch pushes, PR creation/update and verified merging without repeat confirmation while retaining builder/reviewer boundaries."
+    }
+  ],
+  "read_paths": [
+    "AGENTS.md",
+    "docs/plans/2026-09-09-upstream-parity.md"
+  ],
+  "touches": [
+    "bin/deliver.mjs",
+    "tests/setup.test.mjs",
+    "tests/launcher-integration.test.mjs",
+    "README.md",
+    "plugins/deliver/skills/deliver/SKILL.md",
+    "plugins/deliver/skills/deliver/references/workflow.md",
+    "plugins/deliver/skills/deliver/references/compatibility.md",
+    "plugins/deliver/skills/deliver/references/recovery.md",
+    "plugins/deliver/skills/deliver/references/parallel.md"
+  ],
+  "commands": {
+    "test": "npm test",
+    "validate": "npm run validate"
+  },
+  "specs": []
+}

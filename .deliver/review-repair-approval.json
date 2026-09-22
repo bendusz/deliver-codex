@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "approved_by": "Ben",
+  "at": "2026-09-10T10:49:48.558146+00:00",
+  "instruction": "I trust you and would go with your recommendation",
+  "proposal": "docs/plans/2026-09-10-review-repairs-proposal.md",
+  "proposal_sha256": "88695a98c6857253aa633e463ecba4690244a849197d87ae3d496ab2743cee1c",
+  "scope": {
+    "T04F": {
+      "original_task": "T04",
+      "original_run": "9e5faaea-1973-4a63-b57c-6c943bf4c5d0",
+      "previous_fixes": 3,
+      "authorized_fixes": 4,
+      "retries": 0,
+      "change": "One bounded follow-up for audited commit cancellation and pending transition refusal, preserving original lineage."
+    },
+    "T05L": {
+      "run": "df1605ed-56c6-4ee7-8368-01ede0f3c9c4",
+      "previous_fixes": 4,
+      "authorized_fixes": 5,
+      "retries": 1,
+      "change": "One bounded round for frozen finalization/artifact evidence, retained-record recovery and panel aggregate consistency, including audited T04 dependency reconciliation."
+    }
+  },
+  "preserve": "No default limit change, baseline or budget reset. Original histories and evidence retained. No additional external review calls or installation."
+}

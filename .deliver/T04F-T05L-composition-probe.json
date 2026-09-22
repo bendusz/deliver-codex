@@ -1,0 +1,12 @@
+{
+  "kind": "temporary source-only composition probe",
+  "root_commit": "9b3ee4aafb7b7adb899b2078ee5bf4dfbb140446",
+  "candidate_parent": "a18e851375c37ac4c99e62a55fe0e9ff1f1e937d",
+  "candidate_snapshot": "f74deb232127a910f84a997b17fee8e250bca37d9be7b321f761d144900280ab",
+  "temporary_candidate_commit": "bdc8de89187e0f6e501ac91f84bda38ec04d96c3",
+  "temporary_candidate_tree": "a331683f26608cc9963bdf53ce8b9e5421c82fe2",
+  "exit_code": 1,
+  "stdout": "6846e41e54d9db340c7adc81fc8d68a34c3610e8\n100755 495ab818055eb4907c9dfa2716fe75d1f6465034 1\tplugins/deliver/skills/deliver/scripts/deliver.mjs\n100755 559e141ce2fe35e6067dae9b83193c031ec23d40 2\tplugins/deliver/skills/deliver/scripts/deliver.mjs\n100755 15bbb12c1545d56ddfb4ab96e86cb0c42a2f7ddc 3\tplugins/deliver/skills/deliver/scripts/deliver.mjs\n\nAuto-merging plugins/deliver/skills/deliver/scripts/deliver.mjs\nCONFLICT (content): Merge conflict in plugins/deliver/skills/deliver/scripts/deliver.mjs\nAuto-merging plugins/deliver/skills/deliver/scripts/lib/state.mjs\n",
+  "stderr": "",
+  "note": "No branch, worktree, actual index, task state or baseline changed. Excludes runtime evidence files that will be committed only after acceptance. Does not certify integration or replace actual combined gates/review."
+}

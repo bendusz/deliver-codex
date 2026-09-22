@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "target": {
+    "name": "Deliver",
+    "version": "0.25.1",
+    "commit": "3aa3f3a0a6baed15e9a8a99ef15405b79efd37aa",
+    "fixture": "tests/fixtures/upstream-v0.25.1/provenance.json"
+  },
+  "shared_contract": {
+    "authoritative_progress": [
+      "docs/approval.json",
+      "docs/plan.md",
+      "docs/stories/*.md",
+      "docs/handoff/<actor-id>.md",
+      "docs/retros/sprint-<n>.md",
+      "Git history"
+    ],
+    "approval": {
+      "fields": ["status", "approver", "approved_date", "plan_digest", "updated"],
+      "statuses": ["pending", "approved", "revoked"],
+      "digest": "Git blob ID of docs/plan.md"
+    },
+    "plan_policy": {
+      "fields": ["scale", "checkpoint_policy", "integration_branch", "skeleton"],
+      "scales": ["tiny", "small", "standard", "large", "regulated"],
+      "checkpoints": ["story-level", "sprint-level", "autonomous"]
+    },
+    "story": {
+      "contract_fields": ["builder", "touches", "sprint", "priority", "covers", "depends_on", "parallel_safe", "risk", "review_lenses", "specs", "acceptance_criteria"],
+      "execution_fields": ["owner", "builder", "branch", "status", "rounds", "retries", "updated"],
+      "execution_statuses": ["claimed", "building", "built", "in-review", "blocked", "merged"]
+    },
+    "derived_phases": ["migration", "discovery", "retrospective", "specification", "planning", "decomposition", "implementation", "done"],
+    "identity": {
+      "source_precedence": ["git user.email", "git user.name"],
+      "normalization": "ASCII lowercase slug plus 12 hexadecimal characters from two POSIX cksum values",
+      "salt": ":pm-skill",
+      "stable_across_hosts": true
+    },
+    "handoff": {
+      "path": "docs/handoff/<actor-id>.md",
+      "freshness_anchor": "BASE_COMMIT",
+      "current_when": "HEAD matches BASE_COMMIT or every later commit changes only that actor's handoff"
+    }
+  },
+  "deliberate_differences": [
+    {
+      "id": "DIFF-01",
+      "tasks": ["T06", "T14"],
+      "difference": "Codex exposes skill operations through $deliver requests and ordinary prompts, not registered Claude slash commands."
+    },
+    {
+      "id": "DIFF-02",
+      "tasks": ["T03"],
+      "difference": "A missing or mismatched approval digest blocks implementation until reconciliation; the port does not copy upstream fail-open approval behavior."
+    },
+    {
+      "id": "DIFF-03",
+      "tasks": ["T00", "T11", "T13"],
+      "difference": "Codex uses native agent roles. An explicit expert-builder route requires an explicit route change and is never silently translated."
+    },
+    {
+      "id": "DIFF-04",
+      "tasks": ["T00", "T14"],
+      "difference": "Execution defaults to no OS sandbox, but inherited host restrictions remain effective and must be reported."
+    },
+    {
+      "id": "DIFF-05",
+      "tasks": ["T05", "T09", "T12", "T14"],
+      "difference": "Distributed locking, cross-machine adoption of live receipts, and mid-story switching between hosts are outside the release contract."
+    },
+    {
+      "id": "DIFF-06",
+      "tasks": ["T05"],
+      "difference": "Squash or rebase integration needs a documented reconciliation path and does not claim exact upstream Git-history compatibility by default."
+    },
+    {
+      "id": "DIFF-07",
+      "tasks": ["T06", "T11", "T13", "T14"],
+      "difference": "Claude review, external builders, Poteto, and the official SpecDD distribution remain optional external integrations."
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "CAP-01",
+      "name": "Execution defaults and PM Git authority",
+      "tasks": ["T00", "T04", "T05"],
+      "checks": ["Fake-launcher sandbox policy tests", "Commit transition tests", "Fake remote PR and merge tests"]
+    },
+    {
+      "id": "CAP-02",
+      "name": "Pinned upstream compatibility contract",
+      "tasks": ["T01", "T14"],
+      "checks": ["Fixture SHA-256 checks", "Unchanged reader disposable-repository tests", "Release capability matrix"]
+    },
+    {
+      "id": "CAP-03",
+      "name": "Planning and artifact generation",
+      "tasks": ["T06", "T07"],
+      "checks": ["Tiny and standard project examples", "Large and regulated artifact validation", "Installed operation map validation"]
+    },
+    {
+      "id": "CAP-04",
+      "name": "Shared Git-derived project progress",
+      "tasks": ["T02", "T03", "T04", "T05"],
+      "checks": ["Project-state fixture tests", "Story transition tests", "Two-way story-boundary round trips"]
+    },
+    {
+      "id": "CAP-05",
+      "name": "Plan approval and drift handling",
+      "tasks": ["T03", "T08"],
+      "checks": ["Approval reuse and drift tests", "Correct-course recovery tests"]
+    },
+    {
+      "id": "CAP-06",
+      "name": "Claim, build, fix, review, verify, and ship lifecycle",
+      "tasks": ["T03", "T04", "T05"],
+      "checks": ["Sequential lifecycle tests", "Retry persistence tests", "Verified integration tests"]
+    },
+    {
+      "id": "CAP-07",
+      "name": "Resume, doctor, and hook diagnostics",
+      "tasks": ["T08"],
+      "checks": ["Fresh-process resume tests", "Read-only doctor tests", "Malformed hook input tests"]
+    },
+    {
+      "id": "CAP-08",
+      "name": "Legacy project migration",
+      "tasks": ["T09"],
+      "checks": ["Legacy layout migration fixtures", "Conflict and idempotency tests", "Interrupted publication recovery tests"]
+    },
+    {
+      "id": "CAP-09",
+      "name": "Artifact analysis and quality checklists",
+      "tasks": ["T07"],
+      "checks": ["Seeded omission tests", "Dependency cycle tests", "Unknown reference and clarification tests"]
+    },
+    {
+      "id": "CAP-10",
+      "name": "Project scale and checkpoint policy",
+      "tasks": ["T06", "T10"],
+      "checks": ["Scale artifact policy tests", "Checkpoint enforcement tests"]
+    },
+    {
+      "id": "CAP-11",
+      "name": "Sprint retrospectives",
+      "tasks": ["T10"],
+      "checks": ["Sprint range review tests", "Missing retrospective claim-block tests", "Tiny and small skip tests"]
+    },
+    {
+      "id": "CAP-12",
+      "name": "Wiki and source-backed research",
+      "tasks": ["T11"],
+      "checks": ["Wiki schema and lifecycle validation", "Primary-source citation inspection", "Read-only operation tests"]
+    },
+    {
+      "id": "CAP-13",
+      "name": "Parallel shared-story delivery",
+      "tasks": ["T12"],
+      "checks": ["Independent worktree tests", "Overlap and dependency rejection tests", "Interrupted worktree recovery tests"]
+    },
+    {
+      "id": "CAP-14",
+      "name": "Scoped review and decision advice",
+      "tasks": ["T11"],
+      "checks": ["Recent, worktree, branch, and codebase packet tests", "Risk-to-review-panel tests", "CONCERNS receipt adaptation tests"]
+    },
+    {
+      "id": "CAP-15",
+      "name": "Measured builder comparisons",
+      "tasks": ["T13"],
+      "checks": ["Deterministic scoring tests", "Fake-provider two-builder tests", "Unavailable configuration rejection tests"]
+    },
+    {
+      "id": "CAP-16",
+      "name": "Packaging, upgrade guidance, and evaluation",
+      "tasks": ["T14"],
+      "checks": ["Repository test suite", "Packaging validation", "Worked standard project", "Authorized native end-to-end trial"]
+    }
+  ],
+  "tasks": [
+    { "id": "T00", "capabilities": ["CAP-01"], "expected_evidence": ["Launcher tests show unsandboxed default and sandbox opt-in", "Instructions grant scoped PM commit, push, PR, and merge authority"] },
+    { "id": "T01", "capabilities": ["CAP-02"], "expected_evidence": ["Pinned file hashes and source paths", "Temporary Git repository reader tests", "Unchanged 0.22.0 fixture hashes"] },
+    { "id": "T02", "capabilities": ["CAP-04"], "expected_evidence": ["Project-state parser and inspector tests against pinned fixtures", "Malformed artifact and unsafe path diagnostics"] },
+    { "id": "T03", "capabilities": ["CAP-04", "CAP-05", "CAP-06"], "expected_evidence": ["Approval and claim binding lifecycle tests", "Duplicate run and ownership rejection tests"] },
+    { "id": "T04", "capabilities": ["CAP-01", "CAP-04", "CAP-06"], "expected_evidence": ["Commit reconciliation regression tests", "Restart and cumulative scope tests"] },
+    { "id": "T05", "capabilities": ["CAP-01", "CAP-04", "CAP-06"], "expected_evidence": ["Two-way upstream story-boundary round trips", "Fake remote PR and merge tests", "Post-integration content verification"] },
+    { "id": "T06", "capabilities": ["CAP-03", "CAP-10"], "expected_evidence": ["Project artifact examples by scale", "Installed operation map validation", "Stable identifier and clarification checks"] },
+    { "id": "T07", "capabilities": ["CAP-03", "CAP-09"], "expected_evidence": ["Malformed artifact fixtures with located findings", "Analysis gate tests after planning and decomposition"] },
+    { "id": "T08", "capabilities": ["CAP-05", "CAP-07"], "expected_evidence": ["Phase-aware resume tests", "Bounded read-only doctor and hook tests", "Environment readiness diagnostics"] },
+    { "id": "T09", "capabilities": ["CAP-08"], "expected_evidence": ["Migration preview and apply tests", "Counter and unknown-data preservation tests", "Recovery and idempotency tests"] },
+    { "id": "T10", "capabilities": ["CAP-10", "CAP-11"], "expected_evidence": ["Retrospective eligibility tests", "Missing record enforcement tests", "Follow-up finding persistence"] },
+    { "id": "T11", "capabilities": ["CAP-12", "CAP-14"], "expected_evidence": ["Wiki and research artifact validation", "Exact review-scope packet tests", "Risk-based panel and receipt tests"] },
+    { "id": "T12", "capabilities": ["CAP-13"], "expected_evidence": ["Parallel worktree lifecycle tests", "Scope overlap and dependency tests", "Serial integration rechecks"] },
+    { "id": "T13", "capabilities": ["CAP-15"], "expected_evidence": ["Deterministic scorer tests", "Fake adapter comparison tests", "Dirty worktree preservation"] },
+    { "id": "T14", "capabilities": ["CAP-02", "CAP-16"], "expected_evidence": ["Full repository gates", "Installed package inspection", "Worked lifecycle example", "Recorded independent review and authorized live trials"] }
+  ]
+}

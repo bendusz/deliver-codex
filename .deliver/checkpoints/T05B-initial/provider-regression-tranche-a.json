@@ -1,0 +1,20 @@
+{
+  "version": "agent-reported-test-result-v1",
+  "agent": "/root/correction_regressions",
+  "task": "T05B",
+  "file": "tests/remote.test.mjs",
+  "sha256": "8b3f797e85fdbaeadad3a457232050d156d0bbaadbd02cbba3173d394af40d82",
+  "git_blob": "4ba0028acd6cc00c07c3a3bc95dfd6f4e91e80fb",
+  "diff": "+109/-1; one existing vocabulary line expanded; no assertions removed",
+  "syntax": "PASS",
+  "diff_check": "PASS",
+  "command": "node --test --test-name-pattern='reconcileMerged proves exact or advanced merges' tests/remote.test.mjs",
+  "exit_code": 1,
+  "tests": 1,
+  "pass": 0,
+  "fail": 1,
+  "duration_ms": 36.311042,
+  "failure": "API type undefined vs function at line584; no subtest/fixture errors ran",
+  "scope": "Exact MERGED including deleted remote head; MERGED_BASE_ADVANCED with both OIDs; open/queued MERGE_PENDING; missing/malformed proof UNKNOWN; distinct AUTH_REQUIRED/PR_LOOKUP_FAILED; zero provider writes",
+  "provenance": "Exact values reported by independent native test engineer; raw log not provided; not claimed as coordinator execution."
+}

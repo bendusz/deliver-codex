@@ -1,0 +1,42 @@
+{
+  "status": "finished and accepted; source committed",
+  "run_id": "d7c72357-2f28-4ac9-b364-09c3b1b0628a",
+  "revision": 26,
+  "snapshot": "6878683c7c9e3511d86a2d59507c28805816398b43ed8737740dea8a875ea0e3",
+  "source_commit": "3513e0c2146abeb88230dbfacd2c4dc68937da32",
+  "counters": {
+    "retries": 0,
+    "fixes": 4,
+    "corrections": 0
+  },
+  "baseline_snapshot_hash": "ff9d69069c2f635c49085fa00f7c4c30c4b2bb33e6ba6840f107b6297c4c9cf1",
+  "gates": {
+    "test": "PASS294/294",
+    "validate": "PASS"
+  },
+  "review": "PASS nine inherited findings resolved",
+  "verification": "PASS all three original criteria",
+  "report": "docs/reviews/2026-09-13-correction-recovery-acceptance.md",
+  "artifacts": {
+    "approval.json": "803713efbb921cb3a0d735e320ed9fb0950afe60a665ba126a86c584ae7b5af0",
+    "candidate-manifest.json": "4e0abae9dc46c50fdbe23937b1fcdf21b21bb85d47c9131283ae6cce066285fa",
+    "candidate-production.patch": "51308707b08b00768eb71e750067461f3dbe665927e0cff046bcafae48d23afb",
+    "candidate-scope-check.json": "b91aef0bbf81b9c422d04f4cec435a391274b802fa4cb6738087a89473182041",
+    "completed-run.json": "87ca590909a6fd65dc831b26e6bb4b28a1e9189d193e286356467f43f6df9335",
+    "focused-results.json": "2c5f3c19d80b2e11acee74ce0be3386fed46d36e850fdb9a276f831b19c0af3e",
+    "frozen-current-lifecycle.test.mjs": "371de8ed4d0ebe1491b3cd1f57ba5ff7f972af241dd95e59ed5933be5e348baf",
+    "frozen-integration-correction.test.mjs": "4dfc6ccdabd2ee0c93225082d56693c5b0d4f43cee449e5258f72092f7ba25fb",
+    "red-result.json": "2547c9992a9d780614a060665f48e74754035ddf07e3e932b281021f978f722b",
+    "red-scope-check.json": "ce45ea4c00fd7e612b4c5575c2abe1da12fd383fe6d40764bee667e3af9a68ae",
+    "review-round5.json": "40da688366d4c0b2a6663c3b90bfa9e2df08b46585168890e8fd6293dfde0135",
+    "run-after-dispatch.json": "61c6bf5f5f870c19943d6cc63916de03206f163e35d9b0300f8bba21f9fa3e72",
+    "run-after-gates.json": "644213f5e430336828dcc9cfc19522fe994de5eb6deb2150bd168366f890aa7c",
+    "source-commit.json": "02e38cd2a7bd751a7596f9f71ae37f23e676d349ee5ad5f9451aa9df7c603162",
+    "test-delta-review.json": "cb0a074e0255cefff41120a6fc64ad02f93ea4a769fceb987678655d94cc22cb",
+    "test.json": "65533f3aa4030f4e360125a8b50a103e1ea134dda410a32e6238a0dcd5ae9a22",
+    "test.log": "62e81a7b541140575b8be913121841fa5e56cec3185cbaf22827749c02131f0c",
+    "validate.json": "d464ee3b2f80976c2c396286c66ee4227cc3067402885ce31b476d82a3375a20",
+    "validate.log": "9cf4431999ad0ad3d5a8d44774d5afd5d7d9cf16752bde102b855884fa57bea5",
+    "verification-round5.json": "1300961da134aca307c57636107d271b4935d6d0a60cb95242370f11170834ee"
+  }
+}

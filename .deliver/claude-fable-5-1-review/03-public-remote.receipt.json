@@ -1,0 +1,60 @@
+{
+  "status": "PASS",
+  "findings": [
+    {
+      "severity": "minor",
+      "message": "validate.mjs role check `!/^sandbox_mode[ \\t]*=/m.test(text.slice(0, instructionsAt))` only rejects an unindented `sandbox_mode` key. TOML permits leading whitespace (`  sandbox_mode = \"...\"`), which this regex would accept, and the supplied tests (launcher-integration.test.mjs, operations.test.mjs) do not assert the installed `.codex/agents/*.toml` copies are free of a sandbox override. Trigger: an indented override reintroduced into a role file passes `npm run validate`. Impact: T00B-AC3 regression protection is narrower than claimed. Recommendation: anchor as `^[ \\t]*sandbox_mode` (and consider dotted/table forms) and add one installed-copy assertion. Role TOML files themselves are not in the packet, so current absence of overrides is unverified here, not disproved.",
+      "path": "scripts/validate.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "remote.mjs checks(): an exit-0 `[]` from `gh pr checks --required --json` (stdout non-empty, no items) falls through the normal structured path and, with a fresh CLEAN/MERGEABLE view, returns READY without the NO_REQUIRED_CHECKS_PROVEN diagnostic. The accepted rule frames no-required-checks proof narrowly around the exact exit-1 stderr message; the design also says valid exit-0 arrays are processed normally, so this is arguably by design, but the decision is implicit and the test fixture's default state (`checks: []`, exit 0) silently relies on it for the refused/queued/raced/mismatch merge tests. Recommendation: either label this outcome explicitly or require the exact-message path, and add a test pinning the choice so a gh behavior change (exporting `[]` before the empty check) cannot change readiness semantics unnoticed.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/remote.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "remote.mjs lookup(): (a) `--state all` returns historical PRs from any fork with the same head branch name; if any such non-matching entry is malformed by the adapter's strict normalizePr (e.g. `headRepositoryOwner: null` for a deleted fork), the whole lookup returns PR_LOOKUP_FAILED and the story branch is permanently unpublishable/unmergeable; (b) exact same-repo matches that are all CLOSED/MERGED plus one OPEN PR return PR_AMBIGUOUS (`matches.length !== 1`), which also blocks `publish` before the push. GitHub itself allows at most one OPEN PR per head/base, so ambiguity among open PRs cannot occur. Both are fail-safe, but they turn ordinary PR-closed-and-recreated histories into a manual-intervention state, contrary to the practical-autonomy intent. Recommendation: validate and exclude clearly non-matching entries individually, and select a single OPEN exact match when closed/merged history exists (still reporting PR_MERGED when no open PR remains).",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/remote.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "remote.mjs merge() post-merge proof runs `git ls-remote --refs <remote> refs/heads/<base>`, which resolves the remote's fetch URL, whereas repository identity and the push were derived from `git remote get-url --push --all`. With a triangular remote (pushurl differing from url) the base-branch proof is taken from a different repository than the one merged into; the result is MERGE_MISMATCH (fail-safe), not a false MERGED, but it is misleading. Recommendation: in preflight require the fetch URL set to equal the single push URL, or run ls-remote against the exact validated push URL.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/remote.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "remote.mjs commandFailure(): non-ENOENT spawn failures for `gh` (EACCES, ETIMEDOUT, runner throw) map to the stage's fallback state, so an unexecutable or timed-out `gh auth status` reports AUTH_REQUIRED (diagnostic AUTH_PROBE_ERROR) and the same for `git` reports GIT_ERROR rather than UNAVAILABLE. The diagnostic code preserves the distinction but the closed state vocabulary blurs 'unavailable executable' versus 'auth needed'. Tests cover ENOENT and OUTPUT_LIMIT only. Recommendation: map non-ENOENT spawn errors to UNAVAILABLE (or a distinct COMMAND_ERROR state) and add a test for the gh throw case.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/remote.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "remote.mjs checks()/merge() require `mergeable === 'MERGEABLE'` and `mergeStateStatus === 'CLEAN'` on every path, not only the no-required-checks path. A PR whose required checks all pass but whose mergeStateStatus is UNSTABLE (a non-required check failed) or HAS_HOOKS returns CHECKS_UNKNOWN (MERGE_STATE_NOT_CLEAN) forever, which is stricter than T05R-AC3's 'passing required checks' wording; and GitHub computes mergeStateStatus asynchronously, so an inspect immediately after publish commonly returns UNKNOWN. Fail-safe and defensible, but T05B must add bounded polling and the stricter policy should be stated explicitly in remote-design.md so it is not mistaken for a provider error.",
+      "path": "plugins/deliver/skills/deliver/scripts/lib/remote.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "Known T14/T05B-owned documentation contradictions remain in the reviewed tree and are hazardous now, not merely cosmetic: SKILL.md tells the PM to read `references/compatibility.md` before starting, and that file's 'Shared project state' section still instructs 'Use the original Deliver 0.22.0 layout for project progress: pm/pm-state.json ...' with `pm init`/`claim` commands, while SKILL.md and plan decision 1 make `docs/approval.json`/stories/Git authoritative and forbid recreating `pm/`. The same file's T05L-updated 'Verified is not merged' section says current projects use 'the separately installed remote path', implying a wired remote lifecycle that project-status lists as pending (T05B). AGENTS.md's '`pm/` is the upstream-compatible source of project progress' and README's 0.22.0 progress/shared-state claims contradict the current contract. hooks/context.mjs only surfaces legacy `pm/` pointers (T08). Treated as known pending, not completed functionality; recommend T14 add an explicit 'legacy only' label to the pm/ section now so a new project is not started in the retired layout in the interim.",
+      "path": "plugins/deliver/skills/deliver/references/compatibility.md",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "claude-review.mjs: the written receipt is the bare validated review; it does not record the packet SHA-256, model or adapter args, so binding 'against that same snapshot' (claude-review.md) relies entirely on the coordinator. Also the third SECRET_PATTERNS regex requires `token\\s*[:=]`, so JSON-quoted keys (`\"token\": \"...\"`) are not matched; claude-review.md correctly says the scanner cannot certify a packet secret-free. Recommendations, not correctness failures: embed packet digest/model in the receipt (or a sidecar) and extend the key pattern to quoted keys. tests/claude-review.test.mjs was deliberately omitted from the packet; its coverage is unverified here.",
+      "path": "plugins/deliver/skills/deliver/scripts/claude-review.mjs",
+      "resolved": false
+    },
+    {
+      "severity": "minor",
+      "message": "tests/remote.test.mjs coverage gaps relative to remote-design.md's test list: no explicit assertions for PR_CLOSED and PR_MERGED lookup outcomes, PR_NOT_VISIBLE_AFTER_WRITE after create, the markReady PR_STILL_DRAFT path, the PR_NUMBER_MISMATCH merge guard, or the production runCommand's `shell:false`/prompt-suppression env (only the injected runner is exercised, which is acceptable for the no-network requirement). Add these as fake-runner cases; no real service calls are needed.",
+      "path": "tests/remote.test.mjs",
+      "resolved": false
+    }
+  ],
+  "summary": "Design assessment: the reviewed pieces serve the stated intent. The launcher defaults to `--sandbox danger-full-access --ask-for-approval never`, opts into a sandbox only on explicit `--sandbox`, passes per-session flags and never edits configuration; role-level sandbox overrides are rejected by validate.mjs and worker policy inheritance is by omission of any agent sandbox config (T00B-AC1/AC2 supported by supplied evidence; the role TOMLs themselves are not in the packet). Setup is preflight-checked, symlink-refusing, atomic-create-only and non-destructive. The T05R GitHub adapter is a well-bounded, fail-closed state machine: exact remote/checkout/head/PR identity at every stage, bounded output, no shell, exact non-force push of `SHA:refs/heads/BRANCH`, one PR create/edit with a mode-0600 body file in a mode-0700 tmp directory cleaned in `finally`, draft policy preserved, checks distinguished (pass/skipping vs pending/fail/cancel/unknown, nonzero-with-JSON as UNKNOWN), the exact no-required-checks message plus a fresh CLEAN view as the only positive no-CI path, `--match-head-commit` with a normal merge call, and completion only on MERGED + full merge OID + `ls-remote` base equality; races, queueing, refusal, malformed output and base mismatch all return non-completion states, with tests asserting exact argv and body bytes on an injected runner (T05R-AC1..AC3 met). The T05L public routing (SKILL.md row, operations.json `complete` → shipping.md, template, tests) is internally consistent and validated. No block/major defects found in implemented behavior; findings are minor hardening/autonomy recommendations (empty-array readiness labeling, history-induced PR_AMBIGUOUS/PR_LOOKUP_FAILED blocking, fetch-vs-push URL in post-merge proof, spawn-error state mapping, CLEAN strictness) plus known T14/T05B/T08 documentation carry-overs that currently instruct the retired `pm/` layout and hint at an unwired remote path. Limitations: overlay runtime modules (deliver.mjs, pm.mjs, integration/reporting/review/state.mjs), role TOMLs and claude-review tests were not supplied; the 153/153 test claim and receipts were not executed or authenticated by this review."
+}

@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "source_receipt": ".deliver/claude-fable-5-1-review/01-runtime.receipt.json",
+  "source_receipt_sha256": "26a4b7cb6028487fb570f4dab594c59a98962cb4f114946816cd5ae0a67d42f1",
+  "reviewed_snapshot": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9",
+  "scope": [
+    "finding-1-stale-pending-commit-preparation",
+    "finding-2-blocked-resume-budget"
+  ],
+  "findings": [
+    {
+      "source_finding": 1,
+      "verdict": "CONFIRMED",
+      "classification": "implemented_bug",
+      "severity": "major",
+      "evidence": [
+        "transitions.mjs:490 rejects every new preparation while commit_adoption.pending exists.",
+        "transitions.mjs:564-580 validates adoption but throws without clearing or superseding pending on any mismatch.",
+        "transitions.mjs:347-373 and deliver.mjs:340-343 allow a legal Execution transition/correct-course while pending; buildExecutionTransition clones and preserves the stale pending object.",
+        "transitions.mjs:607 and scope.mjs:455 then block finish and normal evidence operations while the stale preparation remains.",
+        "Bounded disposable-repository reproduction: commit-prepare succeeded; correct-course --kind fix succeeded and retained pending; a second commit-prepare exited 66 with \"a commit adoption is already pending\"; committing the legal post-correction images made commit-adopt exit 66 with \"adopted commit tree or index differs from the prepared tree\"; finish exited 66 requiring reconciliation. Raw output: /tmp/t05l-recovery-triage.log (sha256 00b1655aee5e8af02bb328bba632a1509cd78e2030a83206a6b077f65e5925ef)."
+      ],
+      "contract_assessment": "This violates the implemented T04 operation rather than belonging solely to future T08. The plan requires sequential build/commit/fix/resume and kill/restart cases to preserve attempts and cumulative scope (docs/plans/2026-09-09-upstream-parity.md:170-177), and assertFinalCandidate promises commit-or-reconcile even though no reconciliation route exists. T08 resume/doctor is observational and cannot repair this mutable state.",
+      "required_change": "Add one bounded commit-preparation reconciliation operation. It must retain the stale preparation as history/event, require the same run/binding/ref and HEAD equal to the prepared parent, require a clean index and unchanged protected Git state, then either atomically supersede from a newly recomputed passing cumulative snapshot or clear the preparation before a legal transition. Transition/correct-course must not silently preserve a preparation whose story/run images it changes. Regressions must cover source edits, legal Execution transition/correct-course, rejected child commit, reset-to-parent, fresh-process supersession, retained counters/baseline/history, and refusal on moved HEAD/ref, staged index or protected metadata."
+    },
+    {
+      "source_finding": 2,
+      "verdict": "REJECTED",
+      "classification": "intended_contract",
+      "severity": "major",
+      "evidence": [
+        "transitions.mjs:188-205 implements blocked -> building only through --attempt fix|retry, and transitions.mjs:241-247 enforces retry=2/fix=3 limits.",
+        "The approved architecture explicitly defines bounded fix/retry return to building and same-state resume only as a no-op (docs/plans/parity-contracts/architecture-state.md:102-106).",
+        "The installed workflow states that a blocked builder enters a bounded retry and that it is persisted before redispatch (plugins/deliver/skills/deliver/references/workflow.md:51-55); runtime.md:86-89 likewise states every fix/retry return spends the shared counter.",
+        "Bounded reproduction confirmed direct blocked -> building exits 66, two retries and three fixes are accepted and retained, then further retry/fix exits 66 at the declared limits. This is the specified budget stop, not accidental counter loss."
+      ],
+      "contract_assessment": "A budget-free blocked -> building edge would allow another builder dispatch without the attempt accounting required by the approved contract. The current status models a blocked builder attempt, not a passive dependency-wait marker. Exhaustion deliberately requires an explicit user-authorized budget/scope decision; T08 is expected to diagnose and route material correction while preserving maxima, not create an uncounted resume.",
+      "required_change": "No runtime change is justified by this finding. Clarify documentation if users may interpret blocked as a passive waiting state. Supporting a non-dispatch dependency wait would require an explicitly approved distinct status or operation with defined dispatch and budget semantics; it must not be introduced as an uncounted blocked -> building bypass."
+    }
+  ],
+  "summary": "Finding 1 is a confirmed major recovery defect in the frozen T05L overlay and needs a bounded transitions/runtime correction. Finding 2 accurately describes the observed edges but proposes behavior contrary to the approved bounded-attempt contract, so it is rejected as a defect."
+}

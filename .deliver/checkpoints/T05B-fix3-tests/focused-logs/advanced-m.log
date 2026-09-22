@@ -1,0 +1,33 @@
+✖ advanced remote M with changed task-scope bytes receives fresh evidence instead of reusing source receipts (17001.479958ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17043.413875
+
+✖ failing tests:
+
+test at tests/remote-lifecycle.test.mjs:2102:1
+✖ advanced remote M with changed task-scope bytes receives fresh evidence instead of reusing source receipts (17001.479958ms)
+  AssertionError [ERR_ASSERTION]: remote P refuses when either generated report path already exists at valid advanced M
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/t05b-delivery/tests/remote-lifecycle.test.mjs:2194:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+real 17.06
+user 8.62
+sys 6.41

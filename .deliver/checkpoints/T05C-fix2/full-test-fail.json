@@ -1,0 +1,56 @@
+{
+  "gate": {
+    "provenance": "deliver-runtime-executed-v1",
+    "name": "test",
+    "command": "npm test",
+    "cwd": ".",
+    "environment_keys": [],
+    "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "environment_hash": "8e25184df06998149fc0f7488083329d165f7b595a6f272f52294d3df7a17bcb",
+    "snapshot_hash": "de2de30d32020cdeefb7f07fb817ed21d3db0b9c9b0132da5e78e13941eeec47",
+    "status": "FAIL",
+    "exit_code": 1,
+    "signal": null,
+    "error": null,
+    "log_path": ".deliver/logs/d7c72357-2f28-4ac9-b364-09c3b1b0628a/test-d873e978-5347-4218-b287-a1586e0db7be.log",
+    "output": {
+      "stdout_bytes": 25232,
+      "stderr_bytes": 0,
+      "truncated": false
+    },
+    "scope": {
+      "ok": true,
+      "changed": [
+        "plugins/deliver/skills/deliver/references/shipping.md",
+        "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+        "plugins/deliver/skills/deliver/scripts/pm.mjs",
+        "tests/integration-correction.test.mjs"
+      ],
+      "added": [
+        "tests/integration-correction.test.mjs"
+      ],
+      "deleted": [],
+      "renames": [],
+      "out_of_scope": [],
+      "preexisting_dirty_changed": [],
+      "symlink_escapes": [],
+      "git_metadata_changed": false,
+      "ignored_advisory_changed": [],
+      "coordinator_execution_changed": null,
+      "git_metadata_compatibility": null,
+      "contracts_changed": []
+    },
+    "started_at": "2026-09-13T08:36:27.979Z",
+    "finished_at": "2026-09-13T08:46:08.197Z"
+  },
+  "log_sha256": "e072691a42ee9610c81857ee2d655877336c17996d1125086bdc846a7d0bb737",
+  "total": 276,
+  "passed": 275,
+  "failed": 1,
+  "duration_ms": 579908.718167,
+  "failure": "tests/integration.test.mjs:351 bound source-only dirt requires fresh M evidence without mutating C",
+  "qualification": "Completed within600s with no competing diagnostics. No timeout. Existing source-dirt regression failed."
+}

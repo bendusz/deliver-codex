@@ -1,0 +1,9 @@
+✔ explicit reconciliation recovers retained post-P legacy provenance and rejects missing evidence unchanged (14634.387333ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14670.715708

@@ -1,0 +1,11 @@
+{
+  "command": [
+    "node",
+    "--test",
+    "--test-name-pattern=incomplete started publications|binds started publication hashes",
+    "/Users/ben/code/pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe.test.mjs"
+  ],
+  "exit_code": 1,
+  "log_sha256": "4c036764d92f01d1a28faa18e476c7c5e1781a3d59ef0f145e5d79ca53b760a4",
+  "probe_sha256": "fae33daa9a81cd86de3a63f88741d48f91c1d713a22bf69402b8032a7fbb5104"
+}

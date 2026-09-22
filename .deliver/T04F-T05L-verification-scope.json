@@ -1,0 +1,6 @@
+{
+  "reason": "Runtime task packets require a nonempty touches list. Combined verification has not been initialized.",
+  "decision": "Reserve only docs/reviews/2026-09-11-combined-repairs.md as optional report output; production and contracts stay read-only and unchanged. No report creation required. If created, it belongs to frozen snapshot/gates/review. Execution receipts stay in .deliver.",
+  "reviewer": "/root/state_architecture",
+  "review": "Smallest valid representation; no baseline/task reset because no combined run exists."
+}

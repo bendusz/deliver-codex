@@ -1,0 +1,268 @@
+{
+  "schema_version": 1,
+  "source_receipt": ".deliver/claude-fable-5-1-review/01-runtime.receipt.json",
+  "source_receipt_sha256": "26a4b7cb6028487fb570f4dab594c59a98962cb4f114946816cd5ae0a67d42f1",
+  "source_status": "FAIL",
+  "scope": {
+    "major_findings": [3],
+    "minor_findings": [1, 2, 3, 4, 5, 6, 7, 8],
+    "excluded_major_findings": [1, 2]
+  },
+  "candidate_basis": {
+    "root": "accepted root including T05R commit 9009f71 and the approved parity plan",
+    "t05l_overlay": "/tmp/deliver-parity-t05l",
+    "t05l_snapshot": "10c782b2bc1cd025b41eefbaf7b3ade860ebb1dcf2af74e17226d89425bb7de9",
+    "note": "T05L is a frozen candidate overlay, not integrated root behavior. T05C, T05B and T08-T14 remain future work."
+  },
+  "classification_counts": {
+    "confirmed_bug": 3,
+    "disproved_after_dependency_review": 1,
+    "deliberate_current_contract": 3,
+    "planned_future_behavior": 1,
+    "mixed": 1
+  },
+  "findings": [
+    {
+      "receipt_finding": "major-3",
+      "severity": "major",
+      "classification": "deliberate_current_contract",
+      "conclusion": "The blocking behavior is real, but it implements the accepted fail-closed inventory contract rather than contradicting it. Continuation calls reach requireExecutable through assertCurrentBinding, and requireExecutable rejects any unreadable story inventory. The accepted claim precedence explicitly says unreadable blocks. Relaxing unrelated-story failures would be a policy change because an unreadable record can conceal ownership, branch or counter evidence.",
+      "evidence": [
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+          "lines": "286-295, 433-457",
+          "detail": "requireExecutable rejects STORY_UNREADABLE/STORIES_UNREADABLE, and every current binding assertion calls it."
+        },
+        {
+          "path": "docs/plans/parity-contracts/architecture-state.md",
+          "lines": "78-98",
+          "detail": "Accepted claim precedence states that unreadable blocks and that hidden or ambiguous claim signals fail closed."
+        },
+        {
+          "path": "docs/plans/2026-09-09-upstream-parity.md",
+          "lines": "155-168",
+          "detail": "The inspector must expose unreadable stories and T03 requires foreign claims and duplicate runs to block without overwriting other actors."
+        }
+      ],
+      "task_mapping": null,
+      "policy_action": "Keep the current fail-closed rule. If Ben wants continuation to ignore unrelated unreadable stories, authorize a contract decision and a separate bounded change that proves the unreadable record cannot hide a collision; no pending task explicitly authorizes that relaxation."
+    },
+    {
+      "receipt_finding": "minor-1",
+      "severity": "minor",
+      "classification": "confirmed_bug",
+      "conclusion": "A valid unclaimed story without a final newline parses successfully, but first claim appends a newline before the Execution heading. Because contractText includes that added newline, the contract hash changes and replacement fails with a misleading contract-tampering error.",
+      "evidence": [
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/story.mjs",
+          "lines": "198-223, 266-290",
+          "detail": "parseStory hashes the exact pre-Execution text; replaceStoryExecution adds a newline at line 284 and then demands the original hash at line 290."
+        },
+        {
+          "path": "temporary in-memory reproduction",
+          "lines": null,
+          "detail": "parseStory accepted a canonical S1-1 story without a trailing newline; replaceStoryExecution returned DeliverError 66: Execution replacement changed the story contract."
+        }
+      ],
+      "task_mapping": null,
+      "policy_action": "Needs a bounded T02/story parser correction with an explicit contract choice: preserve the original no-newline bytes while appending Execution, or reject the input with a specific validation error. No pending authorized task touches story.mjs."
+    },
+    {
+      "receipt_finding": "minor-2",
+      "severity": "minor",
+      "classification": "disproved_after_dependency_review",
+      "conclusion": "The hypothesized stranded transition does not occur for a legitimately claimed story. snapshotVersion always inventories every tracked and ordinary untracked file; relevantPaths only controls additional ignored paths and nested submodule scope. Therefore the story entry exists even when the task packet omits the story path. An ignored story cannot be claimed because current project transactions reject ignored write targets.",
+      "evidence": [
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/scope.mjs",
+          "lines": "290-341",
+          "detail": "The authoritative set is all git ls-files plus all nonignored untracked files before relevant path filtering is applied only to ignored files."
+        },
+        {
+          "path": "/tmp/deliver-parity-t05l/plugins/deliver/skills/deliver/scripts/deliver.mjs",
+          "lines": "232-247",
+          "detail": "Start captures that whole authoritative snapshot; packet paths are not a whitelist for tracked files."
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+          "lines": "201-224",
+          "detail": "A claim transaction rejects an ignored story write before publication."
+        }
+      ],
+      "task_mapping": null,
+      "policy_action": "No correction. Add a regression only if this behavior is later changed; do not alter snapshot semantics to satisfy the finding."
+    },
+    {
+      "receipt_finding": "minor-3",
+      "severity": "minor",
+      "classification": "confirmed_bug",
+      "conclusion": "The transaction scans the entire after-image, including unchanged story contract prose. The loose secret-shaped pattern accepts ordinary eight-character words, so text such as credential: rotation blocks a claim even though the claim only adds a generated Execution block. This is a false positive in claim publication, while retaining secret checks on newly introduced bytes and recovery images remains required.",
+      "evidence": [
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+          "lines": "24-27, 201-215, 363-371",
+          "detail": "secretScan matches credential/token labels followed by eight value characters; transact.set passes the full replacement text; claim supplies the whole story after-image."
+        }
+      ],
+      "task_mapping": {
+        "task": "T08",
+        "basis": "T08 already owns current-pm claim/recovery validation and current lifecycle tests; its AC4 requires exact legal claim after-images and safe recovery. The fix must be included as a tested claim/recovery rule, not waived."
+      },
+      "policy_action": "Within T08, distinguish unchanged before-image bytes from generated claim bytes while preserving full validation of actual secret-bearing deltas and journal recovery."
+    },
+    {
+      "receipt_finding": "minor-4",
+      "severity": "minor",
+      "classification": "confirmed_bug",
+      "conclusion": "Approval validates the syntax of any Integration branch that is present but permits the field to be absent. It then records an approved plan digest, while requireExecutable rejects that same approved plan later. This creates an avoidable second approval round.",
+      "evidence": [
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/project-state.mjs",
+          "lines": "127-138",
+          "detail": "readPlanPolicy returns integrationBranch null when absent and only validates non-null values."
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+          "lines": "254-270, 286-295",
+          "detail": "approveCurrentPm accepts readPlanPolicy without requiring the branch, while requireExecutable rejects a missing branch."
+        }
+      ],
+      "task_mapping": {
+        "task": "T08",
+        "basis": "T08 owns current-pm approval/claim recovery validation; accepted architecture lines 329-340 require approval to validate live tracked plan policy and digest before writes."
+      },
+      "policy_action": "Make approval reject a missing Integration branch before writing the approved marker and cover the no-write failure path."
+    },
+    {
+      "receipt_finding": "minor-5",
+      "severity": "minor",
+      "classification": "planned_future_behavior",
+      "conclusion": "The current generic plan correction can strand a current-bound run exactly as reported. The accepted T08 design already replaces this behavior: material correct-course must revoke shared approval recoverably, retain spent budgets/history and require explicit reconciliation before a new baseline. The frozen T05L overlay predates that work.",
+      "evidence": [
+        {
+          "path": "/tmp/deliver-parity-t05l/plugins/deliver/skills/deliver/scripts/deliver.mjs",
+          "lines": "334-364",
+          "detail": "Current projects special-case only fix/retry; plan correction rewrites state.plan and clears run approval through the generic path."
+        },
+        {
+          "path": "docs/plans/parity-contracts/architecture-state.md",
+          "lines": "165-167",
+          "detail": "Accepted T08 behavior requires shared revocation, retained counters/history and explicit reconciliation."
+        },
+        {
+          "path": ".deliver/task-blueprints.json",
+          "lines": "T08 acceptance T08-AC3",
+          "detail": "The authorized task explicitly owns material correction revocation and retained spent budgets."
+        }
+      ],
+      "task_mapping": {
+        "task": "T08",
+        "basis": "Direct acceptance coverage and existing touches for deliver.mjs, current-pm.mjs and state.mjs."
+      },
+      "policy_action": "Do not patch T05L. Implement and test the accepted revocation/reconciliation path in T08."
+    },
+    {
+      "receipt_finding": "minor-6",
+      "severity": "minor",
+      "classification": "deliberate_current_contract",
+      "conclusion": "This finding combines two cases. A malformed matching run record blocks because the runtime cannot prove that it does not contain an active duplicate binding; silently skipping it would weaken the fail-closed duplicate-run invariant. A finished same-story run also blocks generic start today by design. The specialized, token-bound correction generation that may continue a failed integration without resetting history is planned in T05C.",
+      "evidence": [
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+          "lines": "398-424",
+          "detail": "prepareCurrentBinding reads every UUID-shaped run through strict readRun and rejects any same-story current binding without trusting phase."
+        },
+        {
+          "path": "docs/plans/2026-09-09-upstream-parity.md",
+          "lines": "161-168",
+          "detail": "Duplicate runs must block and resume must retain counters rather than create replacement state."
+        },
+        {
+          "path": ".deliver/task-blueprints.json",
+          "lines": "T05C acceptance T05C-AC1 through T05C-AC3",
+          "detail": "T05C defines the narrow correction-run exception with immutable lineage and maximum spent budgets."
+        }
+      ],
+      "task_mapping": {
+        "task": "T05C",
+        "basis": "Only the finished failed-integration continuation belongs to T05C. Malformed generic run records remain blocking unless a separately authorized quarantine/proof contract is added."
+      },
+      "policy_action": "Keep malformed run files fail closed and expose them through T08 diagnostics. Implement only the token-bound finished-run continuation in T05C."
+    },
+    {
+      "receipt_finding": "minor-7",
+      "severity": "minor",
+      "classification": "deliberate_current_contract",
+      "conclusion": "The no-write same-owner claim report does require the clean integration checkout, but public sequential claim preparation is explicitly defined at the inspected clean integration tip. Current runtime start already resumes on the claimed story branch. T08 adds the intended fresh-process resume route, so weakening claim checkout semantics is unnecessary.",
+      "evidence": [
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+          "lines": "331-360",
+          "detail": "Existing claims return resumed true only after requireCleanIntegrationCheckout."
+        },
+        {
+          "path": "docs/plans/parity-contracts/architecture-state.md",
+          "lines": "78-98, 400-410",
+          "detail": "Sequential claim publishes from the clean integration checkout; T08 supplies pm resume/doctor routes and preserves same-owner claim evidence."
+        },
+        {
+          "path": ".deliver/task-blueprints.json",
+          "lines": "T08 acceptance T08-AC1",
+          "detail": "Fresh-process resume must select the correct phase/story without resetting state."
+        }
+      ],
+      "task_mapping": {
+        "task": "T08",
+        "basis": "T08's dedicated resume path addresses the usability concern without changing the claim publication contract."
+      },
+      "policy_action": "Keep claim integration-checkout validation. Ensure T08 resume works from the story branch and does not require a redundant claim call."
+    },
+    {
+      "receipt_finding": "minor-8",
+      "severity": "minor",
+      "classification": "mixed",
+      "conclusion": "The status subclaim is correct: the frozen PM CLI calls assertCurrentPmReady before inspection, so it cannot describe the journal that blocks it. This is planned T08 diagnostic behavior. The mutator subclaim is disproved: transitionCurrentExecution calls assertPmBinding, which dispatches to assertCurrentBinding, then requireExecutable, then assertCurrentPmReady; that final helper checks both the current-PM and transition journals.",
+      "evidence": [
+        {
+          "path": "/tmp/deliver-parity-t05l/plugins/deliver/skills/deliver/scripts/pm.mjs",
+          "lines": "113-120",
+          "detail": "status refuses to inspect while either journal exists."
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+          "lines": "347-363",
+          "detail": "transitionCurrentExecution invokes assertPmBinding before constructing a transition."
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/pm.mjs",
+          "lines": "305-311",
+          "detail": "assertPmBinding dispatches current bindings to assertCurrentBinding."
+        },
+        {
+          "path": "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+          "lines": "190-198, 286-295, 433-457",
+          "detail": "The current binding path reaches assertCurrentPmReady, which rejects both journal files."
+        },
+        {
+          "path": "docs/plans/parity-contracts/architecture-state.md",
+          "lines": "156-163, 405-410",
+          "detail": "T08 doctor/resume inspection must remain observational and return bounded located diagnostics."
+        }
+      ],
+      "task_mapping": {
+        "task": "T08",
+        "basis": "Only the read-only status/doctor diagnostic belongs to T08; no transitions.mjs correction is justified by this receipt."
+      },
+      "policy_action": "Have T08 status/doctor report INTERRUPTED_TRANSACTION without mutation. Preserve the existing indirect dual-journal mutator check."
+    }
+  ],
+  "overall": {
+    "blocking_policy_decision": "Major 3 is not a defect against the approved contract. Relaxing it requires explicit authorization because unreadable state may conceal a collision.",
+    "new_unallocated_bug": "Minor 1 requires a bounded story.mjs correction; no pending task owns that path.",
+    "existing_task_work": {
+      "T08": ["minor-3", "minor-4", "minor-5", "minor-7 usability path", "minor-8 status subclaim"],
+      "T05C": ["minor-6 finished failed-integration continuation only"]
+    },
+    "no_change": ["minor-2", "minor-6 malformed-run fail-closed rule", "minor-8 transition-journal subclaim"]
+  }
+}

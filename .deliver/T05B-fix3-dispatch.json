@@ -1,0 +1,68 @@
+{
+  "task": "T05B",
+  "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "revision": 17,
+  "counters": {
+    "retries": 0,
+    "fixes": 3,
+    "corrections": 0
+  },
+  "status": "Third repair authorized within standing delivery scope; tests first, builder held until independent freeze",
+  "failed_snapshot": "009feeee3ea2fee4433de2815ca869f6a54f74b186103a95ec0c902ca29a8c9f",
+  "review": ".deliver/review-T05B-fix2.json",
+  "verification": ".deliver/verification-T05B-fix2.json",
+  "design": ".deliver/T05B-fix3-design-proposal-native.json",
+  "pins": [
+    "All original task paths, acceptance and baseline remain unchanged; preserve all25 review findings.",
+    "Retain the existing identified generation descriptor under adopted artifact proof.generation and cross-bind it to proof parent/source proof/finalization. This pins private representation only.",
+    "P/E story_before must equal independently committed parent story bytes and the retained candidate contract/Execution identities; timestamps remain saved inputs, not claims of authentication.",
+    "Generate H2 using its selected attempt.parent for initial and replacement attempts; do not use original closure terminal on replacements.",
+    "PM admission projects validated closure.proof.terminal_commit directly.",
+    "Final evidence validation enforces the same exact acceptance and actor/panel rules as the existing remote recording API.",
+    "Preserve Git executable modes100644/100755; missing new report paths use100644. Do not impose a new blanket0600 or100644 source policy.",
+    "Keep the declared npm test and npm run validate commands and600-second timeout unchanged.",
+    "Explicit production repair: validate exact unique acceptance IDs, valid independent reviewer/verifier actors, panel member grammar/actors/unique lenses/derived aggregate, and required lens coverage for required/requested reporting P. Skipped reporting retains valid no-panel reviews.",
+    "Retain identified required-lens derivation from independently read frozen-M story, bound to source contract/Execution and finalization; terminal validation cross-checks its required set and identities without environment rehash."
+  ],
+  "test_optimization": {
+    "actor": "/root/correction_regressions",
+    "kind": "Read-only diagnosis, no timing run claimed",
+    "evidence": "Fix1 remote-lifecycle top-level durations sum to about577seconds of579seconds total.",
+    "proposal": "Reuse one genuine finishedRemoteCandidate/providerFixture inside each existing sequential supersession and provider-interruption matrix; restore exact initial integration-record bytes, bare main/story refs, provider state/call log before each child and assert source run/counters/HEAD/worktree status invariants. Preserve every named child and assertion.",
+    "estimated_saving": "40\u201350seconds from five removed duplicate setups; estimate only."
+  },
+  "ownership": {
+    "tests": "/root/correction_regressions owns four existing test paths, builder must remain frozen until root release.",
+    "production": "/root/recover_t05c owns production/docs only after tests freeze.",
+    "review": "/root/recovery_contract",
+    "verification": "/root/correction_verifier"
+  },
+  "stop_rule": "This is fix3 on the original run. Do not dispatch fix4 without a user decision if final repair fails.",
+  "review_requirements_representation": {
+    "location": "remote.integration_evidence.finalization.review_requirements",
+    "version": "remote-review-requirements-v1",
+    "fields": [
+      "version",
+      "commit",
+      "story_path",
+      "story_before",
+      "story_hash",
+      "story_mode",
+      "contract_hash",
+      "execution_hash",
+      "scale",
+      "reporting",
+      "required_lenses",
+      "identity"
+    ],
+    "rules": [
+      "Existing identified canonical identity convention.",
+      "commit equals frozen evidenceM; story_before is independently committed M story text, story_hash hashes it, parsed contract/Execution match source identities.",
+      "Derive sorted unique required_lenses from parsed retained story and existing reporting policy, not from a self-supplied list.",
+      "For skipped reporting use empty required_lenses; supplied panel still validates its structure, actor independence and aggregate.",
+      "Retain existing byte bounds; no new timestamps, environment rehash or authentication claims.",
+      "story_mode is100644 or100755; manifest.entries[story_path] equals file:644|755:<story_hash>. Validate manifest entries/bindings/scopes and recompute manifest.hash as SHA256(canonical({entries,bindings})).",
+      "Derive required lenses in cycle-safe integration/current-pm callers. state.mjs must not import story.mjs or review.mjs, which already depend on state. All public read/admission/closure paths must enforce semantic derivation."
+    ]
+  }
+}

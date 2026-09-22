@@ -1,0 +1,5 @@
+{
+  "agent": "/root/correction_regressions",
+  "qualification": "Exact agent-reported narrow edit and syntax/whitespace results, not formal gates.",
+  "message": "Narrow correction complete and frozen. `expectedLatestProviderObservation(attempt)` now starts from the validated prepared observation, overlays valid latest observed repository/PR/branch/head/base values, and always replaces result_identity with the retained observed transition result_identity. Both head/base `prior_observation_identity` expectations hash that normalized latest observation. The repaired admission control now explicitly proves `handoff_repair.proof.commit === S` and `!== R` before the existing real-field rebind to R; no remote_commit change.\n\n`node --check tests/remote-lifecycle.test.mjs` exit 0; tracked and no-index whitespace checks clean. No expensive tests rerun. Final remote-lifecycle SHA-256: 07f22550b83fb5c82ec02347f0a0c9775b8406677b66f4cc53b879e1fdec7c98. Other three hashes unchanged: remote 8b3f797..., current-roundtrip 453327a..., operations dde1af2...."
+}

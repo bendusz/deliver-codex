@@ -1,0 +1,37 @@
+{
+  "commit": "3513e0c2146abeb88230dbfacd2c4dc68937da32",
+  "snapshot": "6878683c7c9e3511d86a2d59507c28805816398b43ed8737740dea8a875ea0e3",
+  "finished_revision": 26,
+  "counters": {
+    "retries": 0,
+    "fixes": 4,
+    "corrections": 0
+  },
+  "paths": [
+    ".deliver/T05C-fix4-approval.json",
+    ".deliver/T05C-preimplementation-clarifications.json",
+    ".deliver/T05C-successor-provenance.json",
+    ".deliver/review-T05C-round1.json",
+    ".deliver/review-T05C-round2.json",
+    ".deliver/review-T05C-round3.json",
+    ".deliver/review-T05C-round4.json",
+    ".deliver/review-T05C-round5.json",
+    ".deliver/review-T05C.json",
+    ".deliver/runs/d7c72357-2f28-4ac9-b364-09c3b1b0628a.json",
+    ".deliver/tasks/T05C.json",
+    ".deliver/verification-T05C-round1.json",
+    ".deliver/verification-T05C-round2.json",
+    ".deliver/verification-T05C-round3.json",
+    ".deliver/verification-T05C-round4.json",
+    ".deliver/verification-T05C-round5.json",
+    ".deliver/verification-T05C.json",
+    "plugins/deliver/skills/deliver/references/shipping.md",
+    "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+    "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+    "plugins/deliver/skills/deliver/scripts/lib/integration.mjs",
+    "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+    "plugins/deliver/skills/deliver/scripts/pm.mjs",
+    "tests/current-lifecycle.test.mjs",
+    "tests/integration-correction.test.mjs"
+  ]
+}

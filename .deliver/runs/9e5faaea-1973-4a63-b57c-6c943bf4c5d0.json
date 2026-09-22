@@ -1,0 +1,911 @@
+{
+  "schema_version": 1,
+  "run_id": "9e5faaea-1973-4a63-b57c-6c943bf4c5d0",
+  "mode": "managed",
+  "revision": 16,
+  "project_root": "/private/tmp/deliver-parity-t04",
+  "created_at": "2026-09-10T00:09:59.124Z",
+  "updated_at": "2026-09-10T02:06:37.018Z",
+  "phase": "finished",
+  "plan": {
+    "path": "/private/tmp/deliver-parity-t04/docs/plans/2026-09-09-upstream-parity.md",
+    "hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+  },
+  "approval": {
+    "approver": "Ben",
+    "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb",
+    "approved_at": "2026-09-10T00:09:59.203Z"
+  },
+  "task": {
+    "packet": {
+      "id": "T04",
+      "objective": "Add durable coordinator Execution transitions and audited two-phase commit adoption without resetting cumulative scope or budgets",
+      "acceptance": [
+        {
+          "id": "T04-AC1",
+          "text": "Coordinator transitions enforce legal Execution states and persist monotonic retry/fix counters before dispatch; conflict-aware recovery preserves spent attempts and never overwrites changed story contracts."
+        },
+        {
+          "id": "T04-AC2",
+          "text": "Prepared commit adoption checks direct-parent HEAD, exact intended tree/index/branch and protected Git metadata, permits only previously audited scoped edits, and leaves original scope and dirty-work baseline immutable."
+        },
+        {
+          "id": "T04-AC3",
+          "text": "Real temporary Git repo lifecycle tests cover build, authorized commit, fresh gates/review/verification, fix and fresh-process recovery; stale PASS, unauthorized commits and bookkeeping-hidden source/contract/receipt changes cannot pass."
+        }
+      ],
+      "read_paths": [
+        "AGENTS.md",
+        "docs/plans/2026-09-09-upstream-parity.md"
+      ],
+      "touches": [
+        "plugins/deliver/skills/deliver/references/runtime.md",
+        "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/pm.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/scope.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+        "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+        "plugins/deliver/skills/deliver/scripts/pm.mjs",
+        "tests/current-lifecycle.test.mjs",
+        "tests/scope-regressions.test.mjs",
+        "tests/transitions.test.mjs"
+      ],
+      "commands": {
+        "test": "npm test",
+        "validate": "npm run validate"
+      },
+      "specs": []
+    },
+    "builder": "t01_builder",
+    "started_at": "2026-09-10T00:09:59.323Z"
+  },
+  "baseline": {
+    "captured_at": "2026-09-10T00:09:59.446Z",
+    "snapshot": {
+      "entries": {
+        ".gitattributes": "file:644:6866769d73d3e4da4eb37df56a8f4d7c13b76931f43c98b22a0a3dca560b1c98",
+        ".gitignore": "file:644:8180e47269e938c10fac903c5b91adb9d99b17056e0aae991e6129bf77102a0e",
+        "AGENTS.md": "file:644:880f8a032e9e90eead7c3aef538b7c6d8dabf4b50e607405df4a45c20ad66392",
+        "LICENSE": "file:644:3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+        "NOTICE.md": "file:644:7162a1387603b078c268f64c43f3b31a1a61a861269994541d7496400b46b80f",
+        "README.md": "file:644:c5627680bfccb102c3ec5f5440f5f10ff0a627a317123435c4aeda0940a0953a",
+        "bin/deliver.mjs": "file:755:6a417373d0df05ba24464665d4dd9c758e504d8168f23d7257d4e74846f4f0c3",
+        "docs/evaluation.md": "file:644:6d2279f74f772d980261545244c24a0af5e01b22d53ca5bb46646052cf780e67",
+        "docs/parity-contract.json": "file:644:85e82c0b50551fe862db8854f45d3904db53b075e7ea5d6db0368391ec62de42",
+        "docs/plans/2026-09-09-upstream-parity.md": "file:644:d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb",
+        "package.json": "file:644:b940bba2da59045db4c25d7493a6ef8927d7c52a77507c8f2a33d3e81b8b9a7c",
+        "plugins/deliver/.codex-plugin/plugin.json": "file:644:d40d65e4854068d62bd8a9be1b7fa09f1d8d959c1867078953b6a4e1c7018ddd",
+        "plugins/deliver/LICENSE": "file:644:3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+        "plugins/deliver/NOTICE.md": "file:644:7162a1387603b078c268f64c43f3b31a1a61a861269994541d7496400b46b80f",
+        "plugins/deliver/hooks/context.mjs": "file:644:41ad585d4951f565ea30983b7abaf54fbfcee5a14601dc43367fe8c038fd02a4",
+        "plugins/deliver/hooks/hooks.json": "file:644:f9a2302b52033fa6af046fa4651b981c4c00d1842e798df569a3dd62acbcb987",
+        "plugins/deliver/skills/deliver/SKILL.md": "file:644:0634012fa62e2722eace6f1c85c48c7b6ae0de356c35571cfabeed330a43cd62",
+        "plugins/deliver/skills/deliver/agents/openai.yaml": "file:644:0b0770232401e052f05911e92ff824b44cf5be438f942d170448600a97026e98",
+        "plugins/deliver/skills/deliver/assets/benchmark-result.schema.json": "file:644:2733b412ed03d5d5300a8591214e603cbcb843c80913cf62382993c8b8762f28",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-architecture.toml": "file:644:040499a5f52843165d79319496b4af0a01089dd0f8321baa3d54ac41e39adebf",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-builder.toml": "file:644:90a875b6ddab5e7c5a7f09163bb880c32c39b19ee1a7c922c5cb22288d93596e",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-claude-reviewer.toml": "file:644:acbc55f4e601a05cff1ffb6b86339acb28e04989565fc6f3dd9848a0efb85f76",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-debugger.toml": "file:644:3513cff3017fb33b68518e69fef21d5ad6b87cb020def52222053e1fde64b8b3",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-explorer.toml": "file:644:85665851b45bbcb94af0398f9807fac275d688317281a91e2c739e495e42638d",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-librarian.toml": "file:644:2f374ceea41385aae9170bc147190ae5286e84f248b27c2b465d609fd1cac26a",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-researcher.toml": "file:644:beafc50a187e294d7eca7f6715637938343910594a452a264f0c983f582c8301",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-reviewer.toml": "file:644:50b8f71ce77d1cba661cf28bb28b1204e59795ee1f683de52cdc8fdd7caeeb8f",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-security.toml": "file:644:74e5917dc4b0bc6e33bd6a22ef49dd5d3cd0ffd3f49a6a87d25ef503dd844371",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-spec-architect.toml": "file:644:0ac7d6d7fd59bcbe10f08f8174bbda340ae0688e95529b9551f2c7393d6bc6b3",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-technical-writer.toml": "file:644:7d6f8c26947421eff4517d8082e8a50437096e06b7bc393d2bf15dfe8abefccd",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-test-engineer.toml": "file:644:479ed373405dde5fdf265f140829a3d8f27e88a425fcd3599335488df851f905",
+        "plugins/deliver/skills/deliver/assets/codex-agents/deliver-verifier.toml": "file:644:ce39c8b010675ad952a4aca3fb6cb8bcb75b6fe00f97d69646901bde765e01a1",
+        "plugins/deliver/skills/deliver/assets/operations.json": "file:644:20ef9c2c0c7eef6765c94ca799bea412e2db806b2588f00f64cb5ccb3b610fbc",
+        "plugins/deliver/skills/deliver/assets/review.example.json": "file:644:44ca24764896b56c10a97a0f8df84d4bc1d46ff34ec0f87c0c8d1fb5de75f98b",
+        "plugins/deliver/skills/deliver/assets/specdd/bootstrap.md": "file:644:50db90f302d0167930cbad84fabb1461b0ad6e2fc9e65b6b50dfa21027e11687",
+        "plugins/deliver/skills/deliver/assets/specdd/bootstrap.md.template": "file:644:29075149fe2e0c7bbad76374f137dd460cc5b0faf2002b7e3beeaf14f18a16e6",
+        "plugins/deliver/skills/deliver/assets/specdd/module.sdd": "file:644:88f343d6e95ed72e1989863ea72340f7683bf50162a6d72e53fc1a33134c9ce1",
+        "plugins/deliver/skills/deliver/assets/specdd/module.sdd.template": "file:644:d61c9152b875b407185d05b13d3eee1703caa6288f20d4218a6f00db69d380af",
+        "plugins/deliver/skills/deliver/assets/specdd/root.sdd": "file:644:26f1f3f07f5eb173fd0791a6c6404c980686a9567ca0f3af01504d4102767955",
+        "plugins/deliver/skills/deliver/assets/specdd/root.sdd.template": "file:644:b43e572f3831dfeb3b23e0787366073f5ebe805db8947e6fb840c3927acde437",
+        "plugins/deliver/skills/deliver/assets/task.example.json": "file:644:0ce2fce1d34fa454d4e9fd0b1b40533b17dc61939bd7adca1849cd2108b32c8e",
+        "plugins/deliver/skills/deliver/assets/templates/AGENTS.md.template": "file:644:1c437085281939246e1519ddd9efa5ab0bcbdd6124b946fb9cd4916f5d9a7202",
+        "plugins/deliver/skills/deliver/assets/templates/approval.json.template": "file:644:91465c46c86cf5ea709a772cc2ae4c8aee72e187dfce994adbab5fc3c030dbca",
+        "plugins/deliver/skills/deliver/assets/templates/completion-report.md.template": "file:644:7f4ffaa30a2827146a600e198b74851b323a1a5be389b484f1c5067a8637f3d2",
+        "plugins/deliver/skills/deliver/assets/templates/constitution.md.template": "file:644:5aa9c9533b1c3c9e9d532f06002e7267c7e3cb8dfdb52e033eaa3d867789a687",
+        "plugins/deliver/skills/deliver/assets/templates/plan.md.template": "file:644:894763dd8a4a3815bf70398a2c76c4cd4abcd591b0df2047bca1d3133a34c9dc",
+        "plugins/deliver/skills/deliver/assets/templates/spec.md.template": "file:644:d22b061f0b7b253ffbf5d22a3e2015dbefc83c4b3ddd4dd5d064fd2e67f68129",
+        "plugins/deliver/skills/deliver/assets/templates/story.md.template": "file:644:978eaa0ea415e0b58b7076eea602a1ffc31618dc20e4bfc9a5890aa3947a4c0c",
+        "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template": "file:644:1d2992b97a7839f502a9b38f9259978da46eea4c495c55fc6915ef8665454d3c",
+        "plugins/deliver/skills/deliver/assets/verification.example.json": "file:644:12e375d51e1ff51b35afb1ad42cd3e442000efdb0f1d383207e57656ee16bb74",
+        "plugins/deliver/skills/deliver/references/claude-review.md": "file:644:ad1fff062eefbb7049c34e898675c1277dbae14c3ca78bb5d77134ccfcd5a4d1",
+        "plugins/deliver/skills/deliver/references/compatibility.md": "file:644:6f16e1ec716c434bf47025b6fe3b9fe3da6d1e83e04b93cd66630e02cf26cdc8",
+        "plugins/deliver/skills/deliver/references/decomposition.md": "file:644:aa36f1e27a01333629c8e36c3fc9fa653f980b065360b8b767bedc65ba745f68",
+        "plugins/deliver/skills/deliver/references/discovery.md": "file:644:6ca3b2e4e31f48f046b9d95aec6bc73fac1209d0a1d3f1b8c967f90621401a6f",
+        "plugins/deliver/skills/deliver/references/governance.md": "file:644:43ff3086d2416d83e186006dd9881ee2cdc002b850f6bd7003c85fd4b1a178e7",
+        "plugins/deliver/skills/deliver/references/knowledge.md": "file:644:c71b90e563decd626fc5e10256194be794ae85b9dfa33e09f920a982aeac55c5",
+        "plugins/deliver/skills/deliver/references/operations.md": "file:644:8b5d0f782e20147cb62390096fd594cf543efd084f52d8044bfe4259b0700f4e",
+        "plugins/deliver/skills/deliver/references/parallel.md": "file:644:b46b95edfd32c5c486d86d0897726830f54e2e654e6590416d03686ea5ab132b",
+        "plugins/deliver/skills/deliver/references/planning.md": "file:644:ebf852da0258012528ea937e9302f580747671c92b16213ab1f76c91b711c20e",
+        "plugins/deliver/skills/deliver/references/recovery.md": "file:644:3c4fd34bb36cb356e07285aa529730abef557a5b438ba8803914b4206f79189d",
+        "plugins/deliver/skills/deliver/references/runtime.md": "file:644:f51ca052dc3141bad2d0057c19f576ee7f5414d50fe5e3ae99977af4cf063287",
+        "plugins/deliver/skills/deliver/references/scale-profiles.md": "file:644:42c08d624392888a20061a9a18faf61c7bfc6be82edc5284d6d7d2d081e9fe91",
+        "plugins/deliver/skills/deliver/references/specdd.md": "file:644:7f379875904acda43c7a197784e96602fd796ccb28da95e1c37faeac840edadc",
+        "plugins/deliver/skills/deliver/references/specification.md": "file:644:5469cbc552858712622b77517ba8734322e6b2b11ce691986534d1114d8b9a11",
+        "plugins/deliver/skills/deliver/references/workflow.md": "file:644:883b594ee96df35b340912ba69417c5d439a5e09c3d7a3ff4827174478cb669d",
+        "plugins/deliver/skills/deliver/scripts/benchmark.mjs": "file:644:cbc58df431d1d4ba86dc4aadaf6c057077d43555e9defe86dd8f4434fc91d099",
+        "plugins/deliver/skills/deliver/scripts/claude-review.mjs": "file:644:1a1d9271a74b4079353de0651f19c8cf159e3a8ed3f497329ec87c41ccf920cf",
+        "plugins/deliver/skills/deliver/scripts/deliver.mjs": "file:755:78a96493adb83d7cdf1c13e7267af79320ab845f0af0adf6fc7fc874dba67bb9",
+        "plugins/deliver/skills/deliver/scripts/lib/benchmark.mjs": "file:644:599ff7c875e4a0e1de23bd7da16a8ed8989589690bde6be62f601401ceee3ff0",
+        "plugins/deliver/skills/deliver/scripts/lib/contracts.mjs": "file:644:a251f7f98ac1475463cfc557fde86aa042a1ad5ff993ede65e225204f4753cc2",
+        "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs": "file:644:bbafce55693fe562a510101a0f957288f5870b5b87730d483bdde0eea3bcec7b",
+        "plugins/deliver/skills/deliver/scripts/lib/gates.mjs": "file:644:097a86b03827a4cab1668ca4038879155e4d30c8d92007e2e32d2a79e829367c",
+        "plugins/deliver/skills/deliver/scripts/lib/pm.mjs": "file:644:24f680fa3615c90b3163482e7c79ad2c61c3e7a3c54e3d9a0d0ab64ffc729970",
+        "plugins/deliver/skills/deliver/scripts/lib/project-state.mjs": "file:644:5c69402512a6422f88136f7ab6b758e194f1e317caa511282f73f25e1d95b3ff",
+        "plugins/deliver/skills/deliver/scripts/lib/scope.mjs": "file:644:41bf71ddb82ceb0b8d36646e87b6747e19977ee1bd4d47c0fd7cce23935e0b92",
+        "plugins/deliver/skills/deliver/scripts/lib/state.mjs": "file:644:2600ca79d773a37dab8f7f5f3ebfc01d51cd5549f6b061a5df20f3f6f5bf9570",
+        "plugins/deliver/skills/deliver/scripts/lib/story.mjs": "file:644:cad0f9457cbe02865108fb179db3ddcce62b1f222eb02a75799f0277a79e1d98",
+        "plugins/deliver/skills/deliver/scripts/pm.mjs": "file:644:9f4d927eaee82ac95137deff12b8562013de9f3cc7abba6282631d90d546e183",
+        "plugins/deliver/skills/deliver/scripts/specdd.mjs": "file:644:bfae9d5eb24f1784d264e7d70dc0821b4f41a9828d3d473a0346b4ee498ac9c0",
+        "scripts/validate.mjs": "file:755:fab0466e65b39b1cb3a06af88672c99977f0d5a8b7920f75cfe9724fd8f82193",
+        "tests/benchmark.test.mjs": "file:644:b350ad5413baac73c7558556b8ca3c97b5d27d62e04d540c8227ccef8aa1ae8b",
+        "tests/claude-review.test.mjs": "file:644:679c7dae6cf6973880743009ebd29c3ba3fde937e042fe87bff56da8bc22af07",
+        "tests/contracts-integration.test.mjs": "file:644:8eb3c09725dfbe514b5ecfd5ed8520d425d80dcd5d1a3bf0a4e4e78803574fe3",
+        "tests/current-lifecycle.test.mjs": "file:644:54299b6cdfd5238972f09a10184b640b283d27055eb6c41badb35e6b6744b050",
+        "tests/fixtures/upstream-v0.22.0/NOTICE.md": "file:644:f43d5a7ad780077f17700936b7f7bc348567edac78d4c3be0e8de790ececace5",
+        "tests/fixtures/upstream-v0.22.0/hooks/lib.mjs": "file:644:1f9a8ff3a3f4eb300851fcbac7569509050f738a4dd56d22be2e6459f8242339",
+        "tests/fixtures/upstream-v0.22.0/hooks/session-context.mjs": "file:644:820c41410e07ef11f65ad3888971d8c862a7946a9133a2a49479c1b4b1d47c6d",
+        "tests/fixtures/upstream-v0.22.0/templates/actor-state.json.template": "file:644:ae6ae65ca6d3edb00228726b78884e920416dc854f5d0a77a723e8f30ea46d64",
+        "tests/fixtures/upstream-v0.22.0/templates/pm-state.json.template": "file:644:9bdf7ee6b341cf31b94c73ed9cbdade42293db737d6e600d17de791a086d8aa3",
+        "tests/fixtures/upstream-v0.25.1/NOTICE.md": "file:644:5ed9deec2942fd7ca5b3d0da184dd06aa0a57b734f3dc7e43bc83617d6e86458",
+        "tests/fixtures/upstream-v0.25.1/hooks/lib.mjs": "file:644:157bc7afe458d9ce4e05dd9bd3a8bb3326e791d3f5578737bfc17ad7e6dcfaea",
+        "tests/fixtures/upstream-v0.25.1/provenance.json": "file:644:8f1d82ab397d3c5e77e97bda2d2b7896172c8349ea6bebcaaf93d1fcbcab6032",
+        "tests/fixtures/upstream-v0.25.1/templates/AGENTS.md.template": "file:644:e188fbe70d50050a1ea2b5225eff41155366cfb9bcfbd9ac44336e40fa127823",
+        "tests/fixtures/upstream-v0.25.1/templates/CLAUDE.md.template": "file:644:e8d5dd46d7bdc6f6cc5e4b9b845611660d6db84fc647d8519e2fd59f59575ccc",
+        "tests/fixtures/upstream-v0.25.1/templates/HANDOFF.md.template": "file:644:ec44977ce51a36fa54aa30e9a6f9489a5ed235eeb9b9ca43901db35cd7bebc1f",
+        "tests/fixtures/upstream-v0.25.1/templates/approval.json.template": "file:644:91465c46c86cf5ea709a772cc2ae4c8aee72e187dfce994adbab5fc3c030dbca",
+        "tests/fixtures/upstream-v0.25.1/templates/checklist-plan-quality.md.template": "file:644:2cf69e59c44b12f7b22b2b5035b1bcb19a8d25647521ff35206279bf5af9ef25",
+        "tests/fixtures/upstream-v0.25.1/templates/checklist-spec-quality.md.template": "file:644:193518525bdca5760a80b91b7519f7e894cd339a3daed9bb824077a157e1f2fd",
+        "tests/fixtures/upstream-v0.25.1/templates/checklist-story-readiness.md.template": "file:644:f5f365e215233a00629b8c098b0d3f767fd8185c4d5b7089328e93138595d765",
+        "tests/fixtures/upstream-v0.25.1/templates/checklist-verification-quality.md.template": "file:644:f05149e21bfa28f300cab1b1470598c01f0624ce43d0f4a14926a6366dacf68a",
+        "tests/fixtures/upstream-v0.25.1/templates/claude-settings-hardening.json.template": "file:644:730f3279d940a1644f9b0815ade5266757d2e8b93f1e708ee2fb98622f78ebb9",
+        "tests/fixtures/upstream-v0.25.1/templates/completion-report.md.template": "file:644:8b5bee3b93a16a127c3d2c46ae286eff2c18d267d5ffc25f9bc9a3c314d8ec30",
+        "tests/fixtures/upstream-v0.25.1/templates/constitution.md.template": "file:644:0a7dac3ac9c1fb0a0162ef048cf570a5cf9140ba01080d263910edca844ff513",
+        "tests/fixtures/upstream-v0.25.1/templates/plan.md.template": "file:644:95455a8d9e0a86df7484f027ead29d847ecc8964e704c5bbb75d444137a8083f",
+        "tests/fixtures/upstream-v0.25.1/templates/retro.md.template": "file:644:79e642d07644f58c73274ed92d689a27dd13bd610fa717117177d313a6f4ac6d",
+        "tests/fixtures/upstream-v0.25.1/templates/sdd-module.template": "file:644:f8324f4ff59c184bc1ee865847a6a72a4e8cc4feac888f3c6f815c64790a4d88",
+        "tests/fixtures/upstream-v0.25.1/templates/sdd-root.template": "file:644:8169f1e6a0fdb17e4f89b73deaeee1e4b3a5930ad2f65ddc3bf387a65dc991ba",
+        "tests/fixtures/upstream-v0.25.1/templates/spec.md.template": "file:644:29e4c5630f18b5d7458b54b00138826d72d220a3863429a7fc2b0260f415b4d4",
+        "tests/fixtures/upstream-v0.25.1/templates/specdd-bootstrap.md.template": "file:644:2bc3c3175dc0eb5f9ad669517857a0ee324d18d47725552143e0e63dff59ea0a",
+        "tests/fixtures/upstream-v0.25.1/templates/story.md.template": "file:644:2bfa9c32cc339f4b7b8764ff73e4e59e6562ab42dc720192ec8235342bf8c383",
+        "tests/fixtures/upstream-v0.25.1/templates/verification-report.md.template": "file:644:9f82e7857ce5e633918156712b56a2ff6e4c38325c3e8c16006e09c07a6a7006",
+        "tests/fixtures/upstream-v0.25.1/templates/wiki-index.md.template": "file:644:a0f8c0fbb36296a24a1be6567e28eaf0cd9808f8e0696084808c72adeefa037d",
+        "tests/fixtures/upstream-v0.25.1/templates/wiki-page.md.template": "file:644:fda4f3d0e37bab47d79774b865752360d5b0bb3acf8cf7e8249d93b0900daeed",
+        "tests/fixtures/upstream-v0.25.1/templates/wiki-schema.md.template": "file:644:f2b5981a07b942d2b87d108c9d90b19cb4738cd632f3e908a75cc14a5c89b0e7",
+        "tests/hooks-and-environment.test.mjs": "file:644:e86d20b3c8eceeefa9608b7bf33f10c9459b1258ff4405a8d778fbcf794b06fb",
+        "tests/launcher-integration.test.mjs": "file:644:faa8fc096ae55c3c57b03b3ccbd1c575f6683c7dafe426f5ec0e117963f8ba98",
+        "tests/operations.test.mjs": "file:644:1bc76156f04123c7ed17fbbf40256779fb5fcb6bbe5f5d01752a38506ab93d1e",
+        "tests/pm-compatibility.test.mjs": "file:644:9cf761f4a5cbc21c9d023630e671a0d135ee10d947a92d88753c4e81b6a90e61",
+        "tests/project-state.test.mjs": "file:644:f37ac20382b22e9368fdabbdc8a43748f2b0d346dc853736bc5db70b97b24b3d",
+        "tests/runtime.test.mjs": "file:644:98c143640801b2de4f31edf2ea09aa414cf8a51f582e14075c5869a9465aa236",
+        "tests/scope-regressions.test.mjs": "file:644:3d188432ccbd590313d465afe39753f644383b0d3284303639c469be0c7bdd70",
+        "tests/setup.test.mjs": "file:644:6ce8238f45e9ecc6b33eb060794054b746e1d0bd9364e35d14f6bd4472c62096",
+        "tests/specdd.test.mjs": "file:644:5893857063ae810717d0d118d4bc728fecfe49350b62e81d76135eeda5c0b88b",
+        "tests/story.test.mjs": "file:644:ab849d6f6d854f5a51e964ecccd8761782a76000d8d57d5c6ab5e19c39eb67ee",
+        "tests/template-compatibility.test.mjs": "file:644:3e70d479879392cf1686afe149f95a0eb8ea0786ba1d7495a1ad7f85c8dcb625",
+        "tests/upstream-contract.test.mjs": "file:644:443c98e946e9719ce528ff1bf248f7d89f76fb7c2507479017e5943b5e7b0542"
+      },
+      "git_meta": "f69f8e0908e7dc22f7066be395d1115a89791950d18eb85787cc476a00b588dc",
+      "ignored_advisory": {},
+      "hash": "bd18c475509a50a0096500e76d2d57dc14690102dde2e99d4eb0084a4ab1a237"
+    },
+    "dirty_paths": []
+  },
+  "gates": [
+    {
+      "provenance": "deliver-runtime-executed-v1",
+      "name": "test",
+      "command": "npm test",
+      "cwd": ".",
+      "environment_keys": [],
+      "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "environment_hash": "87b7bcaca99b615bc4bf53dfc880029bf455dd44951d5b24180029e4f63f1afe",
+      "snapshot_hash": "50471c7d0d9ca1fbe5fb567aefba1966305546e925b6cdeefcaee5b76ec4b1bf",
+      "status": "PASS",
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "log_path": ".deliver/logs/9e5faaea-1973-4a63-b57c-6c943bf4c5d0/test-df49e3c7-600e-45b7-96a4-7d6acd06848f.log",
+      "output": {
+        "stdout_bytes": 10944,
+        "stderr_bytes": 0,
+        "truncated": false
+      },
+      "scope": {
+        "ok": true,
+        "changed": [
+          "plugins/deliver/skills/deliver/references/runtime.md",
+          "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/pm.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/scope.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+          "plugins/deliver/skills/deliver/scripts/pm.mjs",
+          "tests/scope-regressions.test.mjs",
+          "tests/transitions.test.mjs"
+        ],
+        "added": [
+          "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+          "tests/transitions.test.mjs"
+        ],
+        "deleted": [],
+        "renames": [],
+        "out_of_scope": [],
+        "preexisting_dirty_changed": [],
+        "symlink_escapes": [],
+        "git_metadata_changed": false,
+        "ignored_advisory_changed": [],
+        "coordinator_execution_changed": null,
+        "git_metadata_compatibility": "legacy-v1",
+        "contracts_changed": []
+      },
+      "started_at": "2026-09-10T01:54:23.816Z",
+      "finished_at": "2026-09-10T01:55:31.542Z"
+    },
+    {
+      "provenance": "deliver-runtime-executed-v1",
+      "name": "validate",
+      "command": "npm run validate",
+      "cwd": ".",
+      "environment_keys": [],
+      "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "environment_hash": "87b7bcaca99b615bc4bf53dfc880029bf455dd44951d5b24180029e4f63f1afe",
+      "snapshot_hash": "50471c7d0d9ca1fbe5fb567aefba1966305546e925b6cdeefcaee5b76ec4b1bf",
+      "status": "PASS",
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "log_path": ".deliver/logs/9e5faaea-1973-4a63-b57c-6c943bf4c5d0/validate-6a7b9594-ed02-4de2-8587-b31fb0405686.log",
+      "output": {
+        "stdout_bytes": 150,
+        "stderr_bytes": 0,
+        "truncated": false
+      },
+      "scope": {
+        "ok": true,
+        "changed": [
+          "plugins/deliver/skills/deliver/references/runtime.md",
+          "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/pm.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/scope.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+          "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+          "plugins/deliver/skills/deliver/scripts/pm.mjs",
+          "tests/scope-regressions.test.mjs",
+          "tests/transitions.test.mjs"
+        ],
+        "added": [
+          "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+          "tests/transitions.test.mjs"
+        ],
+        "deleted": [],
+        "renames": [],
+        "out_of_scope": [],
+        "preexisting_dirty_changed": [],
+        "symlink_escapes": [],
+        "git_metadata_changed": false,
+        "ignored_advisory_changed": [],
+        "coordinator_execution_changed": null,
+        "git_metadata_compatibility": "legacy-v1",
+        "contracts_changed": []
+      },
+      "started_at": "2026-09-10T01:55:31.861Z",
+      "finished_at": "2026-09-10T01:55:33.018Z"
+    }
+  ],
+  "review": {
+    "status": "PASS",
+    "findings": [
+      {
+        "severity": "major",
+        "message": "Resolved from round 1: commit preparation derives its intended paths from the complete cumulative baseline delta plus the audited story path. It excludes unchanged pre-start dirt, rejects a pre-start staged index without mutation, and retains the original baseline and dirty-path list across adoption.",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+        "resolved": true
+      },
+      {
+        "severity": "major",
+        "message": "Resolved from round 1: recovery validates the complete story/run pair by parsing both before images, regenerating the legal transition with the recorded timestamps and attempt, and comparing both exact after images. Changed criteria, contract identity, binding, counters or concurrent live bytes are rejected before either file is written.",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+        "resolved": true
+      },
+      {
+        "severity": "major",
+        "message": "Resolved from round 2: expectedIndex uses an isolated GIT_INDEX_FILE based on the prepared parent, preserves unchanged skip-worktree and assume-unchanged flags, rejects flags on intended paths, and assertTreeCoverage compares every cumulative intended entry to the resulting tree. Pending state binds the expected tree and index-flag digest; adoption checks both before changing run state.",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+        "resolved": true
+      },
+      {
+        "severity": "major",
+        "message": "Resolved from round 2: current anchors recursively bind initialized-submodule HEAD, tree, index tree, index flags and protected Git metadata. Effective hooks bind configuration, directory or symlink identity, each hook's kind/mode/content, and for a symlinked hook both target text and resolved referent mode/bytes. Check, preparation and adoption reject nested drift, while legacy/flat upgrades require represented metadata equality and no unproved active hook.",
+        "path": "plugins/deliver/skills/deliver/scripts/lib/scope.mjs",
+        "resolved": true
+      },
+      {
+        "severity": "minor",
+        "message": "The runtime reference describes exact legacy metadata compatibility and immutable baseline upgrade, but does not state the operational condition enforced by commit preparation: an old anchorless run with an active hook cannot be upgraded because the legacy digest did not record hook mode or symlink referent identity. Document the fresh-run/removal route with the later reference cleanup.",
+        "path": "plugins/deliver/skills/deliver/references/runtime.md",
+        "resolved": false
+      }
+    ],
+    "summary": "T04 passes at frozen snapshot 50471c7d0d9ca1fbe5fb567aefba1966305546e925b6cdeefcaee5b76ec4b1bf. The complete review confirms legal durable transitions, exact recovery generation, cumulative-scope commit isolation, full prepared-tree/index-flag binding, recursive submodule and effective-hook protection, safe legacy upgrade, and stale-evidence invalidation. Coordinator npm test and npm run validate both passed at that exact snapshot. The remaining finding is documentation-only.",
+    "builder": "t01_builder",
+    "reviewer": "state_architecture",
+    "snapshot_hash": "50471c7d0d9ca1fbe5fb567aefba1966305546e925b6cdeefcaee5b76ec4b1bf",
+    "recorded_at": "2026-09-10T02:06:35.852Z"
+  },
+  "verification": {
+    "verifier": "state_architecture",
+    "criteria": [
+      {
+        "id": "T04-AC1",
+        "status": "PASS",
+        "evidence": "transitionRule and buildExecutionTransition enforce claimed -> building -> built -> in-review, explicit blocked handling, and bounded fix/retry returns to building. Story and run counters use their maximum persisted values and increment before the two-file journal is published. validateTransitionJournal regenerates the complete legal pair from validated before images, while the temporary-repository tests reject changed criteria, contract, binding and counters and preserve conflicting live bytes."
+      },
+      {
+        "id": "T04-AC2",
+        "status": "PASS",
+        "evidence": "prepareCommitAdoption requires a clean index, passing cumulative scope, unchanged protected anchor and committable Execution state. Its temporary index starts at the direct parent, rejects flags on intended paths, retains flags elsewhere, stages every cumulative changed task entry plus audited Execution, and proves each resulting tree entry. adoptPreparedCommit requires the exact one-parent current HEAD, same ref, expected tree/index/index flags, unchanged recursive protected metadata and exact prepared worktree-content hash before advancing the anchor. Tests prove pre-start unstaged dirt is preserved, pre-start staged dirt is rejected without mutation, hidden flagged source cannot be omitted, post-prepare flag drift is rejected, and recursive submodule config/hooks/index drift cannot be adopted."
+      },
+      {
+        "id": "T04-AC3",
+        "status": "PASS",
+        "evidence": "The real temporary-repository suite covers intermediate and final candidate commits, fresh gates/review/verification, fix counter persistence, process recovery, stale evidence, unauthorized commits, altered trees, hidden ignored source, changed protected metadata, wrong lineage/branch, immutable baseline compatibility, index flags and recursive submodules. Coordinator npm test passed 121 tests and npm run validate passed packaging, role, JSON and JavaScript checks; both runtime receipts have exit_code 0, passing scope and snapshot_hash 50471c7d0d9ca1fbe5fb567aefba1966305546e925b6cdeefcaee5b76ec4b1bf."
+      }
+    ],
+    "snapshot_hash": "50471c7d0d9ca1fbe5fb567aefba1966305546e925b6cdeefcaee5b76ec4b1bf",
+    "recorded_at": "2026-09-10T02:06:36.442Z"
+  },
+  "checkpoints": [],
+  "counters": {
+    "retries": 0,
+    "fixes": 3,
+    "corrections": 0
+  },
+  "events": [
+    {
+      "at": "2026-09-10T00:09:59.124Z",
+      "type": "initialized",
+      "mode": "managed",
+      "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+    },
+    {
+      "at": "2026-09-10T00:09:59.203Z",
+      "type": "approved",
+      "approver": "Ben",
+      "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+    },
+    {
+      "at": "2026-09-10T00:09:59.446Z",
+      "type": "baseline_captured",
+      "snapshot_hash": "bd18c475509a50a0096500e76d2d57dc14690102dde2e99d4eb0084a4ab1a237",
+      "dirty_paths": []
+    },
+    {
+      "at": "2026-09-10T00:49:12.094Z",
+      "type": "correct_course",
+      "kind": "fix",
+      "reason": "Independent diagnosis confirmed pre-T04 Git metadata fingerprint schema incompatibility; retain exact legacy comparison and immutable baseline while generating new-format evidence.",
+      "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+    },
+    {
+      "at": "2026-09-10T01:01:54.516Z",
+      "type": "gate_executed",
+      "name": "test",
+      "status": "PASS",
+      "snapshot_hash": "5d760a5e70c0d61eb3df4cf71f63c7705f56b2262118e070b77a646e0b817499"
+    },
+    {
+      "at": "2026-09-10T01:01:56.011Z",
+      "type": "gate_executed",
+      "name": "validate",
+      "status": "PASS",
+      "snapshot_hash": "5d760a5e70c0d61eb3df4cf71f63c7705f56b2262118e070b77a646e0b817499"
+    },
+    {
+      "at": "2026-09-10T01:08:44.533Z",
+      "type": "review_recorded",
+      "reviewer": "state_architecture",
+      "status": "FAIL",
+      "snapshot_hash": "5d760a5e70c0d61eb3df4cf71f63c7705f56b2262118e070b77a646e0b817499"
+    },
+    {
+      "at": "2026-09-10T01:08:44.826Z",
+      "type": "correct_course",
+      "kind": "fix",
+      "reason": "Independent review found pre-start dirty work entering commit intentions and insufficient whole-pair validation of recovery journal story/run images.",
+      "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+    },
+    {
+      "at": "2026-09-10T01:20:33.271Z",
+      "type": "gate_executed",
+      "name": "test",
+      "status": "PASS",
+      "snapshot_hash": "875e8f2ce514173cd99aa70cc04d18bd320767a8fb2821d1622487ae6c6398a2"
+    },
+    {
+      "at": "2026-09-10T01:20:34.708Z",
+      "type": "gate_executed",
+      "name": "validate",
+      "status": "PASS",
+      "snapshot_hash": "875e8f2ce514173cd99aa70cc04d18bd320767a8fb2821d1622487ae6c6398a2"
+    },
+    {
+      "at": "2026-09-10T01:30:02.398Z",
+      "type": "review_recorded",
+      "reviewer": "state_architecture",
+      "status": "FAIL",
+      "snapshot_hash": "875e8f2ce514173cd99aa70cc04d18bd320767a8fb2821d1622487ae6c6398a2"
+    },
+    {
+      "at": "2026-09-10T01:30:02.687Z",
+      "type": "correct_course",
+      "kind": "fix",
+      "reason": "Independent fix2 review: bind exact prepared index flags and complete source-tree coverage; retain recursive initialized-submodule Git metadata protection.",
+      "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+    },
+    {
+      "at": "2026-09-10T01:55:31.542Z",
+      "type": "gate_executed",
+      "name": "test",
+      "status": "PASS",
+      "snapshot_hash": "50471c7d0d9ca1fbe5fb567aefba1966305546e925b6cdeefcaee5b76ec4b1bf"
+    },
+    {
+      "at": "2026-09-10T01:55:33.019Z",
+      "type": "gate_executed",
+      "name": "validate",
+      "status": "PASS",
+      "snapshot_hash": "50471c7d0d9ca1fbe5fb567aefba1966305546e925b6cdeefcaee5b76ec4b1bf"
+    },
+    {
+      "at": "2026-09-10T02:06:35.852Z",
+      "type": "review_recorded",
+      "reviewer": "state_architecture",
+      "status": "PASS",
+      "snapshot_hash": "50471c7d0d9ca1fbe5fb567aefba1966305546e925b6cdeefcaee5b76ec4b1bf"
+    },
+    {
+      "at": "2026-09-10T02:06:36.442Z",
+      "type": "verification_recorded",
+      "verifier": "state_architecture",
+      "snapshot_hash": "50471c7d0d9ca1fbe5fb567aefba1966305546e925b6cdeefcaee5b76ec4b1bf"
+    },
+    {
+      "at": "2026-09-10T02:06:37.018Z",
+      "type": "finished",
+      "snapshot_hash": "50471c7d0d9ca1fbe5fb567aefba1966305546e925b6cdeefcaee5b76ec4b1bf"
+    }
+  ],
+  "pm_binding": null,
+  "contracts": null,
+  "evidence_history": [
+    {
+      "at": "2026-09-10T01:08:44.826Z",
+      "reason": "correct_course",
+      "details": {
+        "kind": "fix",
+        "reason": "Independent review found pre-start dirty work entering commit intentions and insufficient whole-pair validation of recovery journal story/run images.",
+        "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+      },
+      "gates": [
+        {
+          "provenance": "deliver-runtime-executed-v1",
+          "name": "test",
+          "command": "npm test",
+          "cwd": ".",
+          "environment_keys": [],
+          "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "environment_hash": "87b7bcaca99b615bc4bf53dfc880029bf455dd44951d5b24180029e4f63f1afe",
+          "snapshot_hash": "5d760a5e70c0d61eb3df4cf71f63c7705f56b2262118e070b77a646e0b817499",
+          "status": "PASS",
+          "exit_code": 0,
+          "signal": null,
+          "error": null,
+          "log_path": ".deliver/logs/9e5faaea-1973-4a63-b57c-6c943bf4c5d0/test-de0b98fb-972d-41ac-b78d-d5601a489146.log",
+          "output": {
+            "stdout_bytes": 10142,
+            "stderr_bytes": 0,
+            "truncated": false
+          },
+          "scope": {
+            "ok": true,
+            "changed": [
+              "plugins/deliver/skills/deliver/references/runtime.md",
+              "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/pm.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/scope.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+              "plugins/deliver/skills/deliver/scripts/pm.mjs",
+              "tests/scope-regressions.test.mjs",
+              "tests/transitions.test.mjs"
+            ],
+            "added": [
+              "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+              "tests/transitions.test.mjs"
+            ],
+            "deleted": [],
+            "renames": [],
+            "out_of_scope": [],
+            "preexisting_dirty_changed": [],
+            "symlink_escapes": [],
+            "git_metadata_changed": false,
+            "ignored_advisory_changed": [],
+            "coordinator_execution_changed": null,
+            "git_metadata_compatibility": "legacy-v1",
+            "contracts_changed": []
+          },
+          "started_at": "2026-09-10T01:01:12.594Z",
+          "finished_at": "2026-09-10T01:01:54.516Z"
+        },
+        {
+          "provenance": "deliver-runtime-executed-v1",
+          "name": "validate",
+          "command": "npm run validate",
+          "cwd": ".",
+          "environment_keys": [],
+          "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "environment_hash": "87b7bcaca99b615bc4bf53dfc880029bf455dd44951d5b24180029e4f63f1afe",
+          "snapshot_hash": "5d760a5e70c0d61eb3df4cf71f63c7705f56b2262118e070b77a646e0b817499",
+          "status": "PASS",
+          "exit_code": 0,
+          "signal": null,
+          "error": null,
+          "log_path": ".deliver/logs/9e5faaea-1973-4a63-b57c-6c943bf4c5d0/validate-199bdcb2-85ed-4f0f-8613-d3b2cdecc7c8.log",
+          "output": {
+            "stdout_bytes": 150,
+            "stderr_bytes": 0,
+            "truncated": false
+          },
+          "scope": {
+            "ok": true,
+            "changed": [
+              "plugins/deliver/skills/deliver/references/runtime.md",
+              "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/pm.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/scope.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+              "plugins/deliver/skills/deliver/scripts/pm.mjs",
+              "tests/scope-regressions.test.mjs",
+              "tests/transitions.test.mjs"
+            ],
+            "added": [
+              "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+              "tests/transitions.test.mjs"
+            ],
+            "deleted": [],
+            "renames": [],
+            "out_of_scope": [],
+            "preexisting_dirty_changed": [],
+            "symlink_escapes": [],
+            "git_metadata_changed": false,
+            "ignored_advisory_changed": [],
+            "coordinator_execution_changed": null,
+            "git_metadata_compatibility": "legacy-v1",
+            "contracts_changed": []
+          },
+          "started_at": "2026-09-10T01:01:54.819Z",
+          "finished_at": "2026-09-10T01:01:56.011Z"
+        }
+      ],
+      "review": {
+        "status": "FAIL",
+        "findings": [
+          {
+            "severity": "major",
+            "message": "Commit preparation includes every unstaged dirty path under a declared touch, even when that path was already dirty before the run and its bytes have not changed from the immutable baseline. Because intended paths are selected from Git status rather than the cumulative changed set, expectedTree stages and adoption accepts the user's unchanged preexisting work. Limit intended source paths to entries actually changed from the baseline, while retaining the separately audited story Execution path. Preserve the current rejection of a non-clean real index so old staged entries can never enter a later default git commit, and cover both unchanged pre-start unstaged work inside a touched directory and pre-start staged work without altering either.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+            "resolved": false
+          },
+          {
+            "severity": "major",
+            "message": "Execution recovery accepts any two path-shaped string before/after images and never validates the journal's contract_hash, owner or branch, parses the story/run pair, or proves the after images encode the legal transition generated from the before images. If current files match a crafted or corrupt before image, recovery can overwrite story criteria, bindings or counters before later checks run. Validate the complete before/after transition and monotonic counter relationship before either write, and add a regression whose after story changes the contract while the current files still match before.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+            "resolved": false
+          }
+        ],
+        "summary": "Independent review confirmed the legacy metadata compatibility correction and found the normal transition/adoption lifecycle well covered, but commit preparation can absorb unchanged preexisting dirty work and recovery does not authenticate its own legal before/after transition. Both gaps violate the frozen acceptance despite full gates passing at the exact snapshot.",
+        "builder": "t01_builder",
+        "reviewer": "state_architecture",
+        "snapshot_hash": "5d760a5e70c0d61eb3df4cf71f63c7705f56b2262118e070b77a646e0b817499",
+        "recorded_at": "2026-09-10T01:08:44.533Z"
+      },
+      "verification": null
+    },
+    {
+      "at": "2026-09-10T01:30:02.687Z",
+      "reason": "correct_course",
+      "details": {
+        "kind": "fix",
+        "reason": "Independent fix2 review: bind exact prepared index flags and complete source-tree coverage; retain recursive initialized-submodule Git metadata protection.",
+        "plan_hash": "d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb"
+      },
+      "gates": [
+        {
+          "provenance": "deliver-runtime-executed-v1",
+          "name": "test",
+          "command": "npm test",
+          "cwd": ".",
+          "environment_keys": [],
+          "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "environment_hash": "87b7bcaca99b615bc4bf53dfc880029bf455dd44951d5b24180029e4f63f1afe",
+          "snapshot_hash": "875e8f2ce514173cd99aa70cc04d18bd320767a8fb2821d1622487ae6c6398a2",
+          "status": "PASS",
+          "exit_code": 0,
+          "signal": null,
+          "error": null,
+          "log_path": ".deliver/logs/9e5faaea-1973-4a63-b57c-6c943bf4c5d0/test-03651de8-9228-4768-b463-418fb9b68593.log",
+          "output": {
+            "stdout_bytes": 10255,
+            "stderr_bytes": 0,
+            "truncated": false
+          },
+          "scope": {
+            "ok": true,
+            "changed": [
+              "plugins/deliver/skills/deliver/references/runtime.md",
+              "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/pm.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/scope.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+              "plugins/deliver/skills/deliver/scripts/pm.mjs",
+              "tests/scope-regressions.test.mjs",
+              "tests/transitions.test.mjs"
+            ],
+            "added": [
+              "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+              "tests/transitions.test.mjs"
+            ],
+            "deleted": [],
+            "renames": [],
+            "out_of_scope": [],
+            "preexisting_dirty_changed": [],
+            "symlink_escapes": [],
+            "git_metadata_changed": false,
+            "ignored_advisory_changed": [],
+            "coordinator_execution_changed": null,
+            "git_metadata_compatibility": "legacy-v1",
+            "contracts_changed": []
+          },
+          "started_at": "2026-09-10T01:19:48.416Z",
+          "finished_at": "2026-09-10T01:20:33.271Z"
+        },
+        {
+          "provenance": "deliver-runtime-executed-v1",
+          "name": "validate",
+          "command": "npm run validate",
+          "cwd": ".",
+          "environment_keys": [],
+          "environment_additions_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+          "environment_hash": "87b7bcaca99b615bc4bf53dfc880029bf455dd44951d5b24180029e4f63f1afe",
+          "snapshot_hash": "875e8f2ce514173cd99aa70cc04d18bd320767a8fb2821d1622487ae6c6398a2",
+          "status": "PASS",
+          "exit_code": 0,
+          "signal": null,
+          "error": null,
+          "log_path": ".deliver/logs/9e5faaea-1973-4a63-b57c-6c943bf4c5d0/validate-ef482f45-fa13-458f-95c4-d43aa46935c4.log",
+          "output": {
+            "stdout_bytes": 150,
+            "stderr_bytes": 0,
+            "truncated": false
+          },
+          "scope": {
+            "ok": true,
+            "changed": [
+              "plugins/deliver/skills/deliver/references/runtime.md",
+              "plugins/deliver/skills/deliver/scripts/deliver.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/pm.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/scope.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/state.mjs",
+              "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+              "plugins/deliver/skills/deliver/scripts/pm.mjs",
+              "tests/scope-regressions.test.mjs",
+              "tests/transitions.test.mjs"
+            ],
+            "added": [
+              "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+              "tests/transitions.test.mjs"
+            ],
+            "deleted": [],
+            "renames": [],
+            "out_of_scope": [],
+            "preexisting_dirty_changed": [],
+            "symlink_escapes": [],
+            "git_metadata_changed": false,
+            "ignored_advisory_changed": [],
+            "coordinator_execution_changed": null,
+            "git_metadata_compatibility": "legacy-v1",
+            "contracts_changed": []
+          },
+          "started_at": "2026-09-10T01:20:33.566Z",
+          "finished_at": "2026-09-10T01:20:34.708Z"
+        }
+      ],
+      "review": {
+        "status": "FAIL",
+        "findings": [
+          {
+            "severity": "major",
+            "message": "Resolved from round 1: commit preparation now derives intended paths from the cumulative baseline delta plus the audited story Execution path. The temporary-repository regression proves unchanged pre-start unstaged work is excluded and preserved, while a pre-start staged index is rejected without mutation.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "Resolved from round 1: recovery parses both story and run images, regenerates the exact legal transition from the before images, compares the complete generated after images, and rejects changed criteria, contract identity, binding and counters without applying either write.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+            "resolved": true
+          },
+          {
+            "severity": "major",
+            "message": "Commit preparation does not prove complete index coverage of the audited source delta, and adoption does not bind index flags across prepare, commit and adopt. The pending record omits the prepared anchor's index_flags and adoption never compares them. An assume-unchanged or skip-worktree flag can therefore be introduced and adopted; a later changed source path is present in the scope snapshot but absent from Git status, so intended staging can omit it while a story-only commit and worktree content hash still pass. Bind exact index flags through adoption and prove every cumulative changed source entry is represented by the prepared tree, rejecting unsupported index states without changing user index data.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs",
+            "resolved": false
+          },
+          {
+            "severity": "major",
+            "message": "Current Git anchors are root-only, so enabling an anchor disables recursive Git-metadata protection for initialized submodules. inspectScope ignores the baseline git_meta whenever state.git_anchor exists, while captureGitAnchor and protectedGitMetadata inspect only the root. A nested submodule config, hook or index-flag change becomes an ordinary changed submodule entry; when the task touches that submodule it is treated as in scope and can remain through a story-only adopted commit. Protect initialized submodule Git metadata recursively, or reject submodule mutation deterministically; declared touches must never authorize Git config, hooks or index flags.",
+            "path": "plugins/deliver/skills/deliver/scripts/lib/scope.mjs",
+            "resolved": false
+          }
+        ],
+        "summary": "The round-1 dirty-work and recovery-integrity findings are fixed, and coordinator npm test plus npm run validate passed at the exact frozen snapshot. The complete review found two remaining commit-integrity gaps: prepared/adopted index flags and changed-entry coverage are incomplete, and current anchors lose recursive submodule metadata protection. T04 acceptance remains failed.",
+        "builder": "t01_builder",
+        "reviewer": "state_architecture",
+        "snapshot_hash": "875e8f2ce514173cd99aa70cc04d18bd320767a8fb2821d1622487ae6c6398a2",
+        "recorded_at": "2026-09-10T01:30:02.398Z"
+      },
+      "verification": null
+    }
+  ],
+  "completion_snapshot": {
+    "entries": {
+      ".gitattributes": "file:644:6866769d73d3e4da4eb37df56a8f4d7c13b76931f43c98b22a0a3dca560b1c98",
+      ".gitignore": "file:644:8180e47269e938c10fac903c5b91adb9d99b17056e0aae991e6129bf77102a0e",
+      "AGENTS.md": "file:644:880f8a032e9e90eead7c3aef538b7c6d8dabf4b50e607405df4a45c20ad66392",
+      "LICENSE": "file:644:3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "NOTICE.md": "file:644:7162a1387603b078c268f64c43f3b31a1a61a861269994541d7496400b46b80f",
+      "README.md": "file:644:c5627680bfccb102c3ec5f5440f5f10ff0a627a317123435c4aeda0940a0953a",
+      "bin/deliver.mjs": "file:755:6a417373d0df05ba24464665d4dd9c758e504d8168f23d7257d4e74846f4f0c3",
+      "docs/evaluation.md": "file:644:6d2279f74f772d980261545244c24a0af5e01b22d53ca5bb46646052cf780e67",
+      "docs/parity-contract.json": "file:644:85e82c0b50551fe862db8854f45d3904db53b075e7ea5d6db0368391ec62de42",
+      "docs/plans/2026-09-09-upstream-parity.md": "file:644:d6d3a7249989ec52c91cf13eed1a6233208a19550e2da96ab57afce4a156dacb",
+      "package.json": "file:644:b940bba2da59045db4c25d7493a6ef8927d7c52a77507c8f2a33d3e81b8b9a7c",
+      "plugins/deliver/.codex-plugin/plugin.json": "file:644:d40d65e4854068d62bd8a9be1b7fa09f1d8d959c1867078953b6a4e1c7018ddd",
+      "plugins/deliver/LICENSE": "file:644:3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "plugins/deliver/NOTICE.md": "file:644:7162a1387603b078c268f64c43f3b31a1a61a861269994541d7496400b46b80f",
+      "plugins/deliver/hooks/context.mjs": "file:644:41ad585d4951f565ea30983b7abaf54fbfcee5a14601dc43367fe8c038fd02a4",
+      "plugins/deliver/hooks/hooks.json": "file:644:f9a2302b52033fa6af046fa4651b981c4c00d1842e798df569a3dd62acbcb987",
+      "plugins/deliver/skills/deliver/SKILL.md": "file:644:0634012fa62e2722eace6f1c85c48c7b6ae0de356c35571cfabeed330a43cd62",
+      "plugins/deliver/skills/deliver/agents/openai.yaml": "file:644:0b0770232401e052f05911e92ff824b44cf5be438f942d170448600a97026e98",
+      "plugins/deliver/skills/deliver/assets/benchmark-result.schema.json": "file:644:2733b412ed03d5d5300a8591214e603cbcb843c80913cf62382993c8b8762f28",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-architecture.toml": "file:644:040499a5f52843165d79319496b4af0a01089dd0f8321baa3d54ac41e39adebf",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-builder.toml": "file:644:90a875b6ddab5e7c5a7f09163bb880c32c39b19ee1a7c922c5cb22288d93596e",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-claude-reviewer.toml": "file:644:acbc55f4e601a05cff1ffb6b86339acb28e04989565fc6f3dd9848a0efb85f76",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-debugger.toml": "file:644:3513cff3017fb33b68518e69fef21d5ad6b87cb020def52222053e1fde64b8b3",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-explorer.toml": "file:644:85665851b45bbcb94af0398f9807fac275d688317281a91e2c739e495e42638d",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-librarian.toml": "file:644:2f374ceea41385aae9170bc147190ae5286e84f248b27c2b465d609fd1cac26a",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-researcher.toml": "file:644:beafc50a187e294d7eca7f6715637938343910594a452a264f0c983f582c8301",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-reviewer.toml": "file:644:50b8f71ce77d1cba661cf28bb28b1204e59795ee1f683de52cdc8fdd7caeeb8f",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-security.toml": "file:644:74e5917dc4b0bc6e33bd6a22ef49dd5d3cd0ffd3f49a6a87d25ef503dd844371",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-spec-architect.toml": "file:644:0ac7d6d7fd59bcbe10f08f8174bbda340ae0688e95529b9551f2c7393d6bc6b3",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-technical-writer.toml": "file:644:7d6f8c26947421eff4517d8082e8a50437096e06b7bc393d2bf15dfe8abefccd",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-test-engineer.toml": "file:644:479ed373405dde5fdf265f140829a3d8f27e88a425fcd3599335488df851f905",
+      "plugins/deliver/skills/deliver/assets/codex-agents/deliver-verifier.toml": "file:644:ce39c8b010675ad952a4aca3fb6cb8bcb75b6fe00f97d69646901bde765e01a1",
+      "plugins/deliver/skills/deliver/assets/operations.json": "file:644:20ef9c2c0c7eef6765c94ca799bea412e2db806b2588f00f64cb5ccb3b610fbc",
+      "plugins/deliver/skills/deliver/assets/review.example.json": "file:644:44ca24764896b56c10a97a0f8df84d4bc1d46ff34ec0f87c0c8d1fb5de75f98b",
+      "plugins/deliver/skills/deliver/assets/specdd/bootstrap.md": "file:644:50db90f302d0167930cbad84fabb1461b0ad6e2fc9e65b6b50dfa21027e11687",
+      "plugins/deliver/skills/deliver/assets/specdd/bootstrap.md.template": "file:644:29075149fe2e0c7bbad76374f137dd460cc5b0faf2002b7e3beeaf14f18a16e6",
+      "plugins/deliver/skills/deliver/assets/specdd/module.sdd": "file:644:88f343d6e95ed72e1989863ea72340f7683bf50162a6d72e53fc1a33134c9ce1",
+      "plugins/deliver/skills/deliver/assets/specdd/module.sdd.template": "file:644:d61c9152b875b407185d05b13d3eee1703caa6288f20d4218a6f00db69d380af",
+      "plugins/deliver/skills/deliver/assets/specdd/root.sdd": "file:644:26f1f3f07f5eb173fd0791a6c6404c980686a9567ca0f3af01504d4102767955",
+      "plugins/deliver/skills/deliver/assets/specdd/root.sdd.template": "file:644:b43e572f3831dfeb3b23e0787366073f5ebe805db8947e6fb840c3927acde437",
+      "plugins/deliver/skills/deliver/assets/task.example.json": "file:644:0ce2fce1d34fa454d4e9fd0b1b40533b17dc61939bd7adca1849cd2108b32c8e",
+      "plugins/deliver/skills/deliver/assets/templates/AGENTS.md.template": "file:644:1c437085281939246e1519ddd9efa5ab0bcbdd6124b946fb9cd4916f5d9a7202",
+      "plugins/deliver/skills/deliver/assets/templates/approval.json.template": "file:644:91465c46c86cf5ea709a772cc2ae4c8aee72e187dfce994adbab5fc3c030dbca",
+      "plugins/deliver/skills/deliver/assets/templates/completion-report.md.template": "file:644:7f4ffaa30a2827146a600e198b74851b323a1a5be389b484f1c5067a8637f3d2",
+      "plugins/deliver/skills/deliver/assets/templates/constitution.md.template": "file:644:5aa9c9533b1c3c9e9d532f06002e7267c7e3cb8dfdb52e033eaa3d867789a687",
+      "plugins/deliver/skills/deliver/assets/templates/plan.md.template": "file:644:894763dd8a4a3815bf70398a2c76c4cd4abcd591b0df2047bca1d3133a34c9dc",
+      "plugins/deliver/skills/deliver/assets/templates/spec.md.template": "file:644:d22b061f0b7b253ffbf5d22a3e2015dbefc83c4b3ddd4dd5d064fd2e67f68129",
+      "plugins/deliver/skills/deliver/assets/templates/story.md.template": "file:644:978eaa0ea415e0b58b7076eea602a1ffc31618dc20e4bfc9a5890aa3947a4c0c",
+      "plugins/deliver/skills/deliver/assets/templates/verification-report.md.template": "file:644:1d2992b97a7839f502a9b38f9259978da46eea4c495c55fc6915ef8665454d3c",
+      "plugins/deliver/skills/deliver/assets/verification.example.json": "file:644:12e375d51e1ff51b35afb1ad42cd3e442000efdb0f1d383207e57656ee16bb74",
+      "plugins/deliver/skills/deliver/references/claude-review.md": "file:644:ad1fff062eefbb7049c34e898675c1277dbae14c3ca78bb5d77134ccfcd5a4d1",
+      "plugins/deliver/skills/deliver/references/compatibility.md": "file:644:6f16e1ec716c434bf47025b6fe3b9fe3da6d1e83e04b93cd66630e02cf26cdc8",
+      "plugins/deliver/skills/deliver/references/decomposition.md": "file:644:aa36f1e27a01333629c8e36c3fc9fa653f980b065360b8b767bedc65ba745f68",
+      "plugins/deliver/skills/deliver/references/discovery.md": "file:644:6ca3b2e4e31f48f046b9d95aec6bc73fac1209d0a1d3f1b8c967f90621401a6f",
+      "plugins/deliver/skills/deliver/references/governance.md": "file:644:43ff3086d2416d83e186006dd9881ee2cdc002b850f6bd7003c85fd4b1a178e7",
+      "plugins/deliver/skills/deliver/references/knowledge.md": "file:644:c71b90e563decd626fc5e10256194be794ae85b9dfa33e09f920a982aeac55c5",
+      "plugins/deliver/skills/deliver/references/operations.md": "file:644:8b5d0f782e20147cb62390096fd594cf543efd084f52d8044bfe4259b0700f4e",
+      "plugins/deliver/skills/deliver/references/parallel.md": "file:644:b46b95edfd32c5c486d86d0897726830f54e2e654e6590416d03686ea5ab132b",
+      "plugins/deliver/skills/deliver/references/planning.md": "file:644:ebf852da0258012528ea937e9302f580747671c92b16213ab1f76c91b711c20e",
+      "plugins/deliver/skills/deliver/references/recovery.md": "file:644:3c4fd34bb36cb356e07285aa529730abef557a5b438ba8803914b4206f79189d",
+      "plugins/deliver/skills/deliver/references/runtime.md": "file:644:7465e22a6e7cdafd9b62650c2fd210f260c0f837e195e78e3b7701cf7192523f",
+      "plugins/deliver/skills/deliver/references/scale-profiles.md": "file:644:42c08d624392888a20061a9a18faf61c7bfc6be82edc5284d6d7d2d081e9fe91",
+      "plugins/deliver/skills/deliver/references/specdd.md": "file:644:7f379875904acda43c7a197784e96602fd796ccb28da95e1c37faeac840edadc",
+      "plugins/deliver/skills/deliver/references/specification.md": "file:644:5469cbc552858712622b77517ba8734322e6b2b11ce691986534d1114d8b9a11",
+      "plugins/deliver/skills/deliver/references/workflow.md": "file:644:883b594ee96df35b340912ba69417c5d439a5e09c3d7a3ff4827174478cb669d",
+      "plugins/deliver/skills/deliver/scripts/benchmark.mjs": "file:644:cbc58df431d1d4ba86dc4aadaf6c057077d43555e9defe86dd8f4434fc91d099",
+      "plugins/deliver/skills/deliver/scripts/claude-review.mjs": "file:644:1a1d9271a74b4079353de0651f19c8cf159e3a8ed3f497329ec87c41ccf920cf",
+      "plugins/deliver/skills/deliver/scripts/deliver.mjs": "file:755:6ac9b704b88f2d0ecc48110f0d37d867df2eba1e25c2a4cc572a2ce7acb2fb00",
+      "plugins/deliver/skills/deliver/scripts/lib/benchmark.mjs": "file:644:599ff7c875e4a0e1de23bd7da16a8ed8989589690bde6be62f601401ceee3ff0",
+      "plugins/deliver/skills/deliver/scripts/lib/contracts.mjs": "file:644:a251f7f98ac1475463cfc557fde86aa042a1ad5ff993ede65e225204f4753cc2",
+      "plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs": "file:644:d4a3b49f77e4ff29a8ab0c048c0a071a4d3763f995d1076c7b9f072d7c191905",
+      "plugins/deliver/skills/deliver/scripts/lib/gates.mjs": "file:644:097a86b03827a4cab1668ca4038879155e4d30c8d92007e2e32d2a79e829367c",
+      "plugins/deliver/skills/deliver/scripts/lib/pm.mjs": "file:644:ae097d29de9b5f4b3fd2d59eb9cd8952ea79d6bc3f49cb54475ce4272436fd26",
+      "plugins/deliver/skills/deliver/scripts/lib/project-state.mjs": "file:644:5c69402512a6422f88136f7ab6b758e194f1e317caa511282f73f25e1d95b3ff",
+      "plugins/deliver/skills/deliver/scripts/lib/scope.mjs": "file:644:1d022432902104bb0eadbb4ba5116ef3b326b76f4c9d24a44fdcee06b2dedce6",
+      "plugins/deliver/skills/deliver/scripts/lib/state.mjs": "file:644:08acec113acf0e08b068e6fa1b7d3389a8ce2d3686d53138ae46bd32fcf11688",
+      "plugins/deliver/skills/deliver/scripts/lib/story.mjs": "file:644:cad0f9457cbe02865108fb179db3ddcce62b1f222eb02a75799f0277a79e1d98",
+      "plugins/deliver/skills/deliver/scripts/lib/transitions.mjs": "file:644:ca85b02c9ea059bc39d37ee08e1d588d60923da5b13582c3e0833ce5978c7303",
+      "plugins/deliver/skills/deliver/scripts/pm.mjs": "file:644:3d9efcd4380b071fdc93c9233b71fc3534645c6208c34468cc0c96b9021ae48a",
+      "plugins/deliver/skills/deliver/scripts/specdd.mjs": "file:644:bfae9d5eb24f1784d264e7d70dc0821b4f41a9828d3d473a0346b4ee498ac9c0",
+      "scripts/validate.mjs": "file:755:fab0466e65b39b1cb3a06af88672c99977f0d5a8b7920f75cfe9724fd8f82193",
+      "tests/benchmark.test.mjs": "file:644:b350ad5413baac73c7558556b8ca3c97b5d27d62e04d540c8227ccef8aa1ae8b",
+      "tests/claude-review.test.mjs": "file:644:679c7dae6cf6973880743009ebd29c3ba3fde937e042fe87bff56da8bc22af07",
+      "tests/contracts-integration.test.mjs": "file:644:8eb3c09725dfbe514b5ecfd5ed8520d425d80dcd5d1a3bf0a4e4e78803574fe3",
+      "tests/current-lifecycle.test.mjs": "file:644:54299b6cdfd5238972f09a10184b640b283d27055eb6c41badb35e6b6744b050",
+      "tests/fixtures/upstream-v0.22.0/NOTICE.md": "file:644:f43d5a7ad780077f17700936b7f7bc348567edac78d4c3be0e8de790ececace5",
+      "tests/fixtures/upstream-v0.22.0/hooks/lib.mjs": "file:644:1f9a8ff3a3f4eb300851fcbac7569509050f738a4dd56d22be2e6459f8242339",
+      "tests/fixtures/upstream-v0.22.0/hooks/session-context.mjs": "file:644:820c41410e07ef11f65ad3888971d8c862a7946a9133a2a49479c1b4b1d47c6d",
+      "tests/fixtures/upstream-v0.22.0/templates/actor-state.json.template": "file:644:ae6ae65ca6d3edb00228726b78884e920416dc854f5d0a77a723e8f30ea46d64",
+      "tests/fixtures/upstream-v0.22.0/templates/pm-state.json.template": "file:644:9bdf7ee6b341cf31b94c73ed9cbdade42293db737d6e600d17de791a086d8aa3",
+      "tests/fixtures/upstream-v0.25.1/NOTICE.md": "file:644:5ed9deec2942fd7ca5b3d0da184dd06aa0a57b734f3dc7e43bc83617d6e86458",
+      "tests/fixtures/upstream-v0.25.1/hooks/lib.mjs": "file:644:157bc7afe458d9ce4e05dd9bd3a8bb3326e791d3f5578737bfc17ad7e6dcfaea",
+      "tests/fixtures/upstream-v0.25.1/provenance.json": "file:644:8f1d82ab397d3c5e77e97bda2d2b7896172c8349ea6bebcaaf93d1fcbcab6032",
+      "tests/fixtures/upstream-v0.25.1/templates/AGENTS.md.template": "file:644:e188fbe70d50050a1ea2b5225eff41155366cfb9bcfbd9ac44336e40fa127823",
+      "tests/fixtures/upstream-v0.25.1/templates/CLAUDE.md.template": "file:644:e8d5dd46d7bdc6f6cc5e4b9b845611660d6db84fc647d8519e2fd59f59575ccc",
+      "tests/fixtures/upstream-v0.25.1/templates/HANDOFF.md.template": "file:644:ec44977ce51a36fa54aa30e9a6f9489a5ed235eeb9b9ca43901db35cd7bebc1f",
+      "tests/fixtures/upstream-v0.25.1/templates/approval.json.template": "file:644:91465c46c86cf5ea709a772cc2ae4c8aee72e187dfce994adbab5fc3c030dbca",
+      "tests/fixtures/upstream-v0.25.1/templates/checklist-plan-quality.md.template": "file:644:2cf69e59c44b12f7b22b2b5035b1bcb19a8d25647521ff35206279bf5af9ef25",
+      "tests/fixtures/upstream-v0.25.1/templates/checklist-spec-quality.md.template": "file:644:193518525bdca5760a80b91b7519f7e894cd339a3daed9bb824077a157e1f2fd",
+      "tests/fixtures/upstream-v0.25.1/templates/checklist-story-readiness.md.template": "file:644:f5f365e215233a00629b8c098b0d3f767fd8185c4d5b7089328e93138595d765",
+      "tests/fixtures/upstream-v0.25.1/templates/checklist-verification-quality.md.template": "file:644:f05149e21bfa28f300cab1b1470598c01f0624ce43d0f4a14926a6366dacf68a",
+      "tests/fixtures/upstream-v0.25.1/templates/claude-settings-hardening.json.template": "file:644:730f3279d940a1644f9b0815ade5266757d2e8b93f1e708ee2fb98622f78ebb9",
+      "tests/fixtures/upstream-v0.25.1/templates/completion-report.md.template": "file:644:8b5bee3b93a16a127c3d2c46ae286eff2c18d267d5ffc25f9bc9a3c314d8ec30",
+      "tests/fixtures/upstream-v0.25.1/templates/constitution.md.template": "file:644:0a7dac3ac9c1fb0a0162ef048cf570a5cf9140ba01080d263910edca844ff513",
+      "tests/fixtures/upstream-v0.25.1/templates/plan.md.template": "file:644:95455a8d9e0a86df7484f027ead29d847ecc8964e704c5bbb75d444137a8083f",
+      "tests/fixtures/upstream-v0.25.1/templates/retro.md.template": "file:644:79e642d07644f58c73274ed92d689a27dd13bd610fa717117177d313a6f4ac6d",
+      "tests/fixtures/upstream-v0.25.1/templates/sdd-module.template": "file:644:f8324f4ff59c184bc1ee865847a6a72a4e8cc4feac888f3c6f815c64790a4d88",
+      "tests/fixtures/upstream-v0.25.1/templates/sdd-root.template": "file:644:8169f1e6a0fdb17e4f89b73deaeee1e4b3a5930ad2f65ddc3bf387a65dc991ba",
+      "tests/fixtures/upstream-v0.25.1/templates/spec.md.template": "file:644:29e4c5630f18b5d7458b54b00138826d72d220a3863429a7fc2b0260f415b4d4",
+      "tests/fixtures/upstream-v0.25.1/templates/specdd-bootstrap.md.template": "file:644:2bc3c3175dc0eb5f9ad669517857a0ee324d18d47725552143e0e63dff59ea0a",
+      "tests/fixtures/upstream-v0.25.1/templates/story.md.template": "file:644:2bfa9c32cc339f4b7b8764ff73e4e59e6562ab42dc720192ec8235342bf8c383",
+      "tests/fixtures/upstream-v0.25.1/templates/verification-report.md.template": "file:644:9f82e7857ce5e633918156712b56a2ff6e4c38325c3e8c16006e09c07a6a7006",
+      "tests/fixtures/upstream-v0.25.1/templates/wiki-index.md.template": "file:644:a0f8c0fbb36296a24a1be6567e28eaf0cd9808f8e0696084808c72adeefa037d",
+      "tests/fixtures/upstream-v0.25.1/templates/wiki-page.md.template": "file:644:fda4f3d0e37bab47d79774b865752360d5b0bb3acf8cf7e8249d93b0900daeed",
+      "tests/fixtures/upstream-v0.25.1/templates/wiki-schema.md.template": "file:644:f2b5981a07b942d2b87d108c9d90b19cb4738cd632f3e908a75cc14a5c89b0e7",
+      "tests/hooks-and-environment.test.mjs": "file:644:e86d20b3c8eceeefa9608b7bf33f10c9459b1258ff4405a8d778fbcf794b06fb",
+      "tests/launcher-integration.test.mjs": "file:644:faa8fc096ae55c3c57b03b3ccbd1c575f6683c7dafe426f5ec0e117963f8ba98",
+      "tests/operations.test.mjs": "file:644:1bc76156f04123c7ed17fbbf40256779fb5fcb6bbe5f5d01752a38506ab93d1e",
+      "tests/pm-compatibility.test.mjs": "file:644:9cf761f4a5cbc21c9d023630e671a0d135ee10d947a92d88753c4e81b6a90e61",
+      "tests/project-state.test.mjs": "file:644:f37ac20382b22e9368fdabbdc8a43748f2b0d346dc853736bc5db70b97b24b3d",
+      "tests/runtime.test.mjs": "file:644:98c143640801b2de4f31edf2ea09aa414cf8a51f582e14075c5869a9465aa236",
+      "tests/scope-regressions.test.mjs": "file:644:c9feabbbbb45bb00bcbd195adae1660b2c7c1315d863487615553bcf5e707d95",
+      "tests/setup.test.mjs": "file:644:6ce8238f45e9ecc6b33eb060794054b746e1d0bd9364e35d14f6bd4472c62096",
+      "tests/specdd.test.mjs": "file:644:5893857063ae810717d0d118d4bc728fecfe49350b62e81d76135eeda5c0b88b",
+      "tests/story.test.mjs": "file:644:ab849d6f6d854f5a51e964ecccd8761782a76000d8d57d5c6ab5e19c39eb67ee",
+      "tests/template-compatibility.test.mjs": "file:644:3e70d479879392cf1686afe149f95a0eb8ea0786ba1d7495a1ad7f85c8dcb625",
+      "tests/transitions.test.mjs": "file:644:863dfa1caa253a11c85f49fd0aa3069cce4a411cae3c044f4fe103d8c9892f34",
+      "tests/upstream-contract.test.mjs": "file:644:443c98e946e9719ce528ff1bf248f7d89f76fb7c2507479017e5943b5e7b0542"
+    },
+    "git_meta": "d6d2760b32c67ed953050615aa4fd068e79e38da8c70f094655e3e8609092d68",
+    "ignored_advisory": {},
+    "hash": "50471c7d0d9ca1fbe5fb567aefba1966305546e925b6cdeefcaee5b76ec4b1bf"
+  },
+  "finished_at": "2026-09-10T02:06:37.018Z"
+}

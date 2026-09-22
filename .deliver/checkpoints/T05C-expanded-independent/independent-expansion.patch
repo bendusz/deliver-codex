@@ -1,0 +1,509 @@
+--- initial-cohort-with-fixture-corrections
++++ expanded-cohort
+@@ -192,7 +192,73 @@
+   };
+ }
+ 
+-function installOlderIntegrationExecution(fixture, { rounds = 2, retries = 2 } = {}) {
++function makeAdoptedM(t, options = {}) {
++  const fixture = buildFinishedSource(t, options);
++  const prepared = fixture.pm('integrate-prepare', '--run', fixture.runFile);
++  assert.equal(prepared.status, 0, prepared.stdout);
++  git(fixture.integration, 'merge', '--no-ff', '--no-edit', fixture.candidate);
++  const merge = git(fixture.integration, 'rev-parse', 'HEAD');
++  const adopted = fixture.pm('integrate-adopt', '--integration', prepared.json.file,
++    '--expected-record', prepared.json.hash, '--token', prepared.json.record.integration.token, '--commit', merge);
++  assert.equal(adopted.status, 0, adopted.stdout);
++  const gated = fixture.pm('integrate-gate', '--integration', prepared.json.file,
++    '--expected-record', adopted.json.hash, '--name', 'test');
++  assert.equal(gated.status, 0, gated.stdout);
++  assert.equal(gated.json.result.status, 'PASS');
++  return {
++    ...fixture, recordFile: gated.json.file, record: gated.json.record, recordHash: gated.json.hash,
++    startCommit: merge, basis: 'failed-integration',
++  };
++}
++
++function writeRecord(fixture, record) {
++  fs.writeFileSync(fixture.recordFile, `${JSON.stringify(record, null, 2)}\n`);
++  fixture.record = record;
++  fixture.recordHash = sha256(canonical(record));
++}
++
++function reidentify(receipt) {
++  const next = structuredClone(receipt);
++  delete next.identity;
++  next.identity = sha256(canonical(next));
++  return next;
++}
++
++function recordFailedIntegrationReview(fixture, finding = {
++  severity: 'major', message: 'Actual M needs correction.', path: 'src/value.txt', resolved: false,
++}) {
++  write(fixture.integration, '.deliver/failed-integration-review.json', {
++    status: 'FAIL', findings: [], panel: {
++      snapshot_hash: fixture.record.evidence.snapshot_hash,
++      members: [{
++        lens: 'code-integrity-reviewer', reviewer: 'm-panel-reviewer', verdict: 'FAIL',
++        snapshot_hash: fixture.record.evidence.snapshot_hash, findings: [finding],
++      }],
++    },
++  });
++  const reviewed = fixture.pm('integrate-review', '--integration', fixture.recordFile,
++    '--expected-record', fixture.recordHash, '--reviewer', 'm-reviewer',
++    '--receipt', '.deliver/failed-integration-review.json');
++  assert.equal(reviewed.status, 0, reviewed.stdout);
++  fixture.record = reviewed.json.record;
++  fixture.recordHash = reviewed.json.hash;
++  return fixture;
++}
++
++function recordFailedIntegrationVerification(fixture, status = 'FAIL') {
++  write(fixture.integration, '.deliver/failed-integration-verification.json', {
++    criteria: [{ id: 'AC-1', status, evidence: `Actual M criterion is ${status}.` }],
++  });
++  const verified = fixture.pm('integrate-verify', '--integration', fixture.recordFile,
++    '--expected-record', fixture.recordHash, '--verifier', 'm-verifier',
++    '--results', '.deliver/failed-integration-verification.json');
++  assert.equal(verified.status, 0, verified.stdout);
++  fixture.record = verified.json.record;
++  fixture.recordHash = verified.json.hash;
++  return fixture;
++}
++
++function installOlderIntegrationExecution(fixture, { rounds = 2, retries = 2, ...overrides } = {}) {
+   const document = readStory(fixture.integration, storyRel);
+   const sourceExecution = readStory(fixture.root, storyRel).execution;
+   const replacement = replaceStoryExecution(document, {
+@@ -204,14 +270,15 @@
+     retries,
+     updated: '2026-09-10 12:00',
+     retained_unknown: 'older-I-value',
++    ...overrides,
+   });
+   fs.writeFileSync(path.join(fixture.integration, storyRel), replacement.after);
+ }
+ 
+-function makeActualNoM(t, { before = 'unclaimed', ...options } = {}) {
++function makeActualNoM(t, { before = 'unclaimed', executionOverrides = {}, ...options } = {}) {
+   const fixture = buildFinishedSource(t, options);
+   write(fixture.integration, 'src/value.txt', 'integration-side conflict\n');
+-  if (before === 'older') installOlderIntegrationExecution(fixture);
++  if (before === 'older') installOlderIntegrationExecution(fixture, executionOverrides);
+   else fs.writeFileSync(path.join(fixture.integration, storyRel), story());
+   git(fixture.integration, 'add', 'src/value.txt', storyRel);
+   git(fixture.integration, 'commit', '-qm', 'Integration I conflicts with candidate C');
+@@ -370,6 +437,133 @@
+     assert.throws(() => prepare(fixture.runFile, {
+       integrationRecord: fixture.recordFile, expectedRecordHash: fixture.recordHash,
+     }, fixture.integration), /fix|attempt|exhaust|limit|3/i);
++    assertImmutableBefore(fixture, before);
++  });
++});
++
++test('failed-M qualification accepts current review or verification failure and rejects invalid authority or UNKNOWN alone', async (t) => {
++  await t.test('current review FAIL qualifies and retains its actor and finding origin', () => {
++    const fixture = recordFailedIntegrationReview(makeAdoptedM(t));
++    const prepared = correctionPrepare(fixture);
++    assert.equal(prepared.result.basis, 'failed-integration');
++    const required = prepared.record.correction.token.root_review_lineage.required_resolutions;
++    assert.equal(required.length, 4);
++    assert.equal(required.at(-1).severity, 'major');
++    assert.equal(required.at(-1).message, 'Actual M needs correction.');
++    assert.match(required.at(-1).receipt_identity, /^[0-9a-f]{64}$/);
++    assert.equal(Number.isSafeInteger(required.at(-1).ordinal), true);
++  });
++
++  await t.test('current verification FAIL qualifies', () => {
++    const fixture = recordFailedIntegrationVerification(makeAdoptedM(t));
++    const prepared = correctionPrepare(fixture);
++    assert.equal(prepared.result.basis, 'failed-integration');
++    assert.equal(prepared.record.correction.token.basis.integration_commit, fixture.startCommit);
++  });
++
++  await t.test('UNKNOWN-only verification does not qualify', () => {
++    const fixture = recordFailedIntegrationVerification(makeAdoptedM(t), 'UNKNOWN');
++    const before = immutableBefore(fixture);
++    const prepare = requireFunction('prepareIntegrationCorrection');
++    assert.throws(() => prepare(fixture.runFile, {
++      integrationRecord: fixture.recordFile, expectedRecordHash: fixture.recordHash,
++    }, fixture.integration), /UNKNOWN|qualif|failure|failed/i);
++    assertImmutableBefore(fixture, before);
++  });
++
++  for (const [label, mutate] of [
++    ['invalid reviewer identity', (record) => { record.evidence.review.reviewer = 'not valid'; }],
++    ['reviewer equals builder', (record) => { record.evidence.review.reviewer = record.source.builder; }],
++    ['panel reviewer equals builder', (record) => { record.evidence.review.panel.members[0].reviewer = record.source.builder; }],
++  ]) {
++    await t.test(label, () => {
++      const fixture = recordFailedIntegrationReview(makeAdoptedM(t));
++      const changed = structuredClone(fixture.record);
++      mutate(changed);
++      changed.evidence.review = reidentify(changed.evidence.review);
++      writeRecord(fixture, changed);
++      const before = immutableBefore(fixture);
++      const prepare = requireFunction('prepareIntegrationCorrection');
++      assert.throws(() => prepare(fixture.runFile, {
++        integrationRecord: fixture.recordFile, expectedRecordHash: fixture.recordHash,
++      }, fixture.integration), /actor|reviewer|builder|identity|invalid|differ/i);
++      assertImmutableBefore(fixture, before);
++    });
++  }
++
++  for (const [label, verifier] of [
++    ['verifier equals builder', 'source-builder'],
++    ['verifier equals reviewer', 'source-reviewer'],
++    ['verifier equals panel member', 'source-panel-reviewer'],
++    ['invalid verifier identity', 'not valid'],
++  ]) {
++    await t.test(label, () => {
++      const fixture = recordFailedIntegrationVerification(makeAdoptedM(t));
++      const changed = structuredClone(fixture.record);
++      changed.evidence.verification.verifier = verifier;
++      changed.evidence.verification = reidentify(changed.evidence.verification);
++      writeRecord(fixture, changed);
++      const before = immutableBefore(fixture);
++      const prepare = requireFunction('prepareIntegrationCorrection');
++      assert.throws(() => prepare(fixture.runFile, {
++        integrationRecord: fixture.recordFile, expectedRecordHash: fixture.recordHash,
++      }, fixture.integration), /actor|verifier|builder|reviewer|identity|invalid|differ/i);
++      assertImmutableBefore(fixture, before);
++    });
++  }
++
++  await t.test('malformed FAIL criteria cannot qualify', () => {
++    const fixture = recordFailedIntegrationVerification(makeAdoptedM(t));
++    const changed = structuredClone(fixture.record);
++    changed.evidence.verification.criteria[0].id = 'AC-not-in-the-task';
++    changed.evidence.verification = reidentify(changed.evidence.verification);
++    writeRecord(fixture, changed);
++    const before = immutableBefore(fixture);
++    const prepare = requireFunction('prepareIntegrationCorrection');
++    assert.throws(() => prepare(fixture.runFile, {
++      integrationRecord: fixture.recordFile, expectedRecordHash: fixture.recordHash,
++    }, fixture.integration), /criterion|criteria|verification|acceptance|invalid/i);
++    assertImmutableBefore(fixture, before);
++  });
++
++  await t.test('stale review snapshot cannot qualify', () => {
++    const fixture = recordFailedIntegrationReview(makeAdoptedM(t));
++    const changed = structuredClone(fixture.record);
++    changed.evidence.review.snapshot_hash = '0'.repeat(64);
++    changed.evidence.review.panel.snapshot_hash = '0'.repeat(64);
++    for (const member of changed.evidence.review.panel.members) member.snapshot_hash = '0'.repeat(64);
++    changed.evidence.review = reidentify(changed.evidence.review);
++    writeRecord(fixture, changed);
++    const before = immutableBefore(fixture);
++    const prepare = requireFunction('prepareIntegrationCorrection');
++    assert.throws(() => prepare(fixture.runFile, {
++      integrationRecord: fixture.recordFile, expectedRecordHash: fixture.recordHash,
++    }, fixture.integration), /snapshot|stale|review|identity|current/i);
++    assertImmutableBefore(fixture, before);
++  });
++
++  await t.test('superseded review FAIL does not qualify', () => {
++    const fixture = recordFailedIntegrationReview(makeAdoptedM(t));
++    write(fixture.integration, '.deliver/passing-integration-review.json', {
++      status: 'PASS', findings: [], panel: {
++        snapshot_hash: fixture.record.evidence.snapshot_hash,
++        members: [{ lens: 'code-integrity-reviewer', reviewer: 'new-panel-reviewer', verdict: 'PASS',
++          snapshot_hash: fixture.record.evidence.snapshot_hash, findings: [] }],
++      },
++    });
++    const passed = fixture.pm('integrate-review', '--integration', fixture.recordFile,
++      '--expected-record', fixture.recordHash, '--reviewer', 'new-reviewer',
++      '--receipt', '.deliver/passing-integration-review.json');
++    assert.equal(passed.status, 0, passed.stdout);
++    fixture.record = passed.json.record;
++    fixture.recordHash = passed.json.hash;
++    assert.equal(fixture.record.evidence.review.status, 'PASS');
++    assert.equal(fixture.record.evidence.review_history.at(-1).status, 'FAIL');
++    const before = immutableBefore(fixture);
++    const prepare = requireFunction('prepareIntegrationCorrection');
++    assert.throws(() => prepare(fixture.runFile, {
++      integrationRecord: fixture.recordFile, expectedRecordHash: fixture.recordHash,
++    }, fixture.integration), /current|superseded|qualif|failure|failed/i);
+     assertImmutableBefore(fixture, before);
+   });
+ });
+@@ -466,6 +660,138 @@
+   }
+ });
+ 
++function advanceCorrectionToReview(fixture, prepared, correctionRoot) {
++  const runId = prepared.result.run_id;
++  const pm = (...args) => call(correctionRoot, pmCli, ...args);
++  const run = (...args) => call(correctionRoot, runtime, ...args);
++  write(correctionRoot, 'src/value.txt', 'corrected candidate value\n');
++  for (const status of ['built', 'in-review']) {
++    const transitioned = pm('transition', '--run', runId, '--to', status);
++    assert.equal(transitioned.status, 0, transitioned.stdout);
++  }
++  const commitPreparation = run('commit-prepare', '--run', runId);
++  assert.equal(commitPreparation.status, 0, commitPreparation.stdout);
++  git(correctionRoot, 'add', '-A', '--', ...commitPreparation.json.preparation.paths);
++  git(correctionRoot, 'commit', '-qm', 'Correct complete original task');
++  assert.equal(run('commit-adopt', '--run', runId, '--token', commitPreparation.json.preparation.token,
++    '--commit', git(correctionRoot, 'rev-parse', 'HEAD')).status, 0);
++  const checked = run('check', '--run', runId);
++  assert.equal(checked.status, 0, checked.stdout);
++  assert.equal(run('gate', '--run', runId, '--name', 'test', '--command', gateCommand).status, 0);
++  return { run, runId, runFile: path.join(correctionRoot, '.deliver/runs', `${runId}.json`), snapshot: checked.json.snapshot_hash };
++}
++
++function correctionReview(snapshot, findings) {
++  const unresolved = findings.some((finding) => !finding.resolved);
++  return {
++    status: 'PASS', findings: [], panel: {
++      snapshot_hash: snapshot,
++      members: [{
++        lens: 'code-integrity-reviewer', reviewer: 'correction-panel-reviewer',
++        verdict: unresolved ? 'CONCERNS' : 'PASS', snapshot_hash: snapshot, findings,
++      }],
++    },
++  };
++}
++
++test('fresh correction review must resolve the inherited finding multiset exactly', (t) => {
++  const fixture = makeActualNoM(t);
++  const prepared = correctionPrepare(fixture);
++  const correctionRoot = addCorrectionWorktree(t, fixture, prepared);
++  correctionStart(fixture, prepared, correctionRoot);
++  const active = advanceCorrectionToReview(fixture, prepared, correctionRoot);
++  const resolved = fixture.inherited.map((finding) => ({ ...finding, resolved: true }));
++  const variants = [
++    ['omitted duplicate', [resolved[0], resolved[2]]],
++    ['extra duplicate', [resolved[0], resolved[0], resolved[1], resolved[2]]],
++    ['wrong path', resolved.map((finding, index) => index === 2 ? { ...finding, path: 'src/value.txt' } : finding)],
++    ['open inherited minor', resolved.map((finding, index) => index === 2 ? { ...finding, resolved: false } : finding)],
++  ];
++  for (const [label, findings] of variants) {
++    write(correctionRoot, '.deliver/correction-review.json', correctionReview(active.snapshot, findings));
++    const before = fs.readFileSync(active.runFile, 'utf8');
++    const refused = active.run('review', '--run', active.runId, '--snapshot', active.snapshot,
++      '--reviewer', 'correction-reviewer', '--receipt', '.deliver/correction-review.json');
++    assert.notEqual(refused.status, 0, label);
++    assert.match(refused.stdout, /inherited|required|resolution|finding|multiplicity|path/i, label);
++    assert.equal(fs.readFileSync(active.runFile, 'utf8'), before, `${label} must not publish a review`);
++  }
++  write(correctionRoot, '.deliver/correction-review.json', correctionReview(active.snapshot, resolved));
++  const accepted = active.run('review', '--run', active.runId, '--snapshot', active.snapshot,
++    '--reviewer', 'correction-reviewer', '--receipt', '.deliver/correction-review.json');
++  assert.equal(accepted.status, 0, accepted.stdout);
++});
++
++function finishFirstCorrection(t) {
++  const fixture = makeActualNoM(t);
++  const prepared = correctionPrepare(fixture);
++  const correctionRoot = addCorrectionWorktree(t, fixture, prepared);
++  correctionStart(fixture, prepared, correctionRoot);
++  const active = advanceCorrectionToReview(fixture, prepared, correctionRoot);
++  const resolved = fixture.inherited.map((finding) => ({ ...finding, resolved: true }));
++  write(correctionRoot, '.deliver/correction-review.json', correctionReview(active.snapshot, resolved));
++  assert.equal(active.run('review', '--run', active.runId, '--snapshot', active.snapshot,
++    '--reviewer', 'correction-reviewer', '--receipt', '.deliver/correction-review.json').status, 0);
++  write(correctionRoot, '.deliver/correction-verification.json', {
++    criteria: [{ id: 'AC-1', status: 'PASS', evidence: 'Fresh generation-one correction evidence.' }],
++  });
++  assert.equal(active.run('verify', '--run', active.runId, '--snapshot', active.snapshot,
++    '--verifier', 'correction-verifier', '--results', '.deliver/correction-verification.json').status, 0);
++  assert.equal(active.run('finish', '--run', active.runId).status, 0);
++  return { fixture, prepared, correctionRoot, runFile: active.runFile, candidate: git(correctionRoot, 'rev-parse', 'HEAD') };
++}
++
++function failNextIntegration(first) {
++  const prepared = first.fixture.pm('integrate-prepare', '--run', first.runFile);
++  assert.equal(prepared.status, 0, prepared.stdout);
++  git(first.fixture.integration, 'merge', '--no-ff', '--no-edit', first.candidate);
++  const merge = git(first.fixture.integration, 'rev-parse', 'HEAD');
++  const adopted = first.fixture.pm('integrate-adopt', '--integration', prepared.json.file,
++    '--expected-record', prepared.json.hash, '--token', prepared.json.record.integration.token, '--commit', merge);
++  assert.equal(adopted.status, 0, adopted.stdout);
++  write(first.fixture.integration, '.deliver/fail-integration', 'fail the generation-two integration gate\n');
++  const failed = first.fixture.pm('integrate-gate', '--integration', prepared.json.file,
++    '--expected-record', adopted.json.hash, '--name', 'test');
++  assert.equal(failed.status, 0, failed.stdout);
++  assert.equal(failed.json.result.status, 'FAIL');
++  fs.unlinkSync(path.join(first.fixture.integration, '.deliver/fail-integration'));
++  return {
++    ...first.fixture, runFile: first.runFile, recordFile: failed.json.file,
++    record: failed.json.record, recordHash: failed.json.hash, startCommit: merge,
++  };
++}
++
++test('a genuine prior correction remains in root lineage and cannot hide MAX attempts behind a new generation', (t) => {
++  const first = finishFirstCorrection(t);
++  const next = failNextIntegration(first);
++  const prepared = correctionPrepare(next);
++  assert.equal(prepared.result.branch, 'pm/S1-1-integration-fix-2');
++  assert.equal(prepared.record.correction.token.generation, 2);
++  assert.equal(prepared.record.correction.token.original_root_run, first.fixture.runId);
++  assert.equal(prepared.record.correction.token.original_source_run, first.prepared.result.run_id);
++  assert.equal(prepared.record.correction.token.counter_maxima.fixes, 2);
++  assert.equal(prepared.record.correction.token.counter_maxima.retries, 1);
++  assert.equal(prepared.record.correction.token.counter_maxima.corrections, 2);
++  const sources = prepared.record.correction.token.counter_sources;
++  assert.equal(Array.isArray(sources), true);
++  assert.equal(sources.some((source) => source.run_id === first.fixture.runId), true);
++  assert.equal(sources.some((source) => source.run_id === first.prepared.result.run_id), true);
++  assert.equal(sources.every((source) => /^[0-9a-f]{64}$/.test(source.identity)), true);
++  assert.deepEqual(sources, [...sources].sort((left, right) => canonical(left).localeCompare(canonical(right))),
++    'counter sources have one deterministic sorted order');
++
++  const correctionRoot = addCorrectionWorktree(t, next, prepared);
++  const ancestor = readJson(first.runFile);
++  ancestor.counters.fixes = 3;
++  fs.writeFileSync(first.runFile, `${JSON.stringify(ancestor, null, 2)}\n`);
++  const recordBefore = fs.readFileSync(next.recordFile, 'utf8');
++  const storyBefore = fs.readFileSync(path.join(correctionRoot, storyRel), 'utf8');
++  assert.throws(() => correctionStart(next, prepared, correctionRoot), /counter|source|identity|changed|fix|exhaust|3/i);
++  assert.equal(fs.readFileSync(next.recordFile, 'utf8'), recordBefore);
++  assert.equal(fs.readFileSync(path.join(correctionRoot, storyRel), 'utf8'), storyBefore);
++  assert.equal(fs.existsSync(path.join(correctionRoot, '.deliver/runs', `${prepared.result.run_id}.json`)), false);
++});
++
+ test('correction start rejects dirty, moved and duplicate checkouts without consuming its token', async (t) => {
+   await t.test('dirty exact branch', () => {
+     const fixture = makeActualNoM(t);
+@@ -505,6 +831,89 @@
+     assert.throws(() => correctionStart(fixture, prepared, correctionRoot), /sole|worktree|duplicate|attached/i);
+     assert.equal(fs.readFileSync(fixture.recordFile, 'utf8'), recordBefore);
+   });
++
++  await t.test('unrelated active same-story branch and worktree', () => {
++    const fixture = makeActualNoM(t);
++    const prepared = correctionPrepare(fixture);
++    const correctionRoot = addCorrectionWorktree(t, fixture, prepared);
++    const duplicate = `${correctionRoot}-same-story`;
++    t.after(() => fs.rmSync(duplicate, { recursive: true, force: true }));
++    git(fixture.integration, 'worktree', 'add', '-qb', 'pm/S1-1-unrelated', duplicate, prepared.result.start_commit);
++    const document = readStory(duplicate, storyRel);
++    const sourceExecution = readStory(fixture.root, storyRel).execution;
++    fs.writeFileSync(path.join(duplicate, storyRel), replaceStoryExecution(document, {
++      ...sourceExecution, branch: 'pm/S1-1-unrelated', status: 'building', updated: '2026-09-10 13:00',
++    }).after);
++    git(duplicate, 'add', storyRel);
++    git(duplicate, 'commit', '-qm', 'Actual duplicate same-story work');
++    const recordBefore = fs.readFileSync(fixture.recordFile, 'utf8');
++    const storyBefore = fs.readFileSync(path.join(correctionRoot, storyRel), 'utf8');
++    assert.throws(() => correctionStart(fixture, prepared, correctionRoot), /same.story|duplicate|active|unrelated/i);
++    assert.equal(fs.readFileSync(fixture.recordFile, 'utf8'), recordBefore);
++    assert.equal(fs.readFileSync(path.join(correctionRoot, storyRel), 'utf8'), storyBefore);
++  });
++
++  await t.test('same-owner active other-story worktree', () => {
++    const fixture = makeActualNoM(t);
++    const prepared = correctionPrepare(fixture);
++    const correctionRoot = addCorrectionWorktree(t, fixture, prepared);
++    const other = `${correctionRoot}-other-story`;
++    t.after(() => fs.rmSync(other, { recursive: true, force: true }));
++    git(fixture.integration, 'worktree', 'add', '-qb', 'pm/S1-2-other', other, prepared.result.start_commit);
++    const sourceExecution = readStory(fixture.root, storyRel).execution;
++    const otherStory = story().replaceAll('S1-1', 'S1-2').replace('Correct value', 'Other active work');
++    write(other, 'docs/stories/S1-2-other.md', `${otherStory}\n## Execution\n<!-- pm-exec: ${JSON.stringify({
++      owner: sourceExecution.owner, builder: sourceExecution.builder, branch: 'pm/S1-2-other',
++      status: 'building', rounds: 0, retries: 0, updated: '2026-09-10 13:00',
++    })} -->\n`);
++    git(other, 'add', 'docs/stories/S1-2-other.md');
++    git(other, 'commit', '-qm', 'Actual same-owner other-story work');
++    const recordBefore = fs.readFileSync(fixture.recordFile, 'utf8');
++    assert.throws(() => correctionStart(fixture, prepared, correctionRoot), /^PARALLEL_BATCH_REQUIRED:|parallel|other.story|same.owner/i);
++    assert.equal(fs.readFileSync(fixture.recordFile, 'utf8'), recordBefore);
++  });
++});
++
++test('correction preparation rejects foreign, merged and conflicting no-M I Execution states', async (t) => {
++  const sourceOwner = 'casey-example-invalid-990545ea8d20';
++  for (const [label, executionOverrides] of [
++    ['foreign owner', { owner: 'foreign-actor' }],
++    ['merged state', { status: 'merged' }],
++    ['conflicting unknown metadata', { retained_unknown: 'different-I-value' }],
++  ]) {
++    await t.test(label, () => {
++      const fixture = makeActualNoM(t, { before: 'older', executionOverrides });
++      if (label === 'foreign owner') assert.notEqual(readStory(fixture.integration, storyRel).execution.owner, sourceOwner);
++      const before = immutableBefore(fixture);
++      const prepare = requireFunction('prepareIntegrationCorrection');
++      assert.throws(() => prepare(fixture.runFile, {
++        integrationRecord: fixture.recordFile, expectedRecordHash: fixture.recordHash,
++      }, fixture.integration), /foreign|merged|owner|unknown|conflict|Execution|state/i);
++      assertImmutableBefore(fixture, before);
++    });
++  }
++});
++
++test('correction start revalidates approval, plan and no-M probe identities before publication', async (t) => {
++  for (const [label, mutate, expected] of [
++    ['approval drift', (fixture) => fs.appendFileSync(path.join(fixture.root, 'docs/approval.json'), ' '), /approval|changed|drift|source/i],
++    ['plan drift', (fixture) => fs.appendFileSync(path.join(fixture.root, 'docs/plan.md'), '\nchanged\n'), /plan|approval|changed|drift|source/i],
++    ['probe log drift', (fixture) => fs.appendFileSync(path.join(fixture.integration,
++      fixture.record.integration.failure.log_path), 'changed'), /probe|log|hash|changed|drift/i],
++  ]) {
++    await t.test(label, () => {
++      const fixture = makeActualNoM(t);
++      const prepared = correctionPrepare(fixture);
++      const correctionRoot = addCorrectionWorktree(t, fixture, prepared);
++      mutate(fixture);
++      const recordBefore = fs.readFileSync(fixture.recordFile, 'utf8');
++      const storyBefore = fs.readFileSync(path.join(correctionRoot, storyRel), 'utf8');
++      assert.throws(() => correctionStart(fixture, prepared, correctionRoot), expected);
++      assert.equal(fs.readFileSync(fixture.recordFile, 'utf8'), recordBefore);
++      assert.equal(fs.readFileSync(path.join(correctionRoot, storyRel), 'utf8'), storyBefore);
++      assert.equal(fs.existsSync(path.join(correctionRoot, '.deliver/runs', `${prepared.result.run_id}.json`)), false);
++    });
++  }
+ });
+ 
+ function interruptedStart(t, boundary) {
+@@ -608,3 +1017,50 @@
+     assert.equal(fs.readFileSync(torn.journal, 'utf8'), coexistingBefore);
+   });
+ });
++
++test('recovery rejects a fully rehashed but semantically illegal correction pair and third-state files unchanged', async (t) => {
++  const recover = requireFunction('recoverIntegrationCorrectionStart');
++  await t.test('self-consistent outer hashes cannot legalize a built story after-image', () => {
++    const torn = interruptedStart(t, 'journal');
++    const wrapper = readJson(torn.journal);
++    const live = readJson(torn.fixture.recordFile);
++    const changed = structuredClone(wrapper);
++    const storyWrite = changed.descriptor.writes[1];
++    storyWrite.after = storyWrite.after.replace('"status":"building"', '"status":"built"');
++    changed.descriptor_identity = sha256(canonical(changed.descriptor));
++    live.correction.starting.descriptor_identity = changed.descriptor_identity;
++    live.correction.starting.reconstruction.descriptor = structuredClone(changed.descriptor);
++    changed.expected_starting_record_hash = sha256(canonical(live));
++    fs.writeFileSync(torn.fixture.recordFile, `${JSON.stringify(live, null, 2)}\n`);
++    fs.writeFileSync(torn.journal, `${JSON.stringify(changed, null, 2)}\n`);
++    const before = {
++      record: fs.readFileSync(torn.fixture.recordFile, 'utf8'),
++      journal: fs.readFileSync(torn.journal, 'utf8'),
++      story: fs.readFileSync(torn.storyFile, 'utf8'),
++    };
++    assert.throws(() => recover(torn.correctionRoot), /legal|Execution|transition|descriptor|reconstruct|after/i);
++    assert.equal(fs.readFileSync(torn.fixture.recordFile, 'utf8'), before.record);
++    assert.equal(fs.readFileSync(torn.journal, 'utf8'), before.journal);
++    assert.equal(fs.readFileSync(torn.storyFile, 'utf8'), before.story);
++  });
++
++  for (const boundary of ['journal', 'run', 'story']) {
++    await t.test(`third states after ${boundary} preserve every byte`, () => {
++      const torn = interruptedStart(t, boundary);
++      fs.mkdirSync(path.dirname(torn.runFile), { recursive: true });
++      fs.writeFileSync(torn.runFile, '{"third":"run-state"}\n');
++      fs.writeFileSync(torn.storyFile, `${fs.readFileSync(torn.storyFile, 'utf8')}\nthird story state\n`);
++      const before = {
++        record: fs.readFileSync(torn.fixture.recordFile, 'utf8'),
++        journal: fs.readFileSync(torn.journal, 'utf8'),
++        run: fs.readFileSync(torn.runFile, 'utf8'),
++        story: fs.readFileSync(torn.storyFile, 'utf8'),
++      };
++      assert.throws(() => recover(torn.correctionRoot), /conflict|third|before|after|journal|state/i);
++      assert.equal(fs.readFileSync(torn.fixture.recordFile, 'utf8'), before.record);
++      assert.equal(fs.readFileSync(torn.journal, 'utf8'), before.journal);
++      assert.equal(fs.readFileSync(torn.runFile, 'utf8'), before.run);
++      assert.equal(fs.readFileSync(torn.storyFile, 'utf8'), before.story);
++    });
++  }
++});

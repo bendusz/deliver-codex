@@ -34,8 +34,12 @@ and a rerun can complete them without overwriting existing content. There is no 
 
 After setup, `$deliver` also works in an ordinary Codex session. That invocation retains the
 session's selected model. The `deliver` launcher selects GPT-6-Astra and GPT-5.6 worker defaults
-for that invocation only. Models never silently fall back. Use `--model` and `--effort` for an
-explicit main-session override. Project trust and host permissions still apply.
+for that invocation only. It launches with `--sandbox danger-full-access` and
+`--ask-for-approval never` by default. Pass `--sandbox read-only` or
+`--sandbox workspace-write` to opt into a sandbox; those modes use `on-request` approval.
+Native workers inherit the effective session policy. Models never silently fall back. Use
+`--model` and `--effort` for an explicit main-session override. The launcher passes per-session
+flags and does not edit global or project configuration. Inherited host restrictions still apply.
 
 Use `setup --dry-run` to inspect installation paths, and `--dry-run` on the launcher to inspect
 the actual argument list without calling a model. This repository has not installed itself
@@ -50,8 +54,12 @@ globally or changed any of your existing projects.
 | Governed | Managed delivery plus traceability, risk-specific review and a distinct verifier |
 
 SpecDD, wiki/librarian and parallel worktrees are separate choices, not automatic consequences
-of project size. Review-only and discovery-only requests remain read-only. `finish` records a
-verified task; it does not commit, merge, push or deploy.
+of project size. Review-only and discovery-only requests remain read-only. For an approved
+delivery, the PM may commit scoped work, push story branches, create or update pull requests,
+and merge verified code without asking again for each step. Builders and reviewers do not
+perform Git integration. `finish` records a verified task; the PM still checks the repository's
+policy and actual integration result before recording a merge. Installation, paid provider
+calls and deployment need their own authorization.
 
 The 13 native role templates include builder, explorer, reviewer, verifier, security,
 architecture, researcher, debugger, test engineer, technical writer, spec architect, librarian,

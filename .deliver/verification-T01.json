@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T01-AC1",
+      "status": "PASS",
+      "evidence": "Independent byte comparison against pinned upstream found no differences. provenance.json records source paths/commit/dependencies/SHA-256 for reader plus22 templates; upstream-contract tests verify bytes and inventory."
+    },
+    {
+      "id": "T01-AC2",
+      "status": "PASS",
+      "evidence": "Independent review of upstream-contract.test.mjs confirms disposable Git repo with approval, two story claims, actor/state derivation and unchanged reader CLI execution; exact-snapshot npm test passed with no model calls."
+    },
+    {
+      "id": "T01-AC3",
+      "status": "PASS",
+      "evidence": "Independent review confirms parity-contract maps16 capabilities and T00-T14 to evidence with bidirectional task links. All five old v0.22 fixture hashes are pinned and unchanged."
+    }
+  ]
+}

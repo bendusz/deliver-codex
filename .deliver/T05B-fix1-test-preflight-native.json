@@ -1,0 +1,36 @@
+{
+  "status": "NOT_READY",
+  "findings": [
+    {
+      "kind": "overconstraint",
+      "finding": 5,
+      "message": "The supersession test requires the old slot.effect.attempt_identity to equal a current retained attempt identity after that predecessor is marked superseded. Marking disposition/superseded_by necessarily changes the identified predecessor. The approved contract instead preserves the pre-mutation attempt identity and effect identity in the successor's identified supersession proof while leaving slot.effect unchanged during preparation. Remove priorEffectStillBound and assert exact structured fields for predecessor_attempt_identity, predecessor_effect_identity, prior_observation_identity, current_observation_identity and changed_fields."
+    },
+    {
+      "kind": "coverage_omission",
+      "finding": 5,
+      "message": "The current substring assertion can pass because successor.supersedes already contains the predecessor token, and it never checks the predecessor attempt identity or observation identities. The base-drift case also lacks these assertions. Add exact field assertions for both head and base supersession, then reidentify deliberately broken reciprocal links, effect binding and supersession proof fields and require record validation to reject them."
+    },
+    {
+      "kind": "coverage_omission",
+      "finding": 2,
+      "message": "Closure and repair after-effect recovery is exercised by calling the publish operation again in the same process. The public reconcileRemoteClosure/reconcileRemoteHandoffRepair paths are not required to settle the retained executing provider slot, and fresh-process exact-effect adoption is not covered. Exercise each public reconcile directly after a lost merge response and require the same attempt to become observed/proven without another provider write."
+    },
+    {
+      "kind": "coverage_omission",
+      "finding": 1,
+      "message": "Admission proof stripping is tested only on a normal-closure completion. Add the repaired H2/S completion case with missing, mismatched or rebound handoff_repair proof so admission cannot validate normal R while ignoring the selected repaired terminal chain."
+    },
+    {
+      "kind": "coverage_omission",
+      "finding": 8,
+      "message": "The finalization mutation matrix covers identity, snapshot, gate and review binding but omits verification. Add a reidentified finalization with missing or mismatched verification identity and require refusal before closure checkout allocation with exact record preservation."
+    },
+    {
+      "kind": "coverage_omission",
+      "finding": 4,
+      "message": "The protected H2 regression covers ignored .codex bytes and common Git configuration, but the frozen remote contract also requires adoption-time branch-attachment proof. Add an attachment change between prepare and adopt and require unchanged refusal; otherwise a fix can still omit this original protected-adoption boundary."
+    }
+  ],
+  "controls": "The empty-rebase positive, both unauthorized-history negatives, legitimate multi-commit advanced-base positive, mode-only closure race, transaction-time admission injection, premature-H refusal and H2 before/after/third-image cases reach the intended boundaries. The tracked patch removes no original behavioral assertion."
+}

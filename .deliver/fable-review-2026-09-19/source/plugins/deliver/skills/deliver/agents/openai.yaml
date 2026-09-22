@@ -1,0 +1,4 @@
+interface:
+  display_name: "Deliver"
+  short_description: "Bounded software delivery with durable checkpoints"
+  default_prompt: "Use $deliver to plan and deliver this change."

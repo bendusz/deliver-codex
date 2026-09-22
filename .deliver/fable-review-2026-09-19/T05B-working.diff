@@ -1,0 +1,2802 @@
+diff --git a/plugins/deliver/skills/deliver/references/compatibility.md b/plugins/deliver/skills/deliver/references/compatibility.md
+index 0320134..9d958fa 100644
+--- a/plugins/deliver/skills/deliver/references/compatibility.md
++++ b/plugins/deliver/skills/deliver/references/compatibility.md
+@@ -111,3 +111,18 @@ This bridge targets upstream 0.22.0 records. Older flat/legacy actor layouts req
+ migration first. Task-boundary PM handoffs are portable; live Codex receipts remain checkout-bound.
+ No automatic migration of existing standalone `.deliver` runs, mid-story conversion, sprint
+ planning engine or automatic integration re-verification is claimed.
++
++## Native remote completion hold
++
++A protected integration branch uses the remote lifecycle in `references/shipping.md`. Native
++remote evidence remains in the canonical integration record until its exact fetched terminal
++commit is fast-forwarded into the approved local integration checkout and adopted. During that
++interval `pm.mjs status` reports `REMOTE_PENDING`, `REMOTE_CLOSURE_PROVEN` or
++`LOCAL_ADOPTION_PENDING`; claim and direct start remain blocked. Malformed, copied or ambiguous
++records report `UNKNOWN`. A proved completed record remains readable after later legitimate
++integration commits, and completed history does not block a later story.
++
++Provider writes retain prepared, executing and observed transitions. A process restart never
++replays an ambiguous executing write merely because its PID disappeared. Read-only reconciliation
++may adopt an exact observed provider effect; same-process replay requires a positively ended call
++and exact absence proof on the same attempt token.
+diff --git a/plugins/deliver/skills/deliver/references/shipping.md b/plugins/deliver/skills/deliver/references/shipping.md
+index 3d3662a..7cb9bfb 100644
+--- a/plugins/deliver/skills/deliver/references/shipping.md
++++ b/plugins/deliver/skills/deliver/references/shipping.md
+@@ -150,3 +150,64 @@ before/after proof. Later stages revalidate the entire adopted M/P/E/H chain. An
+ extra path, changed branch, tree, manifest, log or record hash blocks without consuming the
+ preparation. Integration records live only at the canonical per-run path under
+ `.deliver/integrations`.
++
++## Protected-branch remote completion
++
++The `complete` operation may use the remote path when the integration branch is protected. The
++same standing authority covers the scoped push, ordinary pull request and verified merge. Keep
++each returned record hash and pass it to the next command. Provider pending, failed or unknown
++results stop the sequence; they are never treated as approval or PASS.
++
++Publish C, inspect required checks, request the selected source merge method, then fetch and prove
++the provider result. The reconcile step accepts merge, squash or rebase only when real Git history
++proves its claimed lineage and tree. Fetch and push destinations must be identical.
++
++```text
++node <pm> remote-source-publish --integration <file> --expected-record <hash> --remote origin --title <title> --body-file <file>
++node <pm> remote-source-readiness --integration <file> --expected-record <hash>
++node <pm> remote-source-merge --integration <file> --expected-record <hash> --pr <number> --method <merge|squash|rebase> --subject <subject> --body-file <file>
++node <pm> remote-source-reconcile --integration <file> --expected-record <hash> --pr <number>
++node <pm> remote-evidence-prepare --integration <file> --expected-record <hash> --evidence-root <root>
++node <pm> remote-evidence-gate --integration <file> --expected-record <hash> --name <gate>
++node <pm> remote-evidence-review --integration <file> --expected-record <hash> --reviewer <id> --receipt <json>
++node <pm> remote-evidence-verify --integration <file> --expected-record <hash> --verifier <id> --results <json>
++node <pm> remote-evidence-finalize --integration <file> --expected-record <hash>
++```
++
++Create the exact branch and checkout returned by `remote-closure-checkout-prepare`, then adopt it.
++Use the remote report commands when reporting is required or requested; otherwise continue with E
++and H. Each prepare is followed by a PM-created direct-child commit and its matching adopt.
++
++```text
++node <pm> remote-closure-checkout-prepare --integration <file> --expected-record <hash>
++node <pm> remote-closure-checkout-adopt --integration <file> --expected-record <hash> --token <token>
++node <pm> remote-report-prepare --integration <file> --expected-record <hash>
++node <pm> remote-report-adopt --integration <file> --expected-record <hash> --token <token> --commit <P>
++node <pm> remote-close-prepare --integration <file> --expected-record <hash>
++node <pm> remote-close-adopt --integration <file> --expected-record <hash> --token <token> --commit <E>
++node <pm> remote-handoff-prepare --integration <file> --expected-record <hash> --next <action>
++node <pm> remote-handoff-adopt --integration <file> --expected-record <hash> --token <token> --commit <H>
++node <pm> remote-closure-publish --integration <file> --expected-record <hash> --remote origin --title <title> --body-file <file>
++node <pm> remote-closure-reconcile --integration <file> --expected-record <hash> --pr <number>
++```
++
++Closure always requests an ordinary merge commit. If the provider prohibits that merge method,
++retain `MERGE_METHOD_UNSUPPORTED` and the pull request for inspection. A raced integration branch
++may prove E while leaving H stale. In that case use the bounded handoff-only repair path; it never
++relabels source gates and permits two replacements after the first publication attempt.
++
++```text
++node <pm> remote-handoff-repair-prepare --integration <file> --expected-record <hash>
++node <pm> remote-handoff-repair-adopt --integration <file> --expected-record <hash> --token <token> --commit <H2>
++node <pm> remote-handoff-repair-publish --integration <file> --expected-record <hash> --remote origin --title <title> --body-file <file>
++node <pm> remote-handoff-repair-reconcile --integration <file> --expected-record <hash> --pr <number>
++```
++
++Finally prepare an immutable fast-forward token. While the status is `LOCAL_ADOPTION_PENDING`, the
++native admission hold blocks another claim. Fast-forward the canonical integration checkout to the
++exact returned target and adopt it; do not create a merge commit for this local step.
++
++```text
++node <pm> remote-completion-prepare --integration <file> --expected-record <hash>
++node <pm> remote-completion-adopt --integration <file> --expected-record <hash> --token <token>
++```
+diff --git a/plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs b/plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs
+index 514b39b..065387a 100644
+--- a/plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs
++++ b/plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs
+@@ -2,7 +2,10 @@ import fs from 'node:fs';
+ import path from 'node:path';
+ import { randomUUID } from 'node:crypto';
+ import { execFileSync } from 'node:child_process';
+-import { DeliverError, canonical, createRunState, internalDirectory, readRun, sha256, validateRunState } from './state.mjs';
++import {
++  DeliverError, canonical, createRunState, internalDirectory, readRun, sha256,
++  validateRemotePublicationRecord, validateRunState,
++} from './state.mjs';
+ import { inspectProjectState, readApprovalMarker, readPlanPolicy } from './project-state.mjs';
+ import { isValidGitBranchName, parseStory, readStory, replaceStoryExecution, storyTaskContract } from './story.mjs';
+ import { baselineDirtyPaths, captureGitAnchor, snapshot } from './scope.mjs';
+@@ -302,6 +305,135 @@ function requireExecutable(root, actorId) {
+   return state;
+ }
+ 
++function remoteStatusBase(root) {
++  let integrationBranch = null;
++  try { integrationBranch = readPlanPolicy(root)?.integrationBranch || null; } catch {}
++  return {
++    version: 'remote-admission-status-v1', state: 'CLEAR', blocking: false,
++    common_repository: (() => { try { return fs.realpathSync.native(path.resolve(root, git(root, ['rev-parse', '--git-common-dir']))); } catch { return null; } })(),
++    integration_branch: integrationBranch, story: null, source_run_id: null,
++    integration_record: null, record_hash: null, remote_terminal_commit: null,
++    local_head: (() => { try { return git(root, ['rev-parse', '--verify', 'HEAD']); } catch { return null; } })(),
++    continuation: null, diagnostics: [],
++  };
++}
++
++function validRemoteIdentity(value) {
++  if (!record(value) || !/^[0-9a-f]{64}$/.test(value.identity || '')) return false;
++  const { identity, ...body } = value;
++  return identity === sha256(canonical(body));
++}
++
++function validateAdmissionRecord(value, file, root, common, integrationBranch) {
++  if (!record(value) || value.id !== path.basename(file, '.json') || value.source?.run_id !== value.id
++    || value.destination?.common_repository !== common || value.destination?.branch !== integrationBranch
++    || path.join(fs.realpathSync.native(value.destination?.root || ''), '.deliver', 'integrations', `${value.id}.json`) !== file
++    || value.remote?.version !== 'remote-publication-v1') throw new Error('record identity or repository binding is malformed');
++  const completion = value.remote.completion;
++  validateRemotePublicationRecord(value, { requireTerminal: completion?.status === 'complete' });
++}
++
++function terminalEntry(root, commit, rel) {
++  if (typeof rel !== 'string' || path.isAbsolute(rel) || rel.split('/').some((part) => !part || part === '.' || part === '..')) {
++    throw new Error('remote terminal artifact path is invalid');
++  }
++  const output = git(root, ['ls-tree', '-z', commit, '--', rel]);
++  const match = /^(100644|100755) blob ([0-9a-f]{40}(?:[0-9a-f]{24})?)\t([^\0]+)\0$/.exec(output);
++  if (!match || match[3] !== rel) throw new Error('remote terminal artifact entry is missing or ambiguous');
++  let bytes;
++  try {
++    bytes = execFileSync('git', ['-C', root, 'show', `${commit}:${rel}`], {
++      encoding: undefined, stdio: ['ignore', 'pipe', 'pipe'], timeout: 30000,
++      maxBuffer: MAX_BYTES, windowsHide: true,
++    });
++  } catch (error) { throw new Error(`remote terminal artifact is unreadable: ${error.message}`); }
++  return { mode: match[1], hash: sha256(bytes) };
++}
++
++function validateAdmissionTerminalGit(value, root) {
++  const completion = value.remote.completion;
++  if (completion?.status !== 'complete') return;
++  const closureWrite = value.remote.closure.artifacts.closure.proof.writes
++    .find((item) => item.path === value.source.story_path);
++  const repair = value.remote.handoff_repair.proof
++    ? value.remote.handoff_repair.attempts.at(-1).proof.write : null;
++  const handoffWrite = repair || value.remote.closure.artifacts.handoff.proof.writes
++    .find((item) => item.path === value.handoff.path);
++  for (const write of [closureWrite, handoffWrite]) {
++    if (!write) throw new Error('remote terminal artifact proof is missing');
++    const entry = terminalEntry(root, completion.target, write.path);
++    if (entry.mode !== write.mode || entry.hash !== write.hash) {
++      throw new Error('remote terminal artifact bytes or mode differ from retained proof');
++    }
++  }
++}
++
++export function remoteAdmissionStatus(root) {
++  root = rootPath(root);
++  const out = remoteStatusBase(root);
++  let worktrees;
++  try {
++    worktrees = git(root, ['worktree', 'list', '--porcelain']).split(/\r?\n/)
++      .filter((line) => line.startsWith('worktree ')).map((line) => line.slice(9));
++  } catch (error) {
++    return { ...out, state: 'UNKNOWN', blocking: true,
++      diagnostics: [{ code: 'REMOTE_WORKTREES_UNKNOWN', message: error.message }] };
++  }
++  const candidates = [];
++  for (const checkout of worktrees) {
++    const directory = path.join(checkout, '.deliver', 'integrations');
++    let entries;
++    try { entries = fs.readdirSync(directory, { withFileTypes: true }); }
++    catch (error) { if (error.code === 'ENOENT') continue; return { ...out, state: 'UNKNOWN', blocking: true,
++      diagnostics: [{ code: 'REMOTE_RECORD_DIRECTORY_UNREADABLE', message: error.message, path: directory }] }; }
++    for (const entry of entries) {
++      if (!/^[0-9a-f-]{36}\.json$/.test(entry.name)) continue;
++      const file = path.join(directory, entry.name);
++      try {
++        const stat = fs.lstatSync(file);
++        if (!entry.isFile() || stat.isSymbolicLink() || stat.size > MAX_BYTES || fs.realpathSync.native(file) !== file) throw new Error('record is not a bounded canonical regular file');
++        const value = JSON.parse(fs.readFileSync(file, 'utf8'));
++        if (value.remote !== undefined && value.remote !== null) {
++          validateAdmissionRecord(value, file, root, out.common_repository, out.integration_branch);
++          validateAdmissionTerminalGit(value, root);
++          candidates.push({ file, value });
++        }
++      } catch (error) {
++        return { ...out, state: 'UNKNOWN', blocking: true,
++          diagnostics: [{ code: 'REMOTE_RECORD_MALFORMED', message: error.message, path: file }] };
++      }
++    }
++  }
++  if (!candidates.length) return out;
++  const active = candidates.filter(({ value }) => value.remote.completion?.status !== 'complete');
++  if (active.length > 1) return { ...out, state: 'UNKNOWN', blocking: true,
++    diagnostics: [{ code: 'REMOTE_RECORD_AMBIGUOUS', message: 'More than one active native remote integration record applies.' }] };
++  const selected = active[0] || candidates.filter(({ value }) => value.remote.completion?.status === 'complete')
++    .sort((a, b) => String(b.value.updated_at).localeCompare(String(a.value.updated_at)))[0];
++  const { file, value } = selected;
++  const completion = value.remote.completion;
++  const terminal = completion?.commit || completion?.target || value.remote.handoff_repair?.proof?.commit || value.remote.closure?.proof?.commit || null;
++  let state = 'REMOTE_PENDING';
++  let blocking = true;
++  if (completion?.status === 'complete') {
++    try {
++      if (git(root, ['merge-base', '--is-ancestor', completion.commit, 'HEAD']) !== '') throw new Error('unexpected ancestry output');
++      state = 'COMPLETE'; blocking = false;
++    } catch { return { ...out, state: 'UNKNOWN', blocking: true,
++      diagnostics: [{ code: 'REMOTE_COMPLETION_UNPROVEN', message: 'Completed remote target is not an ancestor of local HEAD.', path: file }] }; }
++  }
++  else if (completion?.status === 'prepared') state = 'LOCAL_ADOPTION_PENDING';
++  else if (value.remote.handoff_repair?.proof || value.remote.closure?.proof) state = 'REMOTE_CLOSURE_PROVEN';
++  return { ...out, state, blocking, story: value.source.story, source_run_id: value.source.run_id,
++    integration_record: file, record_hash: sha256(canonical(value)), remote_terminal_commit: terminal,
++    continuation: completion?.continuation || null };
++}
++
++function assertRemoteAdmissionClear(root) {
++  const status = remoteAdmissionStatus(root);
++  if (status.blocking) fail(`remote integration admission is ${status.state}; reconcile ${status.integration_record || 'its evidence'} first`);
++}
++
+ function resolvedBuilder(builder) {
+   if (builder === 'expert-builder') fail('story explicitly routes to unavailable expert-builder; obtain an approved routing change');
+   if (builder === 'auto' || builder === 'codex-builder') return 'codex-builder';
+@@ -338,6 +470,7 @@ function requireCleanIntegrationCheckout(root, integrationBranch) {
+ export function claimCurrentPm(root, storyPath, plannedBranch) {
+   const actor = currentActorId(root);
+   assertCurrentPmReady(root);
++  assertRemoteAdmissionClear(root);
+   const first = readStory(root, storyPath);
+   const builder = resolvedBuilder(first.meta.builder);
+   const branch = plannedBranch || first.execution?.branch || targetBranch(first);
+@@ -368,6 +501,7 @@ export function claimCurrentPm(root, storyPath, plannedBranch) {
+   const conflict = storyRefConflict(root, first.id);
+   if (conflict) fail(`unclaimed story has an existing target branch or worktree: ${conflict}`);
+   return transact(root, (get, set) => {
++    assertRemoteAdmissionClear(root);
+     const before = get(first.path);
+     if (before === null) fail(`story is missing: ${first.path}`);
+     const document = parseStory(before, first.path);
+@@ -404,6 +538,7 @@ function packetMatchesStory(packet, document) {
+ 
+ export function prepareCurrentBinding(state, packet, storyPath) {
+   if (!storyPath) fail('current projects require start --story docs/stories/<story>.md');
++  assertRemoteAdmissionClear(state.project_root);
+   const actor = currentActorId(state.project_root);
+   const project = requireExecutable(state.project_root, actor);
+   const document = readStory(state.project_root, storyPath);
+diff --git a/plugins/deliver/skills/deliver/scripts/lib/integration.mjs b/plugins/deliver/skills/deliver/scripts/lib/integration.mjs
+index 8abbe21..57e912d 100644
+--- a/plugins/deliver/skills/deliver/scripts/lib/integration.mjs
++++ b/plugins/deliver/skills/deliver/scripts/lib/integration.mjs
+@@ -2,7 +2,11 @@ import fs from 'node:fs';
+ import path from 'node:path';
+ import { execFileSync, spawnSync } from 'node:child_process';
+ import { randomUUID } from 'node:crypto';
+-import { canonical, DeliverError, internalDirectory, readRun, sha256, validateTaskPacket } from './state.mjs';
++import {
++  canonical, DeliverError, internalDirectory, readRun, remoteProviderAttemptIdentity,
++  remoteProviderAttemptObservation, sha256,
++  validateRemotePublicationRecord, validateTaskPacket,
++} from './state.mjs';
+ import {
+   applyIntegrationCorrectionJournal,
+   assertCurrentBinding,
+@@ -19,6 +23,7 @@ import { parseVerificationResults, renderVerificationArtifacts } from './reporti
+ import { parseStory, readStory, replaceStoryExecution } from './story.mjs';
+ import { environmentHandle } from './gates.mjs';
+ import { captureGitAnchor, snapshot } from './scope.mjs';
++import { createGitHubRemoteAdapter } from './remote.mjs';
+ 
+ const OID = /^[0-9a-f]{40}(?:[0-9a-f]{24})?$/;
+ const HASH = /^[0-9a-f]{64}$/;
+@@ -26,6 +31,9 @@ const RUN_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9
+ const ACTOR_ID = /^[A-Za-z0-9][A-Za-z0-9._@-]{0,127}$/;
+ const MAX_RECORD_BYTES = 8 * 1024 * 1024;
+ const NO_MUTATION = Symbol('no-mutation');
++const PROCESS_INSTANCE = randomUUID();
++const ACTIVE_PROVIDER_INVOCATIONS = new Set();
++const ENDED_PROVIDER_INVOCATIONS = new Set();
+ const fail = (message, code = 66) => { throw new DeliverError(message, code); };
+ const json = (value) => `${JSON.stringify(value, null, 2)}\n`;
+ const now = () => new Date().toISOString();
+@@ -661,6 +669,11 @@ function validateCorrectionEnvelope(record) {
+   }
+ }
+ 
++function withoutIdentity(value) {
++  const { identity: _identity, ...body } = value;
++  return body;
++}
++
+ function validateRecord(record) {
+   if (!record || typeof record !== 'object' || Array.isArray(record) || !RUN_ID.test(record.id || '')) {
+     fail('integration record id must be a canonical run id');
+@@ -743,6 +756,7 @@ function validateRecord(record) {
+     || record.integration.checkout_proof !== null || !hasReceiptIdentity(record.integration.failure))) fail('failed integration probe claims an M');
+   validateTaskPacket(record.source.packet);
+   validateCorrectionEnvelope(record);
++  validateRemotePublicationRecord(record);
+   return record;
+ }
+ 
+@@ -1642,6 +1656,1382 @@ function readCompletedCorrectionImage(root, rel, label) {
+   }
+ }
+ 
++function identified(body) {
++  return { ...body, identity: sha256(canonical(body)) };
++}
++
++function emptyProviderSlot() {
++  return { version: 'remote-provider-slot-v1', active_token: null, attempts: [], effect: null };
++}
++
++function newRemoteEnvelope() {
++  return {
++    version: 'remote-publication-v1',
++    source: {
++      status: 'empty', remote: null, repository: null,
++      publication: emptyProviderSlot(), merge: emptyProviderSlot(), proof: null,
++    },
++    integration_evidence: null,
++    closure: null,
++    handoff_repair: { publication_retry: 0, attempts: [], proof: null },
++    completion: null,
++  };
++}
++
++function remoteEnvelope(record) {
++  record.remote ||= newRemoteEnvelope();
++  return record.remote;
++}
++
++function remoteSlot(record, area, operation, repairToken = null) {
++  const remote = remoteEnvelope(record);
++  if (area === 'source') return remote.source[operation];
++  if (area === 'closure') return remote.closure?.publication?.[operation];
++  if (area === 'repair') {
++    const attempt = repairToken
++      ? remote.handoff_repair.attempts.find((item) => item.token === repairToken)
++      : remote.handoff_repair.attempts.at(-1);
++    return attempt?.publication?.[operation];
++  }
++  fail('remote provider operation slot is unavailable');
++}
++
++function lastTransition(attempt) { return attempt.transitions.at(-1); }
++
++function refreshAttempt(attempt) {
++  attempt.identity = remoteProviderAttemptIdentity(attempt);
++  return attempt;
++}
++
++function appendAttemptTransition(attempt, body) {
++  const transition = identified({ ...body, previous: lastTransition(attempt)?.identity || null });
++  attempt.transitions.push(transition);
++  return refreshAttempt(attempt);
++}
++
++function providerResult(value, expectedHead) {
++  let bytes;
++  try { bytes = Buffer.byteLength(JSON.stringify(value)); } catch { fail('provider result is not serializable'); }
++  if (!value || typeof value !== 'object' || Array.isArray(value) || bytes > 2 * 1024 * 1024
++    || typeof value.state !== 'string' || value.expectedHead !== expectedHead) fail('provider returned an invalid or unbound result');
++  return structuredClone(value);
++}
++
++function domainProviderState(operation, state) {
++  if (state === 'PUBLISHED') return 'PUBLISHED';
++  if (state === 'READY') return 'READY';
++  if (state === 'MERGED') return operation.includes('source') ? 'SOURCE_MERGED' : 'MERGED';
++  if (state === 'MERGED_BASE_ADVANCED') return operation.includes('source') ? 'SOURCE_BASE_ADVANCED' : 'HANDOFF_BASE_RACE';
++  if (['PR_DRAFT', 'CHECKS_PENDING', 'MERGE_PENDING'].includes(state)) return 'PENDING';
++  if (['PUSH_REJECTED', 'PR_WRITE_FAILED', 'PR_READY_FAILED', 'CHECKS_FAILED', 'MERGE_REJECTED'].includes(state)) return 'FAILED';
++  return 'UNKNOWN';
++}
++
++function remoteResult(operation, state, extra = {}) {
++  return { operation, state, ...extra };
++}
++
++function safeRemoteInput(value, label, max, { multiline = false } = {}) {
++  if (typeof value !== 'string' || Buffer.byteLength(value) > max || value.includes('\0')
++    || (!multiline && (!value.trim() || /[\x00-\x1f\x7f]/.test(value)))) fail(`invalid remote ${label}`, 64);
++  return value;
++}
++
++function sourceTarget(record, remote = undefined) {
++  const envelope = record.remote;
++  const selected = remote ?? envelope?.source?.remote ?? 'origin';
++  if (envelope?.source?.remote && selected !== envelope.source.remote) fail('remote differs from the retained source publication');
++  return {
++    root: record.source.root, remote: selected, storyBranch: record.source.branch,
++    integrationBranch: record.destination.branch, expectedHead: record.source.candidate,
++  };
++}
++
++function providerAttemptResult(wrapper, operation, attempt, providerValue) {
++  return {
++    file: wrapper.file, record: wrapper.record, hash: wrapper.hash,
++    result: remoteResult(operation, domainProviderState(operation, providerValue.state), {
++      attempt_token: attempt.token, provider_state: providerValue.state,
++      ...(providerValue.pr ? { pr: providerValue.pr } : {}),
++      ...(providerValue.mergeCommit ? { merge_commit: providerValue.mergeCommit } : {}),
++      ...(providerValue.remoteBase ? { remote_base: providerValue.remoteBase } : {}),
++    }),
++  };
++}
++
++function executeProviderAttempt(recordArg, expectedRecordHash, {
++  area, slotName, operation, input, expectedHead, invoke, successStates = [], retry = 0, repairToken = null,
++}, cwd) {
++  const inputIdentity = sha256(canonical(input));
++  const prepared = withRecord(recordArg, expectedRecordHash, (record) => {
++    const slot = remoteSlot(record, area, slotName, repairToken);
++    const previous = slot.attempts.at(-1);
++    if (!slot.active_token && slot.effect && previous && lastTransition(previous)?.state === 'observed') {
++      const stripObservation = ({ remote_observation: _observation, ...rest }) => rest;
++      if (canonical(stripObservation(previous.input)) !== canonical(stripObservation(input))) {
++        fail('remote provider input differs from the retained successful intent');
++      }
++      const retained = lastTransition(previous).result;
++      return { [NO_MUTATION]: true, value: remoteResult(operation, domainProviderState(operation, retained.state), {
++        attempt_token: previous.token, provider_state: retained.state,
++        ...(retained.pr ? { pr: retained.pr } : {}), ...(retained.mergeCommit ? { merge_commit: retained.mergeCommit } : {}),
++        ...(retained.remoteBase ? { remote_base: retained.remoteBase } : {}),
++      }) };
++    }
++    if (!slot.active_token && previous && previous.input_identity === inputIdentity
++      && lastTransition(previous)?.state === 'observed') {
++      const retained = lastTransition(previous).result;
++      return { [NO_MUTATION]: true, value: remoteResult(operation, domainProviderState(operation, retained.state), {
++        attempt_token: previous.token, provider_state: retained.state,
++        ...(retained.pr ? { pr: retained.pr } : {}),
++        ...(retained.mergeCommit ? { merge_commit: retained.mergeCommit } : {}),
++        ...(retained.remoteBase ? { remote_base: retained.remoteBase } : {}),
++      }) };
++    }
++    if (!slot.active_token && previous && lastTransition(previous)?.state === 'observed'
++      && previous.input_identity !== inputIdentity) {
++      fail('remote provider input differs from the retained unresolved or terminal attempt');
++    }
++    const active = slot.active_token && slot.attempts.find((item) => item.token === slot.active_token);
++    if (active) {
++      const transition = lastTransition(active);
++      if (active.input_identity !== inputIdentity) fail('active remote provider attempt has different immutable input');
++      if (transition.state === 'executing') return { [NO_MUTATION]: true,
++        value: remoteResult(operation, 'PROVIDER_EXECUTING', { attempt_token: active.token }) };
++      if (transition.state === 'prepared') return { attempt: active, resumed: true };
++    }
++    const token = randomUUID();
++    const attempt = {
++      version: 'remote-provider-attempt-v1', token, operation, ordinal: slot.attempts.length,
++      input: structuredClone(input), input_identity: inputIdentity, predecessor_record_hash: expectedRecordHash,
++      retry, supersedes: null, transitions: [], disposition: 'active', superseded_by: null, identity: null,
++    };
++    appendAttemptTransition(attempt, { state: 'prepared', at: now() });
++    slot.attempts.push(attempt);
++    slot.active_token = token;
++    return { attempt, resumed: false };
++  }, cwd);
++  if (prepared.unchanged) return prepared;
++  const preparedAttempt = remoteSlot(prepared.record, area, slotName, repairToken).attempts
++    .find((item) => item.token === prepared.result.attempt.token);
++  const invocationToken = randomUUID();
++  const executing = withRecord(prepared.file, prepared.hash, (record) => {
++    const slot = remoteSlot(record, area, slotName, repairToken);
++    const attempt = slot.attempts.find((item) => item.token === preparedAttempt.token);
++    if (!attempt || slot.active_token !== attempt.token || lastTransition(attempt).state !== 'prepared') {
++      fail('remote provider attempt is no longer prepared');
++    }
++    appendAttemptTransition(attempt, {
++      state: 'executing', at: now(), invocation: {
++        token: invocationToken, pid: process.pid, process_instance: PROCESS_INSTANCE,
++        operation, input_identity: attempt.input_identity,
++      },
++    });
++    return { attempt_token: attempt.token, invocation_token: invocationToken };
++  }, cwd);
++  let raw;
++  ACTIVE_PROVIDER_INVOCATIONS.add(invocationToken);
++  try { raw = invoke(); }
++  catch {
++    ENDED_PROVIDER_INVOCATIONS.add(invocationToken);
++    return { file: executing.file, record: executing.record, hash: executing.hash,
++      result: remoteResult(operation, 'PROVIDER_UNKNOWN', { attempt_token: preparedAttempt.token }) };
++  } finally { ACTIVE_PROVIDER_INVOCATIONS.delete(invocationToken); }
++  ENDED_PROVIDER_INVOCATIONS.add(invocationToken);
++  const value = providerResult(raw, expectedHead);
++  const observed = withRecord(executing.file, executing.hash, (record) => {
++    const slot = remoteSlot(record, area, slotName, repairToken);
++    const attempt = slot.attempts.find((item) => item.token === preparedAttempt.token);
++    if (!attempt || lastTransition(attempt).invocation?.token !== invocationToken) fail('remote provider invocation identity changed');
++    appendAttemptTransition(attempt, {
++      state: 'observed', at: now(), invocation_token: invocationToken,
++      result: value, result_identity: sha256(canonical(value)),
++    });
++    slot.active_token = null;
++    if (successStates.includes(value.state)) {
++      attempt.disposition = 'proven';
++      refreshAttempt(attempt);
++      slot.effect = identified({ attempt_identity: attempt.identity,
++        result_identity: sha256(canonical(value)), proof_identity: null });
++    }
++    if (area === 'source') {
++      const remote = remoteEnvelope(record).source;
++      remote.remote ||= input.target.remote;
++      if (remote.remote !== input.target.remote) fail('provider attempt remote identity changed');
++      if (value.repository) {
++        const repository = canonical(value.repository);
++        if (remote.repository && canonical(remote.repository) !== repository) fail('provider repository identity changed');
++        remote.repository ||= structuredClone(value.repository);
++      }
++      if (operation === 'source-publish' && value.state === 'PUBLISHED') remote.status = 'published';
++      if (operation === 'source-merge' && value.state === 'MERGED') remote.status = 'merged';
++    }
++    return { attempt, provider: value };
++  }, cwd);
++  const attempt = remoteSlot(observed.record, area, slotName, repairToken).attempts.find((item) => item.token === preparedAttempt.token);
++  return providerAttemptResult(observed, operation, attempt, value);
++}
++
++function reconcileExecutingAttempt(recordArg, expectedRecordHash, {
++  area, slotName, operation, expectedHead, reconcile, effectStates, absenceStates = [], repairToken = null,
++}, cwd) {
++  const loaded = readIntegrationRecord(recordArg, cwd);
++  if (loaded.hash !== expectedRecordHash) fail('integration record hash is missing or stale');
++  const slot = remoteSlot(loaded.record, area, slotName, repairToken);
++  const attempt = slot.active_token && slot.attempts.find((item) => item.token === slot.active_token);
++  if (!attempt || lastTransition(attempt).state !== 'executing') return null;
++  const invocation = lastTransition(attempt).invocation;
++  if (invocation.process_instance === PROCESS_INSTANCE && ACTIVE_PROVIDER_INVOCATIONS.has(invocation.token)) {
++    return { file: loaded.file, record: loaded.record, hash: loaded.hash,
++      result: remoteResult(operation, 'PROVIDER_EXECUTING', { attempt_token: attempt.token }) };
++  }
++  const observed = providerResult(reconcile(attempt), expectedHead);
++  if (effectStates.includes(observed.state)) return withRecord(loaded.file, loaded.hash, (record) => {
++    const currentSlot = remoteSlot(record, area, slotName, repairToken); const current = currentSlot.attempts.find((item) => item.token === attempt.token);
++    appendAttemptTransition(current, { state: 'observed', at: now(), invocation_token: invocation.token,
++      reconciliation: true, result: observed, result_identity: sha256(canonical(observed)) });
++    current.disposition = 'proven'; refreshAttempt(current); currentSlot.active_token = null;
++    currentSlot.effect = identified({ attempt_identity: current.identity, result_identity: sha256(canonical(observed)), proof_identity: null });
++    if (area === 'source') {
++      const source = remoteEnvelope(record).source;
++      source.remote ||= current.input.target.remote;
++      if (source.remote !== current.input.target.remote) fail('provider attempt remote identity changed');
++      if (observed.repository) {
++        if (source.repository && canonical(source.repository) !== canonical(observed.repository)) {
++          fail('provider repository identity changed');
++        }
++        source.repository ||= structuredClone(observed.repository);
++      }
++      if (slotName === 'publication') source.status = 'published';
++      if (slotName === 'merge') source.status = 'merged';
++    }
++    const state = operation.endsWith('publish') ? 'PUBLISHED' : domainProviderState(operation, observed.state);
++    return remoteResult(operation, state, { attempt_token: current.token,
++      provider_state: observed.state, reconciled: true, ...(observed.pr ? { pr: observed.pr } : {}),
++      ...(observed.mergeCommit ? { merge_commit: observed.mergeCommit } : {}), ...(observed.remoteBase ? { remote_base: observed.remoteBase } : {}) });
++  }, cwd);
++  const endedHere = invocation.process_instance === PROCESS_INSTANCE
++    && ENDED_PROVIDER_INVOCATIONS.has(invocation.token) && !ACTIVE_PROVIDER_INVOCATIONS.has(invocation.token);
++  if (absenceStates.includes(observed.state) && endedHere) return withRecord(loaded.file, loaded.hash, (record) => {
++    const current = remoteSlot(record, area, slotName, repairToken).attempts.find((item) => item.token === attempt.token);
++    appendAttemptTransition(current, { state: 'prepared', at: now(), replay: identified({
++      version: 'remote-provider-replay-proof-v1', invocation_token: invocation.token,
++      absence_result: observed, absence_identity: sha256(canonical(observed)), proved_at: now() }) });
++    return remoteResult(operation, 'PROVIDER_REPLAYABLE', { attempt_token: current.token, provider_state: observed.state });
++  }, cwd);
++  return { file: loaded.file, record: loaded.record, hash: loaded.hash,
++    result: remoteResult(operation, observed.state === 'MERGE_PENDING' ? 'PENDING' : 'PROVIDER_UNKNOWN', {
++      attempt_token: attempt.token, provider_state: observed.state,
++    }) };
++}
++
++function remoteObservation(provider, target) {
++  const result = providerResult(provider.inspect(target), target.expectedHead);
++  const remoteBase = Object.hasOwn(result, 'remoteBase')
++    ? (OID.test(result.remoteBase || '') ? result.remoteBase : null)
++    : observedRemoteBase(target.root, target.remote, target.integrationBranch);
++  if (remoteBase === null) fail('provider inspection returned an invalid explicit remote base');
++  return { observation: { version: 'remote-provider-observation-v1', repository_identity: result.repository ? sha256(canonical(result.repository)) : null,
++    pr_number: result.pr?.number || null, story_branch: target.storyBranch, integration_branch: target.integrationBranch,
++    observed_remote_head: result.pr?.headRefOid || null, observed_remote_base: remoteBase,
++    result_identity: sha256(canonical(result)) }, result };
++}
++
++function maybeSupersedeSourceAttempt(recordArg, expectedRecordHash, slotName, operation, input, fresh, cwd) {
++  const loaded = readIntegrationRecord(recordArg, cwd); const slot = remoteSlot(loaded.record, 'source', slotName);
++  if (loaded.record.remote.source.merge.effect || loaded.record.remote.source.proof) return null;
++  if (slot.active_token) return null;
++  const prior = slot.attempts.at(-1); const priorResult = prior && lastTransition(prior)?.result;
++  const publishedHeadMayMove = slotName === 'publication' && prior?.disposition === 'proven' && priorResult?.state === 'PUBLISHED';
++  if (!prior || lastTransition(prior)?.state !== 'observed'
++    || (!publishedHeadMayMove && prior.disposition !== 'active')
++    || (!publishedHeadMayMove && !['HEAD_MISMATCH', 'MERGE_PENDING'].includes(priorResult?.state))) return null;
++  const freshObservation = input.remote_observation;
++  const priorObservation = remoteProviderAttemptObservation(prior);
++  if (!priorObservation) return null;
++  const desired = ({ remote_observation: _observation, ...rest }) => rest;
++  if (canonical(desired(prior.input)) !== canonical(desired(input))) return null;
++  const priorPr = priorResult.pr || { number: priorObservation?.pr_number,
++    headRefName: priorObservation?.story_branch, baseRefName: priorObservation?.integration_branch,
++    headRefOid: priorObservation?.observed_remote_head };
++  const headChanged = ((priorResult.state === 'HEAD_MISMATCH' && priorPr.headRefOid !== input.target.expectedHead
++    && fresh.pr?.headRefOid === input.target.expectedHead)
++    || (publishedHeadMayMove && priorPr.headRefOid === input.target.expectedHead
++      && OID.test(fresh.pr?.headRefOid || '') && fresh.pr.headRefOid !== input.target.expectedHead))
++    && fresh.pr?.headRefName === priorPr.headRefName && fresh.pr?.baseRefName === priorPr.baseRefName;
++  const baseChanged = priorResult.state === 'MERGE_PENDING' && priorObservation && OID.test(priorObservation.observed_remote_base || '')
++    && OID.test(freshObservation.observed_remote_base || '')
++    && priorObservation.observed_remote_base !== freshObservation.observed_remote_base;
++  if (!['READY', 'HEAD_MISMATCH'].includes(fresh.state)
++    || fresh.pr?.number !== priorPr.number || !(headChanged || baseChanged)
++    || (priorResult.repository && canonical(fresh.repository) !== canonical(priorResult.repository))
++    || (!priorResult.repository && freshObservation.repository_identity !== priorObservation?.repository_identity)
++    || (priorObservation && (freshObservation.story_branch !== priorObservation.story_branch
++      || freshObservation.integration_branch !== priorObservation.integration_branch))) return null;
++  return withRecord(loaded.file, expectedRecordHash, (record) => {
++    const currentSlot = remoteSlot(record, 'source', slotName); const old = currentSlot.attempts.at(-1); const token = randomUUID();
++    const predecessorIdentity = old.identity;
++    const predecessorEffect = currentSlot.effect ? structuredClone(currentSlot.effect) : null;
++    const priorObservation = remoteProviderAttemptObservation(old);
++    const changedFields = ['observed_remote_head', 'observed_remote_base']
++      .filter((field) => priorObservation?.[field] !== input.remote_observation?.[field]);
++    old.disposition = 'superseded'; old.superseded_by = token;
++    const next = { version: 'remote-provider-attempt-v1', token, operation, ordinal: currentSlot.attempts.length,
++      input: structuredClone(input), input_identity: sha256(canonical(input)), predecessor_record_hash: expectedRecordHash,
++      retry: old.retry, supersedes: old.token, transitions: [], disposition: 'active', superseded_by: null, identity: null };
++    appendAttemptTransition(next, { state: 'prepared', at: now(), supersession: identified({
++      version: 'remote-provider-supersession-proof-v1', predecessor: old.token,
++      predecessor_token: old.token, predecessor_attempt_identity: predecessorIdentity,
++      predecessor_effect: predecessorEffect,
++      predecessor_effect_identity: predecessorEffect?.identity || null,
++      successor_token: token,
++      prior_observation_identity: sha256(canonical(priorObservation)),
++      current_observation_identity: sha256(canonical(input.remote_observation)),
++      changed_fields: changedFields,
++      old_head: priorPr.headRefOid, new_head: fresh.pr.headRefOid,
++      old_base: priorObservation?.observed_remote_base || null, new_base: freshObservation.observed_remote_base || null,
++      pr_number: fresh.pr.number, repository: fresh.repository, proved_at: now() }) });
++    currentSlot.attempts.push(next); currentSlot.active_token = token;
++    return remoteResult(operation, 'PROVIDER_SUPERSEDED', { predecessor_token: old.token, attempt_token: token });
++  }, cwd);
++}
++
++export function publishRemoteSource(recordArg, {
++  expectedRecordHash, remote = undefined, title, body, createDraft = false, markReady = false,
++  provider = createGitHubRemoteAdapter(),
++} = {}, cwd = process.cwd()) {
++  title = safeRemoteInput(title, 'title', 512);
++  body = safeRemoteInput(body, 'body', 1024 * 1024, { multiline: true });
++  if (typeof createDraft !== 'boolean' || typeof markReady !== 'boolean') fail('remote draft options must be booleans', 64);
++  const loaded = readIntegrationRecord(recordArg, cwd);
++  if (loaded.hash !== expectedRecordHash) fail('integration record hash is missing or stale');
++  assertRecordSource(loaded.record);
++  validateIntegrationProofs(loaded.record);
++  const target = sourceTarget(loaded.record, remote);
++  const recovered = reconcileExecutingAttempt(loaded.file, loaded.hash, { area: 'source', slotName: 'publication',
++    operation: 'source-publish', expectedHead: target.expectedHead, reconcile: () => provider.inspect(target),
++    effectStates: ['READY', 'PR_DRAFT', 'CHECKS_PENDING', 'CHECKS_FAILED'], absenceStates: ['PR_ABSENT'] }, cwd);
++  if (recovered && recovered.result.state !== 'PROVIDER_REPLAYABLE') return recovered;
++  if (recovered) { expectedRecordHash = recovered.hash; recordArg = recovered.file; }
++  if (!recovered && (loaded.record.remote?.source?.merge?.effect || loaded.record.remote?.source?.proof)) {
++    const retained = loaded.record.remote.source.publication.attempts.at(-1);
++    const input = { target, title, body, createDraft, markReady,
++      remote_observation: retained?.input?.remote_observation };
++    return executeProviderAttempt(loaded.file, loaded.hash, {
++      area: 'source', slotName: 'publication', operation: 'source-publish', input,
++      expectedHead: target.expectedHead,
++      invoke: () => fail('proved source merge cannot issue another publication write'), successStates: ['PUBLISHED'],
++    }, cwd);
++  }
++  const observed = remoteObservation(provider, target);
++  const input = { target, title, body, createDraft, markReady, remote_observation: observed.observation };
++  const superseded = maybeSupersedeSourceAttempt(recordArg, expectedRecordHash, 'publication', 'source-publish', input, observed.result, cwd);
++  if (superseded) return superseded;
++  return executeProviderAttempt(recordArg, expectedRecordHash, {
++    area: 'source', slotName: 'publication', operation: 'source-publish', input,
++    expectedHead: target.expectedHead, invoke: () => provider.publish(target, { title, body, createDraft, markReady }),
++    successStates: ['PUBLISHED'],
++  }, cwd);
++}
++
++export function inspectRemoteSourceReadiness(recordArg, {
++  expectedRecordHash, provider = createGitHubRemoteAdapter(),
++} = {}, cwd = process.cwd()) {
++  const loaded = readIntegrationRecord(recordArg, cwd);
++  if (loaded.hash !== expectedRecordHash) fail('integration record hash is missing or stale');
++  assertRecordSource(loaded.record);
++  validateIntegrationProofs(loaded.record);
++  if (loaded.record.remote?.source?.status === 'empty') fail('source publication is not prepared');
++  const target = sourceTarget(loaded.record);
++  const value = providerResult(provider.inspect(target), target.expectedHead);
++  return { file: loaded.file, record: loaded.record, hash: loaded.hash,
++    result: remoteResult('source-readiness', domainProviderState('source-readiness', value.state), {
++      provider_state: value.state, ...(value.pr ? { pr: value.pr } : {}),
++    }) };
++}
++
++export function mergeRemoteSource(recordArg, {
++  expectedRecordHash, prNumber, method, subject, body, provider = createGitHubRemoteAdapter(),
++} = {}, cwd = process.cwd()) {
++  if (!Number.isSafeInteger(prNumber) || prNumber <= 0 || !['merge', 'squash', 'rebase'].includes(method)) {
++    fail('remote source merge options are invalid', 64);
++  }
++  subject = safeRemoteInput(subject, 'merge subject', 512);
++  body = safeRemoteInput(body, 'merge body', 1024 * 1024, { multiline: true });
++  const loaded = readIntegrationRecord(recordArg, cwd);
++  if (loaded.hash !== expectedRecordHash) fail('integration record hash is missing or stale');
++  if (!loaded.record.remote?.source?.publication?.effect) fail('source pull request publication is not proven');
++  const target = sourceTarget(loaded.record);
++  const recovered = reconcileExecutingAttempt(loaded.file, loaded.hash, { area: 'source', slotName: 'merge',
++    operation: 'source-merge', expectedHead: target.expectedHead,
++    reconcile: (attempt) => provider.reconcileMerged(target, { prNumber: attempt.input.prNumber }),
++    effectStates: ['MERGED', 'MERGED_BASE_ADVANCED'] }, cwd);
++  if (recovered && recovered.result.state !== 'PROVIDER_REPLAYABLE') return recovered;
++  if (recovered) { expectedRecordHash = recovered.hash; recordArg = recovered.file; }
++  const observed = remoteObservation(provider, target);
++  const input = { target, prNumber, method, subject, body, remote_observation: observed.observation };
++  const superseded = maybeSupersedeSourceAttempt(recordArg, expectedRecordHash, 'merge', 'source-merge', input, observed.result, cwd);
++  if (superseded) return superseded;
++  return executeProviderAttempt(recordArg, expectedRecordHash, {
++    area: 'source', slotName: 'merge', operation: 'source-merge', input,
++    expectedHead: target.expectedHead,
++    invoke: () => provider.merge(target, { prNumber, method, subject, body }), successStates: ['MERGED'],
++  }, cwd);
++}
++
++function singleRemoteUrl(root, remote, push) {
++  const args = ['remote', 'get-url', ...(push ? ['--push'] : []), '--all', remote];
++  const values = String(git(root, args)).trim().split(/\r?\n/).filter(Boolean);
++  if (values.length !== 1) fail(`remote ${remote} must have one ${push ? 'push' : 'fetch'} destination`);
++  return values[0];
++}
++
++function observedRemoteBase(root, remote, remoteBranch) {
++  const output = String(git(root, ['ls-remote', '--refs', remote, `refs/heads/${remoteBranch}`])).trim().split(/\r?\n/).filter(Boolean);
++  const match = output.length === 1 ? /^([0-9a-f]{40}(?:[0-9a-f]{24})?)\trefs\/heads\/(.+)$/.exec(output[0]) : null;
++  if (!match || match[2] !== remoteBranch) fail('remote integration base is not one exact full object id');
++  return match[1];
++}
++
++function assertFetchPushIdentity(root, remote) {
++  if (singleRemoteUrl(root, remote, false) !== singleRemoteUrl(root, remote, true)) {
++    fail('remote fetch and push destinations differ');
++  }
++}
++
++function defaultFetchRemote({ root, remote, branch: remoteBranch, proofRef }) {
++  assertFetchPushIdentity(root, remote);
++  try { git(root, ['show-ref', '--verify', '--quiet', proofRef]); fail('remote proof ref already exists'); }
++  catch (error) { if (error instanceof DeliverError && !/Git cannot/.test(error.message)) throw error; }
++  git(root, ['fetch', '--no-tags', '--no-write-fetch-head', remote, `refs/heads/${remoteBranch}:${proofRef}`]);
++  return { state: 'FETCHED', oid: String(git(root, ['rev-parse', '--verify', proofRef])).trim() };
++}
++
++function assertCommit(root, oid, label) {
++  if (!OID.test(oid || '')) fail(`${label} is not a full object id`);
++  try { git(root, ['cat-file', '-e', `${oid}^{commit}`]); } catch { fail(`${label} is not a commit object`); }
++}
++
++function isAncestor(root, older, newer) {
++  const result = spawnSync('git', ['-C', root, 'merge-base', '--is-ancestor', older, newer], {
++    stdio: 'ignore', timeout: 30000, windowsHide: true,
++  });
++  if (result.status === 0) return true;
++  if (result.status === 1) return false;
++  fail('Git could not prove remote commit ancestry');
++}
++
++export function reconcileRemoteSource(recordArg, {
++  expectedRecordHash, prNumber, provider = createGitHubRemoteAdapter(), fetchRemote = defaultFetchRemote,
++} = {}, cwd = process.cwd()) {
++  if (!Number.isSafeInteger(prNumber) || prNumber <= 0 || typeof fetchRemote !== 'function') fail('remote source reconcile options are invalid', 64);
++  let loaded = readIntegrationRecord(recordArg, cwd);
++  if (loaded.hash !== expectedRecordHash) fail('integration record hash is missing or stale');
++  let target = sourceTarget(loaded.record);
++  if (!loaded.record.remote?.source?.merge?.effect && loaded.record.remote?.source?.merge?.active_token) {
++    const recovered = reconcileExecutingAttempt(loaded.file, loaded.hash, {
++      area: 'source', slotName: 'merge', operation: 'source-merge', expectedHead: target.expectedHead,
++      reconcile: (attempt) => provider.reconcileMerged(target, { prNumber: attempt.input.prNumber }),
++      effectStates: ['MERGED', 'MERGED_BASE_ADVANCED'],
++    }, cwd);
++    if (recovered && recovered.hash === loaded.hash) return recovered;
++    if (recovered) {
++      loaded = readIntegrationRecord(recovered.file, cwd);
++      target = sourceTarget(loaded.record);
++    }
++  }
++  assertFetchPushIdentity(target.root, target.remote);
++  const value = providerResult(provider.reconcileMerged(target, { prNumber }), target.expectedHead);
++  if (!['MERGED', 'MERGED_BASE_ADVANCED'].includes(value.state)) {
++    return { file: loaded.file, record: loaded.record, hash: loaded.hash,
++      result: remoteResult('source-reconcile', domainProviderState('source-reconcile', value.state), { provider_state: value.state }) };
++  }
++  if (!OID.test(value.remoteBase || '')) fail('provider remote base is invalid');
++  const token = randomUUID();
++  const proofRef = `refs/deliver/remote-evidence/${loaded.record.id}/${token}`;
++  const fetchResult = fetchRemote({ root: target.root, remote: target.remote,
++    branch: target.integrationBranch, proofRef, expectedRemoteOid: value.remoteBase });
++  const fetched = String(git(target.root, ['rev-parse', '--verify', proofRef])).trim();
++  if (fetched !== value.remoteBase || fetchResult?.oid !== value.remoteBase) fail('fetched proof ref does not match the provider remote base');
++  assertCommit(target.root, fetched, 'fetched remote base');
++  assertCommit(target.root, value.mergeCommit, 'provider merge commit');
++  if (value.state === 'MERGED' && fetched !== value.mergeCommit) fail('exact merge reconciliation returned a different remote base');
++  if (value.state === 'MERGED_BASE_ADVANCED' && !isAncestor(target.root, value.mergeCommit, fetched)) {
++    fail('advanced remote base does not descend from the source merge commit');
++  }
++  const mergeAttempt = loaded.record.remote?.source?.merge?.attempts?.at(-1);
++  const method = mergeAttempt?.input?.method;
++  if (!['merge', 'squash', 'rebase'].includes(method)) fail('source merge method was not retained');
++  const base = loaded.record.integration.base;
++  const candidate = loaded.record.source.candidate;
++  const premergeBase = mergeAttempt.input?.remote_observation?.observed_remote_base;
++  assertCommit(target.root, premergeBase, 'retained premerge base');
++  if (!isAncestor(target.root, base, premergeBase)) fail('retained premerge base does not descend from approved I');
++  const parents = String(git(target.root, ['rev-list', '--parents', '-n', '1', value.mergeCommit])).trim().split(/\s+/).slice(1);
++  if (method === 'merge' && (parents.length !== 2 || parents[0] !== premergeBase || parents[1] !== candidate
++    || tree(target.root, value.mergeCommit) !== expectedMergeTree(target.root, premergeBase, candidate))) {
++    fail('remote merge does not have exact N/C parents and composition');
++  }
++  if (method === 'squash') {
++    const sourceBases = String(git(target.root, ['merge-base', '--all', premergeBase, candidate])).trim().split(/\r?\n/).filter(Boolean);
++    if (sourceBases.length !== 1) fail('source squash lineage does not have a unique merge base');
++    const sourcePaths = String(git(target.root, ['diff', '--name-only', sourceBases[0], candidate, '--'])).trim().split(/\r?\n/).filter(Boolean).sort();
++    const squashPaths = String(git(target.root, ['diff', '--name-only', premergeBase, value.mergeCommit, '--'])).trim().split(/\r?\n/).filter(Boolean).sort();
++    if (parents.length !== 1 || parents[0] !== premergeBase || sourcePaths.length > 10000
++      || canonical(sourcePaths) !== canonical(squashPaths)
++      || tree(target.root, value.mergeCommit) !== expectedMergeTree(target.root, premergeBase, candidate)) {
++      fail('remote squash is not the exact bounded N/C composition');
++    }
++  }
++  if (method === 'rebase') {
++    const rebaseBase = premergeBase;
++    assertCommit(target.root, rebaseBase, 'retained premerge base');
++    if (parents.length !== 1 || !isAncestor(target.root, rebaseBase, value.mergeCommit)) {
++      fail('remote rebase does not descend from its retained premerge base');
++    }
++    const bases = String(git(target.root, ['merge-base', '--all', rebaseBase, value.mergeCommit])).trim().split(/\r?\n/).filter(Boolean);
++    const chain = String(git(target.root, ['rev-list', '--first-parent', `${rebaseBase}..${value.mergeCommit}`])).trim().split(/\r?\n/).filter(Boolean);
++    const sourceBases = String(git(target.root, ['merge-base', '--all', rebaseBase, candidate])).trim().split(/\r?\n/).filter(Boolean);
++    if (sourceBases.length !== 1) fail('source lineage does not have a unique merge base');
++    const sourcePaths = String(git(target.root, ['diff', '--name-only', sourceBases[0], candidate, '--'])).trim().split(/\r?\n/).filter(Boolean).sort();
++    const rebasedPaths = String(git(target.root, ['diff', '--name-only', rebaseBase, value.mergeCommit, '--'])).trim().split(/\r?\n/).filter(Boolean).sort();
++    const sourceSet = new Set(sourcePaths);
++    const boundedCommits = chain.every((commit) => {
++      const changed = String(git(target.root, ['diff-tree', '--no-commit-id', '--name-only', '-r', `${commit}^`, commit, '--'])).trim().split(/\r?\n/).filter(Boolean);
++      return changed.every((rel) => sourceSet.has(rel));
++    });
++    if (bases.length !== 1 || bases[0] !== rebaseBase || !chain.length || chain.length > 10000 || !boundedCommits
++      || tree(target.root, value.mergeCommit) !== expectedMergeTree(target.root, rebaseBase, candidate)
++      || canonical(sourcePaths) !== canonical(rebasedPaths)) fail('remote rebase lacks a bounded unique first-parent source delta');
++  }
++  return withRecord(loaded.file, loaded.hash, (record) => {
++    const proof = identified({ version: 'remote-source-proof-v1', provider_state: value.state,
++      repository: structuredClone(value.repository || record.remote.source.repository), pr_number: prNumber,
++      method, source_merge_commit: value.mergeCommit, verified_integration_commit: fetched,
++      proof_ref: proofRef, evidence_token: token,
++      evidence_branch: `pm/${record.source.story}-remote-evidence-${token}`, proved_at: now() });
++    record.remote.source.status = 'proven';
++    record.remote.source.proof = proof;
++    return remoteResult('source-reconcile', value.state === 'MERGED' ? 'LINEAGE_PROVEN' : 'SOURCE_BASE_ADVANCED', {
++      provider_state: value.state, source_merge_commit: value.mergeCommit,
++      verified_integration_commit: fetched, proof_ref: proofRef,
++      evidence_branch: proof.evidence_branch,
++    });
++  }, cwd);
++}
++
++function remoteEvidenceRoot(record) {
++  const evidence = record.remote?.integration_evidence;
++  if (!evidence || evidence.status === 'prepared') fail('remote integration evidence checkout is not prepared');
++  const root = rootPath(evidence.root);
++  if (commonRepository(root) !== record.destination.common_repository || branch(root) !== evidence.branch
++    || head(root) !== evidence.commit) fail('remote evidence checkout no longer identifies fetched M');
++  assertClean(root); assertOrdinaryIndex(root);
++  verifyCheckoutProof(root, evidence.commit, evidence.checkout_proof, evidence.anchor);
++  return root;
++}
++
++export function prepareRemoteIntegrationEvidence(recordArg, {
++  expectedRecordHash, evidenceRoot,
++} = {}, cwd = process.cwd()) {
++  return withRecord(recordArg, expectedRecordHash, (record) => {
++    const proof = record.remote?.source?.proof;
++    if (!proof) fail('proved remote source lineage is required');
++    const root = rootPath(evidenceRoot);
++    const existing = record.remote.integration_evidence;
++    if (existing) {
++      if (existing.root !== root || existing.branch !== proof.evidence_branch
++        || existing.commit !== proof.verified_integration_commit) fail('remote evidence resume differs from retained checkout');
++      remoteEvidenceRoot(record);
++      return { [NO_MUTATION]: true, value: remoteResult('remote-evidence-prepare', 'REMOTE_EVIDENCE_PREPARED', {
++        root, branch: existing.branch, commit: existing.commit, snapshot_hash: existing.snapshot_hash }) };
++    }
++    if (commonRepository(root) !== record.destination.common_repository || branch(root) !== proof.evidence_branch
++      || head(root) !== proof.verified_integration_commit) fail('remote evidence checkout does not match its allocated branch and M');
++    assertClean(root); assertOrdinaryIndex(root);
++    const attachments = String(git(root, ['worktree', 'list', '--porcelain'])).split(/\r?\n/)
++      .filter((line) => line === `branch refs/heads/${proof.evidence_branch}`).length;
++    if (attachments !== 1) fail('remote evidence branch must have one exact worktree attachment');
++    const anchor = captureGitAnchor(root);
++    const checkoutProof = buildCheckoutProof(root, proof.verified_integration_commit, anchor);
++    verifyCheckoutProof(root, proof.verified_integration_commit, checkoutProof, anchor);
++    const manifest = boundManifest(root, proof.verified_integration_commit, record.source.packet,
++      record.source.story_path, record.integration.manifest.bindings);
++    record.remote.integration_evidence = {
++      version: 'remote-integration-evidence-v1', status: 'ready', root, branch: proof.evidence_branch,
++      commit: proof.verified_integration_commit, anchor, checkout_proof: checkoutProof, manifest,
++      source_reusable: manifest.hash === record.integration.manifest.hash,
++      snapshot_hash: sha256(canonical({ commit: proof.verified_integration_commit, manifest: manifest.hash,
++        anchor: sha256(canonical(anchor)), checkout: sha256(canonical(checkoutProof)) })),
++      gates: [], gate_history: [], review: null, review_history: [], verification: null,
++      verification_history: [], finalized: false, finalization: null, prepared_at: now(),
++    };
++    return remoteResult('remote-evidence-prepare', 'REMOTE_EVIDENCE_PREPARED', {
++      root, branch: proof.evidence_branch, commit: proof.verified_integration_commit,
++      snapshot_hash: record.remote.integration_evidence.snapshot_hash,
++    });
++  }, cwd);
++}
++
++export function runRemoteIntegrationGate(recordArg, { expectedRecordHash, name } = {}, cwd = process.cwd()) {
++  return withRecord(recordArg, expectedRecordHash, (record) => {
++    const evidence = record.remote?.integration_evidence;
++    assertRemoteEvidenceMutable(record);
++    const root = remoteEvidenceRoot(record);
++    const command = record.source.packet.commands?.[name];
++    if (typeof command !== 'string') fail('remote integration gate is not declared by the source task');
++    const started = now();
++    const result = spawnSync(command, { cwd: root, shell: true, encoding: 'utf8', timeout: 10 * 60 * 1000,
++      maxBuffer: 1024 * 1024, windowsHide: true });
++    let stable = true; try { remoteEvidenceRoot(record); } catch { stable = false; }
++    const logDir = internalDirectory(root, ['logs', `remote-integration-${record.id}`]);
++    const log = path.join(logDir, `${name}-${randomUUID()}.log`);
++    const logText = `command: ${command}\nstarted: ${started}\nexit: ${result.status}\n\n[stdout]\n${result.stdout || ''}\n[stderr]\n${result.stderr || ''}`;
++    fs.writeFileSync(log, logText, { flag: 'wx', mode: 0o600 });
++    const receipt = identified({ provenance: 'deliver-remote-integration-gate-v1', name, command,
++      integration_commit: evidence.commit, snapshot_hash: evidence.snapshot_hash,
++      status: result.status === 0 && !result.error && stable ? 'PASS' : 'FAIL', exit_code: result.status,
++      signal: result.signal || null, error: result.error?.message || null, started_at: started, finished_at: now(),
++      log_path: path.relative(root, log).split(path.sep).join('/'), log_hash: sha256(logText) });
++    const previous = evidence.gates.find((item) => item.name === name);
++    if (previous) evidence.gate_history.push(previous);
++    evidence.gates = evidence.gates.filter((item) => item.name !== name); evidence.gates.push(receipt);
++    evidence.finalized = false; evidence.finalization = null;
++    return remoteResult('remote-evidence-gate', receipt.status === 'PASS' ? 'PASSED' : 'FAILED', { receipt });
++  }, cwd);
++}
++
++export function recordRemoteIntegrationReview(recordArg, {
++  expectedRecordHash, reviewer, receipt,
++} = {}, cwd = process.cwd()) {
++  return withRecord(recordArg, expectedRecordHash, (record) => {
++    const evidence = record.remote?.integration_evidence; remoteEvidenceRoot(record);
++    assertRemoteEvidenceMutable(record);
++    if (!ACTOR_ID.test(reviewer || '') || reviewer === record.source.builder) fail('remote integration reviewer must differ from the builder');
++    const parsed = parseReviewReceipt(receipt, { expectedSnapshot: evidence.snapshot_hash });
++    const value = identified({ ...parsed, reviewer, snapshot_hash: evidence.snapshot_hash, recorded_at: now() });
++    if (evidence.review) evidence.review_history.push(evidence.review); evidence.review = value;
++    evidence.finalized = false; evidence.finalization = null;
++    return remoteResult('remote-evidence-review', 'RECORDED', { receipt: value });
++  }, cwd);
++}
++
++export function recordRemoteIntegrationVerification(recordArg, {
++  expectedRecordHash, verifier, results,
++} = {}, cwd = process.cwd()) {
++  return withRecord(recordArg, expectedRecordHash, (record) => {
++    const evidence = record.remote?.integration_evidence; remoteEvidenceRoot(record);
++    assertRemoteEvidenceMutable(record);
++    const reviewers = new Set([evidence.review?.reviewer, ...(evidence.review?.panel?.members || []).map((item) => item.reviewer)]);
++    if (!ACTOR_ID.test(verifier || '') || verifier === record.source.builder || reviewers.has(verifier)) fail('remote integration verifier is not independent');
++    const criteria = parseVerificationResults(results, record.source.packet.acceptance);
++    const value = identified({ verifier, criteria, snapshot_hash: evidence.snapshot_hash, recorded_at: now() });
++    if (evidence.verification) evidence.verification_history.push(evidence.verification); evidence.verification = value;
++    evidence.finalized = false; evidence.finalization = null;
++    return remoteResult('remote-evidence-verification', 'RECORDED', { receipt: value });
++  }, cwd);
++}
++
++export function finalizeRemoteIntegrationEvidence(recordArg, { expectedRecordHash } = {}, cwd = process.cwd()) {
++  return withRecord(recordArg, expectedRecordHash, (record) => {
++    const evidence = record.remote?.integration_evidence; remoteEvidenceRoot(record);
++    assertRemoteEvidenceMutable(record);
++    for (const [name, command] of Object.entries(record.source.packet.commands)) {
++      if (!evidence.gates.some((item) => item.name === name && item.command === command && item.status === 'PASS'
++        && item.snapshot_hash === evidence.snapshot_hash)) fail(`fresh remote integration gate is missing or failed: ${name}`);
++    }
++    if (!evidence.review || evidence.review.status !== 'PASS' || evidence.review.snapshot_hash !== evidence.snapshot_hash
++      || evidence.review.findings.some((item) => !item.resolved && item.severity !== 'minor')) fail('remote integration review is incomplete');
++    if (!evidence.verification || evidence.verification.snapshot_hash !== evidence.snapshot_hash
++      || evidence.verification.criteria.some((item) => item.status !== 'PASS')) fail('remote integration verification is incomplete');
++    const finalization = identified({ version: 'remote-integration-finalization-v1', snapshot_hash: evidence.snapshot_hash,
++      gates: evidence.gates.map((item) => item.identity).sort(), review: evidence.review.identity,
++      verification: evidence.verification.identity, finalized_at: now() });
++    evidence.finalized = true; evidence.finalization = finalization;
++    return remoteResult('remote-evidence-finalize', 'REMOTE_EVIDENCE_FINALIZED', { finalization: finalization.identity });
++  }, cwd);
++}
++export function prepareRemoteClosureCheckout(recordArg, { expectedRecordHash } = {}, cwd = process.cwd()) {
++  return withRecord(recordArg, expectedRecordHash, (record) => {
++    const evidence = record.remote?.integration_evidence;
++    if (!evidence?.finalized || !evidence.finalization) fail('finalized remote integration evidence is required');
++    if (record.remote.closure) {
++      const checkout = record.remote.closure.checkout;
++      return { [NO_MUTATION]: true, value: remoteResult('remote-closure-checkout-prepare', 'CLOSURE_CHECKOUT_PREPARED', {
++        token: checkout.token, branch: checkout.branch, start_commit: checkout.start_commit }) };
++    }
++    const token = randomUUID();
++    const checkout = { status: 'prepared', token, branch: `pm/${record.source.story}-closure-${token}`,
++      start_commit: evidence.commit, root: null, anchor: null, checkout_proof: null, prepared_at: now(), adopted_at: null };
++    record.remote.closure = { version: 'remote-closure-v1', checkout,
++      artifacts: { report: { pending: null, commit: null, proof: null }, closure: { pending: null, commit: null, proof: null },
++        handoff: { path: record.handoff.path, pending: null, commit: null, proof: null } },
++      publication: { publish: emptyProviderSlot(), merge: emptyProviderSlot() }, proof: null };
++    return remoteResult('remote-closure-checkout-prepare', 'CLOSURE_CHECKOUT_PREPARED', {
++      token, branch: checkout.branch, start_commit: checkout.start_commit });
++  }, cwd);
++}
++
++export function adoptRemoteClosureCheckout(recordArg, {
++  expectedRecordHash, token, closureRoot,
++} = {}, cwd = process.cwd()) {
++  return withRecord(recordArg, expectedRecordHash, (record) => {
++    const checkout = record.remote?.closure?.checkout;
++    if (!checkout || checkout.token !== token || checkout.status !== 'prepared') fail('remote closure checkout token is invalid');
++    const root = rootPath(closureRoot);
++    if (commonRepository(root) !== record.destination.common_repository || branch(root) !== checkout.branch
++      || head(root) !== checkout.start_commit) fail('remote closure checkout does not match the allocated branch and M');
++    assertClean(root); assertOrdinaryIndex(root);
++    const attachments = String(git(root, ['worktree', 'list', '--porcelain'])).split(/\r?\n/)
++      .filter((line) => line === `branch refs/heads/${checkout.branch}`).length;
++    if (attachments !== 1) fail('remote closure branch must have one exact worktree attachment');
++    checkout.root = root; checkout.anchor = captureGitAnchor(root);
++    checkout.checkout_proof = buildCheckoutProof(root, checkout.start_commit, checkout.anchor);
++    verifyCheckoutProof(root, checkout.start_commit, checkout.checkout_proof, checkout.anchor);
++    checkout.status = 'ready'; checkout.adopted_at = now();
++    return remoteResult('remote-closure-checkout-adopt', 'CLOSURE_CHECKOUT_READY', { root, branch: checkout.branch, commit: checkout.start_commit });
++  }, cwd);
++}
++
++function remoteClosureRoot(record, expectedHead = undefined, { clean = false } = {}) {
++  const checkout = record.remote?.closure?.checkout;
++  if (!checkout || checkout.status !== 'ready') fail('remote closure checkout is not ready');
++  const root = rootPath(checkout.root);
++  if (commonRepository(root) !== record.destination.common_repository || branch(root) !== checkout.branch
++    || (expectedHead && head(root) !== expectedHead)) fail('remote closure checkout identity changed');
++  if (clean) { assertClean(root); assertOrdinaryIndex(root); }
++  const liveAnchor = captureGitAnchor(root);
++  if (liveAnchor.protected_hash !== checkout.anchor.protected_hash
++    || canonical(protectedIgnoredEntries(root)) !== canonical(checkout.checkout_proof.protected_ignored)) {
++    fail('remote closure protected metadata changed');
++  }
++  return root;
++}
++
++function remoteArtifactsStarted(record) {
++  return ['report', 'closure', 'handoff'].some((field) => {
++    const slot = record.remote?.closure?.artifacts?.[field];
++    return slot?.pending !== null && slot?.pending !== undefined
++      || slot?.commit !== null && slot?.commit !== undefined;
++  });
++}
++
++function assertRemoteEvidenceMutable(record) {
++  if (remoteArtifactsStarted(record)) fail('remote integration evidence is frozen by a closure artifact');
++}
++
++function remoteEvidenceView(record, { closureCommit, destinationBranch } = {}) {
++  const view = structuredClone(record);
++  const evidence = record.remote.integration_evidence;
++  delete view.remote;
++  delete view.revision;
++  delete view.created_at;
++  delete view.updated_at;
++  view.integration = { ...view.integration, commit: evidence.commit, tree: tree(evidence.root, evidence.commit) };
++  view.manifest = structuredClone(evidence.manifest);
++  view.evidence = {
++    source_reusable: evidence.source_reusable,
++    gates: structuredClone(evidence.gates),
++    review: structuredClone(evidence.review),
++    verification: structuredClone(evidence.verification),
++    finalized: true,
++    finalization: structuredClone(evidence.finalization),
++  };
++  view.closure = { ...view.closure,
++    commit: closureCommit === undefined
++      ? record.remote.closure?.artifacts?.closure?.commit || null
++      : closureCommit };
++  if (destinationBranch !== undefined) view.destination.branch = destinationBranch;
++  else if (record.remote.closure?.checkout?.branch) view.destination.branch = record.remote.closure.checkout.branch;
++  return view;
++}
++
++function remoteArtifactGeneration(record, field, inputs, options = {}) {
++  const evidence = record.remote?.integration_evidence;
++  return identified({
++    version: 'remote-artifact-generation-v1',
++    field,
++    source_proof: structuredClone(record.remote?.source?.proof),
++    finalization: structuredClone(evidence?.finalization),
++    view: remoteEvidenceView(record, options),
++    inputs: structuredClone(inputs),
++  });
++}
++
++function generatedRemoteWrites(generation) {
++  const { field, inputs, view } = generation;
++  if (field === 'report') {
++    const story = parseStory(inputs.story_before, view.source.story_path);
++    const artifacts = renderVerificationArtifacts(view, story, view.evidence.review, view.evidence.verification);
++    return [
++      { path: `docs/verification/${view.source.story}.md`, after: artifacts.report },
++      { path: `docs/checklists/verification-${view.source.story}.md`, after: artifacts.checklist },
++    ];
++  }
++  if (field === 'closure') {
++    const story = parseStory(inputs.story_before, view.source.story_path);
++    const closed = replaceStoryExecution(story, { status: 'merged', updated: inputs.closed_at }, {
++      note: `${inputs.closed_at} remotely integrated at ${view.integration.commit}`,
++    });
++    if (closed.executionHash !== inputs.execution_hash) fail('remote closure generated execution identity changed');
++    return [{ path: view.source.story_path, after: closed.after }];
++  }
++  if (field === 'handoff' || field === 'handoff-repair') {
++    return [{ path: view.handoff.path,
++      after: handoffContent(view, inputs.handoff_at, inputs.next, view.evidence.review) }];
++  }
++  fail('remote artifact generation field is invalid');
++}
++
++function committedArtifactImage(root, parent, rel) {
++  const entry = commitEntry(root, parent, rel, { allowMissing: true });
++  return { before: entry ? committedText(root, parent, rel) : null, expected_mode: entry?.mode || '100644' };
++}
++
++function materializeRemoteWrites(root, parent, drafts) {
++  return drafts.map((draft) => {
++    const rel = safeTrackedPath(draft.path);
++    if (typeof draft.after !== 'string' || Buffer.byteLength(draft.after) > 8 * 1024 * 1024) {
++      fail('remote artifact bytes are invalid');
++    }
++    const retained = committedArtifactImage(root, parent, rel);
++    if (readArtifact(root, rel) !== retained.before) fail(`remote artifact parent image changed: ${rel}`);
++    return { path: rel, before: retained.before, after: draft.after, hash: sha256(draft.after),
++      expected_mode: retained.expected_mode };
++  });
++}
++
++function validateRemoteGeneration(record, field, pending, root, options = {}) {
++  if (!pending || pending.version !== 'remote-artifact-pending-v1' || pending.field !== field
++    || pending.identity !== sha256(canonical(Object.fromEntries(Object.entries(pending)
++      .filter(([key]) => key !== 'identity'))))
++    || typeof pending.token !== 'string' || !pending.token
++    || !OID.test(pending.parent || '') || !Array.isArray(pending.writes) || !pending.writes.length) {
++    fail(`remote ${field} pending image is invalid`);
++  }
++  const generation = pending.generation;
++  if (!generation || generation.version !== 'remote-artifact-generation-v1' || generation.field !== field
++    || generation.identity !== sha256(canonical(Object.fromEntries(Object.entries(generation)
++      .filter(([key]) => key !== 'identity'))))) fail(`remote ${field} generated image is invalid`);
++  const expectedGeneration = remoteArtifactGeneration(record, field, generation.inputs, options);
++  if (canonical(generation) !== canonical(expectedGeneration)) fail(`remote ${field} generation basis changed`);
++  const expectedWrites = generatedRemoteWrites(generation).map((draft) => {
++    const retained = committedArtifactImage(root, pending.parent, safeTrackedPath(draft.path));
++    return { path: draft.path, before: retained.before, after: draft.after, hash: sha256(draft.after),
++      expected_mode: retained.expected_mode };
++  });
++  if (canonical(pending.writes) !== canonical(expectedWrites)) fail(`remote ${field} pending write shape changed`);
++  return pending;
++}
++
++function assertRemotePendingStatus(root, parent, writes) {
++  if (head(root) !== parent) fail('remote pending parent is no longer current');
++  assertOrdinaryIndex(root);
++  const allowed = new Set(writes.map((write) => write.path));
++  const extra = statusPaths(root).filter((rel) => !allowed.has(rel));
++  if (extra.length) fail(`remote pending recovery found unrelated checkout status: ${extra.sort().join(', ')}`);
++  for (const write of writes) {
++    const current = readArtifact(root, write.path);
++    if (current !== write.before && current !== write.after) {
++      fail(`remote pending image changed: ${write.path}`);
++    }
++  }
++}
++
++function remotePrepareArtifact(recordArg, expectedRecordHash, field, build, cwd) {
++  const updated = withRecord(recordArg, expectedRecordHash, (record) => {
++    const slot = record.remote?.closure?.artifacts?.[field];
++    if (!slot) fail(`remote ${field} artifact slot is unavailable`);
++    if (field === 'handoff' && !record.remote.closure.artifacts.closure.commit) {
++      fail('adopted remote story closure E is required before handoff preparation');
++    }
++    const parent = field === 'report' ? record.remote.integration_evidence.commit
++      : field === 'closure' ? (record.remote.closure.artifacts.report.commit || record.remote.integration_evidence.commit)
++        : record.remote.closure.artifacts.closure.commit;
++    const root = remoteClosureRoot(record, parent, { clean: !slot.pending });
++    if (slot.commit) fail(`remote ${field} commit is already adopted`);
++    if (slot.pending) {
++      validateRemoteGeneration(record, field, slot.pending, root);
++      assertRemotePendingStatus(root, parent, slot.pending.writes);
++      return { [NO_MUTATION]: true, value: slot.pending };
++    }
++    const built = build(record, root, parent);
++    const generation = remoteArtifactGeneration(record, field, built.inputs);
++    const writes = materializeRemoteWrites(root, parent, generatedRemoteWrites(generation));
++    const pending = identified({ version: 'remote-artifact-pending-v1', field,
++      token: randomUUID(), parent, generation, writes, prepared_at: now() });
++    slot.pending = pending; return pending;
++  }, cwd);
++  applyPending(updated.record.remote.closure.checkout.root, updated.result);
++  return { ...updated, result: remoteResult(`remote-${field}-prepare`, 'PREPARED', { token: updated.result.token,
++    parent: updated.result.parent, paths: updated.result.writes.map((item) => item.path) }) };
++}
++
++function remoteAdoptArtifact(recordArg, { expectedRecordHash, token, commit } = {}, field, cwd) {
++  return withRecord(recordArg, expectedRecordHash, (record) => {
++    const slot = record.remote?.closure?.artifacts?.[field]; const pending = slot?.pending;
++    if (!pending || pending.token !== token || !OID.test(commit || '')) fail(`remote ${field} adoption token or commit is invalid`);
++    const root = remoteClosureRoot(record, commit, { clean: true });
++    validateRemoteGeneration(record, field, pending, root);
++    const parents = String(git(root, ['rev-list', '--parents', '-n', '1', commit])).trim().split(/\s+/);
++    if (parents.length !== 2 || parents[1] !== pending.parent) fail(`remote ${field} must be a direct child of its prepared parent`);
++    const changed = String(git(root, ['diff-tree', '--no-commit-id', '--name-only', '-r', pending.parent, commit, '--'])).trim().split(/\r?\n/).filter(Boolean).sort();
++    const paths = pending.writes.map((item) => item.path).sort();
++    if (canonical(changed) !== canonical(paths)) fail(`remote ${field} commit changes unprepared paths`);
++    for (const write of pending.writes) {
++      if (sha256(git(root, ['show', `${commit}:${write.path}`], { buffer: true })) !== write.hash
++        || readArtifact(root, write.path) !== write.after) fail(`remote ${field} bytes differ from preparation`);
++      const entry = commitEntry(root, commit, write.path); write.mode = entry.mode; write.oid = entry.oid;
++      if (entry.mode !== write.expected_mode) fail(`remote ${field} mode differs from preparation`);
++    }
++    slot.commit = commit; slot.proof = identified({ version: 'remote-artifact-proof-v1', field, commit,
++      parent: pending.parent, tree: tree(root, commit), writes: structuredClone(pending.writes), adopted_at: now() });
++    slot.pending = null;
++    return remoteResult(`remote-${field}-adopt`, 'ADOPTED', { commit, paths });
++  }, cwd);
++}
++
++export function prepareRemoteVerificationReport(recordArg, { expectedRecordHash } = {}, cwd = process.cwd()) {
++  return remotePrepareArtifact(recordArg, expectedRecordHash, 'report', (record, root) => {
++    if (record.reporting === 'skipped') fail('remote verification reporting is not enabled');
++    return { inputs: { story_before: readArtifact(root, record.source.story_path) } };
++  }, cwd);
++}
++export function adoptRemoteVerificationReport(recordArg, options = {}, cwd = process.cwd()) { return remoteAdoptArtifact(recordArg, options, 'report', cwd); }
++
++export function prepareRemoteStoryClosure(recordArg, { expectedRecordHash } = {}, cwd = process.cwd()) {
++  return remotePrepareArtifact(recordArg, expectedRecordHash, 'closure', (record, root) => {
++    if (record.reporting !== 'skipped' && !record.remote.closure.artifacts.report.commit) fail('remote report P is required before closure E');
++    const story = readStory(root, record.source.story_path);
++    if (story.contractHash !== record.source.contract_hash || story.executionHash !== record.source.execution_hash
++      || story.execution?.status !== 'in-review') fail('remote closure story differs from candidate C');
++    const closedAt = stamp(); const closed = replaceStoryExecution(story, { status: 'merged', updated: closedAt }, {
++      note: `${closedAt} remotely integrated at ${record.remote.integration_evidence.commit}` });
++    record.remote.closure.execution_hash = closed.executionHash;
++    return { inputs: { story_before: story.text, closed_at: closedAt, execution_hash: closed.executionHash } };
++  }, cwd);
++}
++export function adoptRemoteStoryClosure(recordArg, options = {}, cwd = process.cwd()) { return remoteAdoptArtifact(recordArg, options, 'closure', cwd); }
++
++export function prepareRemoteHandoff(recordArg, { expectedRecordHash, next = 'Continue with the next ready story.' } = {}, cwd = process.cwd()) {
++  if (typeof next !== 'string' || !next.trim() || next.length > 1000 || /[\x00-\x1f\x7f]/.test(next)) fail('remote handoff next action is invalid');
++  return remotePrepareArtifact(recordArg, expectedRecordHash, 'handoff', (record) => {
++    return { inputs: { handoff_at: stamp(), next } };
++  }, cwd);
++}
++export function adoptRemoteHandoff(recordArg, options = {}, cwd = process.cwd()) { return remoteAdoptArtifact(recordArg, options, 'handoff', cwd); }
++function closureTarget(record, remote = undefined) {
++  const checkout = record.remote?.closure?.checkout;
++  const handoff = record.remote?.closure?.artifacts?.handoff?.commit;
++  if (!checkout || !handoff) fail('adopted remote handoff H is required');
++  const selected = remote ?? record.remote.source.remote;
++  if (selected !== record.remote.source.remote) fail('closure remote differs from the retained source destination');
++  return { root: checkout.root, remote: selected, storyBranch: checkout.branch,
++    integrationBranch: record.destination.branch, expectedHead: handoff };
++}
++
++export function publishRemoteClosure(recordArg, {
++  expectedRecordHash, remote = undefined, title, body, provider = createGitHubRemoteAdapter(),
++} = {}, cwd = process.cwd()) {
++  title = safeRemoteInput(title, 'title', 512); body = safeRemoteInput(body, 'body', 1024 * 1024, { multiline: true });
++  const loaded = readIntegrationRecord(recordArg, cwd); if (loaded.hash !== expectedRecordHash) fail('integration record hash is missing or stale');
++  const target = closureTarget(loaded.record, remote); remoteClosureRoot(loaded.record, target.expectedHead, { clean: true });
++  const slots = loaded.record.remote.closure.publication;
++  if (!slots.publish.effect) {
++    const recovered = reconcileExecutingAttempt(loaded.file, loaded.hash, {
++      area: 'closure', slotName: 'publish', operation: 'closure-publish', expectedHead: target.expectedHead,
++      reconcile: () => provider.inspect(target),
++      effectStates: ['READY', 'PR_DRAFT', 'CHECKS_PENDING', 'CHECKS_FAILED'], absenceStates: ['PR_ABSENT'],
++    }, cwd);
++    if (recovered?.result.state === 'PROVIDER_REPLAYABLE') {
++      return publishRemoteClosure(recovered.file, { expectedRecordHash: recovered.hash, remote, title, body, provider }, cwd);
++    }
++    if (recovered) return recovered;
++  }
++  if (!slots.publish.effect) return executeProviderAttempt(loaded.file, loaded.hash, {
++    area: 'closure', slotName: 'publish', operation: 'closure-publish', input: { target, title, body, createDraft: false, markReady: false },
++    expectedHead: target.expectedHead, invoke: () => provider.publish(target, { title, body, createDraft: false, markReady: false }),
++    successStates: ['PUBLISHED'],
++  }, cwd);
++  if (!slots.merge.effect) {
++    const recovered = reconcileExecutingAttempt(loaded.file, loaded.hash, {
++      area: 'closure', slotName: 'merge', operation: 'closure-merge', expectedHead: target.expectedHead,
++      reconcile: (attempt) => provider.reconcileMerged(target, { prNumber: attempt.input.prNumber }),
++      effectStates: ['MERGED', 'MERGED_BASE_ADVANCED'],
++    }, cwd);
++    if (recovered) return recovered;
++  }
++  const readiness = providerResult(provider.inspect(target), target.expectedHead);
++  if (readiness.state !== 'READY') return { file: loaded.file, record: loaded.record, hash: loaded.hash,
++    result: remoteResult('closure-readiness', domainProviderState('closure-readiness', readiness.state), { provider_state: readiness.state }) };
++  const prNumber = readiness.pr?.number;
++  if (!Number.isSafeInteger(prNumber) || prNumber <= 0) fail('closure readiness lacks an exact pull request number');
++  if (slots.merge.effect) return { file: loaded.file, record: loaded.record, hash: loaded.hash,
++    result: remoteResult('closure-merge', 'MERGED', { provider_state: 'MERGED', pr: readiness.pr }) };
++  return executeProviderAttempt(loaded.file, loaded.hash, {
++    area: 'closure', slotName: 'merge', operation: 'closure-merge',
++    input: { target, prNumber, method: 'merge', subject: title, body }, expectedHead: target.expectedHead,
++    invoke: () => provider.merge(target, { prNumber, method: 'merge', subject: title, body }), successStates: ['MERGED'],
++  }, cwd);
++}
++
++function settlePublicationBeforeProof(recordArg, expectedRecordHash, {
++  slotArea, repairToken = null, prNumber, provider, target,
++}, cwd) {
++  let loaded = readIntegrationRecord(recordArg, cwd);
++  if (loaded.hash !== expectedRecordHash) fail('integration record hash is missing or stale');
++  const publish = remoteSlot(loaded.record, slotArea, 'publish', repairToken);
++  if (!publish.effect && publish.active_token) {
++    const recovered = reconcileExecutingAttempt(loaded.file, loaded.hash, {
++      area: slotArea, repairToken, slotName: 'publish', operation: `${slotArea === 'repair' ? 'handoff-repair' : 'closure'}-publish`,
++      expectedHead: target.expectedHead, reconcile: () => provider.inspect(target),
++      effectStates: ['READY', 'PR_DRAFT', 'CHECKS_PENDING', 'CHECKS_FAILED'], absenceStates: ['PR_ABSENT'],
++    }, cwd);
++    if (recovered && recovered.hash === loaded.hash) return { result: recovered };
++    if (recovered?.result.state === 'PROVIDER_REPLAYABLE') return { result: recovered };
++    if (recovered) loaded = readIntegrationRecord(recovered.file, cwd);
++  }
++  const merge = remoteSlot(loaded.record, slotArea, 'merge', repairToken);
++  if (!merge.effect && merge.active_token) {
++    const recovered = reconcileExecutingAttempt(loaded.file, loaded.hash, {
++      area: slotArea, repairToken, slotName: 'merge', operation: `${slotArea === 'repair' ? 'handoff-repair' : 'closure'}-merge`,
++      expectedHead: target.expectedHead,
++      reconcile: (attempt) => provider.reconcileMerged(target, { prNumber: attempt.input.prNumber }),
++      effectStates: ['MERGED', 'MERGED_BASE_ADVANCED'],
++    }, cwd);
++    if (recovered && recovered.hash === loaded.hash) return { result: recovered };
++    if (recovered) loaded = readIntegrationRecord(recovered.file, cwd);
++  }
++  return { loaded };
++}
++
++function reconcilePublication(recordArg, expectedRecordHash, { area, slotArea, repairToken = null,
++  prNumber, provider, fetchRemote, target, operation }, cwd) {
++  if (!Number.isSafeInteger(prNumber) || prNumber <= 0 || typeof fetchRemote !== 'function') fail(`${operation} reconcile options are invalid`, 64);
++  const settled = settlePublicationBeforeProof(recordArg, expectedRecordHash, {
++    slotArea, repairToken, prNumber, provider, target,
++  }, cwd);
++  if (settled.result) return settled.result;
++  const loaded = settled.loaded;
++  const mergeSlot = remoteSlot(loaded.record, slotArea, 'merge', repairToken);
++  if (mergeSlot.effect) {
++    const effectAttempt = mergeSlot.attempts.find((item) => item.identity === mergeSlot.effect.attempt_identity);
++    if (!effectAttempt || effectAttempt.input?.prNumber !== prNumber) {
++      fail(`${operation} pull request differs from the retained merge effect`);
++    }
++  }
++  assertFetchPushIdentity(target.root, target.remote);
++  const value = providerResult(provider.reconcileMerged(target, { prNumber }), target.expectedHead);
++  if (!['MERGED', 'MERGED_BASE_ADVANCED'].includes(value.state)) return { file: loaded.file, record: loaded.record, hash: loaded.hash,
++    result: remoteResult(operation, domainProviderState(operation, value.state), { provider_state: value.state }) };
++  const token = randomUUID(); const proofRef = `refs/deliver/${area}/${loaded.record.id}/${token}`;
++  const fetchedResult = fetchRemote({ root: target.root, remote: target.remote, branch: target.integrationBranch,
++    proofRef, expectedRemoteOid: value.remoteBase });
++  const fetched = String(git(target.root, ['rev-parse', '--verify', proofRef])).trim();
++  if (fetched !== value.remoteBase || fetchedResult?.oid !== fetched) fail('fetched publication proof differs from provider base');
++  assertCommit(target.root, value.mergeCommit, 'publication wrapper'); assertCommit(target.root, fetched, 'publication remote tip');
++  return { loaded, value, fetched, proofRef };
++}
++
++export function reconcileRemoteClosure(recordArg, {
++  expectedRecordHash, prNumber, provider = createGitHubRemoteAdapter(), fetchRemote = defaultFetchRemote,
++} = {}, cwd = process.cwd()) {
++  const initial = readIntegrationRecord(recordArg, cwd); const target = closureTarget(initial.record);
++  const reconciled = reconcilePublication(initial.file, expectedRecordHash, { area: 'remote-closure', prNumber, provider, fetchRemote,
++    slotArea: 'closure', target, operation: 'closure-reconcile' }, cwd);
++  if (!reconciled.loaded) return reconciled;
++  const { loaded, value, fetched, proofRef } = reconciled; const record = loaded.record;
++  const m = record.remote.integration_evidence.commit; const h = record.remote.closure.artifacts.handoff.commit;
++  const parents = String(git(target.root, ['rev-list', '--parents', '-n', '1', value.mergeCommit])).trim().split(/\s+/).slice(1);
++  if (parents.length !== 2 || parents[1] !== h || !isAncestor(target.root, m, parents[0])) fail('remote closure wrapper lacks proved integration/H parents');
++  const racedBase = parents[0] !== m;
++  if (!racedBase && tree(target.root, value.mergeCommit) !== tree(target.root, h)) fail('remote closure wrapper tree differs from H');
++  if (racedBase) {
++    const allowed = new Set(Object.values(record.remote.closure.artifacts).flatMap((slot) => slot.proof?.writes?.map((item) => item.path) || []));
++    const changed = String(git(target.root, ['diff', '--name-only', parents[0], value.mergeCommit, '--'])).trim().split(/\r?\n/).filter(Boolean);
++    if (changed.some((rel) => !allowed.has(rel))) fail('raced closure wrapper rewrites paths outside P/E/H');
++    for (const rel of allowed) {
++      const atM = commitEntry(target.root, m, rel, { allowMissing: true });
++      const atAdvanced = commitEntry(target.root, parents[0], rel, { allowMissing: true });
++      if (canonical(atM) !== canonical(atAdvanced)) {
++        fail('raced closure base changes a P/E/H preimage');
++      }
++      const atWrapper = commitEntry(target.root, value.mergeCommit, rel); const atH = commitEntry(target.root, h, rel);
++      if (atWrapper.mode !== atH.mode || atWrapper.oid !== atH.oid) {
++        fail('raced closure wrapper changes prepared P/E/H bytes or mode');
++      }
++    }
++  }
++  const advanced = racedBase || fetched !== value.mergeCommit;
++  if (advanced && !isAncestor(target.root, value.mergeCommit, fetched)) fail('remote closure advanced tip does not descend from R');
++  return withRecord(loaded.file, loaded.hash, (next) => {
++    next.remote.closure.proof = identified({ version: 'remote-closure-proof-v1', state: advanced ? 'handoff-stale' : 'proven',
++      merge_commit: value.mergeCommit, terminal_commit: fetched, proof_ref: proofRef, pr_number: prNumber,
++      base_commit: m, handoff_commit: h, proved_at: now() });
++    return remoteResult('closure-reconcile', advanced ? 'HANDOFF_STALE' : 'REMOTE_CLOSURE_PROVEN', {
++      provider_state: value.state, closure_commit: value.mergeCommit, terminal_commit: fetched, proof_ref: proofRef });
++  }, cwd);
++}
++export function prepareHandoffRepair(recordArg, {
++  expectedRecordHash, integrationRoot,
++} = {}, cwd = process.cwd()) {
++  const updated = withRecord(recordArg, expectedRecordHash, (record) => {
++    const closure = record.remote?.closure?.proof;
++    if (!closure || closure.state !== 'handoff-stale') fail('a proved stale remote handoff is required for repair');
++    if (record.remote.handoff_repair.publication_retry > 2
++      || record.remote.handoff_repair.attempts.at(-1)?.exhausted) fail('handoff repair publication retries are exhausted');
++    const latest = repairAttempt(record);
++    const root = rootPath(integrationRoot);
++    if (latest && !latest.race_proof) {
++      if (latest.status !== 'prepared' || root !== latest.root || commonRepository(root) !== record.destination.common_repository
++        || branch(root) !== latest.branch || head(root) !== latest.parent) {
++        fail('the current handoff repair preparation cannot resume in this checkout');
++      }
++      const liveAnchor = captureGitAnchor(root);
++      if (liveAnchor.protected_hash !== latest.anchor.protected_hash
++        || canonical(protectedIgnoredEntries(root)) !== canonical(latest.checkout_proof?.protected_ignored)) {
++        fail('handoff repair protected metadata changed during preparation');
++      }
++      if (!latest.preparation || latest.preparation.token !== latest.token
++        || latest.preparation.parent !== latest.parent
++        || canonical(latest.preparation.writes) !== canonical([latest.write])) {
++        fail('handoff repair pending preparation shape changed');
++      }
++      validateRemoteGeneration(record, 'handoff-repair', latest.preparation, root, {
++        closureCommit: closure.terminal_commit, destinationBranch: latest.branch,
++      });
++      assertRemotePendingStatus(root, latest.parent, [latest.write]);
++      return { [NO_MUTATION]: true, value: latest };
++    }
++    const repairBase = latest?.race_proof?.terminal_commit || closure.terminal_commit;
++    if (commonRepository(root) !== record.destination.common_repository || head(root) !== repairBase) {
++      fail('handoff repair checkout must begin at latest proved N');
++    }
++    assertClean(root); assertOrdinaryIndex(root);
++    const repairBranch = branch(root);
++    if ([record.destination.branch, record.remote.closure.checkout.branch].includes(repairBranch)) fail('handoff repair requires a fresh unique branch');
++    if (record.remote.handoff_repair.attempts.some((item) => item.branch === repairBranch)) fail('handoff repair branch was already used');
++    const attachments = String(git(root, ['worktree', 'list', '--porcelain'])).split(/\r?\n/)
++      .filter((line) => line === `branch refs/heads/${repairBranch}`).length;
++    if (attachments !== 1) fail('handoff repair branch must have one exact worktree attachment');
++    const token = randomUUID(); const at = stamp();
++    const next = record.remote.closure.artifacts.handoff.proof?.writes?.[0]?.after?.match(/NEXT \(ordered\):\n1\. ([^\n]+)/)?.[1]
++      || 'Continue with the next ready story.';
++    const generation = remoteArtifactGeneration(record, 'handoff-repair', {
++      handoff_at: at, next,
++    }, { closureCommit: closure.terminal_commit, destinationBranch: repairBranch });
++    const write = materializeRemoteWrites(root, repairBase, generatedRemoteWrites(generation))[0];
++    const anchor = captureGitAnchor(root);
++    const checkoutProof = buildCheckoutProof(root, repairBase, anchor);
++    const preparedAt = now();
++    const preparation = identified({ version: 'remote-artifact-pending-v1', field: 'handoff-repair',
++      token, parent: repairBase, generation, writes: [write], prepared_at: preparedAt });
++    const attempt = { version: 'remote-handoff-repair-v1', token, status: 'prepared', retry: record.remote.handoff_repair.publication_retry,
++      root, branch: repairBranch, parent: repairBase, anchor, checkout_proof: checkoutProof,
++      preparation, write, commit: null, proof: null,
++      publication: { publish: emptyProviderSlot(), merge: emptyProviderSlot() }, prepared_at: preparedAt };
++    record.remote.handoff_repair.attempts.push(attempt);
++    return attempt;
++  }, cwd);
++  applyPending(updated.result.root, updated.result.preparation);
++  return { ...updated, result: remoteResult('remote-handoff-repair-prepare', 'PREPARED', {
++    token: updated.result.token, branch: updated.result.branch, parent: updated.result.parent,
++    path: updated.result.write.path }) };
++}
++
++export function adoptHandoffRepair(recordArg, {
++  expectedRecordHash, token, commit,
++} = {}, cwd = process.cwd()) {
++  return withRecord(recordArg, expectedRecordHash, (record) => {
++    const attempt = record.remote?.handoff_repair?.attempts?.find((item) => item.token === token);
++    if (!attempt || attempt.status !== 'prepared' || !OID.test(commit || '')) fail('handoff repair adoption token or commit is invalid');
++    const root = rootPath(attempt.root); if (branch(root) !== attempt.branch || head(root) !== commit) fail('handoff repair commit is not current');
++    const attachments = String(git(root, ['worktree', 'list', '--porcelain'])).split(/\r?\n/)
++      .filter((line) => line === `branch refs/heads/${attempt.branch}`).length;
++    if (attachments !== 1) fail('handoff repair branch attachment changed');
++    assertClean(root); assertOrdinaryIndex(root);
++    const liveAnchor = captureGitAnchor(root);
++    if (liveAnchor.protected_hash !== attempt.anchor.protected_hash
++      || canonical(protectedIgnoredEntries(root)) !== canonical(attempt.checkout_proof?.protected_ignored)) {
++      fail('handoff repair protected metadata changed');
++    }
++    const closure = record.remote?.closure?.proof;
++    if (!latestRepairPreparation(record, attempt)) fail('handoff repair pending preparation shape changed');
++    validateRemoteGeneration(record, 'handoff-repair', attempt.preparation, root, {
++      closureCommit: closure?.terminal_commit, destinationBranch: attempt.branch,
++    });
++    const parents = String(git(root, ['rev-list', '--parents', '-n', '1', commit])).trim().split(/\s+/).slice(1);
++    const changed = String(git(root, ['diff-tree', '--no-commit-id', '--name-only', '-r', attempt.parent, commit, '--'])).trim().split(/\r?\n/).filter(Boolean);
++    const adoptedEntry = commitEntry(root, commit, attempt.write.path);
++    if (parents.length !== 1 || parents[0] !== attempt.parent || canonical(changed) !== canonical([attempt.write.path])
++      || sha256(git(root, ['show', `${commit}:${attempt.write.path}`], { buffer: true })) !== attempt.write.hash
++      || adoptedEntry.mode !== attempt.write.expected_mode) {
++      fail('handoff repair H2 is not the exact prepared direct child');
++    }
++    attempt.status = 'adopted'; attempt.commit = commit;
++    attempt.write.mode = adoptedEntry.mode; attempt.write.oid = adoptedEntry.oid;
++    attempt.proof = identified({ version: 'remote-handoff-repair-commit-v1', parent: attempt.parent, commit,
++      tree: tree(root, commit), write: structuredClone(attempt.write), adopted_at: now() });
++    return remoteResult('remote-handoff-repair-adopt', 'ADOPTED', { commit, branch: attempt.branch });
++  }, cwd);
++}
++
++function latestRepairPreparation(record, attempt) {
++  return attempt === repairAttempt(record) && attempt.preparation?.token === attempt.token
++    && attempt.preparation?.parent === attempt.parent
++    && canonical(attempt.preparation?.writes) === canonical([attempt.write]);
++}
++
++function repairAttempt(record) { return record.remote?.handoff_repair?.attempts?.at(-1); }
++
++function validateRemoteTerminalArtifacts(record, root, terminal, { live = false } = {}) {
++  const storyWrite = record.remote?.closure?.artifacts?.closure?.proof?.writes?.find((item) => item.path === record.source.story_path);
++  const repair = record.remote?.handoff_repair?.proof ? repairAttempt(record)?.proof?.write : null;
++  const handoffWrite = repair || record.remote?.closure?.artifacts?.handoff?.proof?.writes?.find((item) => item.path === record.handoff.path);
++  for (const [label, write] of [['story', storyWrite], ['handoff', handoffWrite]]) {
++    if (!write || !HASH.test(write.hash || '') || !['100644', '100755'].includes(write.mode || '')) fail(`remote terminal ${label} proof is missing`);
++    const bytes = git(root, ['show', `${terminal}:${write.path}`], { buffer: true }); const entry = commitEntry(root, terminal, write.path);
++    if (sha256(bytes) !== write.hash || entry.mode !== write.mode || (live && readArtifact(root, write.path) !== write.after)) {
++      fail(`remote terminal ${label} bytes or mode differ from retained publication`);
++    }
++  }
++}
++function repairTarget(record, remote = undefined) {
++  const attempt = repairAttempt(record); if (!attempt?.commit) fail('adopted handoff repair H2 is required');
++  const selected = remote ?? record.remote.source.remote; if (selected !== record.remote.source.remote) fail('repair remote differs from retained destination');
++  return { root: attempt.root, remote: selected, storyBranch: attempt.branch,
++    integrationBranch: record.destination.branch, expectedHead: attempt.commit };
++}
++
++export function publishRemoteHandoffRepair(recordArg, {
++  expectedRecordHash, remote = undefined, title, body, provider = createGitHubRemoteAdapter(),
++} = {}, cwd = process.cwd()) {
++  title = safeRemoteInput(title, 'title', 512); body = safeRemoteInput(body, 'body', 1024 * 1024, { multiline: true });
++  const loaded = readIntegrationRecord(recordArg, cwd); const target = repairTarget(loaded.record, remote);
++  const attempt = repairAttempt(loaded.record); const slots = attempt.publication;
++  if (!slots.publish.effect) {
++    const recovered = reconcileExecutingAttempt(loaded.file, expectedRecordHash, {
++      area: 'repair', repairToken: attempt.token, slotName: 'publish', operation: 'handoff-repair-publish',
++      expectedHead: target.expectedHead, reconcile: () => provider.inspect(target),
++      effectStates: ['READY', 'PR_DRAFT', 'CHECKS_PENDING', 'CHECKS_FAILED'], absenceStates: ['PR_ABSENT'],
++    }, cwd);
++    if (recovered?.result.state === 'PROVIDER_REPLAYABLE') {
++      return publishRemoteHandoffRepair(recovered.file, {
++        expectedRecordHash: recovered.hash, remote, title, body, provider,
++      }, cwd);
++    }
++    if (recovered) return recovered;
++    return executeProviderAttempt(loaded.file, expectedRecordHash, {
++      area: 'repair', repairToken: attempt.token, slotName: 'publish', operation: 'handoff-repair-publish',
++      input: { target, title, body, createDraft: false, markReady: false }, expectedHead: target.expectedHead,
++      invoke: () => provider.publish(target, { title, body, createDraft: false, markReady: false }),
++      successStates: ['PUBLISHED'], retry: attempt.retry,
++    }, cwd);
++  }
++  if (!slots.merge.effect) {
++    const recovered = reconcileExecutingAttempt(loaded.file, expectedRecordHash, {
++      area: 'repair', repairToken: attempt.token, slotName: 'merge', operation: 'handoff-repair-merge',
++      expectedHead: target.expectedHead,
++      reconcile: (providerAttempt) => provider.reconcileMerged(target, { prNumber: providerAttempt.input.prNumber }),
++      effectStates: ['MERGED', 'MERGED_BASE_ADVANCED'],
++    }, cwd);
++    if (recovered) return recovered;
++  }
++  const ready = providerResult(provider.inspect(target), target.expectedHead);
++  if (ready.state !== 'READY') return { file: loaded.file, record: loaded.record, hash: loaded.hash,
++    result: remoteResult('handoff-repair-readiness', domainProviderState('handoff-repair-readiness', ready.state), { provider_state: ready.state }) };
++  return executeProviderAttempt(loaded.file, expectedRecordHash, {
++    area: 'repair', repairToken: attempt.token, slotName: 'merge', operation: 'handoff-repair-merge',
++    input: { target, prNumber: ready.pr.number, method: 'merge', subject: title, body },
++    expectedHead: target.expectedHead,
++    invoke: () => provider.merge(target, { prNumber: ready.pr.number, method: 'merge', subject: title, body }),
++    successStates: ['MERGED'], retry: attempt.retry,
++  }, cwd);
++}
++
++export function reconcileRemoteHandoffRepair(recordArg, {
++  expectedRecordHash, prNumber, provider = createGitHubRemoteAdapter(), fetchRemote = defaultFetchRemote,
++} = {}, cwd = process.cwd()) {
++  const initial = readIntegrationRecord(recordArg, cwd); const target = repairTarget(initial.record);
++  const reconciled = reconcilePublication(initial.file, expectedRecordHash, { area: 'remote-repair', prNumber, provider, fetchRemote,
++    slotArea: 'repair', repairToken: repairAttempt(initial.record).token,
++    target, operation: 'handoff-repair-reconcile' }, cwd);
++  if (!reconciled.loaded) return reconciled;
++  const { loaded, value, fetched, proofRef } = reconciled; const attempt = repairAttempt(loaded.record);
++  const parents = String(git(target.root, ['rev-list', '--parents', '-n', '1', value.mergeCommit])).trim().split(/\s+/).slice(1);
++  if (parents.length !== 2 || parents[0] !== attempt.parent || parents[1] !== attempt.commit
++    || tree(target.root, value.mergeCommit) !== tree(target.root, attempt.commit)) fail('handoff repair wrapper does not have exact N/H2 parents and H2 tree');
++  if (fetched !== value.mergeCommit) return withRecord(loaded.file, loaded.hash, (record) => {
++    const current = repairAttempt(record);
++    if (current.race_proof?.terminal_commit === fetched && current.race_proof?.merge_commit === value.mergeCommit) {
++      return { [NO_MUTATION]: true, value: remoteResult('handoff-repair-reconcile',
++        current.exhausted ? 'EXHAUSTED' : 'HANDOFF_BASE_RACE', {
++          provider_state: value.state, terminal_commit: fetched, proof_ref: current.race_proof.proof_ref }) };
++    }
++    if (!isAncestor(target.root, value.mergeCommit, fetched)) fail('handoff repair race tip does not descend from its wrapper');
++    current.race_proof = identified({ version: 'remote-handoff-race-proof-v1', merge_commit: value.mergeCommit,
++      terminal_commit: fetched, proof_ref: proofRef, proved_at: now() });
++    if (record.remote.handoff_repair.publication_retry >= 2) current.exhausted = true;
++    else record.remote.handoff_repair.publication_retry += 1;
++    return remoteResult('handoff-repair-reconcile', current.exhausted ? 'EXHAUSTED' : 'HANDOFF_BASE_RACE', {
++      provider_state: value.state, terminal_commit: fetched, proof_ref: proofRef });
++  }, cwd);
++  return withRecord(loaded.file, loaded.hash, (record) => {
++    record.remote.handoff_repair.proof = identified({ version: 'remote-handoff-repair-proof-v1', commit: value.mergeCommit,
++      parent: attempt.parent, handoff_commit: attempt.commit, proof_ref: proofRef, pr_number: prNumber, proved_at: now() });
++    return remoteResult('handoff-repair-reconcile', 'HANDOFF_REPAIRED', { terminal_commit: value.mergeCommit, proof_ref: proofRef });
++  }, cwd);
++}
++
++export function prepareRemoteCompletion(recordArg, { expectedRecordHash } = {}, cwd = process.cwd()) {
++  return withRecord(recordArg, expectedRecordHash, (record) => {
++    const terminal = record.remote?.handoff_repair?.proof?.commit
++      || (record.remote?.closure?.proof?.state === 'proven' ? record.remote.closure.proof.terminal_commit : null);
++    if (!terminal) fail('a proved fresh remote closure or repaired handoff is required');
++    const root = rootPath(record.destination.root); if (branch(root) !== record.destination.branch) fail('canonical integration branch is not checked out');
++    assertClean(root); assertOrdinaryIndex(root); const previous = head(root);
++    validateRemoteTerminalArtifacts(record, root, terminal);
++    if (record.remote.completion) {
++      const saved = record.remote.completion;
++      if (saved.target !== terminal || ![saved.previous_head, saved.target].includes(previous)) fail('remote completion resume state changed');
++      return { [NO_MUTATION]: true, value: remoteResult('remote-completion-prepare', saved.status === 'complete' ? 'COMPLETE' : 'LOCAL_ADOPTION_PENDING',
++        { token: saved.token, previous_head: saved.previous_head, target: saved.target }) };
++    }
++    if (!isAncestor(root, previous, terminal)) fail('remote completion target is not a fast-forward');
++    const token = randomUUID(); record.remote.completion = { version: 'remote-completion-v1', status: 'prepared', token,
++      previous_head: previous, target: terminal, branch: record.destination.branch, anchor: captureGitAnchor(root),
++      checkout_proof: buildCheckoutProof(root, previous), continuation: 'Continue with the next ready story.', prepared_at: now(), commit: null };
++    return remoteResult('remote-completion-prepare', 'LOCAL_ADOPTION_PENDING', { token, previous_head: previous, target: terminal });
++  }, cwd);
++}
++
++export function adoptRemoteCompletion(recordArg, { expectedRecordHash, token } = {}, cwd = process.cwd()) {
++  return withRecord(recordArg, expectedRecordHash, (record) => {
++    const completion = record.remote?.completion;
++    if (!completion || completion.status !== 'prepared' || completion.token !== token) fail('remote completion token is invalid');
++    const root = rootPath(record.destination.root);
++    if (branch(root) !== completion.branch || head(root) !== completion.target || tree(root) !== tree(root, completion.target)) {
++      fail('canonical integration checkout has not adopted the exact remote target');
++    }
++    assertClean(root); assertOrdinaryIndex(root);
++    const liveAnchor = captureGitAnchor(root);
++    if (liveAnchor.protected_hash !== completion.anchor.protected_hash
++      || canonical(protectedIgnoredEntries(root)) !== canonical(completion.checkout_proof.protected_ignored)) {
++      fail('canonical integration protected metadata changed during completion');
++    }
++    if (!isAncestor(root, completion.previous_head, completion.target)) fail('remote completion adoption is not a fast-forward');
++    validateRemoteTerminalArtifacts(record, root, completion.target, { live: true });
++    const story = readStory(root, record.source.story_path);
++    if (story.execution?.status !== 'merged' || story.contractHash !== record.source.contract_hash) fail('adopted remote completion lacks exact merged story bytes');
++    const handoff = readArtifact(root, record.handoff.path);
++    if (!handoff || !handoff.includes(`BASE_COMMIT: ${record.remote.handoff_repair.proof?.parent || record.remote.closure.artifacts.closure.commit}`)) {
++      fail('adopted remote completion lacks a fresh handoff');
++    }
++    completion.status = 'complete'; completion.commit = completion.target; completion.completed_at = now();
++    return remoteResult('remote-completion-adopt', 'COMPLETE', { commit: completion.commit });
++  }, cwd);
++}
++
+ export function recoverIntegrationCorrectionStart(root) {
+   root = rootPath(root);
+   const conflicts = integrationCorrectionJournalConflicts(root);
+@@ -1693,6 +3083,9 @@ export function prepareLocalIntegration(runArg, { integrationRoot = process.cwd(
+   if (commonRepository(sourceRoot) !== commonRepository(integrationRoot)) fail('source and integration checkouts are not in the same repository');
+   const policy = readPlanPolicy(sourceRoot);
+   const scale = policy?.scale || 'standard';
++  if (verificationReport === true && ['tiny', 'small'].includes(scale)) {
++    fail(`verification reports are not available for ${scale} plans`);
++  }
+   const integrationBranch = policy?.integrationBranch;
+   if (!integrationBranch || branch(integrationRoot) !== integrationBranch) fail('check out the approved integration branch before preparing a merge');
+   assertClean(integrationRoot);
+@@ -2128,8 +3521,9 @@ function commitParents(root, commit) {
+   return String(git(root, ['rev-list', '--parents', '-n', '1', commit])).trim().split(/\s+/).slice(1);
+ }
+ 
+-function commitEntry(root, commit, rel) {
++function commitEntry(root, commit, rel, { allowMissing = false } = {}) {
+   const raw = String(git(root, ['ls-tree', '-z', commit, '--', rel])).split('\0').filter(Boolean);
++  if (allowMissing && raw.length === 0) return null;
+   if (raw.length !== 1) fail(`integration artifact is absent from commit: ${rel}`);
+   const match = /^(\d{6}) (\w+) ([0-9a-f]+)\t(.+)$/.exec(raw[0]);
+   if (!match || match[2] !== 'blob' || match[4] !== rel) fail(`integration artifact commit entry is invalid: ${rel}`);
+diff --git a/plugins/deliver/skills/deliver/scripts/lib/remote.mjs b/plugins/deliver/skills/deliver/scripts/lib/remote.mjs
+index c206676..f3771f7 100644
+--- a/plugins/deliver/skills/deliver/scripts/lib/remote.mjs
++++ b/plugins/deliver/skills/deliver/scripts/lib/remote.mjs
+@@ -35,6 +35,8 @@ export const GITHUB_REMOTE_STATES = Object.freeze([
+   'MERGE_PENDING',
+   'MERGE_MISMATCH',
+   'MERGED',
++  'MERGED_BASE_ADVANCED',
++  'UNKNOWN',
+ ]);
+ 
+ const MAX_OUTPUT_BYTES = 2 * 1024 * 1024;
+@@ -254,6 +256,16 @@ function preflight(targetInput, run, timeoutMs) {
+   if (!repo) return { target, failure: result(target, 'preflight', 'UNSUPPORTED_REMOTE', {
+     diagnostic: diagnostic('REMOTE_URL_UNSUPPORTED', 'The push URL is not an uncredentialed GitHub HTTPS or SSH repository URL.'),
+   }) };
++  const fetchRemote = command(run, timeoutMs, 'git', ['remote', 'get-url', '--all', target.remote], target.root);
++  const fetchFailure = commandFailure(target, 'preflight', 'git', fetchRemote, 'GIT_ERROR', 'REMOTE_LOOKUP_ERROR', 'Git could not inspect the configured fetch remote.');
++  if (fetchFailure) return { target, failure: fetchFailure };
++  const fetchUrls = trimOneLineEnding(fetchRemote.stdout).split('\n').filter((line) => line.length > 0);
++  if (fetchRemote.exitCode !== 0 || fetchUrls.length !== 1 || fetchUrls[0] !== urls[0]) {
++    return { target, failure: result(target, 'preflight', 'REMOTE_AMBIGUOUS', {
++      repository: repo,
++      diagnostic: diagnostic('REMOTE_FETCH_PUSH_MISMATCH', 'The selected remote must have one identical fetch and push destination.'),
++    }) };
++  }
+ 
+   const branch = command(run, timeoutMs, 'git', ['symbolic-ref', '--quiet', '--short', 'HEAD'], target.root);
+   const branchFailure = commandFailure(target, 'preflight', 'git', branch, 'GIT_ERROR', 'CHECKOUT_PROBE_ERROR', 'Git could not inspect the checked-out branch.');
+@@ -387,7 +399,9 @@ function lookup(target, repo, run, timeoutMs, { allowStaleHead = false } = {}) {
+   return { pr };
+ }
+ 
+-function view(target, repo, prNumber, run, timeoutMs, { allowMerged = false, stage = 'lookup' } = {}) {
++function view(target, repo, prNumber, run, timeoutMs, {
++  allowMerged = false, stage = 'lookup', requireMergeability = true,
++} = {}) {
+   const invocation = command(run, timeoutMs, 'gh', ['pr', 'view', String(prNumber), '--repo', repo.slug, '--json', VIEW_FIELDS], target.root);
+   const failure = commandFailure(target, stage, 'gh', invocation, 'PR_LOOKUP_FAILED', 'PR_VIEW_ERROR', 'The pull request could not be read.');
+   if (failure) return { failure };
+@@ -397,7 +411,8 @@ function view(target, repo, prNumber, run, timeoutMs, { allowMerged = false, sta
+   }) };
+   const parsed = parseJson(invocation);
+   const pr = normalizePr(parsed, repo);
+-  if (!pr || !safeProviderString(pr.mergeable, 32) || !safeProviderString(pr.mergeStateStatus, 64)) {
++  if (!pr || (requireMergeability
++    && (!safeProviderString(pr.mergeable, 32) || !safeProviderString(pr.mergeStateStatus, 64)))) {
+     return { failure: result(target, stage, 'PR_LOOKUP_FAILED', {
+       repository: repo,
+       diagnostic: diagnostic('PR_VIEW_MALFORMED', 'The pull request view returned invalid fields.'),
+@@ -542,6 +557,28 @@ function mergeOptions(options) {
+   };
+ }
+ 
++function reconcileOptions(options) {
++  if (!record(options)) invalid('reconcile options must be an object');
++  const unknown = Object.keys(options).filter((key) => key !== 'prNumber');
++  if (unknown.length) invalid(`unsupported reconcile fields: ${unknown.join(', ')}`);
++  if (!Number.isSafeInteger(options.prNumber) || options.prNumber <= 0) invalid('prNumber must be a positive safe integer');
++  return { prNumber: options.prNumber };
++}
++
++function inspectRemoteBase(target, repo, run, timeoutMs) {
++  const invocation = command(run, timeoutMs, 'git', ['ls-remote', '--refs', target.remote,
++    `refs/heads/${target.integrationBranch}`], target.root);
++  const problem = commandFailure(target, 'lookup', 'git', invocation, 'GIT_ERROR', 'REMOTE_BASE_ERROR', 'Git could not inspect the remote integration branch.');
++  if (problem) return { failure: problem };
++  const lines = trimOneLineEnding(invocation.stdout).split('\n').filter(Boolean);
++  const match = lines.length === 1 ? /^([0-9a-f]{40}(?:[0-9a-f]{24})?)\t(refs\/heads\/.+)$/.exec(lines[0]) : null;
++  if (invocation.exitCode !== 0 || !match || match[2] !== `refs/heads/${target.integrationBranch}`) {
++    return { failure: result(target, 'lookup', 'GIT_ERROR', { repository: repo,
++      diagnostic: diagnostic('REMOTE_BASE_UNPROVEN', 'The remote integration branch did not resolve to one full object ID.') }) };
++  }
++  return { oid: match[1] };
++}
++
+ export function createGitHubRemoteAdapter({ run = runCommand, timeoutMs = 30_000 } = {}) {
+   if (typeof run !== 'function') invalid('run must be a command runner');
+   if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 100 || timeoutMs > 300_000) invalid('timeoutMs is out of bounds');
+@@ -550,11 +587,13 @@ export function createGitHubRemoteAdapter({ run = runCommand, timeoutMs = 30_000
+     inspect(targetInput) {
+       const prepared = preflight(targetInput, run, timeoutMs);
+       if (prepared.failure) return prepared.failure;
++      const base = inspectRemoteBase(prepared.target, prepared.repo, run, timeoutMs);
++      if (base.failure) return base.failure;
+       const found = lookup(prepared.target, prepared.repo, run, timeoutMs);
+-      if (found.failure) return found.failure;
++      if (found.failure) return { ...found.failure, remoteBase: base.oid };
+       const viewed = view(prepared.target, prepared.repo, found.pr.number, run, timeoutMs);
+-      if (viewed.failure) return viewed.failure;
+-      return checks(prepared.target, prepared.repo, viewed.pr, run, timeoutMs);
++      if (viewed.failure) return { ...viewed.failure, remoteBase: base.oid };
++      return { ...checks(prepared.target, prepared.repo, viewed.pr, run, timeoutMs), remoteBase: base.oid };
+     },
+ 
+     publish(targetInput, optionsInput) {
+@@ -724,5 +763,65 @@ export function createGitHubRemoteAdapter({ run = runCommand, timeoutMs = 30_000
+         remoteBase: match[1],
+       });
+     },
++
++    reconcileMerged(targetInput, optionsInput) {
++      const options = reconcileOptions(optionsInput);
++      const prepared = preflight(targetInput, run, timeoutMs);
++      if (prepared.failure) return prepared.failure;
++      const viewed = view(prepared.target, prepared.repo, options.prNumber, run, timeoutMs, {
++        allowMerged: true,
++        stage: 'postmerge',
++        requireMergeability: false,
++      });
++      if (viewed.failure) {
++        if (viewed.failure.diagnostic?.code === 'PR_VIEW_MALFORMED'
++          || viewed.failure.state === 'PR_CLOSED' || viewed.failure.state === 'PR_MERGED') {
++          return result(prepared.target, 'postmerge', 'UNKNOWN', {
++            repository: prepared.repo,
++            diagnostic: diagnostic('MERGE_PROOF_UNKNOWN', 'The pull request does not provide a complete merged result.'),
++          });
++        }
++        return viewed.failure;
++      }
++      if (viewed.pr.state === 'OPEN') {
++        return result(prepared.target, 'postmerge', 'MERGE_PENDING', {
++          repository: prepared.repo,
++          pr: publicPr(viewed.pr),
++          diagnostic: diagnostic('MERGE_NOT_FINAL', 'The pull request has not reached a final merged state.'),
++        });
++      }
++      const mergeOid = viewed.pr.mergeCommit?.oid;
++      if (viewed.pr.state !== 'MERGED' || typeof mergeOid !== 'string' || !OID.test(mergeOid)) {
++        return result(prepared.target, 'postmerge', 'UNKNOWN', {
++          repository: prepared.repo,
++          pr: publicPr(viewed.pr),
++          diagnostic: diagnostic('MERGE_COMMIT_MISSING', 'The provider did not return a full merged commit object ID.'),
++        });
++      }
++      const remoteBase = command(run, timeoutMs, 'git', ['ls-remote', '--refs', prepared.target.remote,
++        `refs/heads/${prepared.target.integrationBranch}`], prepared.target.root);
++      const baseProblem = commandFailure(prepared.target, 'postmerge', 'git', remoteBase, 'GIT_ERROR', 'REMOTE_BASE_ERROR', 'Git could not verify the remote integration branch.');
++      if (baseProblem) return baseProblem;
++      if (remoteBase.exitCode !== 0) return result(prepared.target, 'postmerge', 'GIT_ERROR', {
++        repository: prepared.repo,
++        diagnostic: diagnostic('REMOTE_BASE_FAILED', 'Git could not verify the remote integration branch.'),
++      });
++      const lines = trimOneLineEnding(remoteBase.stdout).split('\n').filter(Boolean);
++      const match = lines.length === 1 ? /^([0-9a-f]{40}(?:[0-9a-f]{24})?)\t(refs\/heads\/.+)$/.exec(lines[0]) : null;
++      if (!match || match[2] !== `refs/heads/${prepared.target.integrationBranch}`) {
++        return result(prepared.target, 'postmerge', 'UNKNOWN', {
++          repository: prepared.repo,
++          pr: publicPr(viewed.pr),
++          mergeCommit: mergeOid,
++          diagnostic: diagnostic('REMOTE_BASE_UNKNOWN', 'The remote integration branch did not return one full exact ref.'),
++        });
++      }
++      return result(prepared.target, 'postmerge', match[1] === mergeOid ? 'MERGED' : 'MERGED_BASE_ADVANCED', {
++        repository: prepared.repo,
++        pr: publicPr(viewed.pr),
++        mergeCommit: mergeOid,
++        remoteBase: match[1],
++      });
++    },
+   });
+ }
+diff --git a/plugins/deliver/skills/deliver/scripts/lib/state.mjs b/plugins/deliver/skills/deliver/scripts/lib/state.mjs
+index bfd6a67..851c86a 100644
+--- a/plugins/deliver/skills/deliver/scripts/lib/state.mjs
++++ b/plugins/deliver/skills/deliver/scripts/lib/state.mjs
+@@ -23,6 +23,433 @@ export function canonical(value) {
+   return JSON.stringify(value);
+ }
+ 
++const REMOTE_HASH = /^[0-9a-f]{64}$/;
++const REMOTE_OID = /^[0-9a-f]{40}(?:[0-9a-f]{24})?$/;
++const REMOTE_TOKEN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
++
++const remoteRecord = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
++const withoutRemoteIdentity = (value) => {
++  const { identity: _identity, ...body } = value;
++  return body;
++};
++const validRemoteIdentified = (value) => remoteRecord(value) && REMOTE_HASH.test(value.identity || '')
++  && value.identity === sha256(canonical(withoutRemoteIdentity(value)));
++const remoteInvalid = (message) => { throw new DeliverError(`invalid remote publication evidence: ${message}`, 66); };
++
++// Provider-attempt identity covers immutable intent. Transitions and reciprocal
++// disposition links are independently identified so later observations cannot
++// invalidate an effect that names the original attempt.
++export function remoteProviderAttemptIdentity(attempt) {
++  return sha256(canonical({
++    version: attempt.version,
++    token: attempt.token,
++    operation: attempt.operation,
++    ordinal: attempt.ordinal,
++    input: attempt.input,
++    input_identity: attempt.input_identity,
++    predecessor_record_hash: attempt.predecessor_record_hash,
++    retry: attempt.retry,
++    supersedes: attempt.supersedes,
++  }));
++}
++
++export function remoteProviderAttemptObservation(attempt) {
++  const observation = structuredClone(attempt?.input?.remote_observation);
++  if (!remoteRecord(observation) || observation.version !== 'remote-provider-observation-v1') return null;
++  const observed = attempt.transitions?.at(-1);
++  if (observed?.state !== 'observed') return observation;
++  const result = observed.result;
++  if (Object.hasOwn(result, 'repository')) {
++    if (!remoteRecord(result.repository)) return null;
++    observation.repository_identity = sha256(canonical(result.repository));
++  }
++  if (Object.hasOwn(result, 'pr')) {
++    if (!remoteRecord(result.pr) || !Number.isSafeInteger(result.pr.number) || result.pr.number <= 0
++      || typeof result.pr.headRefName !== 'string' || !result.pr.headRefName
++      || typeof result.pr.baseRefName !== 'string' || !result.pr.baseRefName
++      || !REMOTE_OID.test(result.pr.headRefOid || '')) return null;
++    observation.pr_number = result.pr.number;
++    observation.story_branch = result.pr.headRefName;
++    observation.integration_branch = result.pr.baseRefName;
++    observation.observed_remote_head = result.pr.headRefOid;
++  }
++  if (Object.hasOwn(result, 'remoteBase')) {
++    if (!REMOTE_OID.test(result.remoteBase || '')) return null;
++    observation.observed_remote_base = result.remoteBase;
++  }
++  observation.result_identity = observed.result_identity;
++  return observation;
++}
++
++function validateRemoteProviderSlot(slot, label) {
++  if (!remoteRecord(slot) || slot.version !== 'remote-provider-slot-v1' || !Array.isArray(slot.attempts)
++    || !(slot.active_token === null || REMOTE_TOKEN.test(slot.active_token || ''))
++    || !(slot.effect === null || validRemoteIdentified(slot.effect))) remoteInvalid(`${label} provider slot`);
++  const tokens = new Map();
++  for (const attempt of slot.attempts) {
++    if (!remoteRecord(attempt) || attempt.version !== 'remote-provider-attempt-v1'
++      || !REMOTE_TOKEN.test(attempt.token || '') || tokens.has(attempt.token)
++      || !Number.isSafeInteger(attempt.ordinal) || attempt.ordinal < 0
++      || attempt.ordinal !== tokens.size || typeof attempt.operation !== 'string'
++      || !REMOTE_HASH.test(attempt.input_identity || '')
++      || attempt.input_identity !== sha256(canonical(attempt.input))
++      || !REMOTE_HASH.test(attempt.predecessor_record_hash || '')
++      || !Number.isSafeInteger(attempt.retry) || attempt.retry < 0 || attempt.retry > 2
++      || !(attempt.supersedes === null || REMOTE_TOKEN.test(attempt.supersedes || ''))
++      || !(attempt.superseded_by === null || REMOTE_TOKEN.test(attempt.superseded_by || ''))
++      || !['active', 'superseded', 'proven'].includes(attempt.disposition)
++      || !Array.isArray(attempt.transitions) || !attempt.transitions.length
++      || attempt.identity !== remoteProviderAttemptIdentity(attempt)) remoteInvalid(`${label} provider attempt`);
++    let previous = null;
++    let previousTransition = null;
++    for (const [transitionIndex, transition] of attempt.transitions.entries()) {
++      if (!validRemoteIdentified(transition) || !['prepared', 'executing', 'observed'].includes(transition.state)
++        || transition.previous !== previous || typeof transition.at !== 'string') remoteInvalid(`${label} provider transition`);
++      if (transitionIndex === 0 && transition.state !== 'prepared') remoteInvalid(`${label} provider transition must begin prepared`);
++      if (transitionIndex > 0) {
++        const legal = previousTransition.state === 'prepared' ? transition.state === 'executing'
++          : previousTransition.state === 'executing' && ['prepared', 'observed'].includes(transition.state);
++        if (!legal) remoteInvalid(`${label} provider transition order`);
++      }
++      if (transition.state === 'executing' && (!remoteRecord(transition.invocation)
++        || !REMOTE_TOKEN.test(transition.invocation.token || '')
++        || !Number.isSafeInteger(transition.invocation.pid) || transition.invocation.pid <= 0
++        || !REMOTE_TOKEN.test(transition.invocation.process_instance || '')
++        || transition.invocation.operation !== attempt.operation
++        || transition.invocation.input_identity !== attempt.input_identity)) remoteInvalid(`${label} executing transition`);
++      if (transition.state === 'observed' && (!REMOTE_HASH.test(transition.result_identity || '')
++        || transition.result_identity !== sha256(canonical(transition.result)))) remoteInvalid(`${label} observed transition`);
++      if (transition.state === 'observed' && transition.invocation_token !== previousTransition?.invocation?.token) {
++        remoteInvalid(`${label} observed invocation binding`);
++      }
++      if (transition.state === 'prepared' && transitionIndex > 0) {
++        if (!validRemoteIdentified(transition.replay)
++          || transition.replay.version !== 'remote-provider-replay-proof-v1'
++          || transition.replay.invocation_token !== previousTransition?.invocation?.token
++          || transition.replay.absence_result?.state !== 'PR_ABSENT'
++          || transition.replay.absence_identity !== sha256(canonical(transition.replay.absence_result))) {
++          remoteInvalid(`${label} replay proof`);
++        }
++      } else if (transition.replay) remoteInvalid(`${label} unexpected replay proof`);
++      if (transition.supersession && !validRemoteIdentified(transition.supersession)) remoteInvalid(`${label} supersession proof`);
++      previous = transition.identity;
++      previousTransition = transition;
++    }
++    tokens.set(attempt.token, attempt);
++  }
++  if (slot.active_token !== null) {
++    const active = tokens.get(slot.active_token);
++    if (!active || active !== slot.attempts.at(-1) || active.disposition !== 'active'
++      || !['prepared', 'executing'].includes(active.transitions.at(-1).state)) remoteInvalid(`${label} active token`);
++  }
++  for (const attempt of slot.attempts) {
++    const terminal = attempt.transitions.at(-1);
++    if (['prepared', 'executing'].includes(terminal.state)
++      && (slot.active_token !== attempt.token || attempt.disposition !== 'active')) remoteInvalid(`${label} unfinished attempt state`);
++    if (terminal.state === 'observed' && slot.active_token === attempt.token) remoteInvalid(`${label} observed active token`);
++    if (attempt.disposition === 'proven' && terminal.state !== 'observed') remoteInvalid(`${label} proven disposition`);
++    if (attempt.disposition === 'superseded' && (terminal.state !== 'observed' || attempt.superseded_by === null)) {
++      remoteInvalid(`${label} superseded disposition`);
++    }
++  }
++  for (const attempt of slot.attempts) {
++    if (attempt.superseded_by !== null) {
++      const successor = tokens.get(attempt.superseded_by);
++      const proof = successor?.transitions?.[0]?.supersession;
++      const priorObservation = remoteProviderAttemptObservation(attempt);
++      const currentObservation = successor?.input?.remote_observation;
++      const changedFields = ['observed_remote_head', 'observed_remote_base']
++        .filter((field) => priorObservation?.[field] !== currentObservation?.[field]);
++      if (attempt.disposition !== 'superseded' || successor?.supersedes !== attempt.token
++        || !validRemoteIdentified(proof) || proof.predecessor_token !== attempt.token
++        || proof.predecessor_attempt_identity !== attempt.identity
++        || proof.successor_token !== successor.token
++        || !validRemoteObservation(priorObservation) || !validRemoteObservation(currentObservation)
++        || proof.prior_observation_identity !== sha256(canonical(priorObservation))
++        || proof.current_observation_identity !== sha256(canonical(currentObservation))
++        || canonical(proof.changed_fields) !== canonical(changedFields)
++        || changedFields.length === 0
++        || !(proof.predecessor_effect === null
++          ? proof.predecessor_effect_identity === null
++          : validRemoteIdentified(proof.predecessor_effect)
++            && proof.predecessor_effect.identity === proof.predecessor_effect_identity)) {
++        remoteInvalid(`${label} reciprocal supersession`);
++      }
++      if (proof.predecessor_effect) {
++        const priorObserved = attempt.transitions.find((transition) => transition.state === 'observed'
++          && transition.result_identity === proof.predecessor_effect.result_identity);
++        if (proof.predecessor_effect.attempt_identity !== attempt.identity || !priorObserved) {
++          remoteInvalid(`${label} predecessor effect history`);
++        }
++      }
++    }
++    if (attempt.supersedes !== null) {
++      const predecessor = tokens.get(attempt.supersedes);
++      if (!predecessor || predecessor.superseded_by !== attempt.token) remoteInvalid(`${label} predecessor link`);
++    }
++  }
++  if (slot.effect) {
++    const attempt = slot.attempts.find((item) => item.identity === slot.effect.attempt_identity);
++    const observed = attempt?.transitions?.find((item) => item.state === 'observed'
++      && item.result_identity === slot.effect.result_identity);
++    if (!attempt || !observed || !['proven', 'superseded'].includes(attempt.disposition)) remoteInvalid(`${label} effect binding`);
++  }
++  for (const attempt of slot.attempts) {
++    if (attempt.disposition === 'proven' && slot.effect?.attempt_identity !== attempt.identity) {
++      remoteInvalid(`${label} proven attempt lacks current effect`);
++    }
++    const effectState = ['PUBLISHED', 'READY', 'PR_DRAFT', 'CHECKS_PENDING', 'CHECKS_FAILED',
++      'MERGED', 'MERGED_BASE_ADVANCED'].includes(attempt.transitions.at(-1).result?.state);
++    if (attempt.disposition === 'active' && attempt.transitions.at(-1).state === 'observed'
++      && (slot.effect?.attempt_identity === attempt.identity || effectState)) {
++      remoteInvalid(`${label} unresolved attempt has effect`);
++    }
++  }
++}
++
++function requireRemoteIdentified(value, label) {
++  if (!validRemoteIdentified(value)) remoteInvalid(`${label} identity`);
++  return value;
++}
++
++function remoteEffectObservation(slot, label) {
++  if (!slot?.effect) return null;
++  const attempt = slot.attempts.find((item) => item.identity === slot.effect.attempt_identity);
++  const observed = attempt?.transitions?.find((item) => item.state === 'observed'
++    && item.result_identity === slot.effect.result_identity);
++  if (!attempt || !observed) remoteInvalid(`${label} effect observation`);
++  return { attempt, observed };
++}
++
++function validRemoteObservation(value) {
++  return remoteRecord(value) && value.version === 'remote-provider-observation-v1'
++    && (value.repository_identity === null || REMOTE_HASH.test(value.repository_identity || ''))
++    && (value.pr_number === null || Number.isSafeInteger(value.pr_number) && value.pr_number > 0)
++    && typeof value.story_branch === 'string' && value.story_branch.length > 0
++    && typeof value.integration_branch === 'string' && value.integration_branch.length > 0
++    && (value.observed_remote_head === null || REMOTE_OID.test(value.observed_remote_head || ''))
++    && (value.observed_remote_base === null || REMOTE_OID.test(value.observed_remote_base || ''))
++    && REMOTE_HASH.test(value.result_identity || '');
++}
++
++function validateRemoteEffectTarget(slot, expected, label, states) {
++  const effect = remoteEffectObservation(slot, label);
++  if (!effect) remoteInvalid(`${label} effect is missing`);
++  const target = effect.attempt.input?.target;
++  for (const [field, expectedValue] of Object.entries(expected)) {
++    if (target?.[field] !== expectedValue) remoteInvalid(`${label} target ${field}`);
++  }
++  if (effect.observed.result?.expectedHead !== expected.expectedHead
++    || !states.includes(effect.observed.result?.state)) remoteInvalid(`${label} provider result`);
++  return effect;
++}
++
++function validateRemoteWrite(write, label) {
++  if (!remoteRecord(write) || typeof write.path !== 'string' || !write.path
++    || typeof write.after !== 'string' || !REMOTE_HASH.test(write.hash || '')
++    || write.hash !== sha256(write.after)
++    || !['100644', '100755'].includes(write.mode || '')) remoteInvalid(`${label} write`);
++}
++
++/**
++ * Validate the identified, cross-bound remote publication envelope without
++ * consulting a checkout. Callers separately prove live Git objects and roots.
++ * Partial lifecycle states are accepted; requireTerminal demands the complete
++ * source/evidence/closure-or-repair/completion chain used for admission.
++ */
++export function validateRemotePublicationRecord(value, { requireTerminal = false } = {}) {
++  const remote = value?.remote;
++  if (remote === undefined || remote === null) {
++    if (requireTerminal) remoteInvalid('terminal envelope is missing');
++    return value;
++  }
++  if (!remoteRecord(remote) || remote.version !== 'remote-publication-v1' || !remoteRecord(remote.source)
++    || !remoteRecord(remote.handoff_repair) || !Array.isArray(remote.handoff_repair.attempts)
++    || !Number.isSafeInteger(remote.handoff_repair.publication_retry)
++    || remote.handoff_repair.publication_retry < 0 || remote.handoff_repair.publication_retry > 2) remoteInvalid('envelope');
++  validateRemoteProviderSlot(remote.source.publication, 'source publication');
++  validateRemoteProviderSlot(remote.source.merge, 'source merge');
++
++  const sourceProof = remote.source.proof;
++  if (sourceProof !== null && sourceProof !== undefined) {
++    requireRemoteIdentified(sourceProof, 'source proof');
++    if (sourceProof.version !== 'remote-source-proof-v1' || !REMOTE_OID.test(sourceProof.source_merge_commit || '')
++      || !REMOTE_OID.test(sourceProof.verified_integration_commit || '') || !Number.isSafeInteger(sourceProof.pr_number)
++      || !['merge', 'squash', 'rebase'].includes(sourceProof.method)
++      || remote.source.status !== 'proven' || !remote.source.merge.effect) remoteInvalid('source proof binding');
++    const mergeEffect = remoteEffectObservation(remote.source.merge, 'source merge');
++    const mergeAttempt = mergeEffect?.attempt;
++    const mergeObserved = mergeEffect?.observed;
++    if (!mergeAttempt || mergeAttempt.input?.method !== sourceProof.method
++      || mergeAttempt.input?.prNumber !== sourceProof.pr_number
++      || mergeObserved?.result?.mergeCommit !== sourceProof.source_merge_commit
++      || (sourceProof.repository && canonical(mergeObserved.result?.repository) !== canonical(sourceProof.repository))) {
++      remoteInvalid('source merge effect');
++    }
++  }
++
++  const evidence = remote.integration_evidence;
++  if (evidence !== null && evidence !== undefined) {
++    if (!remoteRecord(evidence) || evidence.version !== 'remote-integration-evidence-v1'
++      || !['ready'].includes(evidence.status) || !REMOTE_OID.test(evidence.commit || '')
++      || !REMOTE_HASH.test(evidence.snapshot_hash || '') || !remoteRecord(evidence.manifest)
++      || !REMOTE_HASH.test(evidence.manifest.hash || '') || !Array.isArray(evidence.gates)
++      || !Array.isArray(evidence.gate_history) || !Array.isArray(evidence.review_history)
++      || !Array.isArray(evidence.verification_history)
++      || sourceProof?.verified_integration_commit !== evidence.commit
++      || sourceProof?.evidence_branch !== evidence.branch) remoteInvalid('integration evidence binding');
++    const expectedSnapshot = sha256(canonical({ commit: evidence.commit, manifest: evidence.manifest.hash,
++      anchor: sha256(canonical(evidence.anchor)), checkout: sha256(canonical(evidence.checkout_proof)) }));
++    if (evidence.snapshot_hash !== expectedSnapshot) remoteInvalid('integration evidence snapshot');
++    for (const gate of evidence.gates) {
++      requireRemoteIdentified(gate, 'integration gate');
++      if (gate.integration_commit !== evidence.commit || gate.snapshot_hash !== evidence.snapshot_hash) remoteInvalid('integration gate binding');
++    }
++    if (evidence.review) {
++      requireRemoteIdentified(evidence.review, 'integration review');
++      if (evidence.review.snapshot_hash !== evidence.snapshot_hash) remoteInvalid('integration review binding');
++    }
++    if (evidence.verification) {
++      requireRemoteIdentified(evidence.verification, 'integration verification');
++      if (evidence.verification.snapshot_hash !== evidence.snapshot_hash) remoteInvalid('integration verification binding');
++    }
++    if (evidence.finalized || evidence.finalization) {
++      const finalization = requireRemoteIdentified(evidence.finalization, 'integration finalization');
++      if (!evidence.finalized || finalization.version !== 'remote-integration-finalization-v1'
++        || finalization.snapshot_hash !== evidence.snapshot_hash
++        || canonical(finalization.gates) !== canonical(evidence.gates.map((item) => item.identity).sort())
++        || finalization.review !== evidence.review?.identity
++        || finalization.verification !== evidence.verification?.identity
++        || evidence.gates.some((item) => item.status !== 'PASS')
++        || Object.entries(value.source?.packet?.commands || {}).some(([name, command]) => !evidence.gates.some((item) => (
++          item.name === name && item.command === command && item.status === 'PASS'
++          && item.snapshot_hash === evidence.snapshot_hash)))
++        || evidence.review?.status !== 'PASS' || !Array.isArray(evidence.review?.findings)
++        || evidence.review?.findings?.some((item) => !item.resolved && item.severity !== 'minor')
++        || !Array.isArray(evidence.verification?.criteria) || !evidence.verification.criteria.length
++        || evidence.verification.criteria.some((item) => item.status !== 'PASS')) remoteInvalid('integration finalization binding');
++    }
++  }
++
++  const closure = remote.closure;
++  if (closure !== null && closure !== undefined) {
++    if (!remoteRecord(closure) || closure.version !== 'remote-closure-v1' || !remoteRecord(closure.checkout)
++      || !remoteRecord(closure.artifacts) || !remoteRecord(closure.publication)) remoteInvalid('closure envelope');
++    validateRemoteProviderSlot(closure.publication.publish, 'closure publication');
++    validateRemoteProviderSlot(closure.publication.merge, 'closure merge');
++    if (closure.checkout.start_commit !== evidence?.commit) remoteInvalid('closure checkout start');
++    let parent = evidence?.commit;
++    for (const field of ['report', 'closure', 'handoff']) {
++      const slot = closure.artifacts[field];
++      if (!remoteRecord(slot)) remoteInvalid(`${field} artifact slot`);
++      if (slot.proof) {
++        requireRemoteIdentified(slot.proof, `${field} artifact proof`);
++        if (slot.proof.version !== 'remote-artifact-proof-v1' || slot.proof.field !== field
++          || slot.proof.commit !== slot.commit || slot.proof.parent !== parent
++          || !Array.isArray(slot.proof.writes) || !slot.proof.writes.length) remoteInvalid(`${field} artifact binding`);
++        for (const write of slot.proof.writes) validateRemoteWrite(write, field);
++        parent = slot.commit;
++      } else if (slot.commit !== null) remoteInvalid(`${field} artifact commit`);
++    }
++    if (closure.proof) {
++      requireRemoteIdentified(closure.proof, 'closure proof');
++      const mergeEffect = remoteEffectObservation(closure.publication.merge, 'closure merge');
++      if (!['proven', 'handoff-stale'].includes(closure.proof.state)
++        || closure.proof.base_commit !== evidence?.commit
++        || closure.proof.handoff_commit !== closure.artifacts.handoff.commit
++        || !REMOTE_OID.test(closure.proof.merge_commit || '')
++        || !REMOTE_OID.test(closure.proof.terminal_commit || '')
++        || !closure.publication.merge.effect
++        || mergeEffect?.observed?.result?.mergeCommit !== closure.proof.merge_commit
++        || mergeEffect?.attempt?.input?.prNumber !== closure.proof.pr_number
++        || (closure.proof.state === 'proven' && closure.proof.terminal_commit !== closure.proof.merge_commit)) {
++        remoteInvalid('closure proof binding');
++      }
++    }
++  }
++
++  for (const [index, repair] of remote.handoff_repair.attempts.entries()) {
++    if (!remoteRecord(repair) || repair.version !== 'remote-handoff-repair-v1'
++      || !REMOTE_TOKEN.test(repair.token || '') || repair.retry !== index
++      || !['prepared', 'adopted'].includes(repair.status) || !remoteRecord(repair.publication)) remoteInvalid('handoff repair attempt');
++    validateRemoteProviderSlot(repair.publication.publish, 'handoff repair publication');
++    validateRemoteProviderSlot(repair.publication.merge, 'handoff repair merge');
++    if (repair.race_proof) {
++      requireRemoteIdentified(repair.race_proof, 'handoff repair race proof');
++      const merged = repair.publication.merge.attempts.at(-1)?.transitions
++        ?.filter((item) => item.state === 'observed').at(-1)?.result?.mergeCommit;
++      if (repair.race_proof.merge_commit !== merged || !REMOTE_OID.test(repair.race_proof.terminal_commit || '')) {
++        remoteInvalid('handoff repair race binding');
++      }
++    }
++    if (index > 0 && remote.handoff_repair.attempts[index - 1].race_proof?.terminal_commit !== repair.parent) {
++      remoteInvalid('handoff repair replacement parent');
++    }
++    if (repair.proof) {
++      requireRemoteIdentified(repair.proof, 'handoff repair commit proof');
++      validateRemoteWrite(repair.proof.write, 'handoff repair');
++      if (repair.status !== 'adopted' || repair.proof.commit !== repair.commit || repair.proof.parent !== repair.parent) {
++        remoteInvalid('handoff repair commit binding');
++      }
++    }
++  }
++  if (remote.handoff_repair.proof) {
++    const proof = requireRemoteIdentified(remote.handoff_repair.proof, 'handoff repair proof');
++    const repair = remote.handoff_repair.attempts.at(-1);
++    const mergeEffect = remoteEffectObservation(repair?.publication?.merge, 'handoff repair merge');
++    if (!repair?.proof || !repair.publication.merge.effect || proof.version !== 'remote-handoff-repair-proof-v1'
++      || proof.parent !== repair.parent || proof.handoff_commit !== repair.commit
++      || !REMOTE_OID.test(proof.commit || '') || !Number.isSafeInteger(proof.pr_number) || proof.pr_number <= 0
++      || mergeEffect?.observed?.result?.mergeCommit !== proof.commit
++      || mergeEffect?.attempt?.input?.prNumber !== proof.pr_number) remoteInvalid('handoff repair proof binding');
++  }
++
++  const completion = remote.completion;
++  if (completion !== null && completion !== undefined) {
++    const terminal = remote.handoff_repair.proof?.commit
++      || (closure?.proof?.state === 'proven' ? closure.proof.terminal_commit : null);
++    if (!remoteRecord(completion) || completion.version !== 'remote-completion-v1'
++      || !['prepared', 'complete'].includes(completion.status) || !REMOTE_TOKEN.test(completion.token || '')
++      || !REMOTE_OID.test(completion.previous_head || '') || !REMOTE_OID.test(completion.target || '')
++      || completion.branch !== value.destination?.branch || completion.target !== terminal
++      || (completion.status === 'complete' && completion.commit !== completion.target)) remoteInvalid('completion binding');
++  }
++  if (requireTerminal && (!sourceProof || !remote.source.publication.effect || !remote.source.merge.effect
++    || !evidence?.finalized || !evidence.finalization || !closure?.proof
++    || !(closure.proof.state === 'proven' || remote.handoff_repair.proof)
++    || (value.reporting !== 'skipped' && !closure.artifacts.report.proof)
++    || !closure.artifacts.closure.proof || !closure.artifacts.handoff.proof
++    || completion?.status !== 'complete')) remoteInvalid('terminal proof chain is incomplete');
++  if (requireTerminal) {
++    const sourceTarget = { root: value.source.root, remote: remote.source.remote,
++      storyBranch: value.source.branch, integrationBranch: value.destination.branch,
++      expectedHead: value.source.candidate };
++    validateRemoteEffectTarget(remote.source.publication, sourceTarget, 'source publication',
++      ['PUBLISHED', 'READY', 'PR_DRAFT', 'CHECKS_PENDING', 'CHECKS_FAILED']);
++    validateRemoteEffectTarget(remote.source.merge, sourceTarget, 'source merge', ['MERGED', 'MERGED_BASE_ADVANCED']);
++    const closureTarget = { root: closure.checkout.root, remote: remote.source.remote,
++      storyBranch: closure.checkout.branch, integrationBranch: value.destination.branch,
++      expectedHead: closure.artifacts.handoff.commit };
++    validateRemoteEffectTarget(closure.publication.publish, closureTarget, 'closure publication',
++      ['PUBLISHED', 'READY', 'PR_DRAFT', 'CHECKS_PENDING', 'CHECKS_FAILED']);
++    validateRemoteEffectTarget(closure.publication.merge, closureTarget, 'closure merge', ['MERGED', 'MERGED_BASE_ADVANCED']);
++    if (remote.handoff_repair.proof) {
++      const repair = remote.handoff_repair.attempts.at(-1);
++      const repairTarget = { root: repair.root, remote: remote.source.remote,
++        storyBranch: repair.branch, integrationBranch: value.destination.branch,
++        expectedHead: repair.commit };
++      validateRemoteEffectTarget(repair.publication.publish, repairTarget, 'handoff repair publication',
++        ['PUBLISHED', 'READY', 'PR_DRAFT', 'CHECKS_PENDING', 'CHECKS_FAILED']);
++      validateRemoteEffectTarget(repair.publication.merge, repairTarget, 'handoff repair merge', ['MERGED', 'MERGED_BASE_ADVANCED']);
++    }
++    if (!remoteRecord(completion.anchor) || !remoteRecord(completion.checkout_proof)
++      || completion.checkout_proof.version !== 'whole-checkout-v1'
++      || !REMOTE_HASH.test(completion.checkout_proof.protected_hash || '')
++      || !remoteRecord(completion.checkout_proof.protected_ignored)) remoteInvalid('completion checkout proof');
++  }
++  return value;
++}
++
+ export function readJsonFile(file, label = file) {
+   let raw;
+   try {
+diff --git a/plugins/deliver/skills/deliver/scripts/pm.mjs b/plugins/deliver/skills/deliver/scripts/pm.mjs
+index 9a887c6..44d2553 100644
+--- a/plugins/deliver/skills/deliver/scripts/pm.mjs
++++ b/plugins/deliver/skills/deliver/scripts/pm.mjs
+@@ -12,6 +12,7 @@ import {
+   claimCurrentPm,
+   initializeCurrentPm,
+   recoverCurrentPm,
++  remoteAdmissionStatus,
+   revokeCurrentPm,
+ } from './lib/current-pm.mjs';
+ import { recoverExecutionTransition, transitionCurrentExecution } from './lib/transitions.mjs';
+@@ -31,6 +32,14 @@ import {
+   recordIntegrationVerification,
+   runIntegrationGate,
+   recoverIntegrationCorrectionStart,
++  publishRemoteSource, inspectRemoteSourceReadiness, mergeRemoteSource, reconcileRemoteSource,
++  prepareRemoteIntegrationEvidence, runRemoteIntegrationGate, recordRemoteIntegrationReview,
++  recordRemoteIntegrationVerification, finalizeRemoteIntegrationEvidence,
++  prepareRemoteClosureCheckout, adoptRemoteClosureCheckout,
++  prepareRemoteVerificationReport, adoptRemoteVerificationReport,
++  prepareRemoteStoryClosure, adoptRemoteStoryClosure, prepareRemoteHandoff, adoptRemoteHandoff,
++  publishRemoteClosure, reconcileRemoteClosure, prepareHandoffRepair, adoptHandoffRepair,
++  publishRemoteHandoffRepair, reconcileRemoteHandoffRepair, prepareRemoteCompletion, adoptRemoteCompletion,
+ } from './lib/integration.mjs';
+ 
+ const help = `Shared Deliver project state
+@@ -53,6 +62,13 @@ const help = `Shared Deliver project state
+   pm.mjs report-adopt|close-adopt --integration FILE --expected-record HASH --token TOKEN --commit SHA
+   pm.mjs handoff-prepare --integration FILE --expected-record HASH [--next TEXT]
+   pm.mjs handoff-adopt --integration FILE --expected-record HASH --token TOKEN --commit SHA
++  pm.mjs remote-source-publish|remote-source-readiness|remote-source-merge|remote-source-reconcile ...
++  pm.mjs remote-evidence-prepare|remote-evidence-gate|remote-evidence-review|remote-evidence-verify|remote-evidence-finalize ...
++  pm.mjs remote-closure-checkout-prepare|remote-closure-checkout-adopt ...
++  pm.mjs remote-report-prepare|remote-report-adopt|remote-close-prepare|remote-close-adopt ...
++  pm.mjs remote-handoff-prepare|remote-handoff-adopt|remote-closure-publish|remote-closure-reconcile ...
++  pm.mjs remote-handoff-repair-prepare|remote-handoff-repair-adopt|remote-handoff-repair-publish|remote-handoff-repair-reconcile ...
++  pm.mjs remote-completion-prepare|remote-completion-adopt ...
+   pm.mjs complete --run UUID --commit FULL_INTEGRATION_SHA --next "Next ready story or decision"
+   pm.mjs recover
+ 
+@@ -75,6 +91,13 @@ function durableCurrentMarker(root) {
+   }
+   return false;
+ }
++
++function boundedBodyFile(root, file) {
++  if (typeof file !== 'string' || !file || file.includes('\0')) throw new DeliverError('--body-file must name a bounded regular file', 64);
++  const absolute = path.resolve(root, file); const stat = fs.lstatSync(absolute);
++  if (!stat.isFile() || stat.isSymbolicLink() || stat.size > 1024 * 1024) throw new DeliverError('--body-file must name a bounded regular file', 64);
++  return fs.readFileSync(absolute, 'utf8');
++}
+ try {
+   const [command = 'help', ...rest] = process.argv.slice(2);
+   if (['help', '--help', '-h'].includes(command)) process.stdout.write(help);
+@@ -90,13 +113,35 @@ try {
+       'report-prepare': ['--integration', '--expected-record'], 'report-adopt': ['--integration', '--expected-record', '--token', '--commit'],
+       'close-prepare': ['--integration', '--expected-record'], 'close-adopt': ['--integration', '--expected-record', '--token', '--commit'],
+       'handoff-prepare': ['--integration', '--expected-record', '--next'], 'handoff-adopt': ['--integration', '--expected-record', '--token', '--commit'],
++      'remote-source-publish': ['--integration', '--expected-record', '--remote', '--title', '--body-file', '--draft', '--mark-ready'],
++      'remote-source-readiness': ['--integration', '--expected-record'],
++      'remote-source-merge': ['--integration', '--expected-record', '--pr', '--method', '--subject', '--body-file'],
++      'remote-source-reconcile': ['--integration', '--expected-record', '--pr'],
++      'remote-evidence-prepare': ['--integration', '--expected-record', '--evidence-root'],
++      'remote-evidence-gate': ['--integration', '--expected-record', '--name'],
++      'remote-evidence-review': ['--integration', '--expected-record', '--reviewer', '--receipt'],
++      'remote-evidence-verify': ['--integration', '--expected-record', '--verifier', '--results'],
++      'remote-evidence-finalize': ['--integration', '--expected-record'],
++      'remote-closure-checkout-prepare': ['--integration', '--expected-record'],
++      'remote-closure-checkout-adopt': ['--integration', '--expected-record', '--token'],
++      'remote-report-prepare': ['--integration', '--expected-record'], 'remote-report-adopt': ['--integration', '--expected-record', '--token', '--commit'],
++      'remote-close-prepare': ['--integration', '--expected-record'], 'remote-close-adopt': ['--integration', '--expected-record', '--token', '--commit'],
++      'remote-handoff-prepare': ['--integration', '--expected-record', '--next'], 'remote-handoff-adopt': ['--integration', '--expected-record', '--token', '--commit'],
++      'remote-closure-publish': ['--integration', '--expected-record', '--remote', '--title', '--body-file'],
++      'remote-closure-reconcile': ['--integration', '--expected-record', '--pr'],
++      'remote-handoff-repair-prepare': ['--integration', '--expected-record'],
++      'remote-handoff-repair-adopt': ['--integration', '--expected-record', '--token', '--commit'],
++      'remote-handoff-repair-publish': ['--integration', '--expected-record', '--remote', '--title', '--body-file'],
++      'remote-handoff-repair-reconcile': ['--integration', '--expected-record', '--pr'],
++      'remote-completion-prepare': ['--integration', '--expected-record'],
++      'remote-completion-adopt': ['--integration', '--expected-record', '--token'],
+     };
+     if (!Object.hasOwn(allowed, command)) throw new DeliverError('unknown shared PM command', 64);
+     const options = {};
+     for (let i = 0; i < rest.length;) {
+       const flag = rest[i++];
+       if (!allowed[command].includes(flag) || Object.hasOwn(options, flag)) throw new DeliverError('unknown, duplicate or missing PM option', 64);
+-      if (flag === '--verification-report') options[flag] = true;
++      if (['--verification-report', '--draft', '--mark-ready'].includes(flag)) options[flag] = true;
+       else {
+         if (!rest[i]) throw new DeliverError('unknown, duplicate or missing PM option', 64);
+         options[flag] = rest[i++];
+@@ -119,7 +164,7 @@ try {
+     }
+     else if (command === 'status') {
+       assertCurrentPmReady(root);
+-      if (format === 'current') result = inspectProjectState(root);
++      if (format === 'current') result = { ...inspectProjectState(root), remote: remoteAdmissionStatus(root) };
+       else {
+         const shared = readPm(root);
+         result = { managed: Boolean(shared), ...shared };
+@@ -198,6 +243,35 @@ try {
+     else if (command === 'handoff-adopt') result = adoptIntegrationHandoff(options['--integration'], {
+       expectedRecordHash: options['--expected-record'], token: options['--token'], commit: options['--commit'],
+     }, root);
++    else if (command === 'remote-source-publish') result = publishRemoteSource(options['--integration'], {
++      expectedRecordHash: options['--expected-record'], remote: options['--remote'], title: options['--title'],
++      body: boundedBodyFile(root, options['--body-file']), createDraft: options['--draft'] === true, markReady: options['--mark-ready'] === true,
++    }, root);
++    else if (command === 'remote-source-readiness') result = inspectRemoteSourceReadiness(options['--integration'], { expectedRecordHash: options['--expected-record'] }, root);
++    else if (command === 'remote-source-merge') result = mergeRemoteSource(options['--integration'], { expectedRecordHash: options['--expected-record'],
++      prNumber: Number(options['--pr']), method: options['--method'], subject: options['--subject'], body: boundedBodyFile(root, options['--body-file']) }, root);
++    else if (command === 'remote-source-reconcile') result = reconcileRemoteSource(options['--integration'], { expectedRecordHash: options['--expected-record'], prNumber: Number(options['--pr']) }, root);
++    else if (command === 'remote-evidence-prepare') result = prepareRemoteIntegrationEvidence(options['--integration'], { expectedRecordHash: options['--expected-record'], evidenceRoot: options['--evidence-root'] }, root);
++    else if (command === 'remote-evidence-gate') result = runRemoteIntegrationGate(options['--integration'], { expectedRecordHash: options['--expected-record'], name: options['--name'] }, root);
++    else if (command === 'remote-evidence-review') result = recordRemoteIntegrationReview(options['--integration'], { expectedRecordHash: options['--expected-record'], reviewer: options['--reviewer'], receipt: options['--receipt'] }, root);
++    else if (command === 'remote-evidence-verify') result = recordRemoteIntegrationVerification(options['--integration'], { expectedRecordHash: options['--expected-record'], verifier: options['--verifier'], results: options['--results'] }, root);
++    else if (command === 'remote-evidence-finalize') result = finalizeRemoteIntegrationEvidence(options['--integration'], { expectedRecordHash: options['--expected-record'] }, root);
++    else if (command === 'remote-closure-checkout-prepare') result = prepareRemoteClosureCheckout(options['--integration'], { expectedRecordHash: options['--expected-record'] }, root);
++    else if (command === 'remote-closure-checkout-adopt') result = adoptRemoteClosureCheckout(options['--integration'], { expectedRecordHash: options['--expected-record'], token: options['--token'], closureRoot: root }, root);
++    else if (command === 'remote-report-prepare') result = prepareRemoteVerificationReport(options['--integration'], { expectedRecordHash: options['--expected-record'] }, root);
++    else if (command === 'remote-report-adopt') result = adoptRemoteVerificationReport(options['--integration'], { expectedRecordHash: options['--expected-record'], token: options['--token'], commit: options['--commit'] }, root);
++    else if (command === 'remote-close-prepare') result = prepareRemoteStoryClosure(options['--integration'], { expectedRecordHash: options['--expected-record'] }, root);
++    else if (command === 'remote-close-adopt') result = adoptRemoteStoryClosure(options['--integration'], { expectedRecordHash: options['--expected-record'], token: options['--token'], commit: options['--commit'] }, root);
++    else if (command === 'remote-handoff-prepare') result = prepareRemoteHandoff(options['--integration'], { expectedRecordHash: options['--expected-record'], next: options['--next'] }, root);
++    else if (command === 'remote-handoff-adopt') result = adoptRemoteHandoff(options['--integration'], { expectedRecordHash: options['--expected-record'], token: options['--token'], commit: options['--commit'] }, root);
++    else if (command === 'remote-closure-publish') result = publishRemoteClosure(options['--integration'], { expectedRecordHash: options['--expected-record'], remote: options['--remote'], title: options['--title'], body: boundedBodyFile(root, options['--body-file']) }, root);
++    else if (command === 'remote-closure-reconcile') result = reconcileRemoteClosure(options['--integration'], { expectedRecordHash: options['--expected-record'], prNumber: Number(options['--pr']) }, root);
++    else if (command === 'remote-handoff-repair-prepare') result = prepareHandoffRepair(options['--integration'], { expectedRecordHash: options['--expected-record'], integrationRoot: root }, root);
++    else if (command === 'remote-handoff-repair-adopt') result = adoptHandoffRepair(options['--integration'], { expectedRecordHash: options['--expected-record'], token: options['--token'], commit: options['--commit'] }, root);
++    else if (command === 'remote-handoff-repair-publish') result = publishRemoteHandoffRepair(options['--integration'], { expectedRecordHash: options['--expected-record'], remote: options['--remote'], title: options['--title'], body: boundedBodyFile(root, options['--body-file']) }, root);
++    else if (command === 'remote-handoff-repair-reconcile') result = reconcileRemoteHandoffRepair(options['--integration'], { expectedRecordHash: options['--expected-record'], prNumber: Number(options['--pr']) }, root);
++    else if (command === 'remote-completion-prepare') result = prepareRemoteCompletion(options['--integration'], { expectedRecordHash: options['--expected-record'] }, root);
++    else if (command === 'remote-completion-adopt') result = adoptRemoteCompletion(options['--integration'], { expectedRecordHash: options['--expected-record'], token: options['--token'] }, root);
+     else {
+       result = recoverIntegrationCorrectionStart(root);
+       if (!result.recovered) result = recoverExecutionTransition(root);
+diff --git a/tests/current-roundtrip.test.mjs b/tests/current-roundtrip.test.mjs
+index 05fcbec..310df07 100644
+--- a/tests/current-roundtrip.test.mjs
++++ b/tests/current-roundtrip.test.mjs
+@@ -1,8 +1,16 @@
+ import assert from 'node:assert/strict';
++import { spawnSync, execFileSync } from 'node:child_process';
++import fs from 'node:fs';
++import os from 'node:os';
++import path from 'node:path';
+ import { test } from 'node:test';
++import { fileURLToPath } from 'node:url';
+ import { parseExec as upstreamExecution } from './fixtures/upstream-v0.25.1/hooks/lib.mjs';
+ import { parseStory, replaceStoryExecution } from '../plugins/deliver/skills/deliver/scripts/lib/story.mjs';
+ 
++const currentPmApi = await import('../plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs');
++const pmCli = fileURLToPath(new URL('../plugins/deliver/skills/deliver/scripts/pm.mjs', import.meta.url));
++
+ const rel = 'docs/stories/S2-3-roundtrip.md';
+ const contract = [
+   '# S2-3: Round trip',
+@@ -15,6 +23,49 @@ const contract = [
+   '',
+ ].join('\n');
+ 
++function git(root, ...args) {
++  return execFileSync('git', ['-C', root, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trimEnd();
++}
++
++function write(root, relative, value) {
++  const file = path.join(root, ...relative.split('/'));
++  fs.mkdirSync(path.dirname(file), { recursive: true });
++  fs.writeFileSync(file, value);
++  return file;
++}
++
++function call(root, ...args) {
++  const result = spawnSync(process.execPath, [pmCli, ...args], { cwd: root, encoding: 'utf8' });
++  let json = null;
++  try { json = JSON.parse(result.stdout); } catch {}
++  return { ...result, json };
++}
++
++function admissionProject(t) {
++  const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'deliver-remote-admission-')));
++  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
++  git(root, 'init', '-q', '--initial-branch=main');
++  git(root, 'config', 'user.name', 'Casey Example');
++  git(root, 'config', 'user.email', 'casey@example.invalid');
++  assert.equal(call(root, 'init').status, 0);
++  write(root, 'docs/plan.md', '# Plan\n\n## Delivery mode\n- Scale: standard\n- Checkpoint policy: story-level\n- Integration branch: main\n- Skeleton: none\n');
++  const merged = replaceStoryExecution(parseStory(contract, rel), {
++    owner: 'casey-abcdef123456', builder: 'codex-builder', branch: 'pm/S2-3-roundtrip',
++    status: 'merged', rounds: 1, retries: 0, updated: '2026-09-10 13:00',
++  }, { note: '2026-09-10 13:00 integrated' });
++  write(root, rel, merged.after);
++  const nextRel = 'docs/stories/S2-4-next.md';
++  write(root, nextRel, contract.replaceAll('S2-3', 'S2-4').replace('Round trip', 'Next story'));
++  write(root, 'src/value.txt', 'imported completion\n');
++  git(root, 'add', 'docs', 'src');
++  git(root, 'commit', '-qm', 'Import upstream merged story');
++  const approved = call(root, 'approve', '--approver', 'Ben');
++  assert.equal(approved.status, 0, approved.stdout);
++  git(root, 'add', 'docs/approval.json');
++  git(root, 'commit', '-qm', 'Approve imported project');
++  return { root, nextRel };
++}
++
+ test('upstream Execution is accepted and Codex closure remains readable upstream', () => {
+   const upstream = `${contract}## Execution\n<!-- pm-exec: {"owner":"casey-abcdef123456","builder":"codex-builder","branch":"pm/S2-3-roundtrip","status":"in-review","rounds":2,"retries":1,"updated":"2026-09-10 12:00","host_note":"keep"} -->\n`;
+   const document = parseStory(upstream, rel);
+@@ -40,3 +91,84 @@ test('Codex Execution accepts an upstream boundary update without losing identit
+   assert.equal(document.execution.status, 'building');
+   assert.equal(document.contractHash, claimed.contractHash);
+ });
++
++test('native remote admission preserves imported completion and fails closed on malformed local evidence', async (t) => {
++  assert.equal(typeof currentPmApi.remoteAdmissionStatus, 'function',
++    'current PM must export the native remote admission projection');
++
++  await t.test('imported upstream merged story remains clear without a native remote record', () => {
++    const fixture = admissionProject(t);
++    const status = currentPmApi.remoteAdmissionStatus(fixture.root);
++    assert.equal(status.version, 'remote-admission-status-v1');
++    assert.equal(status.state, 'CLEAR');
++    assert.equal(status.blocking, false);
++    assert.equal(status.integration_branch, 'main');
++    assert.equal(status.integration_record, null);
++    assert.deepEqual(status.diagnostics, []);
++    const projected = call(fixture.root, 'status');
++    assert.equal(projected.status, 0, projected.stdout);
++    assert.deepEqual(projected.json.remote, status);
++    const claimed = call(fixture.root, 'claim', '--story', fixture.nextRel);
++    assert.equal(claimed.status, 0, claimed.stdout);
++    assert.equal(claimed.json.resumed, false);
++  });
++
++  for (const kind of ['malformed regular record', 'symlinked record']) {
++    await t.test(kind, () => {
++      const fixture = admissionProject(t);
++      const integrations = path.join(fixture.root, '.deliver/integrations');
++      fs.mkdirSync(integrations, { recursive: true });
++      const record = path.join(integrations, '11111111-1111-4111-8111-111111111111.json');
++      if (kind === 'symlinked record') {
++        const outside = write(path.dirname(fixture.root), `${path.basename(fixture.root)}-outside.json`, '{}\n');
++        t.after(() => fs.rmSync(outside, { force: true }));
++        fs.symlinkSync(outside, record);
++      } else {
++        fs.writeFileSync(record, '{not json\n');
++      }
++      const status = currentPmApi.remoteAdmissionStatus(fixture.root);
++      assert.equal(status.version, 'remote-admission-status-v1');
++      assert.equal(status.state, 'UNKNOWN');
++      assert.equal(status.blocking, true);
++      assert(status.diagnostics.some((item) => /record|malformed|symlink|canonical|evidence/i.test(`${item.code} ${item.message}`)));
++      const before = fs.lstatSync(record).isSymbolicLink() ? fs.readlinkSync(record) : fs.readFileSync(record, 'utf8');
++      const refused = call(fixture.root, 'claim', '--story', fixture.nextRel);
++      assert.notEqual(refused.status, 0);
++      assert.match(refused.stdout, /remote|unknown|integration|evidence|admission/i);
++      assert.equal(fs.lstatSync(record).isSymbolicLink() ? fs.readlinkSync(record) : fs.readFileSync(record, 'utf8'), before);
++    });
++  }
++});
++
++test('claim repeats remote admission inside its transaction before writing the story', (t) => {
++  const fixture = admissionProject(t);
++  const storyFile = path.join(fixture.root, ...fixture.nextRel.split('/'));
++  const beforeStory = fs.readFileSync(storyFile, 'utf8');
++  const recordDir = path.join(fixture.root, '.deliver/integrations');
++  const recordFile = path.join(recordDir, '33333333-3333-4333-8333-333333333333.json');
++  const originalOpen = fs.openSync;
++  let injected = false;
++  fs.openSync = function interceptedOpen(file, flags, ...rest) {
++    const fd = originalOpen.call(fs, file, flags, ...rest);
++    if (!injected && path.basename(String(file)) === 'current-pm.lock') {
++      injected = true;
++      fs.mkdirSync(recordDir, { recursive: true });
++      fs.writeFileSync(recordFile, '{remote evidence became applicable during claim\n');
++    }
++    return fd;
++  };
++  let refused = false;
++  try {
++    currentPmApi.claimCurrentPm(fixture.root, fixture.nextRel);
++  } catch (error) {
++    refused = /remote|admission|unknown|evidence|integration/i.test(error.message);
++  } finally {
++    fs.openSync = originalOpen;
++  }
++  const afterAttempt = fs.readFileSync(storyFile, 'utf8');
++  if (!refused) fs.writeFileSync(storyFile, beforeStory);
++  assert.equal(injected, true, 'fixture installs evidence only after the claim transaction lock is held');
++  assert.equal(refused, true, 'transaction rechecks remote admission after acquiring its lock');
++  assert.equal(afterAttempt, beforeStory, 'transaction-time refusal leaves story bytes unchanged');
++  assert.equal(fs.existsSync(path.join(fixture.root, '.deliver/current-pm-transaction.json')), false);
++});
+diff --git a/tests/operations.test.mjs b/tests/operations.test.mjs
+index 371df3c..6847604 100644
+--- a/tests/operations.test.mjs
++++ b/tests/operations.test.mjs
+@@ -149,3 +149,44 @@ test('installed planning templates preserve identifiers, scale choices and uncla
+   assert.match(shipping, /report-prepare[\s\S]*close-prepare[\s\S]*handoff-prepare/);
+   assert.match(shipping, /standing authority/);
+ });
++
++test('installed complete operation routes the native remote lifecycle without advertising low-level commands as operations', async () => {
++  const skill = await installedSkill();
++  const map = JSON.parse(read(skill, 'assets/operations.json'));
++  const complete = map.operations.filter((operation) => operation.name === 'complete');
++  assert.equal(complete.length, 1);
++  assert.equal(complete[0].reference, 'references/shipping.md');
++  assert.equal(complete[0].mutation.mode, 'delivery-write');
++  assert(complete[0].mutation.external.includes('verified-merge'));
++  assert.match(complete[0].mutation.external.join('\n'), /push/i);
++  assert.match(complete[0].mutation.external.join('\n'), /pull.?request/i);
++  assert.equal(map.operations.some((operation) => operation.name.startsWith('remote-')), false,
++    'low-level PM commands must remain implementation details of complete');
++
++  const shipping = read(skill, 'references/shipping.md');
++  for (const command of [
++    'remote-source-publish',
++    'remote-source-readiness',
++    'remote-source-merge',
++    'remote-source-reconcile',
++    'remote-evidence-prepare',
++    'remote-evidence-finalize',
++    'remote-closure-checkout-prepare',
++    'remote-closure-checkout-adopt',
++    'remote-report-prepare',
++    'remote-close-prepare',
++    'remote-handoff-prepare',
++    'remote-closure-publish',
++    'remote-closure-reconcile',
++    'remote-handoff-repair-prepare',
++    'remote-handoff-repair-adopt',
++    'remote-handoff-repair-publish',
++    'remote-handoff-repair-reconcile',
++    'remote-completion-prepare',
++    'remote-completion-adopt',
++  ]) assert.match(shipping, new RegExp(`\\b${command}\\b`), `${command} is missing from native shipping guidance`);
++  assert.match(shipping, /merge commit|merge method|MERGE_METHOD_UNSUPPORTED/i);
++  assert.match(shipping, /LOCAL_ADOPTION_PENDING|local adoption pending/i);
++  assert.match(shipping, /standing authority/i);
++  assert.doesNotMatch(shipping, /--admin|--auto|--force|--delete-branch/);
++});
+diff --git a/tests/remote.test.mjs b/tests/remote.test.mjs
+index 3901298..4ba0028 100644
+--- a/tests/remote.test.mjs
++++ b/tests/remote.test.mjs
+@@ -138,6 +138,14 @@ function assertNoUnsafeArgs(calls) {
+   }
+ }
+ 
++function assertReconciliationReadOnly(fixture) {
++  assert.equal(fixture.bodies.length, 0);
++  assert.equal(fixture.calls.some((call) => call.file === 'git' && ['push', 'config'].includes(call.args[0])), false);
++  assert.equal(fixture.calls.some((call) => call.file === 'gh' && call.args[0] === 'pr'
++    && ['create', 'edit', 'ready', 'merge'].includes(call.args[1])), false);
++  assertNoUnsafeArgs(fixture.calls);
++}
++
+ function withRelativeTmpdirAndRestrictiveUmask(callback) {
+   const originalCwd = process.cwd();
+   const originalUmask = process.umask();
+@@ -176,7 +184,8 @@ function assertProtectedBody(body, temporaryBase, call) {
+ 
+ test('exports a closed protocol and rejects invalid caller input with shared DeliverError', (t) => {
+   assert.deepEqual(GITHUB_REMOTE_STAGES, ['preflight', 'lookup', 'publish', 'checks', 'merge', 'postmerge']);
+-  for (const state of ['UNAVAILABLE', 'REMOTE_AMBIGUOUS', 'PR_LOOKUP_FAILED', 'PUBLISHED', 'READY', 'MERGED']) {
++  for (const state of ['UNAVAILABLE', 'REMOTE_AMBIGUOUS', 'PR_LOOKUP_FAILED', 'PUBLISHED', 'READY',
++    'MERGED', 'MERGED_BASE_ADVANCED', 'UNKNOWN']) {
+     assert(GITHUB_REMOTE_STATES.includes(state));
+   }
+   const f = fixture(t);
+@@ -569,3 +578,102 @@ test('merge never reports completion for refusal, queueing, changed head or remo
+     prNumber: 17, method: 'merge', subject: 'Merge', body: '',
+   }).state, 'MERGE_MISMATCH');
+ });
++
++test('reconcileMerged proves exact or advanced merges read-only and keeps pending, unknown and provider failures distinct', async (t) => {
++  const api = fixture(t);
++  assert.equal(typeof api.adapter.reconcileMerged, 'function', 'adapter must expose read-only merged reconciliation');
++
++  await t.test('exact merged result survives a deleted remote head branch', () => {
++    const f = fixture(t);
++    f.state.merged = true;
++    const result = f.adapter.reconcileMerged(f.target, { prNumber: 17 });
++    assert.equal(result.state, 'MERGED');
++    assert.equal(result.expectedHead, HEAD);
++    assert.equal(result.mergeCommit, MERGE);
++    assert.equal(result.remoteBase, MERGE);
++    assert.equal(f.calls.some((call) => call.file === 'git' && call.args[0] === 'ls-remote'
++      && call.args.includes('refs/heads/pm/S1-1-value')), false,
++    'reconciliation must not require the deleted remote source branch');
++    assertReconciliationReadOnly(f);
++  });
++
++  await t.test('advanced remote base retains both proven OIDs', () => {
++    const f = fixture(t, {
++      onRun(request) {
++        if (request.file === 'git' && request.args[0] === 'ls-remote') {
++          return response(0, `${OLD_HEAD}\trefs/heads/main\n`);
++        }
++      },
++    });
++    f.state.merged = true;
++    const result = f.adapter.reconcileMerged(f.target, { prNumber: 17 });
++    assert.equal(result.state, 'MERGED_BASE_ADVANCED');
++    assert.equal(result.expectedHead, HEAD);
++    assert.equal(result.mergeCommit, MERGE);
++    assert.equal(result.remoteBase, OLD_HEAD);
++    assertReconciliationReadOnly(f);
++  });
++
++  for (const [label, onRun] of [
++    ['open pull request', undefined],
++    ['queued pull request', (request, state) => {
++      if (request.file === 'gh' && request.args[0] === 'pr' && request.args[1] === 'view') {
++        return response(0, JSON.stringify(pr(state, { mergeStateStatus: 'QUEUED' })));
++      }
++    }],
++  ]) {
++    await t.test(label, () => {
++      const f = fixture(t, { onRun });
++      const result = f.adapter.reconcileMerged(f.target, { prNumber: 17 });
++      assert.equal(result.state, 'MERGE_PENDING');
++      assert.equal(result.expectedHead, HEAD);
++      assertReconciliationReadOnly(f);
++    });
++  }
++
++  for (const [label, configure] of [
++    ['missing merge commit', (f) => { f.state.merged = true; f.state.mergeOid = null; }],
++    ['malformed merge commit', (f) => { f.state.merged = true; f.state.mergeOid = 'short'; }],
++    ['missing remote base', (f) => { f.state.merged = true; }],
++  ]) {
++    await t.test(label, () => {
++      const options = label === 'missing remote base' ? {
++        onRun(request) {
++          if (request.file === 'git' && request.args[0] === 'ls-remote') return response(0, '');
++        },
++      } : {};
++      const f = fixture(t, options);
++      configure(f);
++      const result = f.adapter.reconcileMerged(f.target, { prNumber: 17 });
++      assert.equal(result.state, 'UNKNOWN');
++      assert.equal(result.expectedHead, HEAD);
++      assertReconciliationReadOnly(f);
++    });
++  }
++
++  await t.test('authentication failure stays distinct', () => {
++    const f = fixture(t, {
++      onRun(request) {
++        if (request.file === 'gh' && request.args[0] === 'auth') return response(1, '', 'secret auth detail');
++      },
++    });
++    const result = f.adapter.reconcileMerged(f.target, { prNumber: 17 });
++    assert.equal(result.state, 'AUTH_REQUIRED');
++    assert.equal(JSON.stringify(result).includes('secret auth detail'), false);
++    assertReconciliationReadOnly(f);
++  });
++
++  await t.test('provider lookup failure stays distinct', () => {
++    const f = fixture(t, {
++      onRun(request) {
++        if (request.file === 'gh' && request.args[0] === 'pr' && request.args[1] === 'view') {
++          return response(1, '', 'secret lookup detail');
++        }
++      },
++    });
++    const result = f.adapter.reconcileMerged(f.target, { prNumber: 17 });
++    assert.equal(result.state, 'PR_LOOKUP_FAILED');
++    assert.equal(JSON.stringify(result).includes('secret lookup detail'), false);
++    assertReconciliationReadOnly(f);
++  });
++});

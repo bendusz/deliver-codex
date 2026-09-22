@@ -1,0 +1,13 @@
+{
+  "at": "2026-09-13T07:45:44.732401+00:00",
+  "approved_by": "Ben",
+  "instruction": "ok, was the task done? can you follow up if everything done, committed, run, code reviewed by fable 5.1 on high effort, then PR'd and merged?",
+  "scope": "Continue approved upstream parity implementation, recover interrupted work transparently, run declared checks, obtain fresh project-scoped Claude Fable5.1 high-effort code review, update existing PR2 and merge only after verified completion.",
+  "external_review": {
+    "requested_model": "claude-fable-5-1",
+    "effort": "high",
+    "authorization": "Explicit user request for this project. Prepare bounded exact source/spec packets; preserve results and do not silently substitute models."
+  },
+  "git_authority": "Scoped commits, pushes, PR creation/updates and verified merge authorized; builders do not perform integration.",
+  "execution": "Sandboxing remains opt-in. Persistent worktrees outside temporary directories."
+}

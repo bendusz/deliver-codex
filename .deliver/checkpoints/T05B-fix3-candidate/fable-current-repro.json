@@ -1,0 +1,9 @@
+{
+  "kind": "Coordinator defect reproduction, not declared gate or acceptance PASS",
+  "command": "node --test /Users/ben/code/pm-skill-codex-worktrees/coordinator/fable-current-repro.test.mjs",
+  "exit_code": 0,
+  "duration_ms": 10919.258833,
+  "snapshot": "232f5d3e1c04cf155b6b0c96f85f988dec93c9588f6a2a70a2b9d7ef165a88d2",
+  "assertions": "Both current failures reproduced using genuine disposable Git source fixture and fake provider; no production or authoritative test changes.",
+  "log_sha256": "f4e1910db93598ea56365f96ded451f69e685b8375850d6ea0b943f18af11e18"
+}

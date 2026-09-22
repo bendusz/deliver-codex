@@ -1,0 +1,60 @@
+diff --git a/Users/ben/code/pm-skill-codex/.deliver/checkpoints/T05B-fix2-tests/tests/remote-lifecycle.test.mjs b/Users/ben/code/pm-skill-codex-worktrees/t05b-delivery/tests/remote-lifecycle.test.mjs
+index 5432e40..688745a 100644
+--- a/Users/ben/code/pm-skill-codex/.deliver/checkpoints/T05B-fix2-tests/tests/remote-lifecycle.test.mjs
++++ b/Users/ben/code/pm-skill-codex-worktrees/t05b-delivery/tests/remote-lifecycle.test.mjs
+@@ -2524,19 +2524,53 @@ test('raced closure preserves concurrent integration bytes and repairs only the
+   assert.equal(currentPmApi.remoteAdmissionStatus(fixture.integration).state, 'COMPLETE');
+   const exactRepairProofBytes = fs.readFileSync(complete.file, 'utf8');
+   const retainedRepair = complete.record.remote.handoff_repair.attempts.at(-1);
++  const retainedRepairMerge = retainedRepair.publication.merge;
++  const retainedRepairEffectAttempt = retainedRepairMerge.attempts.find((attempt) => (
++    attempt.identity === retainedRepairMerge.effect.attempt_identity));
++  const retainedRepairEffectResult = retainedRepairEffectAttempt.transitions.find((transition) => (
++    transition.state === 'observed'
++      && transition.result_identity === retainedRepairMerge.effect.result_identity)).result;
+   assert.equal(complete.record.remote.handoff_repair.proof.pr_number, fake.state.prNumber);
+   assert.equal(retainedRepair.publication.merge.attempts.at(-1).input.prNumber, fake.state.prNumber);
++  assert.equal(retainedRepairEffectResult.pr.number, fake.state.prNumber);
++  assert.equal(retainedRepairEffectResult.mergeCommit, s);
++  const wrongRepairPr = fake.state.prNumber + 1;
++  let wrongRepairPrResponse = null;
++  const wrongRepairPrProvider = {
++    ...fake.provider,
++    reconcileMerged(target, options) {
++      const retained = fake.provider.reconcileMerged(target, options);
++      wrongRepairPrResponse = {
++        ...retained,
++        pr: {
++          ...retained.pr,
++          number: options.prNumber,
++          url: `https://github.example.test/Example/Project/pull/${options.prNumber}`,
++        },
++      };
++      return wrongRepairPrResponse;
++    },
++  };
+   const providerWritesBeforeWrongPr = repairMergeWrites;
+   let wrongRepairPrRefused = false;
+   try {
+     integrationApi.reconcileRemoteHandoffRepair(complete.file, {
+-      expectedRecordHash: complete.hash, prNumber: fake.state.prNumber + 1,
+-      provider: fake.provider, fetchRemote: fetchFromFixture(fixture, flow.fetchCalls),
++      expectedRecordHash: complete.hash, prNumber: wrongRepairPr,
++      provider: wrongRepairPrProvider, fetchRemote: fetchFromFixture(fixture, flow.fetchCalls),
+     }, fixture.integration);
+   } catch (error) {
+     wrongRepairPrRefused = /pull request|pr number|provider|effect|binding|identity|retained/i.test(error.message);
+   }
+   const wrongRepairPrBytes = fs.readFileSync(complete.file, 'utf8');
++  if (wrongRepairPrResponse) {
++    assert.equal(wrongRepairPrResponse.pr.number, wrongRepairPr);
++    assert.equal(wrongRepairPrResponse.pr.url,
++      `https://github.example.test/Example/Project/pull/${wrongRepairPr}`);
++    assert.equal(wrongRepairPrResponse.mergeCommit, s);
++    assert.equal(wrongRepairPrResponse.remoteBase, s);
++    assert.equal(wrongRepairPrResponse.expectedHead, retainedRepair.commit);
++    assert.deepEqual(wrongRepairPrResponse.repository, retainedRepairEffectResult.repository);
++  }
+   if (!wrongRepairPrRefused) fs.writeFileSync(complete.file, exactRepairProofBytes);
+   assert.equal(wrongRepairPrRefused, true,
+     'repair reconciliation PR Y must not rebind the retained exact-S merge effect for PR X');

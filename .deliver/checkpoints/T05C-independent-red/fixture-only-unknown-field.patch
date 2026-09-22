@@ -1,0 +1,13 @@
+--- initial-red-test
++++ fixture-corrected-test
+@@ -94,6 +94,10 @@
+   git(root, 'add', 'docs/approval.json');
+   git(root, 'commit', '-qm', 'Approve plan');
+   assert.equal(pm('claim', '--story', storyRel).status, 0);
++  const claimed = readStory(root, storyRel);
++  fs.writeFileSync(path.join(root, storyRel), replaceStoryExecution(claimed, {
++    retained_unknown: 'older-I-value',
++  }).after);
+   git(root, 'add', storyRel);
+   git(root, 'commit', '-qm', 'Claim source story');
+   git(root, 'checkout', '-qb', 'pm/S1-1-value');

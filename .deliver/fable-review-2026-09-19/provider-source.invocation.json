@@ -1,0 +1,27 @@
+{
+  "model": "claude-fable-5-1",
+  "effort": "high",
+  "effort_environment": {
+    "CLAUDE_CODE_EFFORT_LEVEL": "high"
+  },
+  "argv": [
+    "node",
+    "/Users/ben/code/pm-skill-codex/plugins/deliver/skills/deliver/scripts/claude-review.mjs",
+    "--input",
+    "/Users/ben/code/pm-skill-codex/.deliver/fable-review-2026-09-19/packet-provider-source.json",
+    "--out",
+    "/Users/ben/code/pm-skill-codex/.deliver/fable-review-2026-09-19/provider-source.receipt.json",
+    "--model",
+    "claude-fable-5-1",
+    "--timeout-seconds",
+    "900",
+    "--allow-external"
+  ],
+  "packet_sha256": "ec699ace2c25e5dcfc750b8f56a826bd539f4ce572c761f888842016545cfe1e",
+  "started_at": "2026-09-19T11:07:50.254304+00:00",
+  "attempt": 1,
+  "exit_code": 0,
+  "finished_at": "2026-09-19T11:12:03.170551+00:00",
+  "log_sha256": "a49bf0f4ab7a4135ddb1084d8ac88b3721fa061660c224f8909a737edebf7304",
+  "receipt_sha256": "37dd5b4dbf126b365234cf30dba0946b015baa86e521eaa5826b9f8514c6ff2c"
+}

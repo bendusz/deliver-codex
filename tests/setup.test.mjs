@@ -72,12 +72,27 @@ test("refuses a symlink in an existing destination parent", async (t) => {
 test("launch arguments keep prompt characters in one argv value", () => {
   const args = buildLaunchArgs({ projectDir: "/tmp/project", prompt: ["hello", "$(touch", "owned);", "&&", "echo", "x"] });
   assert.deepEqual(args, [
-    "-C", "/tmp/project", "-m", "gpt-6-astra",
+    "-C", "/tmp/project",
+    "--sandbox", "danger-full-access",
+    "--ask-for-approval", "never",
+    "-m", "gpt-6-astra",
     "-c", 'model_reasoning_effort="high"',
     "-c", 'agents.default_subagent_model="gpt-5.6-sol"',
     "-c", 'agents.default_subagent_reasoning_effort="high"',
     "$deliver hello $(touch owned); && echo x",
   ]);
+});
+
+test("launch arguments opt into a supported sandbox with interactive approval", () => {
+  const args = buildLaunchArgs({ projectDir: "/tmp/project", sandbox: "workspace-write" });
+  assert.deepEqual(args.slice(2, 6), [
+    "--sandbox", "workspace-write",
+    "--ask-for-approval", "on-request",
+  ]);
+  assert.throws(
+    () => buildLaunchArgs({ projectDir: "/tmp/project", sandbox: "unrestricted" }),
+    /Invalid sandbox mode/,
+  );
 });
 
 test("launcher passes injection-looking prompts as literal argv data", async () => {

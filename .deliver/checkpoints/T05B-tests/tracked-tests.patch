@@ -1,0 +1,304 @@
+diff --git a/tests/current-roundtrip.test.mjs b/tests/current-roundtrip.test.mjs
+index 05fcbec..6d58651 100644
+--- a/tests/current-roundtrip.test.mjs
++++ b/tests/current-roundtrip.test.mjs
+@@ -1,8 +1,16 @@
+ import assert from 'node:assert/strict';
++import { spawnSync, execFileSync } from 'node:child_process';
++import fs from 'node:fs';
++import os from 'node:os';
++import path from 'node:path';
+ import { test } from 'node:test';
++import { fileURLToPath } from 'node:url';
+ import { parseExec as upstreamExecution } from './fixtures/upstream-v0.25.1/hooks/lib.mjs';
+ import { parseStory, replaceStoryExecution } from '../plugins/deliver/skills/deliver/scripts/lib/story.mjs';
+ 
++const currentPmApi = await import('../plugins/deliver/skills/deliver/scripts/lib/current-pm.mjs');
++const pmCli = fileURLToPath(new URL('../plugins/deliver/skills/deliver/scripts/pm.mjs', import.meta.url));
++
+ const rel = 'docs/stories/S2-3-roundtrip.md';
+ const contract = [
+   '# S2-3: Round trip',
+@@ -15,6 +23,49 @@ const contract = [
+   '',
+ ].join('\n');
+ 
++function git(root, ...args) {
++  return execFileSync('git', ['-C', root, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trimEnd();
++}
++
++function write(root, relative, value) {
++  const file = path.join(root, ...relative.split('/'));
++  fs.mkdirSync(path.dirname(file), { recursive: true });
++  fs.writeFileSync(file, value);
++  return file;
++}
++
++function call(root, ...args) {
++  const result = spawnSync(process.execPath, [pmCli, ...args], { cwd: root, encoding: 'utf8' });
++  let json = null;
++  try { json = JSON.parse(result.stdout); } catch {}
++  return { ...result, json };
++}
++
++function admissionProject(t) {
++  const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'deliver-remote-admission-')));
++  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
++  git(root, 'init', '-q', '--initial-branch=main');
++  git(root, 'config', 'user.name', 'Casey Example');
++  git(root, 'config', 'user.email', 'casey@example.invalid');
++  assert.equal(call(root, 'init').status, 0);
++  write(root, 'docs/plan.md', '# Plan\n\n## Delivery mode\n- Scale: standard\n- Checkpoint policy: story-level\n- Integration branch: main\n- Skeleton: none\n');
++  const merged = replaceStoryExecution(parseStory(contract, rel), {
++    owner: 'casey-abcdef123456', builder: 'codex-builder', branch: 'pm/S2-3-roundtrip',
++    status: 'merged', rounds: 1, retries: 0, updated: '2026-09-10 13:00',
++  }, { note: '2026-09-10 13:00 integrated' });
++  write(root, rel, merged.after);
++  const nextRel = 'docs/stories/S2-4-next.md';
++  write(root, nextRel, contract.replaceAll('S2-3', 'S2-4').replace('Round trip', 'Next story'));
++  write(root, 'src/value.txt', 'imported completion\n');
++  git(root, 'add', 'docs', 'src');
++  git(root, 'commit', '-qm', 'Import upstream merged story');
++  const approved = call(root, 'approve', '--approver', 'Ben');
++  assert.equal(approved.status, 0, approved.stdout);
++  git(root, 'add', 'docs/approval.json');
++  git(root, 'commit', '-qm', 'Approve imported project');
++  return { root, nextRel };
++}
++
+ test('upstream Execution is accepted and Codex closure remains readable upstream', () => {
+   const upstream = `${contract}## Execution\n<!-- pm-exec: {"owner":"casey-abcdef123456","builder":"codex-builder","branch":"pm/S2-3-roundtrip","status":"in-review","rounds":2,"retries":1,"updated":"2026-09-10 12:00","host_note":"keep"} -->\n`;
+   const document = parseStory(upstream, rel);
+@@ -40,3 +91,51 @@ test('Codex Execution accepts an upstream boundary update without losing identit
+   assert.equal(document.execution.status, 'building');
+   assert.equal(document.contractHash, claimed.contractHash);
+ });
++
++test('native remote admission preserves imported completion and fails closed on malformed local evidence', async (t) => {
++  assert.equal(typeof currentPmApi.remoteAdmissionStatus, 'function',
++    'current PM must export the native remote admission projection');
++
++  await t.test('imported upstream merged story remains clear without a native remote record', () => {
++    const fixture = admissionProject(t);
++    const status = currentPmApi.remoteAdmissionStatus(fixture.root);
++    assert.equal(status.version, 'remote-admission-status-v1');
++    assert.equal(status.state, 'CLEAR');
++    assert.equal(status.blocking, false);
++    assert.equal(status.integration_branch, 'main');
++    assert.equal(status.integration_record, null);
++    assert.deepEqual(status.diagnostics, []);
++    const projected = call(fixture.root, 'status');
++    assert.equal(projected.status, 0, projected.stdout);
++    assert.deepEqual(projected.json.remote, status);
++    const claimed = call(fixture.root, 'claim', '--story', fixture.nextRel);
++    assert.equal(claimed.status, 0, claimed.stdout);
++    assert.equal(claimed.json.resumed, false);
++  });
++
++  for (const kind of ['malformed regular record', 'symlinked record']) {
++    await t.test(kind, () => {
++      const fixture = admissionProject(t);
++      const integrations = path.join(fixture.root, '.deliver/integrations');
++      fs.mkdirSync(integrations, { recursive: true });
++      const record = path.join(integrations, '11111111-1111-4111-8111-111111111111.json');
++      if (kind === 'symlinked record') {
++        const outside = write(path.dirname(fixture.root), `${path.basename(fixture.root)}-outside.json`, '{}\n');
++        t.after(() => fs.rmSync(outside, { force: true }));
++        fs.symlinkSync(outside, record);
++      } else {
++        fs.writeFileSync(record, '{not json\n');
++      }
++      const status = currentPmApi.remoteAdmissionStatus(fixture.root);
++      assert.equal(status.version, 'remote-admission-status-v1');
++      assert.equal(status.state, 'UNKNOWN');
++      assert.equal(status.blocking, true);
++      assert(status.diagnostics.some((item) => /record|malformed|symlink|canonical|evidence/i.test(`${item.code} ${item.message}`)));
++      const before = fs.lstatSync(record).isSymbolicLink() ? fs.readlinkSync(record) : fs.readFileSync(record, 'utf8');
++      const refused = call(fixture.root, 'claim', '--story', fixture.nextRel);
++      assert.notEqual(refused.status, 0);
++      assert.match(refused.stdout, /remote|unknown|integration|evidence|admission/i);
++      assert.equal(fs.lstatSync(record).isSymbolicLink() ? fs.readlinkSync(record) : fs.readFileSync(record, 'utf8'), before);
++    });
++  }
++});
+diff --git a/tests/operations.test.mjs b/tests/operations.test.mjs
+index 371df3c..6847604 100644
+--- a/tests/operations.test.mjs
++++ b/tests/operations.test.mjs
+@@ -149,3 +149,44 @@ test('installed planning templates preserve identifiers, scale choices and uncla
+   assert.match(shipping, /report-prepare[\s\S]*close-prepare[\s\S]*handoff-prepare/);
+   assert.match(shipping, /standing authority/);
+ });
++
++test('installed complete operation routes the native remote lifecycle without advertising low-level commands as operations', async () => {
++  const skill = await installedSkill();
++  const map = JSON.parse(read(skill, 'assets/operations.json'));
++  const complete = map.operations.filter((operation) => operation.name === 'complete');
++  assert.equal(complete.length, 1);
++  assert.equal(complete[0].reference, 'references/shipping.md');
++  assert.equal(complete[0].mutation.mode, 'delivery-write');
++  assert(complete[0].mutation.external.includes('verified-merge'));
++  assert.match(complete[0].mutation.external.join('\n'), /push/i);
++  assert.match(complete[0].mutation.external.join('\n'), /pull.?request/i);
++  assert.equal(map.operations.some((operation) => operation.name.startsWith('remote-')), false,
++    'low-level PM commands must remain implementation details of complete');
++
++  const shipping = read(skill, 'references/shipping.md');
++  for (const command of [
++    'remote-source-publish',
++    'remote-source-readiness',
++    'remote-source-merge',
++    'remote-source-reconcile',
++    'remote-evidence-prepare',
++    'remote-evidence-finalize',
++    'remote-closure-checkout-prepare',
++    'remote-closure-checkout-adopt',
++    'remote-report-prepare',
++    'remote-close-prepare',
++    'remote-handoff-prepare',
++    'remote-closure-publish',
++    'remote-closure-reconcile',
++    'remote-handoff-repair-prepare',
++    'remote-handoff-repair-adopt',
++    'remote-handoff-repair-publish',
++    'remote-handoff-repair-reconcile',
++    'remote-completion-prepare',
++    'remote-completion-adopt',
++  ]) assert.match(shipping, new RegExp(`\\b${command}\\b`), `${command} is missing from native shipping guidance`);
++  assert.match(shipping, /merge commit|merge method|MERGE_METHOD_UNSUPPORTED/i);
++  assert.match(shipping, /LOCAL_ADOPTION_PENDING|local adoption pending/i);
++  assert.match(shipping, /standing authority/i);
++  assert.doesNotMatch(shipping, /--admin|--auto|--force|--delete-branch/);
++});
+diff --git a/tests/remote.test.mjs b/tests/remote.test.mjs
+index 3901298..4ba0028 100644
+--- a/tests/remote.test.mjs
++++ b/tests/remote.test.mjs
+@@ -138,6 +138,14 @@ function assertNoUnsafeArgs(calls) {
+   }
+ }
+ 
++function assertReconciliationReadOnly(fixture) {
++  assert.equal(fixture.bodies.length, 0);
++  assert.equal(fixture.calls.some((call) => call.file === 'git' && ['push', 'config'].includes(call.args[0])), false);
++  assert.equal(fixture.calls.some((call) => call.file === 'gh' && call.args[0] === 'pr'
++    && ['create', 'edit', 'ready', 'merge'].includes(call.args[1])), false);
++  assertNoUnsafeArgs(fixture.calls);
++}
++
+ function withRelativeTmpdirAndRestrictiveUmask(callback) {
+   const originalCwd = process.cwd();
+   const originalUmask = process.umask();
+@@ -176,7 +184,8 @@ function assertProtectedBody(body, temporaryBase, call) {
+ 
+ test('exports a closed protocol and rejects invalid caller input with shared DeliverError', (t) => {
+   assert.deepEqual(GITHUB_REMOTE_STAGES, ['preflight', 'lookup', 'publish', 'checks', 'merge', 'postmerge']);
+-  for (const state of ['UNAVAILABLE', 'REMOTE_AMBIGUOUS', 'PR_LOOKUP_FAILED', 'PUBLISHED', 'READY', 'MERGED']) {
++  for (const state of ['UNAVAILABLE', 'REMOTE_AMBIGUOUS', 'PR_LOOKUP_FAILED', 'PUBLISHED', 'READY',
++    'MERGED', 'MERGED_BASE_ADVANCED', 'UNKNOWN']) {
+     assert(GITHUB_REMOTE_STATES.includes(state));
+   }
+   const f = fixture(t);
+@@ -569,3 +578,102 @@ test('merge never reports completion for refusal, queueing, changed head or remo
+     prNumber: 17, method: 'merge', subject: 'Merge', body: '',
+   }).state, 'MERGE_MISMATCH');
+ });
++
++test('reconcileMerged proves exact or advanced merges read-only and keeps pending, unknown and provider failures distinct', async (t) => {
++  const api = fixture(t);
++  assert.equal(typeof api.adapter.reconcileMerged, 'function', 'adapter must expose read-only merged reconciliation');
++
++  await t.test('exact merged result survives a deleted remote head branch', () => {
++    const f = fixture(t);
++    f.state.merged = true;
++    const result = f.adapter.reconcileMerged(f.target, { prNumber: 17 });
++    assert.equal(result.state, 'MERGED');
++    assert.equal(result.expectedHead, HEAD);
++    assert.equal(result.mergeCommit, MERGE);
++    assert.equal(result.remoteBase, MERGE);
++    assert.equal(f.calls.some((call) => call.file === 'git' && call.args[0] === 'ls-remote'
++      && call.args.includes('refs/heads/pm/S1-1-value')), false,
++    'reconciliation must not require the deleted remote source branch');
++    assertReconciliationReadOnly(f);
++  });
++
++  await t.test('advanced remote base retains both proven OIDs', () => {
++    const f = fixture(t, {
++      onRun(request) {
++        if (request.file === 'git' && request.args[0] === 'ls-remote') {
++          return response(0, `${OLD_HEAD}\trefs/heads/main\n`);
++        }
++      },
++    });
++    f.state.merged = true;
++    const result = f.adapter.reconcileMerged(f.target, { prNumber: 17 });
++    assert.equal(result.state, 'MERGED_BASE_ADVANCED');
++    assert.equal(result.expectedHead, HEAD);
++    assert.equal(result.mergeCommit, MERGE);
++    assert.equal(result.remoteBase, OLD_HEAD);
++    assertReconciliationReadOnly(f);
++  });
++
++  for (const [label, onRun] of [
++    ['open pull request', undefined],
++    ['queued pull request', (request, state) => {
++      if (request.file === 'gh' && request.args[0] === 'pr' && request.args[1] === 'view') {
++        return response(0, JSON.stringify(pr(state, { mergeStateStatus: 'QUEUED' })));
++      }
++    }],
++  ]) {
++    await t.test(label, () => {
++      const f = fixture(t, { onRun });
++      const result = f.adapter.reconcileMerged(f.target, { prNumber: 17 });
++      assert.equal(result.state, 'MERGE_PENDING');
++      assert.equal(result.expectedHead, HEAD);
++      assertReconciliationReadOnly(f);
++    });
++  }
++
++  for (const [label, configure] of [
++    ['missing merge commit', (f) => { f.state.merged = true; f.state.mergeOid = null; }],
++    ['malformed merge commit', (f) => { f.state.merged = true; f.state.mergeOid = 'short'; }],
++    ['missing remote base', (f) => { f.state.merged = true; }],
++  ]) {
++    await t.test(label, () => {
++      const options = label === 'missing remote base' ? {
++        onRun(request) {
++          if (request.file === 'git' && request.args[0] === 'ls-remote') return response(0, '');
++        },
++      } : {};
++      const f = fixture(t, options);
++      configure(f);
++      const result = f.adapter.reconcileMerged(f.target, { prNumber: 17 });
++      assert.equal(result.state, 'UNKNOWN');
++      assert.equal(result.expectedHead, HEAD);
++      assertReconciliationReadOnly(f);
++    });
++  }
++
++  await t.test('authentication failure stays distinct', () => {
++    const f = fixture(t, {
++      onRun(request) {
++        if (request.file === 'gh' && request.args[0] === 'auth') return response(1, '', 'secret auth detail');
++      },
++    });
++    const result = f.adapter.reconcileMerged(f.target, { prNumber: 17 });
++    assert.equal(result.state, 'AUTH_REQUIRED');
++    assert.equal(JSON.stringify(result).includes('secret auth detail'), false);
++    assertReconciliationReadOnly(f);
++  });
++
++  await t.test('provider lookup failure stays distinct', () => {
++    const f = fixture(t, {
++      onRun(request) {
++        if (request.file === 'gh' && request.args[0] === 'pr' && request.args[1] === 'view') {
++          return response(1, '', 'secret lookup detail');
++        }
++      },
++    });
++    const result = f.adapter.reconcileMerged(f.target, { prNumber: 17 });
++    assert.equal(result.state, 'PR_LOOKUP_FAILED');
++    assert.equal(JSON.stringify(result).includes('secret lookup detail'), false);
++    assertReconciliationReadOnly(f);
++  });
++});

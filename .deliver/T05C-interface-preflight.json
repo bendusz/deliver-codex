@@ -1,0 +1,15 @@
+{
+  "scope": "Interface clarification for already-approved T05C before task baseline or implementation",
+  "plan": "docs/plans/2026-09-09-upstream-parity.md",
+  "contract": "docs/plans/parity-contracts/integration-correction-interface.md",
+  "reviewer": "/root/state_architecture",
+  "decisions": [
+    "Bind inherited open findings as origin-identified multiset and require resolved matches, including minors as the original contract requires.",
+    "Separate immutable journal descriptor from its starting-record-hash wrapper to avoid self-referential hashes. Generated run/story images bind only immutable token/basis/root lineage.",
+    "Retain exact descriptor or complete deterministic reconstruction bytes, baseline and timestamps for starting-before-journal recovery.",
+    "Use a dedicated correction journal; reject coexisting journal types and third-state files unchanged.",
+    "MAX across all credible lineage counters; increment fixes only, preserve retries/corrections MAX; reject exhausted limits before token mutation.",
+    "Qualifying review/verification failures require valid actors; a gate-only failure does not require absent actors."
+  ],
+  "status": "Design preflight issues resolved before implementation; no T05C runtime attempts spent."
+}

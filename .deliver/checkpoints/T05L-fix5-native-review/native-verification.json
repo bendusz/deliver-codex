@@ -1,0 +1,29 @@
+{
+  "criteria": [
+    {
+      "id": "T05L-AC1",
+      "status": "FAIL",
+      "evidence": "The normal current completion path still requires a verifier distinct from builder, top reviewer and every panel member, validates real M, and retains identity/counters. But legacy integrate-reconcile can restore older PASS evidence despite a newer valid FAIL gate at the same M/snapshot, after which E can record merged Execution. Thus the universal verified-evidence condition is not satisfied."
+    },
+    {
+      "id": "T05L-AC2",
+      "status": "PASS",
+      "evidence": "The frozen finalization removes later-process environment dependence; fresh-process P-to-E continuation and closure-only continuation pass, current/upstream roundtrips remain covered, and H retains the verified BASE_COMMIT topology. The separate advanced-I reprepare and failed-no-M correction gaps are explicitly assigned to T05B-AC2 and T05C by 02-integration.scope-disposition.json and are not T05L-AC2 failures."
+    },
+    {
+      "id": "T05L-AC3",
+      "status": "FAIL",
+      "evidence": "Normal large/regulated P preparation and adoption bind exact report/checklist bytes and P/E/H topology to the frozen finalization. The legacy repair path can nevertheless attach an older PASS finalization to an adopted P while ignoring a newer failing gate, then permit E/H; this can turn contradictory retained evidence into an unsupported PASS claim."
+    },
+    {
+      "id": "T05L-AC4",
+      "status": "FAIL",
+      "evidence": "Exact declared gates still execute against live verified M with durable bounded logs, C reuse remains constrained by exact source/C/M identities, and fresh M review/verification remains available for evidence-only drift. The bounded probe established that legacy reconciliation ignores a newer active FAIL gate when finalization_history names an older PASS receipt, so effective integration evidence is not always the honest result of the retained actual-M gates."
+    },
+    {
+      "id": "T05L-AC5",
+      "status": "PASS",
+      "evidence": "parseReviewReceipt now checks any nonempty top-level aggregate as an order-independent attributed multiset equal to member-derived findings, retaining duplicate multiplicity and normalized lens/reviewer attribution. Tests cover hidden/extra/missing/altered findings, mixed duplicate order, empty derive sentinel, normalized roundtrip and unchanged legacy no-panel receipts."
+    }
+  ]
+}

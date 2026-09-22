@@ -1,0 +1,11 @@
+{
+  "id": "greeting",
+  "objective": "Return a greeting for the supplied name",
+  "acceptance": [
+    { "id": "AC-1", "text": "greet('Ada') returns 'Hello, Ada!'" }
+  ],
+  "read_paths": ["AGENTS.md", "src/greet.mjs", "tests/greet.test.mjs"],
+  "touches": ["src/greet.mjs", "tests/greet.test.mjs"],
+  "commands": { "test": "node --test tests/greet.test.mjs" },
+  "specs": []
+}

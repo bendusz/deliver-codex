@@ -1,0 +1,63 @@
+▶ correction common core.worktree handling accepts the exact shared checkout and rejects retargeting unchanged
+  ✔ legitimate shared protected Git worktree (16565.511667ms)
+  ✖ fresh clone common config (12892.16125ms)
+  ✖ shared common config (12945.941708ms)
+✖ correction common core.worktree handling accepts the exact shared checkout and rejects retargeting unchanged (42467.783958ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 1
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 42506.336042
+
+✖ failing tests:
+
+test at ../pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe-v2.test.mjs:1594:13
+✖ fresh clone common config (12892.16125ms)
+  AssertionError [ERR_ASSERTION]: submodule ignore=all keeps the superproject operationally clean
+  + actual - expected
+  
+  + '?? vendor/dependency-administrative-sibling/'
+  - ''
+  
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe-v2.test.mjs:1624:14)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe-v2.test.mjs:1594:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '?? vendor/dependency-administrative-sibling/',
+    expected: '',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe-v2.test.mjs:1594:13
+✖ shared common config (12945.941708ms)
+  AssertionError [ERR_ASSERTION]: submodule ignore=all keeps the superproject operationally clean
+  + actual - expected
+  
+  + '?? vendor/dependency-administrative-sibling/'
+  - ''
+  
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe-v2.test.mjs:1624:14)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at TestContext.test (node:internal/test_runner/test:400:20)
+      at TestContext.<anonymous> (file:///Users/ben/code/pm-skill-codex-worktrees/coordinator/t05c-core-worktree-probe-v2.test.mjs:1594:13)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '?? vendor/dependency-administrative-sibling/',
+    expected: '',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

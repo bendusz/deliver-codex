@@ -1,0 +1,18 @@
+# Spec quality checklist: <Project>
+<!-- Write to docs/checklists/spec-quality.md only during an authorized checklist operation.
+Check a box only with evidence from docs/spec.md. Leave UNKNOWN unchecked and record remediation. -->
+
+- [ ] No unresolved `[NEEDS CLARIFICATION]` marker remains.
+  Evidence: <docs/spec.md:line, or missing evidence and remediation>
+- [ ] Every user story names the user, capability and intended outcome.
+  Evidence: <docs/spec.md:lines and reviewer judgment>
+- [ ] Every functional requirement has one stable `FR-` ID and a testable statement.
+  Evidence: <requirement IDs and docs/spec.md:lines>
+- [ ] Every acceptance criterion has one stable `AC-` ID and observable behavior.
+  Evidence: <criterion IDs, docs/spec.md:lines and reviewer judgment>
+- [ ] Success measures are measurable or explicitly identified as non-buildable business measures.
+  Evidence: <SM IDs and docs/spec.md:lines>
+- [ ] Assumptions, edge cases and failure behavior are explicit.
+  Evidence: <docs/spec.md:lines>
+- [ ] The spec states product intent without prescribing implementation or architecture.
+  Evidence: <reviewed sections and any required remediation>

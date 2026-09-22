@@ -1,0 +1,16 @@
+{
+  "scope": "Two independently confirmed fixture errors only; no production edits or formal acceptance.",
+  "run": "4fcd23c4-4b06-4a55-89ae-f2686bb3516f",
+  "revision": 7,
+  "fixes": 1,
+  "old_sha256": "07f22550b83fb5c82ec02347f0a0c9775b8406677b66f4cc53b879e1fdec7c98",
+  "new_sha256": "b1640d5153ffb8b0c184c264865a5a4ef3d0c30b7ffa747066806ec0840fe783",
+  "author": "/root/correction_regressions",
+  "agent_reported_checks": {
+    "syntax": "PASS",
+    "whitespace": "PASS",
+    "focused_tests": "not run"
+  },
+  "coordinator_inspection": "Exact two hunks inspected; explicit PR_ABSENT until successful repair publication, mode-only N blob compared to M. All refusal, count and recovery assertions retained.",
+  "builder_released": true
+}

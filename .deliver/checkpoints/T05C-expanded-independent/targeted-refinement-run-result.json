@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    "--test-name-pattern=failed-M qualification|fresh correction review|a genuine prior correction|correction start rejects dirty|correction start revalidates",
+    "tests/integration-correction.test.mjs"
+  ],
+  "test_sha256": "ce6e9db750659173a90de8c7d88cd00601d658e7aa8abb223b90ac877d482b44",
+  "exit_code": 0,
+  "elapsed_seconds": 287.35652525001206,
+  "log_sha256": "fca747d280b844883bac440eb05a841f2bcd585d7ae545c4c66bfe80e5d6ae5d"
+}

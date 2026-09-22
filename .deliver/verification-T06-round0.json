@@ -1,0 +1,19 @@
+{
+  "criteria": [
+    {
+      "id": "T06-AC1",
+      "status": "PASS",
+      "evidence": "Independent inspection found 27 named operations with explicit arguments, output shape, mutation paths/external authority and one resolving reference each. The entry routes operation lookup to references/operations.md, which directs the PM to read only the selected operation's reference. The installed-skill operation test and full exact-snapshot test gate passed."
+    },
+    {
+      "id": "T06-AC2",
+      "status": "FAIL",
+      "evidence": "The templates preserve US-, FR-, AC- and SM- IDs, require blocking clarifications to be resolved, and decomposition leaves stories unclaimed. Scale and execution mode are recorded independently. However, scale-profiles.md lines 24 and 28 impose per-merge pauses even when the user has already authorized scoped verified merges, and the reference does not say explicit user preferences override these defaults; therefore the current checkpoint policy is not valid for this approved project."
+    },
+    {
+      "id": "T06-AC3",
+      "status": "FAIL",
+      "evidence": "SKILL.md is 576 words, all routed operation/template paths resolve, and inspected files contain no Claude plugin-root or /deliver: registration assumptions. SKILL.md, planning.md and workflow.md grant standing PM Git/PR authority, but scale-profiles.md contradicts them by requiring story-level and high-risk merge pauses, violating the explicit no-repeated-permission plan policy. Exact-snapshot npm test and npm run validate gates passed but do not detect this contradiction."
+    }
+  ]
+}
